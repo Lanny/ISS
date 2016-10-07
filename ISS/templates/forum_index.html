@@ -1,16 +1,16 @@
-<!doctype html>
-<html>
-  <head>
-    <title>Forums</title>
-  </head>
-  <body>
-    <table>
-      {% for forum in forums %}
-      <tr>
-        <td>{{ forum.name }}</td>
-        <td>{{ forum.description }}</td>
-      </tr>
-      {% endfor %}
-    </table>
-  </body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}
+  {{ config.forum_name }} - Forums
+{% endblock %}
+
+{% block content %}
+  <table>
+    {% for forum in forums %}
+    <tr>
+      <td>{{ forum.name }}</td>
+      <td>{{ forum.description }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

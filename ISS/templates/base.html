@@ -1,0 +1,15 @@
+{% load staticfiles %}
+
+<!doctype html>
+<html>
+  <head>
+    <title>{% block title %}{% endblock %}</title>
+  </head>
+  <body>
+  <img src="{% static banner %}" >
+    {% block content %}
+      Base Template.
+    {% endblock %}
+  </body>
+</html>
+
