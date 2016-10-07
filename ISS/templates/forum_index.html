@@ -6,10 +6,21 @@
 
 {% block content %}
   <table>
+    <tr>
+      <th>New</th>
+      <th>Forum</th>
+      <th>Threads</th>
+      <th>Posts</th>
+    </tr>
     {% for forum in forums %}
     <tr>
-      <td>{{ forum.name }}</td>
-      <td>{{ forum.description }}</td>
+      <td></td>
+      <td>
+        <a class="forum-name">{{ forum.name }}</a>
+        <span class="forum-description">{{ forum.description }}</a>
+      </td>
+      <td>{{ forum.get_thread_count }}</td>
+      <td>{{ forum.get_post_count }}</td>
     </tr>
     {% endfor %}
   </table>

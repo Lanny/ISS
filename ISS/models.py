@@ -25,6 +25,12 @@ class Forum(models.Model):
     name = models.TextField()
     description = models.TextField()
 
+    def get_thread_count(self):
+        return self.thread_set.count()
+
+    def get_post_count(self):
+        return Post.objects.filter(thread__forum_id=self.pk).count()
+
 class Thread(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 

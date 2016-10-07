@@ -15,5 +15,5 @@ gulp.task('less', function() {
 gulp.task('generate', ['less']);
 
 gulp.task('watch', ['generate'], function() {
-  gulp.watch([ './src/**/less' ], ['less']);
+  gulp.watch([ './src/**/*.less' ], ['less']);
 });
