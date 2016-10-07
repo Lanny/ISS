@@ -1,8 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, UserManager
+from django.contrib import auth
 from django.utils import timezone
 
-class Poster(AbstractBaseUser):
+class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = [ 'email' ]
 
@@ -12,9 +12,14 @@ class Poster(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
 
-    objects = UserManager()
+    objects = auth.models.UserManager()
+
+    def get_long_name(self):
+        return self.username
+
+    def get_short_name(self):
+        return self.get_long_name()
 
 class Forum(models.Model):
     name = models.TextField()
