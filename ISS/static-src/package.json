@@ -1,0 +1,25 @@
+{
+  "name": "iss-frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RyanJenkins/ISS.git"
+  },
+  "author": "Lanny",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/RyanJenkins/ISS/issues"
+  },
+  "homepage": "https://github.com/RyanJenkins/ISS#readme",
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-flatten": "^0.3.1",
+    "gulp-sources-less": "^1.0.1",
+    "less": "^2.7.1"
+  }
+}

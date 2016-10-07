@@ -3,7 +3,16 @@
 <!doctype html>
 <html>
   <head>
-    <title>{% block title %}{% endblock %}</title>
+    <title>
+      {% block title %}
+        {% block page_name %}{% endblock %}
+        {{ config.forum_name }}
+      {% endblock %}
+    </title>
+    
+    <link rel="stylesheet" href="{% static "css/combined.css" %}">
+    {% block css %} {% endblock %}
+
   </head>
   <body>
   <img src="{% static banner %}" >
