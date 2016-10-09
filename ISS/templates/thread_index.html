@@ -22,7 +22,9 @@
       <tr>
         <td></td>
         <td>
-          <a class="thread-name">{{ thread.title }}</a>
+          <a href="{% url 'thread' thread.pk %}" class="thread-name">
+            {{ thread.title }}
+          </a>
           <a class="thread-author">{{ thread.get_author.username }}</a>
         </td>
         <td>

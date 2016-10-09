@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block page_name %}
+  {{ forum.name }} -
+{% endblock %}
+
+{% block content %}
+  <div class="thread">
+    <ol class="post-list">
+    {% for post in posts %}
+      <li class="post">
+        <div class="post-hat">
+          <span class="post-data">
+            {{ post.created }}
+          </span>
+          <span class="post-number">
+            # {{ forloop.counter0|add:posts.start_index }}
+          </span>
+        </div>
+
+        <div class="user-block">
+          {{ post.author.username }}
+        </div>
+
+        <div class="post-block">
+          {{ post.content }}
+        </div>
+      </li>
+    {% endfor %}
+    </ol>
+  </div>
+{% endblock %}

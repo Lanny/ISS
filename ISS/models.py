@@ -32,7 +32,7 @@ class Forum(models.Model):
         return Post.objects.filter(thread__forum_id=self.pk).count()
 
     def __unicode__(self):
-        return u'%s (%d)' % (self.name, self.pk)
+        return self.name
 
 class Thread(models.Model):
     created = models.DateTimeField(auto_now_add=True)
