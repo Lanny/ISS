@@ -31,28 +31,34 @@ class Forum(models.Model):
     def get_post_count(self):
         return Post.objects.filter(thread__forum_id=self.pk).count()
 
+    def __unicode__(self):
+        return u'%s (%d)' % (self.name, self.pk)
+
 class Thread(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     forum = models.ForeignKey(Forum)
     title = models.TextField()
-    log = models.TextField()
+    log = models.TextField(blank=True)
 
     def get_last_post(self):
         return (self.post_set
                     .order_by('created')
-                    .select_related('author'))
+                    .select_related('author'))[0]
 
     def get_first_post(self):
         return (self.post_set
                     .order_by('-created')
-                    .select_related('author'))
+                    .select_related('author'))[0]
 
     def get_author(self):
         return self.get_first_post().author
 
     def get_post_count(self):
         return self.post_set.count()
+
+    def __unicode__(self):
+        return self.title
 
 class Post(models.Model):
     created = models.DateTimeField(auto_now_add=True)
