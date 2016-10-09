@@ -1,0 +1,23 @@
+@import "../base/config.less";
+
+.forum-index {
+  .index-table;
+
+  tr {
+    th {
+      .teal;
+    }
+
+    td {
+      &:nth-child(3), &:nth-child(4) {
+        text-align: center;
+      }
+
+      .forum-name {
+        display: block;
+        font-weight: bold;
+        color: @link_color
+      }
+    }
+  }
+}

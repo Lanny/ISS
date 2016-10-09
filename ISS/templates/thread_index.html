@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block page_name %}
+  {{ forum.name }} -
+{% endblock %}
+
+{% block content %}
+  <table class="thread-index">
+    <tr>
+      <th>New</th>
+      <th>Thread</th>
+      <th>Last Post</th>
+      <th>Posts</th>
+    </tr>
+    {% for thread in threads %}
+    <tr>
+      <td></td>
+      <td>
+        <a class="thread-name">{{ thread.title }}</a>
+        <a class="thread-author">{{ thread.get_author.username }}</a>
+      </td>
+      <td>
+        {% with last_post=thread.get_last_post %}
+          by {{ last_post.author.username }}
+        {% endwith %}
+      </td>
+      <td>{{ forum.get_post_count }}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

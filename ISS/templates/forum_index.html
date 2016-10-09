@@ -16,7 +16,10 @@
     <tr>
       <td></td>
       <td>
-        <a class="forum-name">{{ forum.name }}</a>
+        <a class="forum-name"
+           href="{% url 'thread-index' forum.pk %}">
+          {{ forum.name }}
+        </a>
         <span class="forum-description">{{ forum.description }}</a>
       </td>
       <td>{{ forum.get_thread_count }}</td>

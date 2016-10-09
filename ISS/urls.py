@@ -19,5 +19,6 @@ from . import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'/?', views.forum_index)
+    url('^forum/(?P<forum_id>\d+)/?$', views.thread_index, name='thread-index'),
+    url(r'/?$', views.forum_index, name='forum-index'),
 ]

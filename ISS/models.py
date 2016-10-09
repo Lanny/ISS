@@ -38,6 +38,22 @@ class Thread(models.Model):
     title = models.TextField()
     log = models.TextField()
 
+    def get_last_post(self):
+        return (self.post_set
+                    .order_by('created')
+                    .select_related('author'))
+
+    def get_first_post(self):
+        return (self.post_set
+                    .order_by('-created')
+                    .select_related('author'))
+
+    def get_author(self):
+        return self.get_first_post().author
+
+    def get_post_count(self):
+        return self.post_set.count()
+
 class Post(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
