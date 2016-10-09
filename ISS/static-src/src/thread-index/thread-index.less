@@ -1,0 +1,38 @@
+@import "../base/config.less";
+
+.thread-index {
+  .forum-intro {
+    background-color: @bg_light;
+
+    .forum-title {
+      .title-box();
+    }
+
+    .forum-description {
+      padding: 5px 20px;
+      display: block;
+    }
+  }
+
+  .threads {
+    .index-table;
+
+    tr {
+      th {
+        .teal;
+      }
+
+      td {
+        &:nth-child(3), &:nth-child(4) {
+          text-align: center;
+        }
+
+        .forum-name {
+          display: block;
+          font-weight: bold;
+          color: @link_color
+        }
+      }
+    }
+  }
+}

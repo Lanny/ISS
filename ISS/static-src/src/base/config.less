@@ -4,10 +4,21 @@
 @fg: #000000;
 @fg_alt: #FFFFFF;
 @link_color: #008080;
+@white: #FFFFFF;
 
 .teal() {
   background-color: @bg_teal;
   color: @fg_alt;
+}
+
+.title-box() {
+  .teal;
+
+  border-bottom: 1px solid @white;
+  padding: 5px 20px;
+  font-size: 12px;
+  font-weight: bold;
+
 }
 
 .index-table() {
