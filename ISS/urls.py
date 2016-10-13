@@ -21,5 +21,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url('^thread/(?P<thread_id>\d+)/?$', views.thread, name='thread'),
     url('^forum/(?P<forum_id>\d+)/?$', views.thread_index, name='thread-index'),
-    url(r'/?$', views.forum_index, name='forum-index'),
+    url(r'^/?$', views.forum_index, name='forum-index'),
 ]
