@@ -52,3 +52,5 @@ def thread(request, thread_id):
 
     return render(request, 'thread.html', ctx)
 
+def new_thread(request, forum_id):
+    return 'foo'

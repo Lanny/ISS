@@ -8,8 +8,12 @@
   <div class="thread-index">
     <div class="forum-intro">
       <h1 class="forum-title">{{ forum.name }}</h1>
-      <span class="forum-description">{{ forum.description }}</h1>
+      <span class="forum-description">{{ forum.description }}</span>
     </div>
+
+    <a class="new-thread" href="{% url 'new-thread' forum.pk %}">
+      New Thread
+    </a>
 
     <table class="threads">
       <tr>
