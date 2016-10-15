@@ -15,10 +15,12 @@
 
   </head>
   <body>
-  <img src="{% static banner %}" >
-    {% block content %}
-      Base Template.
-    {% endblock %}
+    <div class="page-content">
+      <img src="{% static banner %}" class="banner" >
+      {% block content %}
+        Base Template.
+      {% endblock %}
+    </div>
   </body>
 </html>
 
