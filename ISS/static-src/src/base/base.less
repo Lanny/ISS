@@ -1,5 +1,9 @@
 @import "config.less";
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   background: @bg_teal url(/static/img/bg.jpg) repeat 0 0;
   font: 12px Verdana, Lucida, Arial, Helvetica, sans-serif;
@@ -19,4 +23,9 @@ h1, h2, h3, h4, h5, h6 {
   .banner {
     margin: 10px 0;
   }
+}
+
+a {
+  color: @link_color;
+  font-weight: bold;
 }

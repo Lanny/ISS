@@ -7,9 +7,15 @@
 @seperator_color: grey;
 @white: #FFFFFF;
 
+@std_lr_padding: 20px;
+
 .teal() {
   background-color: @bg_teal;
   color: @fg_alt;
+
+  a {
+    color: @fg_alt;
+  }
 }
 
 .teal-inv() {
@@ -34,7 +40,7 @@
   .teal;
 
   border-bottom: 1px solid @white;
-  padding: 5px 20px;
+  padding: 5px @std_lr_padding;
   font-size: 12px;
   font-weight: bold;
 }

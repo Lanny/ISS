@@ -32,6 +32,9 @@ class Forum(models.Model):
     def get_post_count(self):
         return Post.objects.filter(thread__forum_id=self.pk).count()
 
+    def get_url(self):
+        return reverse('thread-index', kwargs={'forum_id': self.pk})
+
     def __unicode__(self):
         return self.name
 

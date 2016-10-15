@@ -1,0 +1,36 @@
+@import "../base/config.less";
+
+.new-thread {
+  form {
+    .rounded();
+    background-color: @white;
+    padding-bottom: 10px;
+
+    h1 {
+      .title-box;
+    }
+
+    fieldset {
+      padding: 0 @std_lr_padding;
+      border: none;
+      margin: 0;
+
+      label, input:not([type="submit"]), textarea {
+        display: block;
+        width: 100%;
+      }
+
+      label {
+        margin-top: 10px
+      }
+
+      [type="submit"] {
+        .btn();
+        .teal();
+
+        float: right;
+        margin-top: 20px;
+      }
+    }
+  }
+}
