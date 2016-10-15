@@ -48,7 +48,7 @@ def thread_index(request, forum_id):
 
 def thread(request, thread_id):
     thread = get_object_or_404(Thread, pk=thread_id)
-    posts = thread.post_set.order_by('-created')
+    posts = thread.post_set.order_by('created')
     paginator = Paginator(posts, 30)
 
     page = utils.page_by_request(paginator, request)

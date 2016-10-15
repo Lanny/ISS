@@ -5,7 +5,7 @@
 @fg_alt: #FFFFFF;
 @link_color: #008080;
 @fg_low_contrast: #333333;
-@seperator_color: grey;
+@seperator_color: #BBBBBB;
 @white: #FFFFFF;
 
 @std_lr_padding: 20px;
@@ -29,12 +29,18 @@
   overflow: hidden;
 }
 
-.btn {
+.btn() {
   border-radius: 0px;
   border: 0;
   padding: 10px 20px;
   cursor: pointer;
   text-decoration: none;
+}
+
+.small-btn() {
+  .btn();
+  border-radius: 3px;
+  padding: 5px 10px;
 }
 
 .title-box() {

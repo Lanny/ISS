@@ -25,6 +25,9 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def get_url(self):
         return '/'
 
+    def get_user_title(self):
+        return 'Regular'
+
 class Forum(models.Model):
     name = models.TextField()
     description = models.TextField()
@@ -50,12 +53,12 @@ class Thread(models.Model):
 
     def get_last_post(self):
         return (self.post_set
-                    .order_by('created')
+                    .order_by('-created')
                     .select_related('author'))[0]
 
     def get_first_post(self):
         return (self.post_set
-                    .order_by('-created')
+                    .order_by('created')
                     .select_related('author'))[0]
 
     def get_author(self):

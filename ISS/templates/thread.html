@@ -6,24 +6,40 @@
 
 {% block content %}
   <div class="thread">
+    <h1>{{ thread.title }}</h1>
+
     <ol class="post-list">
     {% for post in posts %}
       <li class="post">
         <div class="post-hat">
           <span class="post-data">
-            {{ post.created }}
+            {{ post.created|date:"o-m-d" }} at
+            {{ post.created|time:"f A e" }}
           </span>
-          <span class="post-number">
-            # {{ forloop.counter0|add:posts.start_index }}
-          </span>
+          <a href="{{ post.get_url }}" class="post-number">
+            #{{ forloop.counter0|add:posts.start_index }}
+          </a>
         </div>
 
         <div class="user-block">
-          {{ post.author.username }}
+          <a class="author-name" href="{{ post.author.get_url }}">
+            {{ post.author.username }}
+          </a>
+          <span class="user-title">
+            {{ post.author.get_user_title }}
+          </span>
         </div>
 
         <div class="post-block">
-          {{ post.content }}
+          <div class="post-body">
+            {{ post.content }}
+          </div>
+
+          {% if user.is_authenticated %}
+            <div class="post-controls">
+              <button class="quote">Quote</button>
+            </div>
+          {% endif %}
         </div>
       </li>
     {% endfor %}
