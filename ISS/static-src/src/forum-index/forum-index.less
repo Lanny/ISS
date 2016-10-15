@@ -1,32 +1,36 @@
 @import "../base/config.less";
 
 .forum-index {
-  .index-table;
+  .rounded();
 
-  tr {
-    th {
-      .teal;
-    }
+  & > table {
+    .index-table;
 
-    td {
-      &:nth-child(1) {
-        width: 50px;
+    tr {
+      th {
+        .teal;
       }
 
-      &:nth-child(3) {
-        text-align: center;
-        width: 50px;
-      }
+      td {
+        &:nth-child(1) {
+          width: 50px;
+        }
 
-      &:nth-child(4) {
-        text-align: center;
-        width: 50px;
-      }
+        &:nth-child(3) {
+          text-align: center;
+          width: 50px;
+        }
 
-      .forum-name {
-        display: block;
-        font-weight: bold;
-        color: @link_color
+        &:nth-child(4) {
+          text-align: center;
+          width: 50px;
+        }
+
+        .forum-name {
+          display: block;
+          font-weight: bold;
+          color: @link_color
+        }
       }
     }
   }
