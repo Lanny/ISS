@@ -29,11 +29,24 @@
           <a href="{% url 'thread' thread.pk %}" class="thread-name">
             {{ thread.title }}
           </a>
-          <a class="thread-author">{{ thread.get_author.username }}</a>
+          <a class="thread-author" href="{{ thread.get_author.get_url }}">
+            {{ thread.get_author.username }}
+          </a>
         </td>
         <td>
           {% with last_post=thread.get_last_post %}
-            by {{ last_post.author.username }}
+            <span class="last-post-date">
+              {{ last_post.created|date:"o-m-d" }} at
+              {{ last_post.created|time:"f A e" }}
+            </span>
+            <span "last-post-autor">
+              by
+              <a href="{{last_post.author.get_url}}">
+                {{ last_post.author.username }}
+              </a>
+              <a href="{{ last_post.get_url }}">
+                >
+              </a>
           {% endwith %}
         </td>
         <td>

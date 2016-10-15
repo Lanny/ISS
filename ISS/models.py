@@ -22,6 +22,9 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def get_short_name(self):
         return self.get_long_name()
 
+    def get_url(self):
+        return '/'
+
 class Forum(models.Model):
     name = models.TextField()
     description = models.TextField()

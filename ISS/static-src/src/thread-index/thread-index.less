@@ -25,6 +25,7 @@
 
   .threads {
     .index-table;
+    .rounded();
 
     tr {
       th {
@@ -32,14 +33,35 @@
       }
 
       td {
-        &:nth-child(3), &:nth-child(4) {
-          text-align: center;
+        &:nth-child(1) {
+          width: 50px;
         }
 
-        .forum-name {
+        &:nth-child(3) {
+          width: 190px;
+        }
+        
+        &:nth-child(4) {
+          text-align: center;
+          width: 30px;
+        }
+
+        .thread-name {
+          padding-bottom: 5px;
           display: block;
-          font-weight: bold;
-          color: @link_color
+        }
+
+        .thread-author {
+          display: block;
+          font-size: 10px;
+          text-decoration: none;
+          font-weight: normal;
+          color: @fg_low_contrast;
+        }
+
+        .last-post-date {
+          font-size: 10px;
+          display: block;
         }
       }
     }
