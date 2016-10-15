@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib import auth
 from django.utils import timezone
+from django.core.urlresolvers import reverse
 
 class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     USERNAME_FIELD = 'username'
@@ -56,6 +57,11 @@ class Thread(models.Model):
 
     def get_post_count(self):
         return self.post_set.count()
+
+    def get_url(self, post=None):
+        self_url = reverse('thread', kwargs={'thread_id': self.pk})
+
+        return self_url
 
     def __unicode__(self):
         return self.title
