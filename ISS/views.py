@@ -64,4 +64,4 @@ def login_user(request):
             if poster.is_active:
                 login(request, user)
                 return HttpResponseRedirect('/main/')
-    return render_to_response('login.html', context_instance=RequestContext(request))
+    return render('login.html', request, ctx)
