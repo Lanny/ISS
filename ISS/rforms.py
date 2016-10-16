@@ -3,21 +3,16 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm      
 
 class RegistrationForm(UserCreationForm):
-    email = forms.EmailField(required = True)
-    first_name = forms.CharField(required = False)
-    last_name = forms.CharField(required = False)
-    birtday = forms.DateField(required = False)
-
+    username = # Unsure how to proceed
+    
     class Meta:
-        model = User
+        model = poster
         fields = ('username', 'email', 'password')        
 
     def save(self,commit = True):   
-        user = super(MyRegistrationForm, self).save(commit = False)
-        user.email = self.cleaned_data['email']
-        user.first_name = self.cleaned_data['First_name']
-        user.last_name = self.cleaned_data['Last_name']
-        user.birthday = self.cleaned_data['Birthday']
+        poster = super(RegistrationForm, self).save(commit = False)
+        poster.username = self.cleaned_data['password']
+
 
 
         if commit:
