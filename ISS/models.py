@@ -32,6 +32,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 class Forum(models.Model):
     name = models.TextField()
     description = models.TextField()
+    priority = models.IntegerField(default=2147483647, null=False)
 
     def get_thread_count(self):
         return self.thread_set.count()

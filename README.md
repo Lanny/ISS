@@ -79,7 +79,7 @@ In no particular order:
 - Registartion
 - Forum index
     - ~~make it work~~
-    - admin configurable ordering
+    - ~~admin configurable ordering~~
     - figure out what to do with that "new" column that isn't slow
 - Thread locks
 - Links to admin site
@@ -89,7 +89,7 @@ In no particular order:
     - pagination
 - Forum thread list
     - ~~make it work~~
-    - order by updated time
+    - ~~order by updated time~~
     - pagination
     - go to newest post
     - go to oldest unread post
