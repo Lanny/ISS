@@ -3,6 +3,7 @@ from django.contrib import auth
 from django.utils import timezone
 from django.core.urlresolvers import reverse
 
+
 class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = [ 'email' ]
@@ -46,6 +47,7 @@ class Forum(models.Model):
 
 class Thread(models.Model):
     created = models.DateTimeField(auto_now_add=True)
+    last_update = models.DateTimeField(auto_now_add=True)
 
     forum = models.ForeignKey(Forum)
     title = models.TextField()
@@ -91,3 +93,19 @@ class Thanks(models.Model):
     thanker = models.ForeignKey(Poster, related_name='thanks_given')
     thankee = models.ForeignKey(Poster, related_name='thanks_received')
     post = models.ForeignKey(Post)
+
+
+
+
+def update_thread_last_update(sender, instance, created, **kwargs):
+    if not created:
+        # Edits don't bump threads.
+        return
+
+    thread = instance.thread
+
+    if thread.last_update < instance.created:
+        thread.last_update = instance.created
+        thread.save()
+
+models.signals.post_save.connect(update_thread_last_update, sender=Post)

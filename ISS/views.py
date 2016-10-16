@@ -34,7 +34,7 @@ def forum_index(request):
 
 def thread_index(request, forum_id):
     forum = get_object_or_404(Forum, pk=forum_id)
-    threads = forum.thread_set.order_by('-created')
+    threads = forum.thread_set.order_by('-last_update')
     paginator = Paginator(threads, 30)
 
     page = utils.page_by_request(paginator, request)
