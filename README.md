@@ -75,8 +75,17 @@ In no particular order:
 
 - Login
 - Registartion
-- New Thread
+- Thread page
+    - ~~make it work~~
+    - pagination
+- Forum thread list
+    - ~~make it work~~
+    - order by updated time
+    - pagination
+- ~~New Thread~~
 - New Post
+    - Make it work
+    - Quotes
 - Unread Posts in Thread / Thread Subscriptions
 - View Subscriptions (UserCP) 
 - Private Messages
@@ -85,3 +94,5 @@ In no particular order:
     - Reply
     - "Alerts"
 - Navigation
+- More than one usertitle
+- Thanks
