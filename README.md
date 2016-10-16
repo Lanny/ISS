@@ -77,6 +77,13 @@ In no particular order:
 
 - Login
 - Registartion
+- Forum index
+    - ~~make it work~~
+    - admin configurable ordering
+    - figure out what to do with that "new" column that isn't slow
+- Thread locks
+- Links to admin site
+- User active status check before thread/post creation
 - Thread page
     - ~~make it work~~
     - pagination
@@ -84,10 +91,14 @@ In no particular order:
     - ~~make it work~~
     - order by updated time
     - pagination
+    - go to newest post
+    - go to oldest unread post
 - ~~New Thread~~
 - New Post
     - ~~Make it work~~
     - Quotes
+        - In quick reply (ajax)
+        - no-js mode over to new-reply page
 - Unread Posts in Thread / Thread Subscriptions
 - View Subscriptions (UserCP) 
 - Private Messages
@@ -96,6 +107,12 @@ In no particular order:
     - Reply
     - "Alerts"
 - Navigation
+    - Breadcrumbs
+    - Sitemap? Whatever SEO magic the cool kids are into these days
 - More than one usertitle
 - Thanks
+    - AJAX
+    - nojs reload
 - Markdown in posts
+- User profile page
+- Static pages (FAQ, whatever)
