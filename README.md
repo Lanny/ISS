@@ -81,7 +81,7 @@ In no particular order:
     - ~~make it work~~
     - ~~admin configurable ordering~~
     - figure out what to do with that "new" column that isn't slow
-- Thread locks
+- ~~Thread locks~~
 - Links to admin site
 - User active status check before thread/post creation
 - Thread page

@@ -1,5 +1,6 @@
 from django import forms
 from django.db import transaction
+from django.forms import ValidationError
 
 import utils
 from models import Forum, Thread, Post
@@ -56,6 +57,14 @@ class NewPostForm(forms.Form):
         super(NewPostForm, self).__init__(*args, **kwargs)
 
         self.post = None
+
+    def clean_thread(self):
+        thread = self.cleaned_data['thread']
+
+        if not thread.can_reply():
+            raise ValidationError('Can not reply to a locked thread')
+
+        return thread
 
     @transaction.atomic
     def save(self, author):

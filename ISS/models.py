@@ -49,6 +49,7 @@ class Forum(models.Model):
 class Thread(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now_add=True)
+    locked = models.BooleanField(default=False)
 
     forum = models.ForeignKey(Forum)
     title = models.TextField()
@@ -74,6 +75,9 @@ class Thread(models.Model):
         self_url = reverse('thread', kwargs={'thread_id': self.pk})
 
         return self_url
+
+    def can_reply(self):
+        return not self.locked
 
     def __unicode__(self):
         return self.title

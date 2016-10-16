@@ -47,7 +47,7 @@
       </ol>
     </div>
 
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated and thread.can_reply %}
       <form class="quick-reply" method="POST"
         action="{% url 'new-reply' thread.pk %}">
         <h2>Quick Reply</h2>
