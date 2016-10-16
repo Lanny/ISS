@@ -42,3 +42,29 @@ class NewThreadForm(forms.Form):
 
         return self.thread
 
+class NewPostForm(forms.Form):
+    post_min_len = utils.get_config('min_post_chars')
+
+    content = forms.CharField(label='Reply',
+                              min_length=post_min_len,
+                              widget=forms.Textarea())
+
+    thread = forms.ModelChoiceField(queryset=Thread.objects.all(),
+                                    widget=forms.HiddenInput())
+
+    def __init__(self, *args, **kwargs):
+        super(NewPostForm, self).__init__(*args, **kwargs)
+
+        self.post = None
+
+    @transaction.atomic
+    def save(self, author):
+        self.post = Post(
+            thread=self.cleaned_data['thread'],
+            content=self.cleaned_data['content'],
+            author=author)
+
+        self.post.save()
+
+        return self.post
+

@@ -50,12 +50,14 @@ def thread(request, thread_id):
     thread = get_object_or_404(Thread, pk=thread_id)
     posts = thread.post_set.order_by('created')
     paginator = Paginator(posts, 30)
+    reply_form = forms.NewPostForm(initial={ 'thread': thread })
 
     page = utils.page_by_request(paginator, request)
 
     ctx = {
         'thread': thread,
-        'posts': page
+        'posts': page,
+        'reply_form': reply_form
     }
 
     return render(request, 'thread.html', ctx)
@@ -65,7 +67,7 @@ class NewThread(MethodSplitView):
 
     def GET(self, request, forum_id):
         forum = get_object_or_404(Forum, pk=forum_id)
-        form = forms.NewThreadForm(initial={ 'forum':forum })
+        form = forms.NewThreadForm(initial={ 'forum': forum })
         
         ctx = {
             'forum': forum,
@@ -89,3 +91,33 @@ class NewThread(MethodSplitView):
             }
 
             return render(request, 'new_thread.html', ctx)
+
+class NewReply(MethodSplitView):
+    login_required = True
+
+    def GET(self, request, thread_id):
+        thread = get_object_or_404(Thread, pk=thread_id)
+        form = forms.NewPostForm(initial={ 'thread': thread })
+        
+        ctx = {
+            'thread': thread,
+            'form': form
+        }
+
+        return render(request, 'new_post.html', ctx)
+
+    def POST(self, request, thread_id):
+        thread = get_object_or_404(Thread, pk=thread_id)
+        form = forms.NewPostForm(request.POST)
+
+        if form.is_valid():
+            post = form.save(request.user)
+            return HttpResponseRedirect(post.get_url())
+
+        else:
+            ctx = {
+                'thread': thread,
+                'form': form
+            }
+
+            return render(request, 'new_post.html', ctx)

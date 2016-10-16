@@ -6,6 +6,8 @@ Oldschool Forum Software. Design tennants are:
 - Javascript should be optional
 - Responsive pages, mobile-specific designs are shit, 1-col 4 lyfe
 - Slugs are dumb, pks are all anyone has ever needed.
+- You get one theme, rice it yourself if you care
+- Development using notepad is highly encouraged
 
 # Setting it up
 
@@ -84,7 +86,7 @@ In no particular order:
     - pagination
 - ~~New Thread~~
 - New Post
-    - Make it work
+    - ~~Make it work~~
     - Quotes
 - Unread Posts in Thread / Thread Subscriptions
 - View Subscriptions (UserCP) 
@@ -96,3 +98,4 @@ In no particular order:
 - Navigation
 - More than one usertitle
 - Thanks
+- Markdown in posts

@@ -82,6 +82,9 @@ class Post(models.Model):
     content = models.TextField()
     author = models.ForeignKey(Poster)
 
+    def get_url(self):
+        return self.thread.get_url(self)
+
 class Thanks(models.Model):
     given = models.DateTimeField(auto_now_add=True)
 
