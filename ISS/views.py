@@ -52,3 +52,16 @@ def thread(request, thread_id):
 
     return render(request, 'thread.html', ctx)
 
+def login_user(request):
+    logout(request)
+    username = password = ''
+    if request.POST:
+        username = request.POST['username']
+        password = request.POST['password']
+
+        poster = authenticate(username=username, password=password)
+        if poster is not None:
+            if poster.is_active:
+                login(request, user)
+                return HttpResponseRedirect('/main/')
+    return render_to_response('login.html', context_instance=RequestContext(request))
