@@ -10,6 +10,9 @@ banners = os.listdir(os.path.join('ISS/static', utils.get_config('banner_dir')))
 banners = [x for x in banners if re.match(r'.*\.(gif|png|jpg)', x)]
 
 def banner(request):
+    if not banners:
+        return ''
+
     banner_name = random.choice(banners)
 
     return {

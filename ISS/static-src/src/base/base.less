@@ -29,3 +29,17 @@ a {
   color: @link_color;
   font-weight: bold;
 }
+
+.breadcrumb {
+  .rounded();
+  background-color: @bg_dark;
+  margin-bottom: 20px;
+
+  h3 {
+    .title-box();
+  }
+
+  .crumbs {
+    padding: 5px @std_lr_padding;
+  }
+}
