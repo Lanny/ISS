@@ -4,6 +4,10 @@
   {{ forum.name }} -
 {% endblock %}
 
+{% block breadcrumb %}
+  &gt; <a href="{{ forum.get_url }}">{{ forum.name }}</a>
+{% endblock %}
+
 {% block content %}
   <div class="thread-index">
     <div class="forum-intro">

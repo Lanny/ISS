@@ -4,6 +4,11 @@
   {{ thread.title }} -
 {% endblock %}
 
+{% block breadcrumb %}
+  &gt; <a href="{{ thread.forum.get_url }}">{{ thread.forum.name }}</a>
+  &gt; <a href="{{ thread.get_url }}">{{ thread.title }}</a>
+{% endblock %}
+
 {% block content %}
   <div class="thread">
     <div class="thread-content">
