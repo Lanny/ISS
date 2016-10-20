@@ -17,11 +17,13 @@ from django.conf.urls import url
 from django.contrib import admin
 from . import views
 
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url('^thread/(?P<thread_id>\d+)/?$', views.thread, name='thread'),
     url('^thread/(?P<thread_id>\d+)/new-reply/?$', views.NewReply.as_view(), name='new-reply'),
     url('^forum/(?P<forum_id>\d+)/new-thread$', views.NewThread.as_view(), name='new-thread'),
     url('^forum/(?P<forum_id>\d+)/?$', views.thread_index, name='thread-index'),
-    url(r'^/?$', views.forum_index, name='forum-index'),
+    url(r'^/?$', views.forum_index, name='forum-index'), 
+    url(r'^login/$', 'views.login_user')
 ]

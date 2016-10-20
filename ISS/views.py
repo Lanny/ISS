@@ -46,6 +46,20 @@ def thread_index(request, forum_id):
 
     return render(request, 'thread_index.html', ctx)
 
+def login_user(request):
+    logout(request)
+    username = password = ''
+    if request.POST:
+        username = request.POST['username']
+        password = request.POST['password']
+
+        poster = authenticate(username=username, password=password)
+        if poster is not None:
+            if poster.is_active:
+                login(request, user)
+                return HttpResponseRedirect('/main/')
+    return render('login.html', request, ctx)
+
 def thread(request, thread_id):
     thread = get_object_or_404(Thread, pk=thread_id)
     posts = thread.post_set.order_by('created')
@@ -61,6 +75,7 @@ def thread(request, thread_id):
     }
 
     return render(request, 'thread.html', ctx)
+
 
 class NewThread(MethodSplitView):
     login_required = True
@@ -121,3 +136,4 @@ class NewReply(MethodSplitView):
             }
 
             return render(request, 'new_post.html', ctx)
+>>>>>>> upstream/master
