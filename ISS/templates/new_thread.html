@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block page_name %}
+  New Thread -
+{% endblock %}
+
+{% block content %}
+  <div class="new-thread">
+    <form method="POST" action="">
+      <h1>
+        Create New Thread in
+        <a href="{{ forum.get_url }}">{{ forum.name }}</a>
+      </h1>
+      <fieldset>
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Submit" />
+      </fieldset>
+     </form>
+   </div>
+{% endblock %}

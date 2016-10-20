@@ -1,11 +1,45 @@
 @import "config.less";
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   background: @bg_teal url(/static/img/bg.jpg) repeat 0 0;
   font: 12px Verdana, Lucida, Arial, Helvetica, sans-serif;
+  border: 0;
+  padding: 0;
+  margin: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
 }
 
+.page-content {
+  max-width: 1080px;
+  margin: 0 auto;
+
+  .banner {
+    margin: 10px 0;
+  }
+}
+
+a {
+  color: @link_color;
+  font-weight: bold;
+}
+
+.breadcrumb {
+  .rounded();
+  background-color: @bg_dark;
+  margin-bottom: 20px;
+
+  h3 {
+    .title-box();
+  }
+
+  .crumbs {
+    padding: 5px @std_lr_padding;
+  }
+}

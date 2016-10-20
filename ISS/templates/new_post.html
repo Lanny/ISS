@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block page_name %}
+Reply to {{ thread.title }} -
+{% endblock %}
+
+{% block content %}
+  <div class="new-post">
+    <form method="POST" action="">
+      <h1>
+        Reply to:
+        <a href="{{ thread.get_url }}">{{ thread.title }}</a>
+      </h1>
+      <fieldset>
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Submit" />
+      </fieldset>
+     </form>
+   </div>
+{% endblock %}
+

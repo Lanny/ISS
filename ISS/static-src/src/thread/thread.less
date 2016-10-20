@@ -1,0 +1,80 @@
+@import "../base/config.less";
+
+.thread {
+  .thread-content {
+    .rounded();
+
+    h1 {
+      .title-box();
+    }
+
+    .post-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      .post {
+        &:not(:last-child) {
+          margin-bottom: 10px;
+        }
+
+        .post-hat {
+          .teal();
+          padding: 5px;
+          font-size: 10px;
+
+          .post-number {
+            float: right;
+          }
+        }
+
+        .user-block, .post-block {
+          padding: 10px;
+        }
+
+        .user-block {
+          background-color: @bg_light;
+
+          .author-name {
+            font-size: 16px;
+            font-weight: normal;
+            display: block;
+            margin-bottom: 5px;
+          }
+
+          .user-title {
+            display: block;
+            font-size: 10px;
+          }
+        }
+
+        .post-block {
+          background-color: @bg_dark;
+
+          .post-controls {
+            display: block;
+            overflow: hidden;
+            border-top: 1px solid @seperator_color;
+            padding-top: 5px;
+            margin-top: 5px;
+
+            * {
+              float: right;
+            }
+
+            .quote {
+              .small-btn();
+              .teal();
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .quick-reply {
+    margin-top: 20px;
+
+    .standard-form();
+  }
+}

@@ -4,10 +4,15 @@ var less = require('gulp-sources-less');
 var path = require('path');
  
 gulp.task('less', function() {
-  return gulp.src('./src/**/*.less')
-    .pipe(less({
+  var lessStream = less({
       paths: [ path.join(__dirname, 'less', 'includes') ]
-    }))
+    }).on('error', function(err) {
+      console.error(err);
+      this.emit('end');
+    });
+
+  return gulp.src('./src/**/*.less')
+    .pipe(lessStream)
     .pipe(flatten())
     .pipe(gulp.dest('../static/css'));
 });

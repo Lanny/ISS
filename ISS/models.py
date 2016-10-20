@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib import auth
 from django.utils import timezone
+from django.core.urlresolvers import reverse
+
 
 class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     USERNAME_FIELD = 'username'
@@ -21,9 +23,16 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def get_short_name(self):
         return self.get_long_name()
 
+    def get_url(self):
+        return '/'
+
+    def get_user_title(self):
+        return 'Regular'
+
 class Forum(models.Model):
     name = models.TextField()
     description = models.TextField()
+    priority = models.IntegerField(default=2147483647, null=False)
 
     def get_thread_count(self):
         return self.thread_set.count()
@@ -31,11 +40,16 @@ class Forum(models.Model):
     def get_post_count(self):
         return Post.objects.filter(thread__forum_id=self.pk).count()
 
+    def get_url(self):
+        return reverse('thread-index', kwargs={'forum_id': self.pk})
+
     def __unicode__(self):
         return self.name
 
 class Thread(models.Model):
     created = models.DateTimeField(auto_now_add=True)
+    last_update = models.DateTimeField(auto_now_add=True)
+    locked = models.BooleanField(default=False)
 
     forum = models.ForeignKey(Forum)
     title = models.TextField()
@@ -43,12 +57,12 @@ class Thread(models.Model):
 
     def get_last_post(self):
         return (self.post_set
-                    .order_by('created')
+                    .order_by('-created')
                     .select_related('author'))[0]
 
     def get_first_post(self):
         return (self.post_set
-                    .order_by('-created')
+                    .order_by('created')
                     .select_related('author'))[0]
 
     def get_author(self):
@@ -56,6 +70,14 @@ class Thread(models.Model):
 
     def get_post_count(self):
         return self.post_set.count()
+
+    def get_url(self, post=None):
+        self_url = reverse('thread', kwargs={'thread_id': self.pk})
+
+        return self_url
+
+    def can_reply(self):
+        return not self.locked
 
     def __unicode__(self):
         return self.title
@@ -67,9 +89,28 @@ class Post(models.Model):
     content = models.TextField()
     author = models.ForeignKey(Poster)
 
+    def get_url(self):
+        return self.thread.get_url(self)
+
 class Thanks(models.Model):
     given = models.DateTimeField(auto_now_add=True)
 
     thanker = models.ForeignKey(Poster, related_name='thanks_given')
     thankee = models.ForeignKey(Poster, related_name='thanks_received')
     post = models.ForeignKey(Post)
+
+
+
+
+def update_thread_last_update(sender, instance, created, **kwargs):
+    if not created:
+        # Edits don't bump threads.
+        return
+
+    thread = instance.thread
+
+    if thread.last_update < instance.created:
+        thread.last_update = instance.created
+        thread.save()
+
+models.signals.post_save.connect(update_thread_last_update, sender=Post)

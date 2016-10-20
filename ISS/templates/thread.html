@@ -4,29 +4,64 @@
   {{ thread.title }} -
 {% endblock %}
 
+{% block breadcrumb %}
+  &gt; <a href="{{ thread.forum.get_url }}">{{ thread.forum.name }}</a>
+  &gt; <a href="{{ thread.get_url }}">{{ thread.title }}</a>
+{% endblock %}
+
 {% block content %}
   <div class="thread">
-    <ol class="post-list">
-    {% for post in posts %}
-      <li class="post">
-        <div class="post-hat">
-          <span class="post-data">
-            {{ post.created }}
-          </span>
-          <span class="post-number">
-            # {{ forloop.counter0|add:posts.start_index }}
-          </span>
-        </div>
+    <div class="thread-content">
+      <h1>{{ thread.title }}</h1>
 
-        <div class="user-block">
-          {{ post.author.username }}
-        </div>
+      <ol class="post-list">
+      {% for post in posts %}
+        <li class="post">
+          <div class="post-hat">
+            <span class="post-data">
+              {{ post.created|date:"o-m-d" }} at
+              {{ post.created|time:"f A e" }}
+            </span>
+            <a href="{{ post.get_url }}" class="post-number">
+              #{{ forloop.counter0|add:posts.start_index }}
+            </a>
+          </div>
 
-        <div class="post-block">
-          {{ post.content }}
-        </div>
-      </li>
-    {% endfor %}
-    </ol>
+          <div class="user-block">
+            <a class="author-name" href="{{ post.author.get_url }}">
+              {{ post.author.username }}
+            </a>
+            <span class="user-title">
+              {{ post.author.get_user_title }}
+            </span>
+          </div>
+
+          <div class="post-block">
+            <div class="post-body">
+              {{ post.content }}
+            </div>
+
+            {% if user.is_authenticated %}
+              <div class="post-controls">
+                <button class="quote">Quote</button>
+              </div>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+      </ol>
+    </div>
+
+    {% if user.is_authenticated and thread.can_reply %}
+      <form class="quick-reply" method="POST"
+        action="{% url 'new-reply' thread.pk %}">
+        <h2>Quick Reply</h2>
+        <fieldset>
+          {% csrf_token %}
+          {{ reply_form }}
+          <input type="submit" value="Submit" />
+        </fieldset>
+      </form>
+    {% endif %}
   </div>
 {% endblock %}

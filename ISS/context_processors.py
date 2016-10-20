@@ -3,25 +3,21 @@ import os.path
 import re
 import random
 
-from django.conf import settings
+from ISS import utils
 
-config_defaults = {
-    'forum_name': 'INTERNATIONAL SPACE STATION',
-    'banner_dir': 'banners'
-}
 
-config = config_defaults.copy()
-config.update(settings.FORUM_CONFIG)
-
-banners = os.listdir(os.path.join('ISS/static', config['banner_dir']))
+banners = os.listdir(os.path.join('ISS/static', utils.get_config('banner_dir')))
 banners = [x for x in banners if re.match(r'.*\.(gif|png|jpg)', x)]
 
 def banner(request):
+    if not banners:
+        return ''
+
     banner_name = random.choice(banners)
 
     return {
-        'banner': os.path.join(config['banner_dir'], banner_name)
+        'banner': os.path.join(utils.get_config('banner_dir'), banner_name)
     }
 
 def forum_config(request):
-    return {'config': config}
+    return {'config': utils.get_config()}

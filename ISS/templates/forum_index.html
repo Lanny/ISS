@@ -5,26 +5,28 @@
 {% endblock %}
 
 {% block content %}
-  <table class="forum-index">
-    <tr>
-      <th>New</th>
-      <th>Forum</th>
-      <th>Threads</th>
-      <th>Posts</th>
-    </tr>
-    {% for forum in forums %}
-    <tr>
-      <td></td>
-      <td>
-        <a class="forum-name"
-           href="{% url 'thread-index' forum.pk %}">
-          {{ forum.name }}
-        </a>
-        <span class="forum-description">{{ forum.description }}</a>
-      </td>
-      <td>{{ forum.get_thread_count }}</td>
-      <td>{{ forum.get_post_count }}</td>
-    </tr>
-    {% endfor %}
-  </table>
+  <section class="forum-index">
+    <table >
+      <tr>
+        <th>New</th>
+        <th>Forum</th>
+        <th>Threads</th>
+        <th>Posts</th>
+      </tr>
+      {% for forum in forums %}
+      <tr>
+        <td></td>
+        <td>
+          <a class="forum-name"
+             href="{% url 'thread-index' forum.pk %}">
+            {{ forum.name }}
+          </a>
+          <span class="forum-description">{{ forum.description }}</a>
+        </td>
+        <td>{{ forum.get_thread_count }}</td>
+        <td>{{ forum.get_post_count }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </section>
 {% endblock %}
