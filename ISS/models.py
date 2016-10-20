@@ -29,6 +29,9 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def get_user_title(self):
         return 'Regular'
 
+    def embed_images(self):
+        return True
+
 class Forum(models.Model):
     name = models.TextField()
     description = models.TextField()

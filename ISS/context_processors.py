@@ -3,6 +3,8 @@ import os.path
 import re
 import random
 
+from django.contrib.auth.models import AnonymousUser
+
 from ISS import utils
 
 
@@ -21,3 +23,13 @@ def banner(request):
 
 def forum_config(request):
     return {'config': utils.get_config()}
+
+def user_config(request):
+    ctx = {}
+
+    if isinstance(request.user, AnonymousUser):
+        ctx['embed_images'] = True
+    else:
+        ctx['embed_images'] = request.user.embed_images
+
+    return ctx

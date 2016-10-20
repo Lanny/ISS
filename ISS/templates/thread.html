@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load bbc %}
 
 {% block page_name %}
   {{ thread.title }} -
@@ -38,7 +39,7 @@
 
           <div class="post-block">
             <div class="post-body">
-              {{ post.content }}
+              {{ post.content|bbc:embed_images }}
             </div>
 
             {% if user.is_authenticated %}
