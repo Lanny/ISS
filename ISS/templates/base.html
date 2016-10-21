@@ -22,8 +22,23 @@
 
       <div class="user-controls">
         <h3>User Controls</h3>
+
+        <div class="user-controls-content">
         {% if user.is_authenticated %}
-          Welcome {{ user.username }}
+          <ul class="control-links">
+            <li>
+              <form method="POST" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <input type="submit" value="Logout">
+              </form>
+            </li>
+          </ul>
+
+          <div class="welcome-block">
+            <span>
+              Welcome, <a href="{{ user.get_url }}">{{ user.username }}</a>
+            </span>
+          </div>
         {% else %}
           <form class="inline-login" action="{% url 'login' %}" method="POST">
             <div class="fields">
@@ -33,6 +48,7 @@
             <input type="submit" value="Login" />
           </form>
         {% endif %}
+        </div>
       </div>
 
       {% block navigation %}

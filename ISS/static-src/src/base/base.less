@@ -53,7 +53,48 @@ a {
     .title-box();
   }
 
+  .user-controls-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    .control-links {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      flex: 1;
+
+      li {
+        border-right: 1px solid @seperator_color;
+        display: inline-block;
+
+        a, input[type="submit"] { 
+          text-decoration: none;
+          padding: 7px 20px;
+          display: block;
+          border: none;
+          background-color: @bg_dark;
+          cursor: pointer;
+
+          &:hover {
+            background-color: @bg_light;
+          }
+        }
+      }
+    }
+
+    .welcome-block {
+      padding-right: @std_lr_padding;
+
+      > * {
+        display: block;
+        text-align: right;
+      }
+    }
+  }
+
   .inline-login {
+    flex: 1;
     display: flex;
     flex-direction: row;
     justify-content: flex-end;

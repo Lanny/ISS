@@ -48,28 +48,6 @@ def thread_index(request, forum_id):
 
     return render(request, 'thread_index.html', ctx)
 
-class LoginUser(MethodSplitView):
-    def GET(self, request):
-        form = AuthenticationForm()
-        ctx = {'form': form}
-        return render(request, 'login.html', ctx)
-
-    def POST(self, request):
-        logout(request)
-        if request.POST:
-            form = AuthenticationForm(data=request.POST, request=request)
-
-            print request.POST
-            if form.is_valid():
-                login(request, form.user_cache)
-                next_url = request.POST.get('next', '/')
-                return HttpResponseRedirect(next_url)
-
-            else:
-                print form.is_valid()
-                ctx = {'form': form}
-                return render(request, 'login.html', ctx)
-
 def thread(request, thread_id):
     thread = get_object_or_404(Thread, pk=thread_id)
     posts = thread.post_set.order_by('created')
@@ -146,3 +124,31 @@ class NewReply(MethodSplitView):
             }
 
             return render(request, 'new_post.html', ctx)
+
+class LoginUser(MethodSplitView):
+    def GET(self, request):
+        form = AuthenticationForm()
+        ctx = {'form': form}
+        return render(request, 'login.html', ctx)
+
+    def POST(self, request):
+        logout(request)
+        if request.POST:
+            form = AuthenticationForm(data=request.POST, request=request)
+
+            if form.is_valid():
+                login(request, form.user_cache)
+                next_url = request.POST.get('next', '/')
+                return HttpResponseRedirect(next_url)
+
+            else:
+                ctx = {'form': form}
+                return render(request, 'login.html', ctx)
+
+class LogoutUser(MethodSplitView):
+    def POST(self, request):
+        logout(request)
+
+        next_url = request.POST.get('next', '/')
+        return HttpResponseRedirect(next_url)
+
