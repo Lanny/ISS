@@ -20,6 +20,21 @@
         <img src="{% static banner %}" class="banner" >
       </a>
 
+      <div class="user-controls">
+        <h3>User Controls</h3>
+        {% if user.is_authenticated %}
+          Welcome {{ user.username }}
+        {% else %}
+          <form class="inline-login" action="{% url 'login' %}" method="POST">
+            <div class="fields">
+              {{ login_form.as_p }}
+              {% csrf_token %}
+            </div>
+            <input type="submit" value="Login" />
+          </form>
+        {% endif %}
+      </div>
+
       {% block navigation %}
         <div class="breadcrumb">
           <h3>Navigation</h3>

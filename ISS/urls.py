@@ -15,8 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from . import views
-
+from ISS import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -25,5 +24,5 @@ urlpatterns = [
     url('^forum/(?P<forum_id>\d+)/new-thread$', views.NewThread.as_view(), name='new-thread'),
     url('^forum/(?P<forum_id>\d+)/?$', views.thread_index, name='thread-index'),
     url(r'^/?$', views.forum_index, name='forum-index'), 
-    url(r'^login/$', 'views.login_user')
+    url(r'^login/$', views.LoginUser.as_view(), name='login')
 ]

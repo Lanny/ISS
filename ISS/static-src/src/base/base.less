@@ -43,3 +43,46 @@ a {
     padding: 5px @std_lr_padding;
   }
 }
+
+.user-controls {
+  .rounded();
+  background-color: @bg_dark;
+  margin-bottom: 20px;
+
+  h3 {
+    .title-box();
+  }
+
+  .inline-login {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding: 5px 5px 5px;
+
+    .fields {
+      display: table;
+      padding-right: 5px;
+
+      p {
+        display: table-row;
+
+        &:first-child label {
+          padding-bottom: 5px;
+        }
+
+        & > * {
+          display: table-cell;
+        }
+
+        label {
+          padding-right: 5px;
+        }
+      }
+    }
+
+    input[type="submit"] {
+      .btn();
+      .teal();
+    }
+  }
+}

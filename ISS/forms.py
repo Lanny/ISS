@@ -76,4 +76,3 @@ class NewPostForm(forms.Form):
         self.post.save()
 
         return self.post
-

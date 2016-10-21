@@ -3,6 +3,7 @@ import os.path
 import re
 import random
 
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import AnonymousUser
 
 from ISS import utils
@@ -29,7 +30,8 @@ def user_config(request):
 
     if isinstance(request.user, AnonymousUser):
         ctx['embed_images'] = True
+        ctx['login_form'] = AuthenticationForm()
     else:
-        ctx['embed_images'] = request.user.embed_images
+        ctx['embed_images'] = request.user.embed_images()
 
     return ctx
