@@ -77,6 +77,9 @@ In no particular order:
 
 - ~~Login~~
 - Registartion
+  - ~~base functionality~~
+  - email verificiation
+  - password reset
 - Forum index
     - ~~make it work~~
     - ~~admin configurable ordering~~
@@ -104,6 +107,7 @@ In no particular order:
     - profile page
     - avatars
     - list of posts
+    - make user titles work
 - Unread Posts in Thread / Thread Subscriptions
 - View Subscriptions (UserCP) 
 - Private Messages
@@ -121,3 +125,4 @@ In no particular order:
     - list of thanked posts
 - Markdown in posts
 - Static pages (FAQ, whatever)
+- New posts
