@@ -30,6 +30,7 @@
               <form method="POST" action="{% url 'logout' %}">
                 {% csrf_token %}
                 <input type="submit" value="Logout">
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
               </form>
             </li>
           </ul>
@@ -44,6 +45,7 @@
             <div class="fields">
               {{ login_form.as_p }}
               {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
             </div>
             <input type="submit" value="Login" />
           </form>

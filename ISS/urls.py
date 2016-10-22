@@ -25,5 +25,5 @@ urlpatterns = [
     url('^forum/(?P<forum_id>\d+)/?$', views.thread_index, name='thread-index'),
     url(r'^/?$', views.forum_index, name='forum-index'), 
     url(r'^login/$', views.LoginUser.as_view(), name='login'),
-    url(r'^logout/$', views.LoginUser.as_view(), name='logout')
+    url(r'^logout/$', views.LogoutUser.as_view(), name='logout')
 ]
