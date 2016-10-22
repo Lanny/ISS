@@ -15,9 +15,11 @@
       <span class="forum-description">{{ forum.description }}</span>
     </div>
 
-    <a class="new-thread" href="{% url 'new-thread' forum.pk %}">
-      New Thread
-    </a>
+    {% if user.is_authenticated %}
+      <a class="new-thread" href="{% url 'new-thread' forum.pk %}">
+        New Thread
+      </a>
+    {% endif %}
 
     <table class="threads">
       <tr>

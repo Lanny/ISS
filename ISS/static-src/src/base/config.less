@@ -9,6 +9,7 @@
 @white: #FFFFFF;
 
 @std_lr_padding: 20px;
+@content_margin_bottom: 15px;
 
 .teal() {
   background-color: @bg_teal;
@@ -96,6 +97,21 @@
     .title-box;
   }
 
+  .errorlist {
+    list-style: none;
+    padding: 0;
+  }
+
+  .in-error {
+    input, textarea {
+      border: 1px solid red;
+    }
+
+    label {
+      color: red;
+    }
+  }
+
   fieldset {
     padding: 0 @std_lr_padding;
     border: none;
@@ -108,6 +124,16 @@
 
     label {
       margin-top: 10px
+    }
+
+    input, textarea {
+      padding: 5px 10px ;
+      border: 1px solid @seperator_color;
+      border-radius: 3px;
+    }
+
+    input {
+      font-size: 14px;
     }
 
     [type="submit"] {

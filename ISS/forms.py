@@ -7,6 +7,7 @@ import utils
 from models import Forum, Thread, Post, Poster
 
 class NewThreadForm(forms.Form):
+    error_css_class = 'in-error'
     thread_min_len = utils.get_config('min_thread_title_chars')
     post_min_len = utils.get_config('min_post_chars')
 
@@ -45,6 +46,7 @@ class NewThreadForm(forms.Form):
         return self.thread
 
 class NewPostForm(forms.Form):
+    error_css_class = 'in-error'
     post_min_len = utils.get_config('min_post_chars')
 
     content = forms.CharField(label='Reply',
@@ -80,6 +82,8 @@ class NewPostForm(forms.Form):
 
 
 class RegistrationForm(UserCreationForm):
+    error_css_class = 'in-error'
+
     class Meta:
         model = Poster
         fields = ('username', 'email')        
