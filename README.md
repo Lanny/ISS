@@ -9,6 +9,8 @@ Oldschool Forum Software. Design tennants are:
 - You get one theme, rice it yourself if you care
 - Development using notepad is highly encouraged
 
+For some test-in-prod ~~insanity~~joy, see [here](http://iss.lannysport.net/).
+
 # Setting it up
 
 You'll need pip and npm installed to grab dependencies, both should be available
