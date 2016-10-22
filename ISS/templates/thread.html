@@ -17,7 +17,7 @@
 
       <ol class="post-list">
       {% for post in posts %}
-        <li class="post">
+        <li class="post" id="post-{{ post.pk }}">
           <div class="post-hat">
             <span class="post-data">
               {{ post.created|date:"o-m-d" }} at

@@ -3,6 +3,8 @@ from django.contrib import auth
 from django.utils import timezone
 from django.core.urlresolvers import reverse
 
+from ISS import utils
+
 
 class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     USERNAME_FIELD = 'username'
@@ -76,8 +78,20 @@ class Thread(models.Model):
     def get_post_count(self):
         return self.post_set.count()
 
+    def get_posts_in_thread_order(self):
+        return self.post_set.order_by('created')
+
     def get_url(self, post=None):
         self_url = reverse('thread', kwargs={'thread_id': self.pk})
+
+        if post:
+            predecessors = (self.get_posts_in_thread_order()
+                .filter(created__lt=post.created)
+                .count())
+
+            page_num = predecessors / utils.get_config('posts_per_thread_page')
+
+            self_url += '?p=%d#post-%d' % (page_num + 1, post.pk)
 
         return self_url
 

@@ -38,7 +38,8 @@ def forum_index(request):
 def thread_index(request, forum_id):
     forum = get_object_or_404(Forum, pk=forum_id)
     threads = forum.thread_set.order_by('-last_update')
-    paginator = utils.MappingPaginator(threads, 30)
+    threads_per_page = utils.get_config('threads_per_forum_page')
+    paginator = utils.MappingPaginator(threads, threads_per_page)
 
     paginator.install_map_func(lambda t: utils.ThreadFascet(t, request))
 
@@ -54,7 +55,8 @@ def thread_index(request, forum_id):
 def thread(request, thread_id):
     thread = get_object_or_404(Thread, pk=thread_id)
     posts = thread.post_set.order_by('created')
-    paginator = Paginator(posts, 30)
+    posts_per_page = utils.get_config('posts_per_thread_page')
+    paginator = Paginator(posts, posts_per_page)
     reply_form = forms.NewPostForm(initial={ 'thread': thread })
 
     page = utils.page_by_request(paginator, request)
