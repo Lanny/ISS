@@ -75,7 +75,7 @@ server. You can make up some test data using thing admin interface (url
 # TODO
 In no particular order:
 
-- Login
+- ~~Login~~
 - Registartion
 - Forum index
     - ~~make it work~~
@@ -86,7 +86,7 @@ In no particular order:
 - User active status check before thread/post creation
 - Thread page
     - ~~make it work~~
-    - pagination
+    - ~~pagination~~
 - Forum thread list
     - ~~make it work~~
     - ~~order by updated time~~
@@ -99,6 +99,11 @@ In no particular order:
     - Quotes
         - In quick reply (ajax)
         - no-js mode over to new-reply page
+- Users
+    - image embed option(s?) 
+    - profile page
+    - avatars
+    - list of posts
 - Unread Posts in Thread / Thread Subscriptions
 - View Subscriptions (UserCP) 
 - Private Messages
@@ -113,6 +118,6 @@ In no particular order:
 - Thanks
     - AJAX
     - nojs reload
+    - list of thanked posts
 - Markdown in posts
-- User profile page
 - Static pages (FAQ, whatever)
