@@ -4,6 +4,12 @@
 Reply to {{ thread.title }} -
 {% endblock %}
 
+{% block breadcrumb %}
+  &gt; <a href="{{ thread.forum.get_url }}">{{ thread.forum.name }}</a>
+  &gt; <a href="{{ thread.get_url }}">{{ thread.title }}</a>
+  &gt; <a href="">New Post</a>
+{% endblock %}
+
 {% block content %}
   <div class="new-post">
     <form method="POST" action="">

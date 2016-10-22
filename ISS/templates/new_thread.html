@@ -4,6 +4,11 @@
   New Thread -
 {% endblock %}
 
+{% block breadcrumb %}
+  &gt; <a href="{{ forum.get_url }}">{{ forum.name }}</a>
+  &gt; <a href="">New Thread</a>
+{% endblock %}
+
 {% block content %}
   <div class="new-thread">
     <form method="POST" action="">
