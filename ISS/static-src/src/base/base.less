@@ -170,3 +170,19 @@ a {
     }
   }
 }
+
+blockquote {
+  background-color: @bg_light;
+  border: 1px solid @seperator_color;
+  padding: 10px 20px;
+  margin: 10px 0 0 10px;
+  position: relative;
+
+  &:before {
+    content: 'Quote:';
+    position: absolute;
+    top: -16px;
+    left: 0px;
+    font-size: 10px;
+  }
+}
