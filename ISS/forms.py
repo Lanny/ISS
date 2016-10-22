@@ -1,9 +1,10 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm      
 from django.db import transaction
 from django.forms import ValidationError
 
 import utils
-from models import Forum, Thread, Post
+from models import Forum, Thread, Post, Poster
 
 class NewThreadForm(forms.Form):
     thread_min_len = utils.get_config('min_thread_title_chars')
@@ -76,3 +77,15 @@ class NewPostForm(forms.Form):
         self.post.save()
 
         return self.post
+
+
+class RegistrationForm(UserCreationForm):
+    class Meta:
+        model = Poster
+        fields = ('username', 'email')        
+
+    def save(self,commit = True):   
+        poster = super(RegistrationForm, self).save(commit = False)
+        poster.save()
+        return poster
+    

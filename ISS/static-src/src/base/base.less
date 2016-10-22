@@ -94,24 +94,25 @@ a {
   }
 
   .user-controls-content {
-    display: flex;
+    .flex-stretch();
     flex-direction: row;
-    align-items: center;
 
     .control-links {
+      .flex-stretch();
       padding: 0;
       margin: 0;
       list-style: none;
       flex: 1;
 
       li {
+        .flex-stretch();
         border-right: 1px solid @seperator_color;
-        display: inline-block;
 
         a, input[type="submit"] { 
+          display: flex;
+          align-items: center;
           text-decoration: none;
           padding: 7px 20px;
-          display: block;
           border: none;
           background-color: @bg_dark;
           cursor: pointer;
@@ -125,6 +126,8 @@ a {
 
     .welcome-block {
       padding-right: @std_lr_padding;
+      display: flex;
+      align-items: center;
 
       > * {
         display: block;

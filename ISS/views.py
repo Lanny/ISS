@@ -1,4 +1,5 @@
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.paginator import Paginator
@@ -137,6 +138,9 @@ class LoginUser(MethodSplitView):
             form = AuthenticationForm(data=request.POST, request=request)
 
             if form.is_valid():
+                print ' JAZZ!'
+                print form.user_cache
+                print form.user_cache.backend
                 login(request, form.user_cache)
                 next_url = request.POST.get('next', '/')
                 return HttpResponseRedirect(next_url)
@@ -151,4 +155,29 @@ class LogoutUser(MethodSplitView):
 
         next_url = request.POST.get('next', '/')
         return HttpResponseRedirect(next_url)
+
+class RegisterUser(MethodSplitView):
+    def GET(self, request):
+        form = forms.RegistrationForm()
+        ctx = {'form': form}
+
+        return render(request, 'register.html', ctx)
+
+    def POST(self, request):
+        form = forms.RegistrationForm(request.POST)
+
+        if form.is_valid():
+            poster = form.save(commit=True)
+
+            # Ceremoniously call authenticate so login will succeed
+            poster = authenticate(username = form.cleaned_data['username'],
+                                  password = form.cleaned_data['password1'])
+            login(request, poster)
+            return HttpResponseRedirect('/')
+
+        else:
+            ctx = { 'form': form }
+
+            return render(request, 'register.html', ctx)
+
 

@@ -24,8 +24,8 @@
         <h3>User Controls</h3>
 
         <div class="user-controls-content">
-        {% if user.is_authenticated %}
           <ul class="control-links">
+            {% if user.is_authenticated %}
             <li>
               <form method="POST" action="{% url 'logout' %}">
                 {% csrf_token %}
@@ -33,13 +33,20 @@
                 <input type="hidden" name="next" value="{{ request.get_full_path }}">
               </form>
             </li>
+            {% else %}
+              <li>
+                <a href="{% url 'register' %}">Register</a>
+              </li>
+            {% endif %}
           </ul>
 
+        {% if user.is_authenticated %}
           <div class="welcome-block">
             <span>
               Welcome, <a href="{{ user.get_url }}">{{ user.username }}</a>
             </span>
           </div>
+
         {% else %}
           <form class="inline-login" action="{% url 'login' %}" method="POST">
             <div class="fields">

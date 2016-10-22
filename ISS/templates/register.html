@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block page_name %}
+  Create Account -
+{% endblock %}
+
+{% block content %}
+  <div class="registration">
+    <form method="POST" action="">
+      <h1>
+        Create New User
+      </h1>
+
+      <fieldset>
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Submit" />
+      </fieldset>
+     </form>
+   </div>
+{% endblock %}
+
