@@ -64,6 +64,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'ISS.context_processors.banner',
+                'ISS.context_processors.forum_config',
+                'ISS.context_processors.user_config'
             ],
         },
     },
@@ -103,3 +106,4 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'ISS.Poster'
+FORUM_CONFIG = {}

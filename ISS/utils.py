@@ -1,3 +1,5 @@
+import bbcode
+
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.conf import settings
 
@@ -30,4 +32,16 @@ def page_by_request(paginator, request):
 
     return page
     
-    
+def get_standard_bbc_parser(embed_images=True, escape_html=True):
+    parser = bbcode.Parser(escape_html=escape_html, replace_links=False)
+
+    if embed_images:
+        parser.add_simple_formatter(
+            'img',
+            '<a class="img-embed" href="%(value)s"><img src="%(value)s"></a>')
+    else:
+        parser.add_simple_formatter(
+            'img',
+            '<a class="img-link" href="%(value)s">embedded image</a>')
+
+    return parser

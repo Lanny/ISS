@@ -1,7 +1,13 @@
 {% extends "base.html" %}
+{% load bbc %}
 
 {% block page_name %}
   {{ thread.title }} -
+{% endblock %}
+
+{% block breadcrumb %}
+  &gt; <a href="{{ thread.forum.get_url }}">{{ thread.forum.name }}</a>
+  &gt; <a href="{{ thread.get_url }}">{{ thread.title }}</a>
 {% endblock %}
 
 {% block content %}
@@ -33,7 +39,7 @@
 
           <div class="post-block">
             <div class="post-body">
-              {{ post.content }}
+              {{ post.content|bbc:embed_images }}
             </div>
 
             {% if user.is_authenticated %}
