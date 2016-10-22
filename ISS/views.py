@@ -38,7 +38,9 @@ def forum_index(request):
 def thread_index(request, forum_id):
     forum = get_object_or_404(Forum, pk=forum_id)
     threads = forum.thread_set.order_by('-last_update')
-    paginator = Paginator(threads, 30)
+    paginator = utils.MappingPaginator(threads, 30)
+
+    paginator.install_map_func(lambda t: utils.ThreadFascet(t, request))
 
     page = utils.page_by_request(paginator, request)
 
@@ -63,7 +65,13 @@ def thread(request, thread_id):
         'reply_form': reply_form
     }
 
-    return render(request, 'thread.html', ctx)
+    response = render(request, 'thread.html', ctx)
+
+    # Update thread flag
+    if request.user.is_authenticated():
+        thread.mark_read(request.user, page[-1])
+
+    return response
 
 
 class NewThread(MethodSplitView):

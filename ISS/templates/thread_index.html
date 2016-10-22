@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static from staticfiles %} 
 
 {% block page_name %}
   {{ forum.name }} -
@@ -30,7 +31,15 @@
       </tr>
       {% for thread in threads %}
       <tr>
-        <td></td>
+        <td>
+          <div class="read-status">
+          {% if thread.has_unread_posts %}
+            <img src="{% static 'img/forum_new.gif' %}" alt="Unread posts" />
+          {% else %}
+            <img src="{% static 'img/forum_old.gif' %}" alt="No new posts" />
+          {% endif %}
+          </div>
+        </td>
         <td>
           <a href="{% url 'thread' thread.pk %}" class="thread-name">
             {{ thread.title }}

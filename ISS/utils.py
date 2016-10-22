@@ -1,6 +1,6 @@
 import bbcode
 
-from django.core.paginator import EmptyPage, PageNotAnInteger
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator, Page
 from django.conf import settings
 
 config_defaults = {
@@ -45,3 +45,42 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
             '<a class="img-link" href="%(value)s">embedded image</a>')
 
     return parser
+
+class ThreadFascet(object):
+    """
+    Fusion a thread and a request, representing that thread as perceived by the
+    requesting user. Behaves like a Thread object, from the template's
+    perspective in all but a few instances where rendering id contengent on the
+    user.
+    """
+    def __init__(self, thread, request):
+        self._thread = thread
+        self._request = request
+
+    def __getitem__(self, field):
+        prop = getattr(self._thread, field)
+
+        if field in ('has_unread_posts',):
+            if not self._request.user.is_authenticated():
+                return True
+
+            return prop(self._request.user)
+
+        elif callable(prop):
+            return prop()
+        else:
+            return prop
+
+class MappingPaginator(Paginator):
+    def __init__(self, *args, **kwargs):
+        super(MappingPaginator, self).__init__(*args, **kwargs)
+
+        self._map_function = lambda x: x
+
+    def install_map_func(self, f):
+        self._map_function = f
+
+    def _get_page(self, object_list, number, paginator):
+        object_list = map(self._map_function, object_list)
+
+        return Page(object_list, number, paginator)

@@ -58,6 +58,8 @@ class Thread(models.Model):
     title = models.TextField()
     log = models.TextField(blank=True)
 
+    _flag_cache = None
+
     def get_last_post(self):
         return (self.post_set
                     .order_by('-created')
@@ -82,6 +84,42 @@ class Thread(models.Model):
     def can_reply(self):
         return not self.locked
 
+    def _get_flag(self, user, save=True):
+        if not self._flag_cache:
+            self._flag_cache, created = ThreadFlag.objects.get_or_create(
+                poster=user,
+                thread=self)
+
+            if created and save:
+                self._flag_cache.save()
+
+        return self._flag_cache
+
+    def has_unread_posts(self, user):
+        flag = self._get_flag(user)
+
+        if not flag.last_read_date or flag.last_read_date < self.last_update:
+            return True
+        else:
+            return False
+
+    def mark_read(self, user, post=None):
+        flag = self._get_flag(user, save=False)
+
+        if post is None:
+            post = self.get_last_post()
+
+        flag.last_read_post = post
+        flag.last_read_date = post.created
+
+        flag.save()
+
+    def subscribe(self, user):
+        flag = self._get_flag(user, save=False)
+        flag.subscribed = False
+
+        flag.save()
+
     def __unicode__(self):
         return self.title
 
@@ -102,8 +140,16 @@ class Thanks(models.Model):
     thankee = models.ForeignKey(Poster, related_name='thanks_received')
     post = models.ForeignKey(Post)
 
+class ThreadFlag(models.Model):
+    class Meta:
+        unique_together = ('thread', 'poster')
 
+    thread = models.ForeignKey(Thread)
+    poster = models.ForeignKey(Poster)
 
+    last_read_post = models.ForeignKey(Post, null=True)
+    last_read_date = models.DateTimeField(null=True)
+    subscribed = models.BooleanField(default=False)
 
 def update_thread_last_update(sender, instance, created, **kwargs):
     if not created:
