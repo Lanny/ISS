@@ -103,8 +103,9 @@ In no particular order:
     - ~~Make it work~~
     - Quotes
         - Fix quote pyramids
-        - In quick reply (ajax)
+        - ~~In quick reply (ajax)~~
         - ~~no-js mode over to new-reply page~~
+        - Make nojs a user config option rather than requiring the use of noscript
 - Users
     - image embed option(s?) 
     - profile page
