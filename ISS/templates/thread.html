@@ -45,7 +45,8 @@
             {% if user.is_authenticated %}
               <div class="post-controls">
                 <a class="quote"
-                   href="{% url 'new-reply' thread.pk %}?quote={{ post.pk }}">
+                   href="{% url 'new-reply' thread.pk %}?quote={{ post.pk }}"
+                   data-bbc-url="{% url 'get-quote' post.pk %}">
                   Quote
                 </a>
               </div>
@@ -70,4 +71,8 @@
       </form>
     {% endif %}
   </div>
+{% endblock %}
+
+{% block js %}
+  {% include "require.html" with bootstrap="thread" %}
 {% endblock %}

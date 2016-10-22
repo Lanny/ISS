@@ -1,0 +1,11 @@
+{% load staticfiles %}
+
+<script type="text/javascript" src="{% static 'js/require.js' %}"></script>
+<script type="text/javascript">
+  requirejs.config({
+    baseUrl: '{% static "js" %}'
+  });
+
+  requirejs(['{{ bootstrap }}'], function() {});
+</script>
+

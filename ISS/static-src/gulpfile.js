@@ -21,8 +21,15 @@ gulp.task('less', function() {
     .pipe(gulp.dest('../static/css'));
 });
 
-gulp.task('generate', ['less']);
+gulp.task('javascript', function() {
+  return gulp.src('./src/**/*.js')
+    .pipe(flatten())
+    .pipe(gulp.dest('../static/js'));
+});
+
+gulp.task('generate', ['less', 'javascript']);
 
 gulp.task('watch', ['generate'], function() {
   gulp.watch([ './src/**/*.less' ], ['less']);
+  gulp.watch([ './src/**/*.js' ], ['javascript']);
 });

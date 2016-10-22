@@ -3,7 +3,7 @@ from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.paginator import Paginator
-from django.http import HttpResponseRedirect, HttpResponseBadRequest
+from django.http import HttpResponseRedirect, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render, get_object_or_404
 
 import utils
@@ -12,9 +12,7 @@ from .models import *
 
 class MethodSplitView(object):
     def __call__(self, request, *args, **kwargs):
-        meth_name = ('AJAX_' if request.is_ajax() else '') + request.method
-
-        meth = getattr(self, meth_name, None)
+        meth = getattr(self, request.method, None)
 
         if not meth:
             return HttpResponseBadRequest('Request method %s not supported'
@@ -147,6 +145,15 @@ class NewReply(MethodSplitView):
             }
 
             return render(request, 'new_post.html', ctx)
+
+class GetQuote(MethodSplitView):
+    def GET(self, request, post_id):
+        post = get_object_or_404(Post, pk=post_id)
+        BBC = post.quote_content()
+
+        return JsonResponse({
+            'content': BBC
+        })
 
 class LoginUser(MethodSplitView):
     def GET(self, request):
