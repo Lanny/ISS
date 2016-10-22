@@ -100,8 +100,9 @@ In no particular order:
 - New Post
     - ~~Make it work~~
     - Quotes
+        - Fix quote pyramids
         - In quick reply (ajax)
-        - no-js mode over to new-reply page
+        - ~~no-js mode over to new-reply page~~
 - Users
     - image embed option(s?) 
     - profile page

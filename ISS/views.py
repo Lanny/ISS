@@ -109,7 +109,19 @@ class NewReply(MethodSplitView):
 
     def GET(self, request, thread_id):
         thread = get_object_or_404(Thread, pk=thread_id)
-        form = forms.NewPostForm(initial={ 'thread': thread })
+        form_initials = { 'thread': thread }
+
+        # Fetch BBCode for a quote in this response
+        quoted_post_pk = request.GET.get('quote', None)
+        if quoted_post_pk:
+            try:
+                quoted_post = Post.objects.get(pk=quoted_post_pk)
+                form_initials['content'] = quoted_post.quote_content()
+
+            except Post.DoesNotExist:
+                pass
+
+        form = forms.NewPostForm(initial=form_initials)
         
         ctx = {
             'thread': thread,
@@ -146,9 +158,6 @@ class LoginUser(MethodSplitView):
             form = AuthenticationForm(data=request.POST, request=request)
 
             if form.is_valid():
-                print ' JAZZ!'
-                print form.user_cache
-                print form.user_cache.backend
                 login(request, form.user_cache)
                 next_url = request.POST.get('next', '/')
                 return HttpResponseRedirect(next_url)

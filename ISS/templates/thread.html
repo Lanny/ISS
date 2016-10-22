@@ -44,7 +44,10 @@
 
             {% if user.is_authenticated %}
               <div class="post-controls">
-                <button class="quote">Quote</button>
+                <a class="quote"
+                   href="{% url 'new-reply' thread.pk %}?quote={{ post.pk }}">
+                  Quote
+                </a>
               </div>
             {% endif %}
           </div>

@@ -130,6 +130,9 @@ class Post(models.Model):
     content = models.TextField()
     author = models.ForeignKey(Poster)
 
+    def quote_content(self):
+        return '[quote]%s[/quote]' % self.content
+
     def get_url(self):
         return self.thread.get_url(self)
 
