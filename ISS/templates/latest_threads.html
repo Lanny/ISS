@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static from staticfiles %} 
+
+{% block page_name %}
+  New Threads -
+{% endblock %}
+
+{% block breadcrumb %}
+  &gt; <a href="{{ request.get_full_path }}">Latest Threads</a>
+{% endblock %}
+
+{% block content %}
+  <div class="thread-index">
+    <div class="forum-intro">
+      <h1 class="forum-title">Latest Threads</h1>
+      <span class="forum-description">
+        Threads from every forum, sorted by last reply.
+      </span>
+    </div>
+
+    {% include 'thread_list.html' with threads=threads %}
+  </div>
+{% endblock %}

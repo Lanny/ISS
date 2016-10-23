@@ -23,6 +23,7 @@ urlpatterns = [
     url('^thread/(?P<thread_id>\d+)/new-reply/?$', views.NewReply.as_view(), name='new-reply'),
     url('^forum/(?P<forum_id>\d+)/new-thread$', views.NewThread.as_view(), name='new-thread'),
     url('^forum/(?P<forum_id>\d+)/?$', views.thread_index, name='thread-index'),
+    url('^latest-threads/?$', views.latest_threads, name='latest-threads'),
     url(r'^/?$', views.forum_index, name='forum-index'), 
     url(r'^register/$', views.RegisterUser.as_view(), name='register'),
     url(r'^login/$', views.LoginUser.as_view(), name='login'),

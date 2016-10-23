@@ -101,6 +101,8 @@ In no particular order:
 - ~~New Thread~~
 - New Post
     - ~~Make it work~~
+    - video embedding
+    - autolinking that doesn't break other stuff
     - Quotes
         - Fix quote pyramids
         - ~~In quick reply (ajax)~~
@@ -120,16 +122,15 @@ In no particular order:
     - Reply
     - "Alerts"
 - Navigation
-    - Breadcrumbs
+    - ~~Breadcrumbs~~
     - Sitemap? Whatever SEO magic the cool kids are into these days
 - More than one usertitle
 - Thanks
     - AJAX
     - nojs reload
     - list of thanked posts
-- Markdown in posts
 - Static pages (FAQ, whatever)
-- New posts
+- ~~New posts~~
 - Flood control
 - Usernames need to be printable
     - should probably do some char juking prevention as well.

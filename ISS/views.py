@@ -73,6 +73,20 @@ def thread(request, thread_id):
 
     return response
 
+def latest_threads(request):
+    threads = Thread.objects.all().order_by('-last_update')
+    threads_per_page = utils.get_config('threads_per_forum_page')
+    paginator = utils.MappingPaginator(threads, threads_per_page)
+
+    paginator.install_map_func(lambda t: utils.ThreadFascet(t, request))
+
+    page = utils.page_by_request(paginator, request)
+
+    ctx = {
+        'threads': page
+    }
+
+    return render(request, 'latest_threads.html', ctx)
 
 class NewThread(MethodSplitView):
     login_required = True
