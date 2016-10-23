@@ -130,3 +130,6 @@ In no particular order:
 - Markdown in posts
 - Static pages (FAQ, whatever)
 - New posts
+- Flood control
+- Usernames need to be printable
+    - should probably do some char juking prevention as well.
