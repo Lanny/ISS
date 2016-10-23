@@ -4,12 +4,12 @@
       $('body').on('click', '.quote', function(e) {
         e.preventDefault();
 
-        var quoteFetchUrl = $(e.target).attr('data-bbc-url');
+        var quoteFetchUrl = $(e.target).attr('data-bbc-url'),
+          replyTextbox = $('.quick-reply #id_content');
 
         $.getJSON(quoteFetchUrl)
           .done(function(data) {
-            var replyTextbox = $('.quick-reply #id_content'),
-              oldVal = replyTextbox.val(),
+            var oldVal = replyTextbox.val(),
               newVal;
 
             if (oldVal === '') {
