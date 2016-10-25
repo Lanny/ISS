@@ -1,4 +1,7 @@
+import re
+
 from django.db import models
+from django.dispatch import receiver
 from django.contrib import auth
 from django.utils import timezone
 from django.core.urlresolvers import reverse
@@ -11,6 +14,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     REQUIRED_FIELDS = [ 'email' ]
 
     username = models.CharField(max_length=256, unique=True)
+    normalized_username = models.CharField(max_length=256)
     email = models.EmailField()
     date_joined = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
@@ -30,6 +34,13 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     def get_user_title(self):
         return 'Regular'
+
+    @classmethod
+    def normalize_username(cls, username):
+        norm = username.lower()
+        norm = re.sub('\s', '', norm)
+
+        return norm
 
     def embed_images(self):
         return True
@@ -168,6 +179,7 @@ class ThreadFlag(models.Model):
     last_read_date = models.DateTimeField(null=True)
     subscribed = models.BooleanField(default=False)
 
+@receiver(models.signals.post_save, sender=Post)
 def update_thread_last_update(sender, instance, created, **kwargs):
     if not created:
         # Edits don't bump threads.
@@ -179,4 +191,6 @@ def update_thread_last_update(sender, instance, created, **kwargs):
         thread.last_update = instance.created
         thread.save()
 
-models.signals.post_save.connect(update_thread_last_update, sender=Post)
+@receiver(models.signals.pre_save, sender=Poster)
+def set_normalized_username(sender, instance, **kwargs):
+    instance.normalized_username = Poster.normalize_username(instance.username)

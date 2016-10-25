@@ -88,6 +88,20 @@ class RegistrationForm(UserCreationForm):
         model = Poster
         fields = ('username', 'email')        
 
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        norm_username = Poster.normalize_username(username)
+
+        if len(norm_username) < 1:
+            raise ValidationError('Invalid username', code='INVALID_GENERAL')
+
+        if Poster.objects.filter(normalized_username=norm_username).count():
+            raise ValidationError(
+                'User with a similar username already exists',
+                code='TOO_SIMILAR')
+
+        return username
+
     def save(self,commit = True):   
         poster = super(RegistrationForm, self).save(commit = False)
         poster.save()
