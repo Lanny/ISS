@@ -88,6 +88,28 @@ def latest_threads(request):
 
     return render(request, 'latest_threads.html', ctx)
 
+def user_profile(request, user_id):
+    poster = get_object_or_404(Poster, pk=user_id)
+
+    ctx = {
+        'poster': poster
+    }
+
+    return render(request, 'user_profile.html', ctx)
+
+def user_list(request):
+    posters = Poster.objects.all().order_by('username')
+    posters_per_page = 20
+    pagniator = Paginator(posters, posters_per_page)
+
+    page = utils.page_by_request(posters, posters_per_page)
+
+    ctx = {
+        'posters': page
+    }
+
+    return render(request, 'user_list.html', ctx)
+
 class NewThread(MethodSplitView):
     login_required = True
 

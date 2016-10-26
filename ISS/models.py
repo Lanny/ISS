@@ -30,7 +30,10 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         return self.get_long_name()
 
     def get_url(self):
-        return '/'
+        return reverse('user-profile', kwargs={'user_id': self.pk})
+
+    def show_email(self):
+        return False
 
     def get_user_title(self):
         return 'Regular'

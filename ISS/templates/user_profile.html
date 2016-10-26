@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block page_name %}
+  {{ poster.username }} -
+{% endblock %}
+
+{% block breadcrumb %}
+  &gt; Users
+  &gt; <a href="{{ poster.get_url }}">{{ poster.username }}</a>
+{% endblock %}
+
+{% block content %}
+  <section class="user-profile">
+    <h3>User Profile</h3>
+
+    <div class="profile-content">
+      <div class="face-block">
+        <div class="avatar"></div>
+        <div>
+          <h1>{{ poster.username }}</h1>
+          <small class="user-title">
+            {{ poster.get_user_title }}
+          </small>
+        </div>
+      </div>
+
+      <div class="stats-block">
+        <div class="stat">
+          <span class="label">Total Posts</span>
+          <span class="value">{{ poster.post_set.count }}</span>
+        </div>
+
+        <div class="stat">
+          <span class="label">Join Date</span>
+          <span class="value">{{ poster.date_joined|date:"o-m-d" }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
