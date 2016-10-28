@@ -27,7 +27,11 @@
       <div class="stats-block">
         <div class="stat">
           <span class="label">Total Posts</span>
-          <span class="value">{{ poster.post_set.count }}</span>
+          <span class="value">
+            <a href="{% url 'posts-by-user' poster.pk %}">
+              {{ poster.post_set.count }}
+            </a>
+          </span>
         </div>
 
         <div class="stat">

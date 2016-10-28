@@ -1,0 +1,46 @@
+{% load bbc %}
+
+<ol class="post-list">
+{% for post in posts %}
+  <li class="post" id="post-{{ post.pk }}">
+    <div class="post-hat">
+      <span class="post-data">
+        {{ post.created|date:"o-m-d" }} at
+        {{ post.created|time:"f A e" }}
+      </span>
+
+      {% if not show_thread_context %}
+        <a href="{{ post.get_url }}" class="post-number">
+          #{{ forloop.counter0|add:posts.start_index }}
+        </a>
+      {% endif %}
+    </div>
+
+    <div class="user-block">
+      <a class="author-name" href="{{ post.author.get_url }}">
+        {{ post.author.username }}
+      </a>
+      <span class="user-title">
+        {{ post.author.get_user_title }}
+      </span>
+    </div>
+
+    <div class="post-block">
+      <div class="post-body">
+        {{ post.content|bbc:embed_images }}
+      </div>
+
+      {% if user.is_authenticated and show_post_controls %}
+        <div class="post-controls">
+          <a class="quote"
+             href="{% url 'new-reply' thread.pk %}?quote={{ post.pk }}"
+             data-bbc-url="{% url 'get-quote' post.pk %}">
+            Quote
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </li>
+{% endfor %}
+</ol>
+

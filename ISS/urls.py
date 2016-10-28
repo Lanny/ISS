@@ -20,8 +20,10 @@ from ISS import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url('^thread/(?P<thread_id>\d+)/?$', views.thread, name='thread'),
-    url('^thread/(?P<thread_id>\d+)/new-reply/?$', views.NewReply.as_view(), name='new-reply'),
-    url('^forum/(?P<forum_id>\d+)/new-thread$', views.NewThread.as_view(), name='new-thread'),
+    url('^thread/(?P<thread_id>\d+)/new-reply/?$', views.NewReply.as_view(),
+        name='new-reply'),
+    url('^forum/(?P<forum_id>\d+)/new-thread$', views.NewThread.as_view(),
+        name='new-thread'),
     url('^forum/(?P<forum_id>\d+)/?$', views.thread_index, name='thread-index'),
     url('^latest-threads/?$', views.latest_threads, name='latest-threads'),
     url(r'^/?$', views.forum_index, name='forum-index'), 
@@ -29,5 +31,8 @@ urlpatterns = [
     url(r'^login/$', views.LoginUser.as_view(), name='login'),
     url(r'^logout/$', views.LogoutUser.as_view(), name='logout'),
     url(r'^user/(?P<user_id>\d+)/?$', views.user_profile, name='user-profile'),
-    url(r'^post/(?P<post_id>\d+)/get-quote$', views.GetQuote.as_view(), name='get-quote'),
+    url(r'^user/(?P<user_id>\d+)/posts/?$', views.posts_by_user,
+        name='posts-by-user'),
+    url(r'^post/(?P<post_id>\d+)/get-quote$', views.GetQuote.as_view(),
+        name='get-quote'),
 ]

@@ -9,7 +9,8 @@ config_defaults = {
     'min_post_chars': 1,
     'min_thread_title_chars': 1,
     'threads_per_forum_page': 20,
-    'posts_per_thread_page': 20
+    'posts_per_thread_page': 20,
+    'general_items_per_page': 20
 }
 
 config = config_defaults.copy()
