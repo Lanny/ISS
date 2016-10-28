@@ -7,6 +7,13 @@
       <span class="post-data">
         {{ post.created|date:"o-m-d" }} at
         {{ post.created|time:"f A e" }}
+
+        {% if show_thread_context %}
+          in
+          <a href="{{ post.get_url }}">
+            {{ post.thread.title }}
+          </a>
+        {% endif %}
       </span>
 
       {% if not show_thread_context %}
