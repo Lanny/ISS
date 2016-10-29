@@ -159,7 +159,11 @@ class Post(models.Model):
     author = models.ForeignKey(Poster)
 
     def quote_content(self):
-        return '[quote]%s[/quote]' % self.content
+        parser = utils.get_closure_bbc_parser()
+        body = parser.format(self.content)
+
+        template = '[quote author=%s]\n%s\n[/quote]'
+        return template % (self.author.username, body)
 
     def get_url(self):
         return self.thread.get_url(self)
