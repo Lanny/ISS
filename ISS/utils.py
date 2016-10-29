@@ -74,35 +74,17 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
 
 
 def get_closure_bbc_parser():
-    base_parser = get_standard_bbc_parser()
-    tag_set = base_parser.recognized_tags.keys()
-
-    tag_set.remove('quote')
-
     c_parser = bbcode.Parser(
         newline='\n', install_defaults=False, escape_html=False,
         replace_links=False, replace_cosmetic=False)
 
-    def closed_render(tag_name, value, options, parent, context):
-        s = ['[', tag_name]
-
-        for opt_key, opt_val in options.items():
-            s.extend([' ', opt_key, '=', opt_val])
-
-        s.extend([']', value, '[/', tag_name, ']'])
-
-        return ''.join(s)
-
     def depyramiding_quote_render(tag_name, value, options, parent, context):
-        if parent.tag_name == 'quote':
+        if tag_name == 'quote':
             return ''
 
-        return closed_render(tag_name, value, options, parent, context)
+        return value
 
-    parser.add_formatter('quote', depyramiding_quote_render)
-
-    for tag_name in tag_set:
-        c_parser.add_formatter(tag_name, closed_render)
+    c_parser.add_formatter('quote', depyramiding_quote_render)
 
     return c_parser
 
