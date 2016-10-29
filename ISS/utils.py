@@ -47,6 +47,28 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
             'img',
             '<a class="img-link" href="%(value)s">embedded image</a>')
 
+    def render_quote(tag_name, value, options, parent, context):
+        author = options.get('author', None)
+
+        if author:
+            template = """
+                <blockquote>
+                  <small class="attribution">Originally posted by %s</small>
+                  %s
+                </blockquote>
+            """
+
+            return template % (author, value)
+
+        else:
+            return '<blockquote>%s</blockquote>' % value
+
+    parser.add_formatter('quote',
+                         render_quote,
+                         strip=True,
+                         swallow_trailing_newline=True)
+        
+
     return parser
 
 class ThreadFascet(object):
