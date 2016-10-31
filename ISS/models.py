@@ -66,7 +66,7 @@ class Forum(models.Model):
         return self.name
 
 class Thread(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(default=timezone.now)
     last_update = models.DateTimeField(auto_now_add=True)
     locked = models.BooleanField(default=False)
 
@@ -152,7 +152,7 @@ class Thread(models.Model):
         return self.title
 
 class Post(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(default=timezone.now)
 
     thread = models.ForeignKey(Thread)
     content = models.TextField()
