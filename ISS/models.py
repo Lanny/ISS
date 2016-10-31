@@ -67,7 +67,7 @@ class Forum(models.Model):
 
 class Thread(models.Model):
     created = models.DateTimeField(default=timezone.now)
-    last_update = models.DateTimeField(auto_now_add=True)
+    last_update = models.DateTimeField(default=timezone.now)
     locked = models.BooleanField(default=False)
 
     forum = models.ForeignKey(Forum)

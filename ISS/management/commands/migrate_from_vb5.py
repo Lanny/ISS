@@ -88,7 +88,8 @@ class Command(BaseCommand):
                 title=thread['title'],
                 created=datetime.fromtimestamp(thread['publishdate'], utc),
                 forum_id=forum_pk_map[thread['parentid']],
-                log='Migrated at %s' % migration_version)
+                log='Migrated at %s' % migration_version,
+                last_update=datetime.fromtimestamp(0, utc))
 
             new_thread.save()
 
