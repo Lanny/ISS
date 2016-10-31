@@ -3,6 +3,8 @@ import pytz
 from datetime import datetime
 
 import mysql.connector
+
+from django.db.models import Count
 from django.db.utils import IntegrityError
 from django.core.management.base import BaseCommand, CommandError
 from ISS.models import *
@@ -66,7 +68,7 @@ class Command(BaseCommand):
 
         return o2n_map
 
-    def mig_threads(self, cnx, cursor, forum_pk_map):
+    def mig_threads(self, cnx, cursor, forum_pk_map, user_pk_map):
         cursor.execute("""
             SELECT thread.* FROM node AS thread
                 JOIN node AS forum
@@ -80,7 +82,8 @@ class Command(BaseCommand):
         """)
 
         o2n_map = {}
-        for thread in cursor:
+        threads = cursor.fetchall()
+        for thread in threads:
             new_thread = Thread(
                 title=thread['title'],
                 created=datetime.fromtimestamp(thread['publishdate'], utc),
@@ -88,6 +91,26 @@ class Command(BaseCommand):
                 log='Migrated at %s' % migration_version)
 
             new_thread.save()
+
+            cursor.execute('SELECT * FROM text WHERE nodeid=%s',
+                           (thread['nodeid'],))
+
+            first = True
+            for result in cursor:
+                if not first:
+                    raise Exception('Wowah there')
+
+                first = False
+
+                op_text = result['rawtext']
+
+                new_post = Post(
+                    created=datetime.fromtimestamp(thread['publishdate'], utc),
+                    thread_id=new_thread.pk,
+                    content=op_text,
+                    author_id=user_pk_map[thread['userid']])
+
+            new_post.save()
 
             o2n_map[thread['nodeid']] = new_thread.pk
 
@@ -112,6 +135,11 @@ class Command(BaseCommand):
 
                 new_post.save()
 
+            (Thread.objects
+                .annotate(post_count=Count('post'))
+                .filter(post_count=0)
+                .delete())
+
 
     def handle(self, *args, **kwargs):
 
@@ -119,7 +147,7 @@ class Command(BaseCommand):
                                       password=self.db_pass,
                                       host=self.db_host,
                                       database=self.db_name)
-        cursor = cnx.cursor(dictionary=True)
+        cursor = cnx.cursor(dictionary=True, buffered=True)
 
         print 'Migrating users...'
         user_pk_map = self.mig_users(cnx, cursor)
@@ -128,7 +156,7 @@ class Command(BaseCommand):
         forum_pk_map = self.mig_forums(cnx, cursor)
 
         print 'Done.\nMigrating threads...'
-        thread_pk_map = self.mig_threads(cnx, cursor, forum_pk_map)
+        thread_pk_map = self.mig_threads(cnx, cursor, forum_pk_map, user_pk_map)
 
         print 'Done.\nMigrating posts...'
         self.mig_posts(cnx, cursor, thread_pk_map, user_pk_map)
