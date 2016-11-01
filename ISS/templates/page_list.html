@@ -1,3 +1,5 @@
+{% load pagination %}
+
 {% if page.has_other_pages %}
 <div class="paginator">
   <ol>
@@ -14,11 +16,18 @@
     </li>
     {% endif %}
 
-    {% for page_num in page.paginator.page_range %}
+    {% nice_page_set page as page_set %}
+    {% for page_num in page_set %}
       <li class="{% if page_num == page.number %}current-page{% endif %}">
+        {% if page_num == -1 %}
+        <span>
+          ...
+        </span>
+        {% else %}
         <a href="{{ base_url }}?p={{ page_num }}">
           {{ page_num }}
         </a>
+        {% endif %}
       </li>
     {% endfor %}
 
