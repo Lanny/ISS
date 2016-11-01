@@ -23,5 +23,7 @@
     {% endif %}
 
     {% include 'thread_list.html' with threads=threads %}
+
+    {% include "page_list.html" with page=threads %}
   </div>
 {% endblock %}

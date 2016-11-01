@@ -95,7 +95,7 @@ In no particular order:
 - Forum thread list
     - ~~make it work~~
     - ~~order by updated time~~
-    - pagination
+    - ~~pagination~~
     - go to newest post
     - go to oldest unread post
 - ~~New Thread~~
