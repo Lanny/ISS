@@ -13,17 +13,22 @@ migration_version = 'DEVELOPMENT_001'
 utc = pytz.timezone('utc')
 
 class Command(BaseCommand):
-    help = 'Migrates a vBulletin 5 database to ISS'
-
-    db_user = 'root'
-    db_pass = ''
-    db_name = 'vB'
-    db_host = 'localhost'
-    category_pks = []
+    help = ('Migrates a vBulletin 5 database to ISS. Source database location '
+            'and credentials must be supplied, target database info is picked '
+            'up from settings.py. NB: this process is only idempotent over '
+            'the users table.')
 
     def add_arguments(self, parser):
-        # parser.add_argument('n', type=int)
-        pass
+        parser.add_argument('--db-host', default='localhost',
+                            help='Host for the source database')
+        parser.add_argument('--db-port', default=3306, type=int,
+                            help='Port to connect to the source DB on')
+        parser.add_argument('--db-name', 
+                            help='Name of the source database to connect to')
+        parser.add_argument('--db-user', 
+                            help='User to log into the source database as')
+        parser.add_argument('--db-pass', default='',
+                            help='Password for the specified user')
 
     def mig_users(self, cnx, cursor):
         query = 'SELECT * FROM user;'
@@ -144,12 +149,13 @@ class Command(BaseCommand):
                 .delete())
 
 
-    def handle(self, *args, **kwargs):
-
-        cnx = mysql.connector.connect(user=self.db_user,
-                                      password=self.db_pass,
-                                      host=self.db_host,
-                                      database=self.db_name)
+    def handle(self, db_user=None, db_port=None, db_host=None, db_pass=None,
+            db_name=None, **kwargs):
+        cnx = mysql.connector.connect(user=db_user,
+                                      password=db_pass,
+                                      host=db_host,
+                                      port=db_port,
+                                      database=db_name)
         cursor = cnx.cursor(dictionary=True, buffered=True)
 
         print 'Migrating users...'
