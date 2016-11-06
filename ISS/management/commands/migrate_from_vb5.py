@@ -32,7 +32,9 @@ class Command(BaseCommand):
         o2n_map = {}
         for user in cursor:
             new_user = Poster(username=user['username'],
-                              email=user['email'])
+                              email=user['email'],
+                              password=user['token'],
+                              backend='ISS.auth.backends.vB5_%s' % user['scheme'])
             try:
                 new_user.save()
                 o2n_map[user['userid']] = new_user.pk

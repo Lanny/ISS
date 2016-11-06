@@ -107,3 +107,9 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'ISS.Poster'
 FORUM_CONFIG = {}
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'ISS.auth.backends.vB5_legacy'
+]
+

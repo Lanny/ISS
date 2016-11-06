@@ -21,6 +21,10 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
 
+    # For support of vB backends
+    backend = models.TextField(
+        default='django.contrib.auth.backends.ModelBackend')
+
     objects = auth.models.UserManager()
 
     def get_long_name(self):
