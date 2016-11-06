@@ -10,8 +10,6 @@ import utils
 import forms
 from .models import *
 
-print _get_backends(return_tuples=True)
-
 class MethodSplitView(object):
     def __call__(self, request, *args, **kwargs):
         meth = getattr(self, request.method, None)
