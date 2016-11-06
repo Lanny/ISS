@@ -29,7 +29,9 @@ class MethodSplitView(object):
 
 def forum_index(request):
     forums = Forum.objects.all().order_by('priority')
-    ctx = { 'forums': forums }
+    ctx = {
+        'forums': [utils.ForumFascet(f, request) for f in forums]
+    }
 
     return render(request, 'forum_index.html', ctx)
 
@@ -47,6 +49,9 @@ def thread_index(request, forum_id):
         'forum': forum,
         'threads': page
     }
+
+    if request.user.is_authenticated():
+        forum.mark_read(request.user)
 
     return render(request, 'thread_index.html', ctx)
 

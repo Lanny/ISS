@@ -72,7 +72,6 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
 
     return parser
 
-
 def get_closure_bbc_parser():
     c_parser = bbcode.Parser(
         newline='\n', install_defaults=False, escape_html=False,
@@ -93,7 +92,7 @@ class ThreadFascet(object):
     """
     Fusion a thread and a request, representing that thread as perceived by the
     requesting user. Behaves like a Thread object, from the template's
-    perspective in all but a few instances where rendering id contengent on the
+    perspective in all but a few instances where rendering is contengent on the
     user.
     """
     def __init__(self, thread, request):
@@ -104,6 +103,28 @@ class ThreadFascet(object):
         prop = getattr(self._thread, field)
 
         if field in ('has_unread_posts',):
+            if not self._request.user.is_authenticated():
+                return True
+
+            return prop(self._request.user)
+
+        elif callable(prop):
+            return prop()
+        else:
+            return prop
+
+class ForumFascet(object):
+    """
+    Same as above, but for forums.
+    """
+    def __init__(self, forum, request):
+        self._forum = forum
+        self._request = request
+
+    def __getitem__(self, field):
+        prop = getattr(self._forum, field)
+
+        if field in ('is_unread',):
             if not self._request.user.is_authenticated():
                 return True
 

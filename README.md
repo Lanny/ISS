@@ -85,7 +85,7 @@ In no particular order:
 - Forum index
     - ~~make it work~~
     - ~~admin configurable ordering~~
-    - figure out what to do with that "new" column that isn't slow
+    - ~~figure out what to do with that "new" column that isn't slow~~
 - ~~Thread locks~~
 - Links to admin site
 - User active status check before thread/post creation
@@ -110,10 +110,16 @@ In no particular order:
         - Make nojs a user config option rather than requiring the use of noscript
 - Users
     - image embed option(s?) 
-    - profile page
+    - ~~profile page~~
+      - posts per day
+      - avatar
     - avatars
     - list of posts
     - make user titles work
+    - settings
+      - nojs
+      - image embed
+      - email display?
 - Unread Posts in Thread / Thread Subscriptions
 - View Subscriptions (UserCP) 
 - Private Messages
@@ -134,3 +140,5 @@ In no particular order:
 - Flood control
 - Usernames need to be printable
     - should probably do some char juking prevention as well.
+- Add a footer
+- hambergerify user controls at some point

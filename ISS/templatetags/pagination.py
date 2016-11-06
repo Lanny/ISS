@@ -22,5 +22,4 @@ def nice_page_set(page):
 
         elip_pages.append(n)
 
-    print elip_pages
     return elip_pages

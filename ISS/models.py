@@ -52,6 +52,30 @@ class Forum(models.Model):
     name = models.TextField()
     description = models.TextField()
     priority = models.IntegerField(default=2147483647, null=False)
+    last_update = models.DateTimeField(default=timezone.now)
+
+    _flag_cache = None
+
+    def _get_flag(self, user):
+        if not self._flag_cache:
+            self._flag_cache, created = ForumFlag.objects.get_or_create(
+                poster=user,
+                forum=self)
+
+        return self._flag_cache
+
+    def mark_read(self, user):
+        flag = self._get_flag(user)
+        flag.last_read_date = timezone.now()
+        flag.save()
+
+    def is_unread(self, user):
+        flag = self._get_flag(user)
+
+        if not flag.last_read_date or flag.last_read_date < self.last_update:
+            return True
+        else:
+            return False
 
     def get_thread_count(self):
         return self.thread_set.count()
@@ -186,6 +210,15 @@ class ThreadFlag(models.Model):
     last_read_date = models.DateTimeField(null=True)
     subscribed = models.BooleanField(default=False)
 
+class ForumFlag(models.Model):
+    class Meta:
+        unique_together = ('forum', 'poster')
+
+    forum = models.ForeignKey(Forum)
+    poster = models.ForeignKey(Poster)
+
+    last_read_date = models.DateTimeField(null=True)
+
 @receiver(models.signals.post_save, sender=Post)
 def update_thread_last_update(sender, instance, created, **kwargs):
     if not created:
@@ -197,6 +230,15 @@ def update_thread_last_update(sender, instance, created, **kwargs):
     if thread.last_update < instance.created:
         thread.last_update = instance.created
         thread.save()
+
+@receiver(models.signals.post_save, sender=Thread)
+def update_forum_last_update(sender, instance, created, **kwargs):
+    thread = instance
+    forum = thread.forum
+
+    if forum.last_update < thread.last_update:
+        forum.last_update = thread.last_update
+        forum.save()
 
 @receiver(models.signals.pre_save, sender=Poster)
 def set_normalized_username(sender, instance, **kwargs):
