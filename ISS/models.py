@@ -1,10 +1,10 @@
 import re
 
-from django.db import models
-from django.dispatch import receiver
 from django.contrib import auth
-from django.utils import timezone
 from django.core.urlresolvers import reverse
+from django.db import models, IntegrityError
+from django.dispatch import receiver
+from django.utils import timezone
 
 from ISS import utils
 
@@ -250,3 +250,8 @@ def update_forum_last_update(sender, instance, created, **kwargs):
 @receiver(models.signals.pre_save, sender=Poster)
 def set_normalized_username(sender, instance, **kwargs):
     instance.normalized_username = Poster.normalize_username(instance.username)
+
+@receiver(models.signals.pre_save, sender=Thanks)
+def reject_auto_erotic_athanksication(sender, instance, **kwargs):
+    if instance.thanker.pk == instance.thankee.pk:
+        raise IntegrityError('A user may not thank themselves')
