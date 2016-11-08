@@ -197,6 +197,9 @@ class Post(models.Model):
         return self.thread.get_url(self)
 
 class Thanks(models.Model):
+    class Meta:
+        unique_together = ('thanker', 'post')
+
     given = models.DateTimeField(auto_now_add=True)
 
     thanker = models.ForeignKey(Poster, related_name='thanks_given')
