@@ -265,3 +265,12 @@ class RegisterUser(MethodSplitView):
             return render(request, 'register.html', ctx)
 
 
+class ThankPost(MethodSplitView):
+    require_login = True
+
+    def POST(self, request, post_id):
+        post = get_object_or_404(Post, pk=post_id)
+        thanks = Thanks(post=post, thanker=request.user, thankee=post.author)
+        thanks.save()
+
+        return HttpResponseRedirect(post.get_url())

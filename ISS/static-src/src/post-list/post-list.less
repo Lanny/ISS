@@ -52,11 +52,37 @@
 
         * {
           float: right;
+          margin-left: 3px;
         }
 
         .quote {
           .small-btn();
           .teal();
+        }
+
+        .thank-action {
+          .small-btn();
+          .teal();
+        }
+      }
+    }
+
+    .thanker-block {
+      margin-top: 5px;
+      background-color: @bg_dark;
+
+      .thanker-caption {
+        .teal();
+        padding: 3px 5px;
+        font-size: 12px;
+      }
+
+      .thanker-list {
+        list-style: none;
+        padding: 5px;
+
+        li {
+          display: inline-block;
         }
       }
     }
