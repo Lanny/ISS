@@ -21,6 +21,12 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
 
+    custom_user_title = models.CharField(max_length=256, null=True,
+                                         default=None)
+    allow_js = models.BooleanField(default=False)
+    allow_image_embed = models.BooleanField(default=True)
+    allow_avatars = models.BooleanField(default=True)
+
     # For support of vB backends
     backend = models.TextField(
         default='django.contrib.auth.backends.ModelBackend')
@@ -40,7 +46,13 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         return False
 
     def get_user_title(self):
-        return 'Regular'
+        if self.custom_user_title != None:
+            return self.custom_user_title
+        else:
+            return 'Regular'
+
+    def get_nojs(self):
+        return self.allow_js
 
     @classmethod
     def normalize_username(cls, username):
