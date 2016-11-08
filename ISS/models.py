@@ -196,6 +196,9 @@ class Post(models.Model):
     def get_url(self):
         return self.thread.get_url(self)
 
+    def get_thanker_pks(self):
+        return {t.thanker_id for t in self.thanks_set.all()}
+
 class Thanks(models.Model):
     class Meta:
         unique_together = ('thanker', 'post')

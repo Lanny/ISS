@@ -279,3 +279,14 @@ class ThankPost(MethodSplitView):
             pass
 
         return HttpResponseRedirect(post.get_url())
+
+class UnthankPost(MethodSplitView):
+    require_login = True
+
+    def POST(self, request, post_id):
+        post = get_object_or_404(Post, pk=post_id)
+        thanks = get_object_or_404(Thanks, post=post, thanker=request.user)
+
+        thanks.delete()
+
+        return HttpResponseRedirect(post.get_url())

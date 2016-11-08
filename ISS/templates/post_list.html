@@ -46,10 +46,17 @@
           </a>
 
           {% if user.pk != post.author.pk %}
-            <form action="{% url 'thank-post' post.pk %}" method="POST">
-              {% csrf_token %}
-              <input type="submit" value="Thank" class="thank-action" />
-            </form>
+            {% if user.pk in post.get_thanker_pks %}
+              <form action="{% url 'unthank-post' post.pk %}" method="POST">
+                {% csrf_token %}
+                <input type="submit" value="Unthank" class="thank-action" />
+              </form>
+            {% else %}
+              <form action="{% url 'thank-post' post.pk %}" method="POST">
+                {% csrf_token %}
+                <input type="submit" value="Thank" class="thank-action" />
+              </form>
+            {% endif %}
           {% endif %}
         </div>
       {% endif %}
