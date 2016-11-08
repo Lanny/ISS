@@ -3,6 +3,7 @@ from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.paginator import Paginator
+from django.db import IntegrityError
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render, get_object_or_404
 
@@ -271,6 +272,10 @@ class ThankPost(MethodSplitView):
     def POST(self, request, post_id):
         post = get_object_or_404(Post, pk=post_id)
         thanks = Thanks(post=post, thanker=request.user, thankee=post.author)
-        thanks.save()
+
+        try:
+            thanks.save()
+        except IntegrityError:
+            pass
 
         return HttpResponseRedirect(post.get_url())
