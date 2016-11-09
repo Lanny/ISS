@@ -207,3 +207,21 @@ blockquote {
   justify-content: center;
   align-content: center;
 }
+
+.moderation-action {
+  text-decoration: none;
+
+  &:after {
+    content: "✎";
+    .teal();
+    display: inline-block;
+
+    height: 15px;
+    width: 15px;
+    border: 1px solid white;
+    padding: 3px;
+    border-radius: 3px;
+    font-size: 13px;
+    text-align: center;
+  }
+}

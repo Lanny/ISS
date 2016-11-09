@@ -22,7 +22,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     is_staff = models.BooleanField(default=False)
 
     custom_user_title = models.CharField(max_length=256, null=True,
-                                         default=None)
+                                         default=None, blank=True)
     allow_js = models.BooleanField(default=False)
     allow_image_embed = models.BooleanField(default=True)
     allow_avatars = models.BooleanField(default=True)

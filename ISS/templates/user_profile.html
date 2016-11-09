@@ -17,7 +17,15 @@
       <div class="face-block">
         <div class="avatar"></div>
         <div>
-          <h1>{{ poster.username }}</h1>
+          <h1>
+            {{ poster.username }}
+
+            {% if user.is_staff %}
+              <a href={% url 'admin:ISS_poster_change' poster.pk %}
+                 class="moderation-action">
+              </a>
+            {% endif %}
+          </h1>
           <small class="user-title">
             {{ poster.get_user_title }}
           </small>
