@@ -11,42 +11,59 @@
 
 {% block content %}
   <section class="user-profile">
-    <h3>User Profile</h3>
 
-    <div class="profile-content">
-      <div class="face-block">
-        <div class="avatar"></div>
-        <div>
-          <h1>
-            {{ poster.username }}
+    <div class="public-info">
+      <h3>User Profile</h3>
 
-            {% if user.is_staff %}
-              <a href={% url 'admin:ISS_poster_change' poster.pk %}
-                 class="moderation-action">
+      <div class="profile-content">
+        <div class="face-block">
+          <div class="avatar"></div>
+          <div>
+            <h1>
+              {{ poster.username }}
+
+              {% if user.is_staff %}
+                <a href={% url 'admin:ISS_poster_change' poster.pk %}
+                   class="moderation-action">
+                </a>
+              {% endif %}
+            </h1>
+            <small class="user-title">
+              {{ poster.get_user_title }}
+            </small>
+          </div>
+        </div>
+
+        <div class="stats-block">
+          <div class="stat">
+            <span class="label">Total Posts</span>
+            <span class="value">
+              <a href="{% url 'posts-by-user' poster.pk %}">
+                {{ poster.post_set.count }}
               </a>
-            {% endif %}
-          </h1>
-          <small class="user-title">
-            {{ poster.get_user_title }}
-          </small>
-        </div>
-      </div>
+            </span>
+          </div>
 
-      <div class="stats-block">
-        <div class="stat">
-          <span class="label">Total Posts</span>
-          <span class="value">
-            <a href="{% url 'posts-by-user' poster.pk %}">
-              {{ poster.post_set.count }}
-            </a>
-          </span>
-        </div>
-
-        <div class="stat">
-          <span class="label">Join Date</span>
-          <span class="value">{{ poster.date_joined|date:"o-m-d" }}</span>
+          <div class="stat">
+            <span class="label">Join Date</span>
+            <span class="value">{{ poster.date_joined|date:"o-m-d" }}</span>
+          </div>
         </div>
       </div>
     </div>
+
+    {% if settings_form %}
+      <div class="profile-settings">
+        <form action="{% url 'user-profile' poster.pk %}" method="POST">
+          <h3>User Settings</h3>
+
+          <fieldset>
+            {% csrf_token %}
+            {{ settings_form.as_p }}
+            <input type="submit" value="Submit" />
+          </fieldset>
+        </form>
+      </div>
+    {% endif %}
   </section>
 {% endblock %}

@@ -62,7 +62,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         return norm
 
     def embed_images(self):
-        return True
+        return self.allow_image_embed
 
 class Forum(models.Model):
     name = models.TextField()

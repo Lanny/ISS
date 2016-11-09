@@ -1,38 +1,53 @@
 @import "../base/config.less";
 
 .user-profile {
-  .rounded();
-  background-color: @bg_dark;
+  .public-info {
+    .rounded();
+    margin-bottom: 15px;
 
-  h3 {
-    .title-box();
-  }
-
-  .profile-content {
-    padding: 7px @std_lr_padding;
-  }
-
-  .face-block {
-    padding-bottom: 7px;
-    margin-bottom: 7px;
-    border-bottom: 1px solid @seperator_color;
-
-    h1 {
-      font-size: 30px;
-      font-weight: normal;
+    h3 {
+      .title-box();
     }
 
-    small {
-      font-size: 12px;
-    }
-  }
+    .profile-content {
+      padding: 7px @std_lr_padding;
+      background-color: @bg_dark;
 
-  .stats-block {
-    .stat {
-      .label {
-        width: 100px;
-        display: inline-block;
+      .face-block {
+        padding-bottom: 7px;
+        margin-bottom: 7px;
+        border-bottom: 1px solid @seperator_color;
+
+        h1 {
+          font-size: 30px;
+          font-weight: normal;
+        }
+
+        small {
+          font-size: 12px;
+        }
+
       }
+
+      .stats-block {
+        .stat {
+          .label {
+            width: 100px;
+            display: inline-block;
+          }
+        }
+      }
+    }
+  }
+
+  .profile-settings {
+    form {
+      .standard-form();
+      background-color: @bg_dark;
+
+      .bool-field(allow_js);
+      .bool-field(allow_avatars);
+      .bool-field(allow_image_embed);
     }
   }
 }

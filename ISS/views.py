@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.paginator import Paginator
 from django.db import IntegrityError
-from django.http import HttpResponseRedirect, HttpResponseBadRequest, JsonResponse
+from django.http import (HttpResponseRedirect, HttpResponseBadRequest,
+    JsonResponse, HttpResponseForbidden)
 from django.shortcuts import render, get_object_or_404
 
 import utils
@@ -111,15 +112,6 @@ def latest_threads(request):
 
     return render(request, 'latest_threads.html', ctx)
 
-def user_profile(request, user_id):
-    poster = get_object_or_404(Poster, pk=user_id)
-
-    ctx = {
-        'poster': poster
-    }
-
-    return render(request, 'user_profile.html', ctx)
-
 def user_list(request):
     posters = Poster.objects.all().order_by('username')
     posters_per_page = 20
@@ -132,6 +124,44 @@ def user_list(request):
     }
 
     return render(request, 'user_list.html', ctx)
+
+class UserProfile(MethodSplitView):
+    def GET(self, request, user_id):
+        poster = get_object_or_404(Poster, pk=user_id)
+
+        ctx = {
+            'poster': poster
+        }
+
+        if poster.pk == request.user.pk:
+            ctx['settings_form'] = forms.UserSettingsForm(initial={
+                'email': request.user.email,
+                'allow_js': request.user.allow_js,
+                'allow_avatars': request.user.allow_avatars,
+                'allow_image_embed': request.user.allow_image_embed})
+
+        print ctx
+        return render(request, 'user_profile.html', ctx)
+
+    def POST(self, request, user_id):
+        poster = get_object_or_404(Poster, pk=user_id)
+
+        if poster.pk != request.user.pk:
+            raise HttpResponseForbidden()
+
+        form = forms.UserSettingsForm(request.POST)
+
+        if form.is_valid():
+            form.save(poster)
+            return HttpResponseRedirect(poster.get_url())
+
+        else:
+            ctx = {
+                'poster': poster,
+                'settings_form': form
+            }
+
+            return render(request, 'user_profile.html', ctx)
 
 class NewThread(MethodSplitView):
     login_required = True

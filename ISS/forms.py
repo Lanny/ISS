@@ -102,8 +102,28 @@ class RegistrationForm(UserCreationForm):
 
         return username
 
-    def save(self,commit = True):   
+    def save(self, commit=True):   
         poster = super(RegistrationForm, self).save(commit = False)
         poster.save()
         return poster
     
+class UserSettingsForm(forms.Form):
+    error_css_class = 'in-error'
+
+    email = forms.EmailField(label="Email address")
+    allow_js = forms.BooleanField(label="Enable javascript", required=False)
+    allow_avatars = forms.BooleanField(label="Show user avatars", required=False)
+
+    allow_image_embed = forms.BooleanField(
+        label="Enable images embedded in posts",
+        required=False)
+
+    def save(self, poster):
+        poster.email = self.cleaned_data['email']
+        poster.allow_js = self.cleaned_data['allow_js']
+        poster.allow_avatars = self.cleaned_data['allow_avatars']
+        poster.allow_image_embed = self.cleaned_data['allow_image_embed']
+
+        poster.save()
+
+        return poster

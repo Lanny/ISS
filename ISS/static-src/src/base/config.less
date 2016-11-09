@@ -153,6 +153,19 @@
   }
 }
 
+.bool-field(@name) {
+  #id_@{name} {
+    display: inline;
+    width: auto;
+  }
+
+  [for="id_@{name}"] {
+    display: inline-block;
+    width: auto;
+    width: 50%;
+  }
+}
+
 .flex-stretch() {
   display: flex;
   align-items: stretch;
