@@ -82,14 +82,17 @@ In no particular order:
   - ~~base functionality~~
   - email verificiation
   - password reset
-- Forum index
+- ~~Forum index~~
     - ~~make it work~~
     - ~~admin configurable ordering~~
     - ~~figure out what to do with that "new" column that isn't slow~~
 - ~~Thread locks~~
 - Links to admin site
+  - ~~poster profile page~~
+  - on posts
+  - on threads
 - User active status check before thread/post creation
-- Thread page
+- ~~Thread page~~
     - ~~make it work~~
     - ~~pagination~~
 - Forum thread list
@@ -104,21 +107,24 @@ In no particular order:
     - video embedding
     - autolinking that doesn't break other stuff
     - Quotes
-        - Fix quote pyramids
+        - ~~Fix quote pyramids~~
         - ~~In quick reply (ajax)~~
         - ~~no-js mode over to new-reply page~~
         - Make nojs a user config option rather than requiring the use of noscript
 - Users
-    - image embed option(s?) 
+    - ~~image embed option(s?)~~
     - ~~profile page~~
       - posts per day
       - avatar
+      - thanked posts
     - avatars
     - list of posts
     - make user titles work
+      - ~~custom usertitles~~
+      - determine by post count
     - settings
       - nojs
-      - image embed
+      - ~~image embed~~
       - email display?
 - Unread Posts in Thread / Thread Subscriptions
 - View Subscriptions (UserCP) 
@@ -130,11 +136,9 @@ In no particular order:
 - Navigation
     - ~~Breadcrumbs~~
     - Sitemap? Whatever SEO magic the cool kids are into these days
-- More than one usertitle
 - Thanks
     - AJAX
-    - nojs reload
-    - list of thanked posts
+    - ~~nojs reload~~
 - Static pages (FAQ, whatever)
 - ~~New posts~~
 - Flood control
