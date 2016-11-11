@@ -144,5 +144,5 @@ In no particular order:
 - Flood control
 - Usernames need to be printable
     - should probably do some char juking prevention as well.
-- Add a footer
+- ~~Add a footer~~
 - hambergerify user controls at some point

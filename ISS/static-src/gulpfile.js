@@ -6,13 +6,23 @@ var path = require('path');
 var argv = require('yargs').argv;
 var minifyCSS = require('gulp-minify-css');
 var requirejsOptimize = require('gulp-requirejs-optimize');
-
+var concat = require('gulp-concat');
+var svg = require('gulp-svg-inline-css');
 
 var staticDir = '../static',
   jsDir = path.join(staticDir, 'js'),
   optimizeModules = [ 'thread.js' ];
  
-gulp.task('less', function() {
+gulp.task('icons', function() {
+  gulp.src('src/assets/svg/*.svg')
+    .pipe(svg({
+      className: '.icn-%s()'
+    }))
+    .pipe(concat('icons.less'))
+    .pipe(gulp.dest('src/base'));
+});
+
+gulp.task('less', ['icons'], function() {
 
   var lessStream = less({
       paths: [ path.join(__dirname, 'less') ]
@@ -55,6 +65,7 @@ generateTasks.push(argv.optimize ? 'optimize-js' : 'javascript');
 gulp.task('generate', generateTasks);
 
 gulp.task('watch', ['generate'], function() {
+  gulp.watch([ './src/assets/svg/*.svg' ], ['icons']);
   gulp.watch([ './src/**/*.less' ], ['less']);
   gulp.watch([ './src/**/*.js' ], ['javascript']);
 });

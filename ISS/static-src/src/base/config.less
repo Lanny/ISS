@@ -1,3 +1,5 @@
+@import "icons.less";
+
 @bg_dark: #D5DEE5;
 @bg_ultra_dark: #052733;
 @fg_ultra_dark: #D2D2D2;
@@ -171,4 +173,23 @@
 .flex-stretch() {
   display: flex;
   align-items: stretch;
+}
+
+.icn-btn() {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-color: @bg_teal;
+  border: 1px solid @white;
+  border-radius: 3px;
+
+  &:before {
+    content: "";
+    width: 9px;
+    height: 9px;
+    display: block;
+    position: relative;
+    left: 3px;
+    top: 3px;
+  }
 }
