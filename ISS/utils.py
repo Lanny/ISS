@@ -102,7 +102,7 @@ class ThreadFascet(object):
     def __getitem__(self, field):
         prop = getattr(self._thread, field)
 
-        if field in ('has_unread_posts',):
+        if field in ('has_unread_posts', 'get_jump_post'):
             if not self._request.user.is_authenticated():
                 return True
 

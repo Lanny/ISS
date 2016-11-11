@@ -8,6 +8,8 @@ from django.utils import timezone
 
 from ISS import utils
 
+min_time = timezone.make_aware(timezone.datetime.min,
+                               timezone.get_default_timezone())
 
 class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     USERNAME_FIELD = 'username'
@@ -148,6 +150,21 @@ class Thread(models.Model):
             self_url += '?p=%d#post-%d' % (page_num + 1, post.pk)
 
         return self_url
+
+    def get_jump_post(self, user):
+        """
+        Returns the last undread post for a user IF the user has a living
+        flag against this thread. Otherwise none.
+        """
+        preceeding_date = self._get_flag(user, False).last_read_date
+
+        if not preceeding_date:
+            return None
+
+        post = (self.get_posts_in_thread_order()
+            .filter(created__gt=preceeding_date))[0]
+
+        return post
 
     def can_reply(self):
         return not self.locked

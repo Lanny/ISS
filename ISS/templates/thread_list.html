@@ -19,9 +19,19 @@
       </div>
     </td>
     <td>
-      <a href="{% url 'thread' thread.pk %}" class="thread-name">
-        {{ thread.title }}
-      </a>
+      <div class="title-line">
+        <a href="{% url 'thread' thread.pk %}" class="thread-name">
+          {{ thread.title }}{% comment %}
+        {% endcomment %}</a>
+
+        {% with oldest_undread_post=thread.get_jump_post %}
+          {% if oldest_undread_post %}
+            <a href="{{ oldest_undread_post.get_url }}"
+               class="oldest-unread-post"></a>
+          {% endif %}
+        {% endwith %}
+      </div>
+
       <a class="thread-author" href="{{ thread.get_author.get_url }}">
         {{ thread.get_author.username }}
       </a>
