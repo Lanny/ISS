@@ -29,6 +29,8 @@ class Command(BaseCommand):
                             help='User to log into the source database as')
         parser.add_argument('--db-pass', default='',
                             help='Password for the specified user')
+        parser.add_argument('--mig-thanks', action='store_true',
+                            help='Migrate dbtech thanks entries')
 
     def mig_users(self, cnx, cursor):
         query = 'SELECT * FROM user;'
@@ -44,7 +46,6 @@ class Command(BaseCommand):
                 new_user.save()
                 o2n_map[user['userid']] = new_user.pk
             except IntegrityError:
-                print 'Duplicate, could not save user: %s' % user['username']
                 o2n_map[user['userid']] = Poster.objects.get(
                     username=user['username']).pk
 
@@ -88,7 +89,9 @@ class Command(BaseCommand):
                     forum_parent.urlident = 'forum'
         """)
 
-        o2n_map = {}
+        thread_map = {}
+        post_map = {}
+
         threads = cursor.fetchall()
         for thread in threads:
             new_thread = Thread(
@@ -120,11 +123,14 @@ class Command(BaseCommand):
 
             new_post.save()
 
-            o2n_map[thread['nodeid']] = new_thread.pk
+            thread_map[thread['nodeid']] = new_thread.pk
+            post_map[thread['nodeid']] = new_post.pk
 
-        return o2n_map
+        return thread_map, post_map
 
     def mig_posts(self, cnx, cursor, thread_pk_map, user_pk_map):
+        o2n_map = {}
+
         for old_thread_id in thread_pk_map:
             cursor.execute("""
                 SELECT post.*, text.rawtext FROM node AS post
@@ -142,15 +148,38 @@ class Command(BaseCommand):
                     author_id=user_pk_map[post['userid']])
 
                 new_post.save()
+                o2n_map[post['nodeid']] = new_post.pk
 
-            (Thread.objects
-                .annotate(post_count=Count('post'))
-                .filter(post_count=0)
-                .delete())
+        return o2n_map
 
+    def mig_thanks(self, cnx, cursor, user_pk_map, post_pk_map):
+        cursor.execute("""
+            SELECT contentid, userid, receiveduserid FROM dbtech_thanks_entry
+                WHERE varname='thanks'
+                GROUP BY contentid, userid, receiveduserid
+        """)
+
+        for thanks in cursor:
+            try:
+                post_id = post_pk_map[thanks['contentid']]
+            except KeyError:
+                print ('Error migrating thanks: post %d was not found'
+                       % thanks['contentid'])
+            else:
+                new_thanks = Thanks(
+                    thanker_id=user_pk_map[thanks['userid']],
+                    thankee_id=user_pk_map[thanks['receiveduserid']],
+                    post_id=post_id)
+
+                try:
+                    new_thanks.save()
+                except IntegrityError, e:
+                    import pdb; pdb.set_trace()
+
+        return
 
     def handle(self, db_user=None, db_port=None, db_host=None, db_pass=None,
-            db_name=None, **kwargs):
+            db_name=None, mig_thanks=False, **kwargs):
         cnx = mysql.connector.connect(user=db_user,
                                       password=db_pass,
                                       host=db_host,
@@ -165,13 +194,17 @@ class Command(BaseCommand):
         forum_pk_map = self.mig_forums(cnx, cursor)
 
         print 'Done.\nMigrating threads...'
-        thread_pk_map = self.mig_threads(cnx, cursor, forum_pk_map, user_pk_map)
+        thread_pk_map, op_pk_map = self.mig_threads(cnx, cursor, forum_pk_map,
+                                                    user_pk_map)
 
         print 'Done.\nMigrating posts...'
-        self.mig_posts(cnx, cursor, thread_pk_map, user_pk_map)
+        post_pk_map = self.mig_posts(cnx, cursor, thread_pk_map, user_pk_map)
+
+        if mig_thanks:
+            print 'Done.\nMigrating thanks...'
+            post_pk_map.update(op_pk_map)
+            self.mig_thanks(cnx, cursor, user_pk_map, post_pk_map)
 
         print 'Done.'
         
         cnx.close()
-
-        
