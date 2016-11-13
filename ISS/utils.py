@@ -103,9 +103,6 @@ class ThreadFascet(object):
         prop = getattr(self._thread, field)
 
         if field in ('has_unread_posts', 'get_jump_post'):
-            if not self._request.user.is_authenticated():
-                return True
-
             return prop(self._request.user)
 
         elif callable(prop):

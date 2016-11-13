@@ -156,6 +156,9 @@ class Thread(models.Model):
         Returns the last undread post for a user IF the user has a living
         flag against this thread. Otherwise none.
         """
+        if not user.is_authenticated():
+            return None
+
         preceeding_date = self._get_flag(user, False).last_read_date
 
         if not preceeding_date:
@@ -181,6 +184,9 @@ class Thread(models.Model):
         return self._flag_cache
 
     def has_unread_posts(self, user):
+        if not user.is_authenticated():
+            return True
+
         flag = self._get_flag(user)
 
         if not flag.last_read_date or flag.last_read_date < self.last_update:

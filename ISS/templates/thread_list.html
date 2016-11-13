@@ -30,6 +30,12 @@
                class="oldest-unread-post"></a>
           {% endif %}
         {% endwith %}
+
+        {% if user.is_staff %}
+          <a href={% url 'admin:ISS_thread_change' thread.pk %}
+             class="moderation-action edit-thread">
+          </a>
+        {% endif %}
       </div>
 
       <a class="thread-author" href="{{ thread.get_author.get_url }}">
