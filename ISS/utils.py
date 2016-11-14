@@ -68,6 +68,9 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
                          render_quote,
                          strip=True,
                          swallow_trailing_newline=True)
+
+    default_url_hanlder, _ = parser.recognized_tags['url']
+    parser.add_formatter('link', default_url_hanlder, replace_cosmetic=False)
         
 
     return parser
