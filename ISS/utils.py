@@ -1,4 +1,6 @@
 import bbcode
+import urlparse
+import re
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator, Page
 from django.conf import settings
@@ -68,6 +70,29 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
                          render_quote,
                          strip=True,
                          swallow_trailing_newline=True)
+
+    def render_video(tag_name, value, options, parent, context):
+        url = urlparse.urlparse(value)
+
+        if url.netloc not in ('www.youtube.com', 'youtube.com', 'm.youtube.com'):
+            return '[video]%s[/video]' % value
+
+        query = urlparse.parse_qs(url.query, keep_blank_values=False)
+
+        if 'v' not in query:
+            return '[video]%s[/video]' % value
+
+        v = query['v'][0]
+
+        if not re.match('[0-9a-zA-Z]+', v):
+            return '[video]%s[/video]' % value
+
+        return ('<iframe width="640" height="480" src="https://www.youtube.com'
+                '/embed/%s" frameborder="0" allowfullscreen></iframe>') % v
+
+    parser.add_formatter('video', render_video)
+
+
 
     default_url_hanlder, _ = parser.recognized_tags['url']
     parser.add_formatter('link', default_url_hanlder, replace_cosmetic=False)
