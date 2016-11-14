@@ -32,7 +32,7 @@
         {% endwith %}
 
         {% if user.is_staff %}
-          <a href={% url 'admin:ISS_thread_change' thread.pk %}
+          <a href="{% url 'admin:ISS_thread_change' thread.pk %}"
              class="moderation-action edit-thread">
           </a>
         {% endif %}

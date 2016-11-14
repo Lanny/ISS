@@ -49,9 +49,14 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     def get_user_title(self):
         if self.custom_user_title != None:
-            return self.custom_user_title
+            title = self.custom_user_title
         else:
-            return 'Regular'
+            title = 'Regular'
+
+        if not self.is_active:
+            title += ' (banned)'
+
+        return title
 
     def get_nojs(self):
         return self.allow_js
