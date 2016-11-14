@@ -88,7 +88,7 @@ In no particular order:
 - Links to admin site
   - ~~poster profile page~~
   - on posts
-  - on threads
+  - ~~on threads~~
 - User active status check before thread/post creation
 - ~~Thread page~~
     - ~~make it work~~
@@ -97,18 +97,18 @@ In no particular order:
     - ~~make it work~~
     - ~~order by updated time~~
     - ~~pagination~~
-    - go to newest post
-    - go to oldest unread post
+    - ~~go to newest post~~
+    - ~~go to oldest unread post~~
 - ~~New Thread~~
 - New Post
     - ~~Make it work~~
-    - video embedding
+    - ~~video embedding~~
     - autolinking that doesn't break other stuff
     - Quotes
         - ~~Fix quote pyramids~~
         - ~~In quick reply (ajax)~~
         - ~~no-js mode over to new-reply page~~
-        - Make nojs a user config option rather than requiring the use of noscript
+        - ~~Make nojs a user config option rather than requiring the use of noscript~~
 - Users
     - ~~image embed option(s?)~~
     - ~~profile page~~
@@ -116,15 +116,15 @@ In no particular order:
       - avatar
       - thanked posts
     - avatars
-    - list of posts
+    - ~~list of posts~~
     - make user titles work
       - ~~custom usertitles~~
       - determine by post count
     - settings
-      - nojs
+      - ~~nojs~~
       - ~~image embed~~
       - email display?
-- Unread Posts in Thread / Thread Subscriptions
+- ~~Unread Posts in Thread / Thread Subscriptions~~
 - View Subscriptions (UserCP) 
 - Private Messages
     - View
