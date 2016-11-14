@@ -58,6 +58,13 @@
               </form>
             {% endif %}
           {% endif %}
+
+
+          {% if user.pk == post.author.pk %}
+            <a class="edit-post" href="{% url 'edit-post' post.pk %}">
+              Edit
+            </a>
+          {% endif %}
         </div>
       {% endif %}
     </div>

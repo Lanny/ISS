@@ -39,5 +39,7 @@ urlpatterns = [
     url(r'^post/(?P<post_id>\d+)/thank-post$', views.ThankPost.as_view(),
         name='thank-post'),
     url(r'^post/(?P<post_id>\d+)/unthank-post$', views.UnthankPost.as_view(),
-        name='unthank-post')
+        name='unthank-post'),
+    url(r'^post/(?P<post_id>\d+)/edit$', views.EditPost.as_view(),
+        name='edit-post')
 ]

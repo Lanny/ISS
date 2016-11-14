@@ -47,6 +47,9 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def show_email(self):
         return False
 
+    def can_post(self):
+        return self.is_active
+
     def get_user_title(self):
         if self.custom_user_title:
             title = self.custom_user_title

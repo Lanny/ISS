@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block page_name %}
+Reply to {{ thread.title }} -
+{% endblock %}
+
+{% block breadcrumb %}
+  &gt; <a href="{{ thread.forum.get_url }}">{{ thread.forum.name }}</a>
+  &gt; <a href="{{ post.thread.get_url }}">{{ post.thread.title }}</a>
+  &gt; <a href="">Edit Post</a>
+{% endblock %}
+
+{% block content %}
+  <div class="edit-post">
+    <form method="POST" action="">
+      <h1>
+        Edit Post
+      </h1>
+      <fieldset>
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Submit" />
+      </fieldset>
+     </form>
+   </div>
+{% endblock %}
+

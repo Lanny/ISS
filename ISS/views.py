@@ -235,6 +235,43 @@ class NewReply(MethodSplitView):
 
             return render(request, 'new_post.html', ctx)
 
+class EditPost(MethodSplitView):
+    login_required = True
+    
+    def GET(self, request, post_id):
+        post = get_object_or_404(Post, pk=post_id)
+        form_initials = { 'content': post.content, 'post': post }
+
+        if (not request.user == post.author) and (not request.user.is_staff):
+            raise HttpResponseForbidden()
+
+        form = forms.EditPostForm(initial=form_initials)
+        ctx = {
+            'form': form,
+            'post': post
+        }
+
+        return render(request, 'edit_post.html', ctx)
+
+    def POST(self, request, post_id):
+        post = get_object_or_404(Post, pk=post_id)
+
+        if (not request.user == post.author) and (not request.user.is_staff):
+            raise HttpResponseForbidden()
+
+        form = forms.EditPostForm(request.POST)
+
+        if not form.is_valid():
+            ctx = {
+                'form': form,
+                'post': post
+            }
+
+            return render(request, 'edit_post.html', ctx)
+
+        form.save(editor=request.user)
+        return HttpResponseRedirect(post.get_url())
+
 class GetQuote(MethodSplitView):
     def GET(self, request, post_id):
         post = get_object_or_404(Post, pk=post_id)

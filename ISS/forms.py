@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm      
 from django.db import transaction
 from django.forms import ValidationError
+from django.utils import timezone
 
 import utils
 from models import Forum, Thread, Post, Poster
@@ -80,6 +81,28 @@ class NewPostForm(forms.Form):
 
         return self.post
 
+class EditPostForm(forms.Form):
+    error_css_class = 'in-error'
+    post_min_len = utils.get_config('min_post_chars')
+
+    post = forms.ModelChoiceField(queryset=Post.objects.all(),
+                                  widget=forms.HiddenInput())
+    
+    content = forms.CharField(label='Content',
+                              min_length=post_min_len,
+                              widget=forms.Textarea())
+
+    def save(self, editor=None):
+        post = self.cleaned_data['post']
+        post.content = self.cleaned_data['content']
+
+        edit_time = timezone.now() - post.created
+        if edit_time.total_seconds > utils.get_config('ninja_edit_grace_time'):
+            editor_name = editor.username if editor else 'unknown'
+            post.content += '\n\n[i]Post last edited by %s at %s[/i]' % (
+                    editor_name, timezone.now().isoformat())
+
+        post.save()
 
 class RegistrationForm(UserCreationForm):
     error_css_class = 'in-error'
