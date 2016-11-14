@@ -75,21 +75,37 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
     def render_video(tag_name, value, options, parent, context):
         url = urlparse.urlparse(value)
 
-        if url.netloc not in ('www.youtube.com', 'youtube.com', 'm.youtube.com'):
+        embed_pattern = ('<iframe width="640" height="480" '
+            'src="https://www.youtube.com/embed/%s?start=%s" frameborder="0" '
+            'allowfullscreen></iframe>')
+
+        if url.netloc in ('www.youtube.com', 'youtube.com', 'm.youtube.com'):
+            query = urlparse.parse_qs(url.query, keep_blank_values=False)
+
+            if 'v' not in query:
+                return '[video]%s[/video]' % value
+
+            v = query['v'][0]
+
+            if not re.match('[0-9a-zA-Z]+', v):
+                return '[video]%s[/video]' % value
+
+            return embed_pattern % (v, '0')
+
+        elif url.netloc in ('youtu.be',):
+            query = urlparse.parse_qs(url.query, keep_blank_values=False)
+            stripped_path = url.path[1:]
+            t = query.get('t', ['0'])[0]
+
+            if not re.match('[0-9a-zA-Z]+', stripped_path):
+                return '[video]%s[/video]' % value
+            if t and not re.match(r'\d+', t):
+                return '[video]%s[/video]' % value
+
+            return embed_pattern % (stripped_path, t)
+
+        else:
             return '[video]%s[/video]' % value
-
-        query = urlparse.parse_qs(url.query, keep_blank_values=False)
-
-        if 'v' not in query:
-            return '[video]%s[/video]' % value
-
-        v = query['v'][0]
-
-        if not re.match('[0-9a-zA-Z]+', v):
-            return '[video]%s[/video]' % value
-
-        return ('<iframe width="640" height="480" src="https://www.youtube.com'
-                '/embed/%s" frameborder="0" allowfullscreen></iframe>') % v
 
     parser.add_formatter('video', render_video)
 
