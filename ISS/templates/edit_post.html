@@ -5,7 +5,7 @@ Reply to {{ thread.title }} -
 {% endblock %}
 
 {% block breadcrumb %}
-  &gt; <a href="{{ thread.forum.get_url }}">{{ thread.forum.name }}</a>
+  &gt; <a href="{{ post.thread.forum.get_url }}">{{ post.thread.forum.name }}</a>
   &gt; <a href="{{ post.thread.get_url }}">{{ post.thread.title }}</a>
   &gt; <a href="">Edit Post</a>
 {% endblock %}

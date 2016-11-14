@@ -97,7 +97,7 @@ class EditPostForm(forms.Form):
         post.content = self.cleaned_data['content']
 
         edit_time = timezone.now() - post.created
-        if edit_time.total_seconds > utils.get_config('ninja_edit_grace_time'):
+        if edit_time.total_seconds() > utils.get_config('ninja_edit_grace_time'):
             editor_name = editor.username if editor else 'unknown'
             post.content += '\n\n[i]Post last edited by %s at %s[/i]' % (
                     editor_name, timezone.now().isoformat())
