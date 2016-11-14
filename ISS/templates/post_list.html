@@ -38,54 +38,12 @@
       </div>
 
       {% if user.is_authenticated and show_post_controls %}
-        <div class="post-controls">
-          <a class="quote"
-             href="{% url 'new-reply' thread.pk %}?quote={{ post.pk }}"
-             data-bbc-url="{% url 'get-quote' post.pk %}">
-            Quote
-          </a>
-
-          {% if user.pk != post.author.pk %}
-            {% if user.pk in post.get_thanker_pks %}
-              <form action="{% url 'unthank-post' post.pk %}" method="POST">
-                {% csrf_token %}
-                <input type="submit" value="Unthank" class="thank-action" />
-              </form>
-            {% else %}
-              <form action="{% url 'thank-post' post.pk %}" method="POST">
-                {% csrf_token %}
-                <input type="submit" value="Thank" class="thank-action" />
-              </form>
-            {% endif %}
-          {% endif %}
-
-
-          {% if user.pk == post.author.pk %}
-            <a class="edit-post" href="{% url 'edit-post' post.pk %}">
-              Edit
-            </a>
-          {% endif %}
-        </div>
+        {% include 'post_controls.html' with post=post %}
       {% endif %}
     </div>
 
-    {% if show_post_controls and post.thanks_set.all %}
-      <div class="thanker-block">
-        <div class="thanker-caption">
-          The following users say if would be alright if the author of this
-          post <strong>didn't</strong> die in a fire!
-        </div>
-        <ul class="thanker-list">
-          {% for thanks in post.thanks_set.all %}
-            <li>
-              <a href="{{ thanks.thanker.get_url }}">
-                {{ thanks.thanker.username }}{% comment %}
-                {% endcomment %}</a>{% comment %}
-              {% endcomment %}{% if not forloop.last %},&nbsp; {% endif %}
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
+    {% if show_post_controls %}
+      {% include "thanks_block.html" with post=post %}
     {% endif %}
   </li>
 {% endfor %}

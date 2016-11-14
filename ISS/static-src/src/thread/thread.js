@@ -1,5 +1,5 @@
 ;(function() {
-  function wrap($) {
+  function wrap($, thanks) {
     $(function() {
       $('body').on('click', '.quote', function(e) {
         e.preventDefault();
@@ -25,8 +25,14 @@
             alert('Failed to fetch quote.');
           });
       });
+
+      $('.thread').on('submit', '.thank-action-form', function(e) {
+        e.preventDefault();
+        var button = $(e.currentTarget).find('.thank-action');
+        thanks.handleThankIntention(button);
+      });
     });
   }
 
-  define(['jquery'], wrap);
+  define(['jquery', 'thanks'], wrap);
 })();

@@ -345,7 +345,14 @@ class ThankPost(MethodSplitView):
         except IntegrityError:
             pass
 
-        return HttpResponseRedirect(post.get_url())
+        if request.is_ajax():
+            return utils.render_mixed_mode(
+                request,
+                (('thanksBlock', 'thanks_block.html', {'post': post}),
+                 ('postControls', 'post_controls.html', {'post': post})),
+                additional={'status': 'SUCCESS'})
+        else:
+            return HttpResponseRedirect(post.get_url())
 
 class UnthankPost(MethodSplitView):
     require_login = True
@@ -355,5 +362,12 @@ class UnthankPost(MethodSplitView):
         thanks = get_object_or_404(Thanks, post=post, thanker=request.user)
 
         thanks.delete()
+
+        if request.is_ajax():
+            return utils.render_mixed_mode(
+                request,
+                (('thanksBlock', 'thanks_block.html', {'post': post}),
+                 ('postControls', 'post_controls.html', {'post': post})),
+                additional={'status': 'SUCCESS'})
 
         return HttpResponseRedirect(post.get_url())

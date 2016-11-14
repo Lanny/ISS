@@ -4,6 +4,8 @@ import re
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator, Page
 from django.conf import settings
+from django.http import JsonResponse
+from django.shortcuts import render
 
 config_defaults = {
     'forum_name': 'INTERNATIONAL SPACE STATION',
@@ -38,6 +40,16 @@ def page_by_request(paginator, request):
 
     return page
 
+def render_mixed_mode(request, templates, additional={}):
+    data = {}
+
+    for key_name, template, ctx in templates:
+        markup = render(request, template, ctx).content
+        data[key_name] = markup
+
+    data.update(additional)
+
+    return JsonResponse(data)
     
 def get_standard_bbc_parser(embed_images=True, escape_html=True):
     parser = bbcode.Parser(escape_html=escape_html, replace_links=False)
@@ -114,7 +126,6 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
     default_url_hanlder, _ = parser.recognized_tags['url']
     parser.add_formatter('link', default_url_hanlder, replace_cosmetic=False)
         
-
     return parser
 
 def get_closure_bbc_parser():
