@@ -48,7 +48,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         return False
 
     def get_user_title(self):
-        if self.custom_user_title != None:
+        if self.custom_user_title:
             title = self.custom_user_title
         else:
             title = 'Regular'
