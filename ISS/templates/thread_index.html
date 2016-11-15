@@ -22,6 +22,8 @@
       </a>
     {% endif %}
 
+    {% include "page_list.html" with page=threads %}
+
     {% include 'thread_list.html' with threads=threads %}
 
     {% include "page_list.html" with page=threads %}

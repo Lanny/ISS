@@ -12,6 +12,9 @@
 
 {% block content %}
   <div class="thread">
+
+    {% include "page_list.html" with page=posts %}
+
     <div class="thread-content">
       <h1>{{ thread.title }}</h1>
 

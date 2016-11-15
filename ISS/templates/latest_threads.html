@@ -10,13 +10,15 @@
 {% endblock %}
 
 {% block content %}
-  <div class="thread-index">
+  <div class="latest-threads thread-index">
     <div class="forum-intro">
       <h1 class="forum-title">Latest Threads</h1>
       <span class="forum-description">
         Threads from every forum, sorted by last reply.
       </span>
     </div>
+
+    {% include "page_list.html" with page=threads %}
 
     {% include 'thread_list.html' with threads=threads %}
 
