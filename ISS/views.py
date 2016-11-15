@@ -138,7 +138,8 @@ class UserProfile(MethodSplitView):
                 'email': request.user.email,
                 'allow_js': request.user.allow_js,
                 'allow_avatars': request.user.allow_avatars,
-                'allow_image_embed': request.user.allow_image_embed})
+                'allow_image_embed': request.user.allow_image_embed,
+                'timezone': request.user.timezone})
 
         print ctx
         return render(request, 'user_profile.html', ctx)

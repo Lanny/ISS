@@ -1,4 +1,5 @@
 import re
+import pytz
 
 from django.contrib import auth
 from django.core.urlresolvers import reverse
@@ -25,6 +26,12 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     custom_user_title = models.CharField(max_length=256, null=True,
                                          default=None, blank=True)
+    timezone = models.CharField(
+        max_length=256,
+        null=False,
+        default='UTC',
+        choices=[(tz, tz) for tz in pytz.common_timezones])
+
     allow_js = models.BooleanField(default=False)
     allow_image_embed = models.BooleanField(default=True)
     allow_avatars = models.BooleanField(default=True)
