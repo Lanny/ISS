@@ -123,6 +123,7 @@ In no particular order:
     - settings
       - ~~nojs~~
       - ~~image embed~~
+      - timezone
       - email display?
 - ~~Unread Posts in Thread / Thread Subscriptions~~
 - View Subscriptions (UserCP) 
@@ -144,4 +145,5 @@ In no particular order:
     - should probably do some char juking prevention as well.
 - ~~Add a footer~~
 - hambergerify user controls at some point
-- video embed that respects start time
+- ~~video embed that respects start time~~
+- ~~make usernames at login case insensitive~~

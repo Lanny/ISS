@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm      
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import transaction
 from django.forms import ValidationError
 from django.utils import timezone
@@ -103,6 +103,23 @@ class EditPostForm(forms.Form):
                     editor_name, timezone.now().isoformat())
 
         post.save()
+
+class ISSAuthenticationForm(AuthenticationForm):
+    def clean_username(self):
+        """
+        Normalize the submitted username and replace the value in cleaned data
+        with it's cannonical form. Do nothing if no user with that username
+        (or rather normalized image of their username) exists.
+        """
+        username = self.cleaned_data['username']
+        normalized = Poster.normalize_username(username)
+
+        try:
+            user = Poster.objects.get(normalized_username=normalized)
+        except Poster.DoesNotExist, e:
+            return username
+        else:
+            return user.username
 
 class RegistrationForm(UserCreationForm):
     error_css_class = 'in-error'

@@ -283,14 +283,14 @@ class GetQuote(MethodSplitView):
 
 class LoginUser(MethodSplitView):
     def GET(self, request):
-        form = AuthenticationForm()
+        form = forms.ISSAuthenticationForm()
         ctx = {'form': form}
         return render(request, 'login.html', ctx)
 
     def POST(self, request):
         logout(request)
         if request.POST:
-            form = AuthenticationForm(data=request.POST, request=request)
+            form = forms.ISSAuthenticationForm(data=request.POST, request=request)
 
             if form.is_valid():
                 login(request, form.user_cache)
