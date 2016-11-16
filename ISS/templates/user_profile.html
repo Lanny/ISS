@@ -48,6 +48,20 @@
             <span class="label">Join Date</span>
             <span class="value">{{ poster.date_joined|date:"o-m-d" }}</span>
           </div>
+
+          <div class="stat">
+            <span class="label">Thanks Received</span>
+            <span class="value">
+              {{ poster.thanks_received.count }}
+            </span>
+          </div>
+
+          <div class="stat">
+            <span class="label">Thanks Given</span>
+            <span class="value">
+              {{ poster.thanks_given.count }}
+            </span>
+          </div>
         </div>
       </div>
     </div>
