@@ -7,6 +7,6 @@ class TimezoneMiddleware(object):
         if request.user.is_authenticated():
             timezone.activate(pytz.timezone(request.user.timezone))
         else:
-            timezone.activate('UTF')
+            timezone.activate('UTC')
 
         return None
