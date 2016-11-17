@@ -82,7 +82,11 @@ class NewPostForm(forms.Form):
     def clean(self, *args, **kwargs):
         super(NewPostForm, self).clean(*args, **kwargs)
         
-        last_post = self._author.post_set.order_by('-created')[0]
+        try:
+            last_post = self._author.post_set.order_by('-created')[0]
+        except IndexError:
+            return self.cleaned_data
+
 
         if last_post.content == self.cleaned_data.get('content', ''):
             raise ValidationError('Duplicate of your last post.', code='DUPE')
