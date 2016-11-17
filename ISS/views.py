@@ -62,7 +62,8 @@ def thread(request, thread_id):
     posts = thread.post_set.order_by('created')
     posts_per_page = utils.get_config('posts_per_thread_page')
     paginator = Paginator(posts, posts_per_page)
-    reply_form = forms.NewPostForm(initial={ 'thread': thread })
+    reply_form = forms.NewPostForm(author=request.user,
+                                   initial={ 'thread': thread })
 
     page = utils.page_by_request(paginator, request)
 
@@ -200,6 +201,7 @@ class NewReply(MethodSplitView):
     def GET(self, request, thread_id):
         thread = get_object_or_404(Thread, pk=thread_id)
         form_initials = { 'thread': thread }
+        author = request.user
 
         # Fetch BBCode for a quote in this response
         quoted_post_pk = request.GET.get('quote', None)
@@ -211,7 +213,7 @@ class NewReply(MethodSplitView):
             except Post.DoesNotExist:
                 pass
 
-        form = forms.NewPostForm(initial=form_initials)
+        form = forms.NewPostForm(author=author, initial=form_initials)
         
         ctx = {
             'thread': thread,
@@ -222,10 +224,11 @@ class NewReply(MethodSplitView):
 
     def POST(self, request, thread_id):
         thread = get_object_or_404(Thread, pk=thread_id)
-        form = forms.NewPostForm(request.POST)
+        author = request.user
+        form = forms.NewPostForm(request.POST, author=author)
 
         if form.is_valid():
-            post = form.save(request.user)
+            post = form.save()
             return HttpResponseRedirect(post.get_url())
 
         else:

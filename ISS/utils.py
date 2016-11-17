@@ -99,7 +99,7 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
 
             v = query['v'][0]
 
-            if not re.match('[0-9a-zA-Z]+', v):
+            if not re.match('[\-0-9a-zA-Z]+', v):
                 return '[video]%s[/video]' % value
 
             return embed_pattern % (v, '0')
@@ -109,7 +109,7 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
             stripped_path = url.path[1:]
             t = query.get('t', ['0'])[0]
 
-            if not re.match('[0-9a-zA-Z]+', stripped_path):
+            if not re.match('[\-0-9a-zA-Z]+', stripped_path):
                 return '[video]%s[/video]' % value
             if t and not re.match(r'\d+', t):
                 return '[video]%s[/video]' % value

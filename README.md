@@ -147,3 +147,4 @@ In no particular order:
 - hambergerify user controls at some point
 - ~~video embed that respects start time~~
 - ~~make usernames at login case insensitive~~
+- Custom user title celebrating the time honored tradition of front page flush

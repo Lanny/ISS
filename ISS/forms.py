@@ -58,8 +58,15 @@ class NewPostForm(forms.Form):
 
     thread = forms.ModelChoiceField(queryset=Thread.objects.all(),
                                     widget=forms.HiddenInput())
+    _author = None
 
     def __init__(self, *args, **kwargs):
+        if 'author' not in kwargs:
+            raise ValueError('Must be inited with a author')
+
+        self._author = kwargs['author']
+        del kwargs['author']
+
         super(NewPostForm, self).__init__(*args, **kwargs)
 
         self.post = None
@@ -72,12 +79,22 @@ class NewPostForm(forms.Form):
 
         return thread
 
+    def clean(self, *args, **kwargs):
+        super(NewPostForm, self).clean(*args, **kwargs)
+        
+        last_post = self._author.post_set.order_by('-created')[0]
+
+        if last_post.content == self.cleaned_data.get('content', ''):
+            raise ValidationError('Duplicate of your last post.', code='DUPE')
+
+        return self.cleaned_data
+
     @transaction.atomic
-    def save(self, author):
+    def save(self):
         self.post = Post(
             thread=self.cleaned_data['thread'],
             content=self.cleaned_data['content'],
-            author=author)
+            author=self._author)
 
         self.post.save()
 
