@@ -15,12 +15,18 @@ config_defaults = {
     'threads_per_forum_page': 20,
     'posts_per_thread_page': 20,
     'general_items_per_page': 20,
-    'ninja_edit_grace_time': 120
+    'ninja_edit_grace_time': 120,
+    'title_ladder': (
+        (100, 'Regular'),
+        (10, 'Acolyte'),
+        (0, 'Novice')
+    )
 }
 
 config = config_defaults.copy()
 config.update(settings.FORUM_CONFIG)
-
+config['title_ladder'] = sorted(config['title_ladder'], key=lambda x: x[0],
+                                reverse=True)
 
 def get_config(key=None):
     if not key:

@@ -51,6 +51,9 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def get_url(self):
         return reverse('user-profile', kwargs={'user_id': self.pk})
 
+    def get_post_count(self):
+        return self.post_set.count()
+
     def show_email(self):
         return False
 
@@ -61,7 +64,13 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         if self.custom_user_title:
             title = self.custom_user_title
         else:
-            title = 'Regular'
+            post_count = self.get_post_count()
+            title = None
+
+            for threshold, rank_title in utils.get_config('title_ladder'):
+                if post_count >= threshold:
+                    title = rank_title
+                    break
 
         if not self.is_active:
             title += ' (banned)'
