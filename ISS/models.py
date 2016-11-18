@@ -1,4 +1,5 @@
 import re
+import pytz
 
 from django.contrib import auth
 from django.core.urlresolvers import reverse
@@ -25,6 +26,12 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     custom_user_title = models.CharField(max_length=256, null=True,
                                          default=None, blank=True)
+    timezone = models.CharField(
+        max_length=256,
+        null=False,
+        default='UTC',
+        choices=[(tz, tz) for tz in pytz.common_timezones])
+
     allow_js = models.BooleanField(default=False)
     allow_image_embed = models.BooleanField(default=True)
     allow_avatars = models.BooleanField(default=True)
@@ -44,6 +51,9 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def get_url(self):
         return reverse('user-profile', kwargs={'user_id': self.pk})
 
+    def get_post_count(self):
+        return self.post_set.count()
+
     def show_email(self):
         return False
 
@@ -54,7 +64,13 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         if self.custom_user_title:
             title = self.custom_user_title
         else:
-            title = 'Regular'
+            post_count = self.get_post_count()
+            title = None
+
+            for threshold, rank_title in utils.get_config('title_ladder'):
+                if post_count >= threshold:
+                    title = rank_title
+                    break
 
         if not self.is_active:
             title += ' (banned)'

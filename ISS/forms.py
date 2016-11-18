@@ -1,3 +1,5 @@
+import pytz
+
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import transaction
@@ -80,7 +82,11 @@ class NewPostForm(forms.Form):
     def clean(self, *args, **kwargs):
         super(NewPostForm, self).clean(*args, **kwargs)
         
-        last_post = self._author.post_set.order_by('-created')[0]
+        try:
+            last_post = self._author.post_set.order_by('-created')[0]
+        except IndexError:
+            return self.cleaned_data
+
 
         if last_post.content == self.cleaned_data.get('content', ''):
             raise ValidationError('Duplicate of your last post.', code='DUPE')
@@ -168,6 +174,9 @@ class UserSettingsForm(forms.Form):
     error_css_class = 'in-error'
 
     email = forms.EmailField(label="Email address")
+    timezone = forms.ChoiceField(
+            label="Timezone",
+            choices=[(tz, tz) for tz in pytz.common_timezones])
     allow_js = forms.BooleanField(label="Enable javascript", required=False)
     allow_avatars = forms.BooleanField(label="Show user avatars", required=False)
 
@@ -180,6 +189,7 @@ class UserSettingsForm(forms.Form):
         poster.allow_js = self.cleaned_data['allow_js']
         poster.allow_avatars = self.cleaned_data['allow_avatars']
         poster.allow_image_embed = self.cleaned_data['allow_image_embed']
+        poster.timezone = self.cleaned_data['timezone']
 
         poster.save()
 
