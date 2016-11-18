@@ -14,7 +14,7 @@ var staticDir = '../static',
   optimizeModules = [ 'thread.js' ];
  
 gulp.task('icons', function() {
-  gulp.src('src/assets/svg/*.svg')
+  return gulp.src('src/assets/svg/*.svg')
     .pipe(svg({
       className: '.icn-%s()'
     }))

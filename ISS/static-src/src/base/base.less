@@ -54,10 +54,13 @@ a {
       padding: 2px;
       text-align: center;
       border: 1px solid @white;
+
+      &:not(:last-child) {
+        border-right: 0;
+      }
       
       &.arrow {
         .teal();
-        width: 30px;
       }
 
       &.current-page {
@@ -70,6 +73,18 @@ a {
         text-decoration: none;
         font-weight: normal;
       }
+
+      .previous-page, .next-page, .first-page, .last-page {
+        i {
+        .icn(13px);
+        margin: 1px;
+        }
+      }
+
+      .previous-page i { .icn-left-chevron(); }
+      .next-page i { .icn-right-chevron(); }
+      .first-page i { .icn-double-left-chevron(); }
+      .last-page i { .icn-double-right-chevron(); }
     }
   }
 }

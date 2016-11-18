@@ -5,13 +5,14 @@
   <ol>
     {% if page.has_previous %}
     <li class="arrow">
-      <a href="{{ base_url }}?p=1">
-        &lt;&lt;
+      <a href="{{ base_url }}?p=1" class="first-page">
+        <i></i>
       </a>
     </li>
     <li class="arrow">
-      <a href="{{ base_url }}?p={{ page.previous_page_number }}">
-        &lt;
+      <a href="{{ base_url }}?p={{ page.previous_page_number }}"
+         class="previous-page">
+        <i></i>
       </a>
     </li>
     {% endif %}
@@ -33,13 +34,15 @@
 
     {% if page.has_next %}
     <li class="arrow">
-      <a href="{{ base_url }}?p={{ page.next_page_number }}">
-        &gt;
+      <a href="{{ base_url }}?p={{ page.next_page_number }}"
+         class="next-page">
+        <i></i>
       </a>
     </li>
     <li class="arrow">
-      <a href="{{ base_url }}?p={{ page.paginator.num_pages }}">
-        &gt;&gt;
+      <a href="{{ base_url }}?p={{ page.paginator.num_pages }}"
+         class="last-page">
+        <i></i>
       </a>
     </li>
     {% endif %}

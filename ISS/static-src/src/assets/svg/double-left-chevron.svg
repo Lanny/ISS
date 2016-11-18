@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+  <g transform="translate(1.5, 0)">
+    <path d="M 7 0.5 L 2.5 5 L 7 9.5"
+          fill="transparent"
+          stroke-width="1"
+          stroke="#FFFFFF"
+          stroke-linecap="round"
+          stroke-linejoin="round">
+    </path>
+  </g>
+
+  <g transform="translate(-1.5, 0)">
+    <path d="M 7 0.5 L 2.5 5 L 7 9.5"
+          fill="transparent"
+          stroke-width="1"
+          stroke="#FFFFFF"
+          stroke-linecap="round"
+          stroke-linejoin="round">
+    </path>
+  </g>
+</svg>
