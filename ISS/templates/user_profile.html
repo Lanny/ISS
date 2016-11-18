@@ -52,7 +52,9 @@
           <div class="stat">
             <span class="label">Thanks Received</span>
             <span class="value">
-              {{ poster.thanks_received.count }}
+              <a href="{% url 'thanked-posts' poster.pk %}">
+                {{ poster.thanks_received.count }}
+              </a>
             </span>
           </div>
 

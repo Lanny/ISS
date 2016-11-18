@@ -123,7 +123,7 @@ In no particular order:
     - settings
       - ~~nojs~~
       - ~~image embed~~
-      - timezone
+      - ~~timezone~~
       - email display?
 - ~~Unread Posts in Thread / Thread Subscriptions~~
 - View Subscriptions (UserCP) 
@@ -136,11 +136,13 @@ In no particular order:
     - ~~Breadcrumbs~~
     - Sitemap? Whatever SEO magic the cool kids are into these days
 - Thanks
-    - AJAX
+    - ~~AJAX~~
     - ~~nojs reload~~
 - Static pages (FAQ, whatever)
 - ~~New posts~~
 - Flood control
+  - Max posts per time period
+  - ~~deduplication~~
 - Usernames need to be printable
     - should probably do some char juking prevention as well.
 - ~~Add a footer~~

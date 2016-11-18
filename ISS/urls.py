@@ -34,6 +34,8 @@ urlpatterns = [
         name='user-profile'),
     url(r'^user/(?P<user_id>\d+)/posts/?$', views.posts_by_user,
         name='posts-by-user'),
+    url(r'^user/(?P<user_id>\d+)/thankedposts/?$', views.thanked_posts,
+        name='thanked-posts'),
     url(r'^post/(?P<post_id>\d+)/get-quote$', views.GetQuote.as_view(),
         name='get-quote'),
     url(r'^post/(?P<post_id>\d+)/thank-post$', views.ThankPost.as_view(),

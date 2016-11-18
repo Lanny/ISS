@@ -18,7 +18,7 @@
     <div class="thread-content">
       <h1>{{ thread.title }}</h1>
 
-      {% include "post_list.html" with posts=posts thread_context=False show_post_controls=True %}
+      {% include "post_list.html" with posts=posts thread_context=False show_post_controls=True show_thanks_block=True %}
     </div>
 
     {% include "page_list.html" with page=posts %}

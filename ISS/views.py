@@ -98,6 +98,25 @@ def posts_by_user(request, user_id):
 
     return render(request, 'posts_by_user.html', ctx)
 
+def thanked_posts(request, user_id):
+    poster = get_object_or_404(Poster, pk=user_id)
+    posts = (poster.post_set
+        .filter(thanks__isnull=False)
+        .order_by('-created')
+        .distinct()
+        .select_related('thread'))
+    posts_per_page = utils.get_config('general_items_per_page')
+    paginator = Paginator(posts, posts_per_page)
+
+    page = utils.page_by_request(paginator, request)
+
+    ctx = {
+        'poster': poster,
+        'posts': page
+    }
+
+    return render(request, 'thanked_posts.html', ctx)
+
 def latest_threads(request):
     threads = Thread.objects.all().order_by('-last_update')
     threads_per_page = utils.get_config('threads_per_forum_page')
@@ -142,7 +161,6 @@ class UserProfile(MethodSplitView):
                 'allow_image_embed': request.user.allow_image_embed,
                 'timezone': request.user.timezone})
 
-        print ctx
         return render(request, 'user_profile.html', ctx)
 
     def POST(self, request, user_id):
