@@ -125,7 +125,7 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
         else:
             return '[video]%s[/video]' % value
 
-    parser.add_formatter('video', render_video)
+    parser.add_formatter('video', render_video, replace_cosmetic=False)
 
 
 
