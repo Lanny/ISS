@@ -12,7 +12,7 @@ Reply to {{ thread.title }} -
 
 {% block content %}
   <div class="edit-post">
-    <form method="POST" action="">
+    <form method="POST" action="" class="editor">
       <h1>
         Edit Post
       </h1>
@@ -23,5 +23,9 @@ Reply to {{ thread.title }} -
       </fieldset>
      </form>
    </div>
+{% endblock %}
+
+{% block js %}
+  {% include "require.html" with bootstrap="editor-bootstrap" %}
 {% endblock %}
 

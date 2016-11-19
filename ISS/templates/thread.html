@@ -24,7 +24,7 @@
     {% include "page_list.html" with page=posts %}
 
     {% if user.is_authenticated and thread.can_reply %}
-      <form class="quick-reply" method="POST"
+      <form class="quick-reply editor" method="POST"
         action="{% url 'new-reply' thread.pk %}">
         <h2>Quick Reply</h2>
         <fieldset>

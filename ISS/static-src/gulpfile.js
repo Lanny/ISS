@@ -11,7 +11,10 @@ var svg = require('gulp-svg-inline-css');
 
 var staticDir = '../static',
   jsDir = path.join(staticDir, 'js'),
-  optimizeModules = [ 'thread.js' ];
+  optimizeModules = [
+    'thread.js',
+    'editor-bootstrap.js'
+  ];
  
 gulp.task('icons', function() {
   return gulp.src('src/assets/svg/*.svg')

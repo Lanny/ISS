@@ -1,25 +1,19 @@
 ;(function() {
-  function wrap($, thanks) {
+  function wrap($, thanks, Editor) {
     $(function() {
+      $('.editor').each(function(_, el) {
+        new Editor(el);
+      });
+
       $('body').on('click', '.quote', function(e) {
         e.preventDefault();
 
         var quoteFetchUrl = $(e.target).attr('data-bbc-url'),
-          replyTextbox = $('.quick-reply #id_content');
+          editor = $('.quick-reply').data('editor');
 
         $.getJSON(quoteFetchUrl)
           .done(function(data) {
-            var oldVal = replyTextbox.val(),
-              newVal;
-
-            if (oldVal === '') {
-              newVal = data.content;
-            } else {
-              newVal = oldVal + '\n\n' + data.content;
-            }
-
-            replyTextbox.val(newVal + '\n\n')
-              .focus();
+            editor.addQuote(data.content);
           })
           .fail(function(data) {
             alert('Failed to fetch quote.');
@@ -34,5 +28,10 @@
     });
   }
 
-  define(['jquery', 'thanks'], wrap);
+  define([
+    'jquery',
+    'thanks',
+    'editor'
+  ], wrap);
 })();
+
