@@ -1,4 +1,5 @@
 import re
+import uuid
 import pytz
 
 from django.contrib import auth
@@ -287,6 +288,15 @@ class ForumFlag(models.Model):
     poster = models.ForeignKey(Poster)
 
     last_read_date = models.DateTimeField(null=True)
+
+class PrivateMessage(models.Model):
+    chain = models.UUIDField(default=uuid.uuid4, editable=False)
+    created = models.DateTimeField(default=timezone.now)
+
+    sender = models.ForeignKey(Poster, related_name='pms_sent')
+    receiver = models.ForeignKey(Poster, related_name='pms_received')
+    subject = models.CharField(max_length=256)
+    content = models.TextField()
 
 @receiver(models.signals.post_save, sender=Post)
 def update_thread_last_update(sender, instance, created, **kwargs):
