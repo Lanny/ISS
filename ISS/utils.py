@@ -32,7 +32,7 @@ def get_config(key=None):
     if not key:
         return config
     else:
-        return config_defaults.get(key)
+        return config.get(key)
 
 def page_by_request(paginator, request):
     page_num = request.GET.get('p')
