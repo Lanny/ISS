@@ -8,9 +8,8 @@ from django.http import (HttpResponseRedirect, HttpResponseBadRequest,
     JsonResponse, HttpResponseForbidden)
 from django.shortcuts import render, get_object_or_404
 
-import utils
-import forms
-from .models import *
+from ISS import utils, forms
+from ISS.models import *
 
 class MethodSplitView(object):
     def __call__(self, request, *args, **kwargs):

@@ -295,8 +295,11 @@ class PrivateMessage(models.Model):
 
     sender = models.ForeignKey(Poster, related_name='pms_sent')
     receiver = models.ForeignKey(Poster, related_name='pms_received')
+    inbox = models.ForeignKey(Poster)
+
     subject = models.CharField(max_length=256)
     content = models.TextField()
+    read = models.BooleanField(default=False)
 
 @receiver(models.signals.post_save, sender=Post)
 def update_thread_last_update(sender, instance, created, **kwargs):

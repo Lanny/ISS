@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block page_name %}
+  {{ page_name|default:"Private Messages" }} -
+{% endblock %}
+
+{% block content %}
+  <div class="private-messages">
+    <section class="nav-pane">
+      <ul>
+        <li>Inbox</li>
+        <li>Sent Items</li>
+        <li>Messaging Settings</li>
+      </ul>
+    </section>
+    <section class="content-pane">
+      {% block pm_content %}
+      {% endblock %}
+    </section>
+  </div>
+{% endblock %}
