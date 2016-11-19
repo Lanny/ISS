@@ -32,6 +32,11 @@
             <li>
               <a href="{% url 'latest-threads' %}">Latest Threads</a>
             </li>
+
+            <li>
+              <a href="{% url 'inbox' %}">Inbox</a>
+            <li>
+
             {% if user.is_authenticated %}
             <li>
               <form method="POST" action="{% url 'logout' %}">
