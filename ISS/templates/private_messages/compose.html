@@ -1,0 +1,13 @@
+{% extends "private_messages/pm_base.html" %}
+
+{% block pm_content %}
+  <div class="compose-pm">
+    <form action="{% url 'compose-pm' %}" method="POST">
+      <fieldset>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Submit" />
+      </fieldset>
+    </form>
+  </div>
+{% endblock %}

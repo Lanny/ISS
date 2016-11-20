@@ -1,4 +1,5 @@
 import pytz
+import uuid
 
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -7,7 +8,7 @@ from django.forms import ValidationError
 from django.utils import timezone
 
 import utils
-from models import Forum, Thread, Post, Poster
+from models import *
 
 class NewThreadForm(forms.Form):
     error_css_class = 'in-error'
@@ -194,3 +195,110 @@ class UserSettingsForm(forms.Form):
         poster.save()
 
         return poster
+
+class NewPrivateMessageForm(forms.Form):
+    error_css_class = 'in-error'
+    post_min_len = utils.get_config('min_post_chars')
+    title_min_len = utils.get_config('min_thread_title_chars')
+
+    subject = forms.CharField(label='Title',
+                              max_length=1000,
+                              min_length=title_min_len)
+
+    to = forms.CharField(label='To', max_length=512)
+
+    content = forms.CharField(label='Reply',
+                              min_length=post_min_len,
+                              widget=forms.Textarea())
+
+
+    _author = None
+
+    def __init__(self, *args, **kwargs):
+        if 'author' not in kwargs:
+            raise ValueError('Must be inited with a author')
+
+        self._author = kwargs['author']
+        del kwargs['author']
+
+        super(NewPrivateMessageForm, self).__init__(*args, **kwargs)
+
+    def clean_to(self):
+        to_line = self.cleaned_data['to']
+
+        receivers = []
+        unfound = []
+
+        for username in to_line.split(','):
+            norm = Poster.normalize_username(username)
+
+            try:
+                user = Poster.objects.get(normalized_username=norm)
+            except Poster.DoesNotExist:
+                error = ValidationError(
+                    'User with username %(username)s does not exist.',
+                    params={'username': username},
+                    code='UNKNOWN_USER')
+
+                unfound.append(error)
+            else:
+                receivers.append(user)
+
+        if unfound:
+            raise ValidationError(unfound)
+        else:
+            return receivers
+
+    def clean(self, *args, **kwargs):
+        super(NewPrivateMessageForm, self).clean(*args, **kwargs)
+        
+        try:
+            last_pm = (PrivateMessage.objects
+                .filter(sender=self._author)
+                .order_by('-created'))[0]
+
+        except IndexError:
+            return self.cleaned_data
+
+
+        time_since = (timezone.now() - last_pm.created).total_seconds()
+        flood_control = utils.get_config('private_message_flood_control')
+
+        if time_since < flood_control:
+            raise ValidationError(
+                ('Flood control has blocked this message from being sent, '
+                 'you can send another PM in %(ttp)d seconds.'),
+                params={'ttp': flood_control - time_since},
+                code='FLOOD_CONTROL')
+
+
+        return self.cleaned_data
+
+    @transaction.atomic
+    def save(self):
+        chain_id = uuid.uuid4()
+        sent_copies = []
+        kept_copies = []
+
+        for receiver in self.cleaned_data['to']:
+            opts = {
+                'sender': self._author,
+                'receiver': receiver,
+                'inbox': receiver,
+                'subject': self.cleaned_data['subject'],
+                'content': self.cleaned_data['content'],
+                'chain': chain_id
+            }
+
+            # Receiver's copy
+            pm = PrivateMessage(**opts) 
+            pm.save()
+            sent_copies.append(pm)
+
+            # Sender's copy
+            opts['inbox'] = self._author
+            pm = PrivateMessage(**opts)
+            pm.save()
+            kept_copies.append(pm)
+
+        return (sent_copies, kept_copies)

@@ -70,5 +70,8 @@ urlpatterns = [
         name='edit-post'),
     url(r'^pms/inbox$',
         views.private_messages.inbox,
-        name='inbox')
+        name='inbox'),
+    url(r'^pms/compose$',
+        views.private_messages.NewPrivateMessage.as_view(),
+        name='compose-pm')
 ]

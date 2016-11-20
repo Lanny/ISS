@@ -4,7 +4,9 @@ import re
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator, Page
 from django.conf import settings
-from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse, HttpResponseForbidden
+
 from django.shortcuts import render
 
 config_defaults = {
@@ -16,6 +18,7 @@ config_defaults = {
     'posts_per_thread_page': 20,
     'general_items_per_page': 20,
     'ninja_edit_grace_time': 120,
+    'private_message_flood_control': 30,
     'title_ladder': (
         (100, 'Regular'),
         (10, 'Acolyte'),
@@ -27,6 +30,28 @@ config = config_defaults.copy()
 config.update(settings.FORUM_CONFIG)
 config['title_ladder'] = sorted(config['title_ladder'], key=lambda x: x[0],
                                 reverse=True)
+
+class MethodSplitView(object):
+    def __call__(self, request, *args, **kwargs):
+        if getattr(self, 'active_required', False):
+            if not request.user.is_active:
+                raise HttpResponseForbidden('You must be an active user '
+                                            'to do this')
+
+        meth = getattr(self, request.method, None)
+
+        if not meth:
+            return HttpResponseBadRequest('Request method %s not supported'
+                                          % request.method)
+        
+        return meth(request, *args, **kwargs)
+
+    @classmethod
+    def as_view(cls):
+        if getattr(cls, 'require_login', False):
+            return login_required(cls())
+        else:
+            return cls()
 
 def get_config(key=None):
     if not key:

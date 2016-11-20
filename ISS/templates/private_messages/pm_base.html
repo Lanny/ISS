@@ -21,8 +21,8 @@
     <div class="content">
       <section class="nav-pane">
         <ul>
-          <li>
-            <a href="#">Compose</a>
+          <li {% if active_tab == 'compose' %}class="active"{% endif %}>
+            <a href="{% url 'compose-pm' %}">Compose</a>
           </li>
           <li {% if active_tab == 'inbox' %}class="active"{% endif %}>
             <a href="{% url 'inbox' %}">Inbox</a>

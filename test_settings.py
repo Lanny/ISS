@@ -114,3 +114,4 @@ AUTHENTICATION_BACKENDS = [
     'ISS.auth.backends.vB5_legacy'
 ]
 
+LOGIN_URL = '/login'
