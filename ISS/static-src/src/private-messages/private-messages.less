@@ -1,0 +1,56 @@
+@import "../base/config.less";
+
+.private-messages {
+  h1 {
+    .title-box();
+  }
+
+  .content {
+    display: flex;
+    flex-direction: row;
+    background-color: @bg_dark;
+
+    .nav-pane {
+      border-right: 1px solid @seperator_color;
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+          a {
+            display: block;
+            padding: 15px 25px;
+            border-bottom: 1px solid @seperator_color;
+            text-align: center;
+            text-decoration: none;
+
+            &:hover {
+              background-color: @bg_light;
+            }
+          }
+        }
+      }
+    }
+
+    .content-pane {
+      flex: 1;
+
+      .private-message-list {
+        .index-table();
+
+        th {
+          border-bottom: 1px solid @seperator_color;
+        }
+
+        .no-messages[colspan] {
+          text-align: center;
+          background-color: @bg_dark;
+          padding: 60px 0;
+        }
+      }
+    }
+  }
+}
+

@@ -44,11 +44,15 @@
         </tr>
       {% empty %}
         <tr>
-          <td colspan="3">
+          <td colspan="3" class="no-messages">
             No messages.
           </td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
+
+  {% if messages %}
+    {% include "page_list.html" with page=messages %}
+  {% endif %}
 {% endblock %}

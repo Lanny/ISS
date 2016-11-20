@@ -16,9 +16,9 @@ def inbox(request):
 
     ctx = {
         'messages': page,
-        'page_name': inbox,
+        'page_name': 'Inbox',
         'show_from': True,
-        'show_to': False
+        'show_to': False,
     }
 
     return render(request, 'private_messages/pm_list.html', ctx)

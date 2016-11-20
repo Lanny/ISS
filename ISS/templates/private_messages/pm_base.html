@@ -6,16 +6,28 @@
 
 {% block content %}
   <div class="private-messages">
-    <section class="nav-pane">
-      <ul>
-        <li>Inbox</li>
-        <li>Sent Items</li>
-        <li>Messaging Settings</li>
-      </ul>
-    </section>
-    <section class="content-pane">
-      {% block pm_content %}
-      {% endblock %}
-    </section>
+    <h1>{{ page_name }}</h1>
+    <div class="content">
+      <section class="nav-pane">
+        <ul>
+          <li>
+            <a href="#">Compose</a>
+          </li>
+          <li>
+            <a href="{% url 'inbox' %}">Inbox</a>
+          </li>
+          <li>
+            <a href="#">Sent Items</a>
+          </li>
+          <li>
+            <a href="#">Messaging Settings</a>
+          </li>
+        </ul>
+      </section>
+      <section class="content-pane">
+        {% block pm_content %}
+        {% endblock %}
+      </section>
+    </div>
   </div>
 {% endblock %}
