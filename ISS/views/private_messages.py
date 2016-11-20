@@ -10,7 +10,8 @@ from ISS.models import *
 @login_required
 def inbox(request):
     messages = (request.user
-            .pms_received
+            .privatemessage_set
+            .filter(receiver=request.user)
             .order_by('-created'))
 
     items_per_page = utils.get_config('general_items_per_page')
