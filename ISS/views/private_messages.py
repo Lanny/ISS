@@ -17,8 +17,13 @@ def inbox(request):
     ctx = {
         'messages': page,
         'page_name': 'Inbox',
+        'active_tab': 'inbox',
         'show_from': True,
         'show_to': False,
+        'breadcrumbs': [
+            ('Private Messages', ''),
+            ('Inbox', 'inbox')
+        ]
     }
 
     return render(request, 'private_messages/pm_list.html', ctx)
