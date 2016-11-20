@@ -256,3 +256,21 @@ footer {
     max-width: 100%;
   }
 }
+
+pre.code-block {
+  background-color: @bg_light;
+  border: 1px solid @seperator_color;
+  padding: 0px 1.5em 1em;
+  border-radius: 3px;
+  position: relative;
+  margin-top: 2em;
+
+  &:before {
+    content: 'Code:';
+    position: absolute;
+    top: -16px;
+    left: 0px;
+    font-size: 10px;
+  }
+  
+}

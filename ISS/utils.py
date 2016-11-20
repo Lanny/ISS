@@ -127,6 +127,11 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
 
     parser.add_formatter('video', render_video, replace_cosmetic=False)
 
+    def render_code(tag_name, value, options, parent, context):
+        return '<pre class="code-block">%s</pre>' % value
+
+    parser.add_formatter('code', render_code, replace_cosmetic=False)
+
 
 
     default_url_hanlder, _ = parser.recognized_tags['url']
