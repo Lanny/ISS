@@ -4,19 +4,26 @@
   <table class="private-message-list">
     <thead>
       <tr>
+        <th>Subject</th>
         {% if show_from %}
           <th>From</th>
         {% endif %}
         {% if show_to %}
           <th>To</th>
         {% endif %}
-        <th>Subject</th>
         <th>Sent</th>
       </tr>
     </thead>
     <tbody>
       {% for message in messages %}
         <tr>
+          <td>
+            <a href="{% url 'read-pm' message.pk %}"
+               {% if not message.read %}class="unread"{% endif %}>
+              {{ message.subject }}
+            </a>
+          </td>
+
           {% if show_from %}
           <td>
             <a href="{{ message.sender.get_url }}">
@@ -32,10 +39,6 @@
             </a>
           </td>
           {% endif %}
-
-          <td>
-            {{ message.subject }}
-          </td>
 
           <td>
             {{ message.created|date:"o-m-d" }} at

@@ -1,6 +1,8 @@
 @import "../base/config.less";
 
 .private-messages {
+  .rounded();
+
   h1 {
     .title-box();
   }
@@ -45,7 +47,18 @@
         .index-table();
 
         th {
+          .teal();
           border-bottom: 1px solid @seperator_color;
+        }
+
+        td, th {
+          &:nth-child(2) { 
+            width: 20%;
+          }
+
+          &:nth-child(3) { 
+            width: 25%;
+          }
         }
 
         .no-messages[colspan] {

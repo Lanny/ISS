@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404
 
 from ISS import utils, forms
@@ -31,6 +31,39 @@ def inbox(request):
     }
 
     return render(request, 'private_messages/pm_list.html', ctx)
+
+def read_pm(request, pm_id):
+    message = get_object_or_404(PrivateMessage, pk=pm_id)
+
+    if message.inbox != request.user:
+        raise HttpResponseForbidden('You can\'t read that!')
+
+    is_sender = message.sender == request.user
+    is_receiver = message.receiver == request.user
+
+    active_tab = None
+    if is_sender:
+        active_tab = 'sent'
+    elif is_receiver:
+        active_tab = 'inbox'
+
+    ctx = {
+        'message': message,
+        'page_name': 'Message: %s' % message.subject,
+        'active_tab': active_tab,
+        'breadcrumbs': [
+            ('Private Messages', '')
+        ]
+    }
+
+    if is_sender:
+        ctx['breadcrumbs'].append(('Sent', 'sent'))
+    if is_receiver:
+        ctx['breadcrumbs'].append(('Inbox', 'inbox'))
+
+    ctx['breadcrumbs'].append(('Message: %s' % message.subject,''))
+
+    return render(request, 'private_messages/pm_view.html', ctx)
     
 class NewPrivateMessage(utils.MethodSplitView):
     login_required = True

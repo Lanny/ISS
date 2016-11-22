@@ -304,7 +304,6 @@ class PrivateMessage(models.Model):
     def __unicode__(self):
         return self.subject
 
-
 @receiver(models.signals.post_save, sender=Post)
 def update_thread_last_update(sender, instance, created, **kwargs):
     if not created:

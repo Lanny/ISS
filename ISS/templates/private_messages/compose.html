@@ -2,7 +2,7 @@
 
 {% block pm_content %}
   <div class="compose-pm">
-    <form action="{% url 'compose-pm' %}" method="POST">
+    <form action="{% url 'compose-pm' %}" method="POST" class="editor">
       <fieldset>
         {% csrf_token %}
         {{ form.as_p }}
@@ -10,4 +10,8 @@
       </fieldset>
     </form>
   </div>
+{% endblock %}
+
+{% block js %}
+  {% include "require.html" with bootstrap="editor-bootstrap" %}
 {% endblock %}
