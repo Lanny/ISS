@@ -40,5 +40,12 @@
       {{ message.content|bbc:embed_images }}
     </div>
 
+    <div class="message-controls">
+      <a class="reply"
+        href="{% url "compose-pm" %}?replyto={{ message.pk }}">
+        Reply
+      </a>
+    </div>
+
   </div>
 {% endblock %}

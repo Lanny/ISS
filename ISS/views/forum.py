@@ -2,6 +2,7 @@ from django.contrib.auth import login, logout, authenticate, _get_backends
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
+from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.http import (HttpResponseRedirect, HttpResponseBadRequest,
@@ -150,7 +151,7 @@ class UserProfile(utils.MethodSplitView):
         poster = get_object_or_404(Poster, pk=user_id)
 
         if poster.pk != request.user.pk:
-            raise HttpResponseForbidden()
+            raise PermissionDenied()
 
         form = forms.UserSettingsForm(request.POST)
 
@@ -251,7 +252,7 @@ class EditPost(utils.MethodSplitView):
         form_initials = { 'content': post.content, 'post': post }
 
         if (not request.user == post.author) and (not request.user.is_staff):
-            raise HttpResponseForbidden()
+            raise PermissionDenied()
 
         form = forms.EditPostForm(initial=form_initials)
         ctx = {
@@ -265,7 +266,7 @@ class EditPost(utils.MethodSplitView):
         post = get_object_or_404(Post, pk=post_id)
 
         if (not request.user == post.author) and (not request.user.is_staff):
-            raise HttpResponseForbidden()
+            raise PermissionDenied()
 
         form = forms.EditPostForm(request.POST)
 

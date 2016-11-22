@@ -301,6 +301,13 @@ class PrivateMessage(models.Model):
     content = models.TextField()
     read = models.BooleanField(default=False)
 
+    def quote_content(self):
+        parser = utils.get_closure_bbc_parser()
+        body = parser.format(self.content)
+
+        template = '[quote author=%s]\n%s\n[/quote]'
+        return template % (self.sender.username, body)
+
     def __unicode__(self):
         return self.subject
 

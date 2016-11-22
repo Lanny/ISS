@@ -1,7 +1,8 @@
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator
-from django.http import HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 
 from ISS import utils, forms
@@ -65,7 +66,7 @@ def read_pm(request, pm_id):
     message = get_object_or_404(PrivateMessage, pk=pm_id)
 
     if message.inbox != request.user:
-        raise HttpResponseForbidden('You can\'t read that!')
+        raise PermissionDenied('You can\'t read that!')
 
     is_sender = message.sender == request.user
     is_receiver = message.receiver == request.user
@@ -108,7 +109,22 @@ class NewPrivateMessage(utils.MethodSplitView):
     }
 
     def GET(self, request):
-        form = forms.NewPrivateMessageForm(author=request.user)
+        initials = {}
+        if 'replyto' in request.GET:
+            rt = get_object_or_404(PrivateMessage, pk=request.GET['replyto'])
+
+            if rt.inbox != request.user:
+                raise PermissionDenied('You can\'t quote that!')
+
+            if rt.subject.startswith(('re:', 'RE:')):
+                initials['subject'] = rt.subject
+            else:
+                initials['subject'] = 're: ' + rt.subject
+
+            initials['to'] = rt.sender.username
+            initials['content'] = rt.quote_content()
+
+        form = forms.NewPrivateMessageForm(author=request.user, initial=initials)
         
         ctx = { 'form': form }
         ctx.update(self.ctx_defaults)

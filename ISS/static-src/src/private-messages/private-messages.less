@@ -99,6 +99,22 @@
         .message-body {
           padding: 15px;
         }
+
+        .message-controls {
+          border-top: 1px solid @seperator_color;
+          margin: 0 15px;
+          padding: 5px 0;
+          overflow: hidden;
+
+          * {
+            float: right;
+          }
+
+          .reply {
+            .small-btn();
+            .teal();
+          }
+        }
       }
     }
   }
