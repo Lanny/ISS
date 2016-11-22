@@ -27,8 +27,8 @@
           <li {% if active_tab == 'inbox' %}class="active"{% endif %}>
             <a href="{% url 'inbox' %}">Inbox</a>
           </li>
-          <li>
-            <a href="#">Sent Items</a>
+          <li {% if active_tab == 'sent' %}class="active"{% endif %}>
+            <a href="{% url 'sent-pms' %}">Sent Items</a>
           </li>
           <li>
             <a href="#">Messaging Settings</a>

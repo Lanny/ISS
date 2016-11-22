@@ -32,6 +32,35 @@ def inbox(request):
 
     return render(request, 'private_messages/pm_list.html', ctx)
 
+@login_required
+def sent(request):
+    messages = (request.user
+            .privatemessage_set
+            .filter(sender=request.user)
+            .order_by('-created'))
+
+    items_per_page = utils.get_config('general_items_per_page')
+    paginator = Paginator(messages, items_per_page)
+    page = utils.page_by_request(paginator, request)
+
+    ctx = {
+        'messages': page,
+        'page_name': 'Sent',
+        'active_tab': 'sent',
+        'show_from': False,
+        'show_to': True,
+        'breadcrumbs': [
+            ('Private Messages', ''),
+            ('Sent', 'sent-pms')
+        ]
+    }
+
+    return render(request, 'private_messages/pm_list.html', ctx)
+
+
+
+
+@login_required
 def read_pm(request, pm_id):
     message = get_object_or_404(PrivateMessage, pk=pm_id)
 
@@ -57,7 +86,7 @@ def read_pm(request, pm_id):
     }
 
     if is_sender:
-        ctx['breadcrumbs'].append(('Sent', 'sent'))
+        ctx['breadcrumbs'].append(('Sent', 'sent-pms'))
     if is_receiver:
         ctx['breadcrumbs'].append(('Inbox', 'inbox'))
 
