@@ -73,6 +73,33 @@
           .standard-form()
         }
       }
+
+      .read-pm {
+        .message-info {
+          background-color: @bg_light;
+          padding: 0 15px;
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+
+            tr {
+              &:not(:last-child) td {
+                border-bottom: 1px solid @seperator_color;
+              }
+
+              td {
+                border: none;
+                padding: 5px 0;
+              }
+            }
+          }
+        }
+
+        .message-body {
+          padding: 15px;
+        }
+      }
     }
   }
 }

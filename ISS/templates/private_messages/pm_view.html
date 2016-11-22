@@ -4,7 +4,8 @@
 
 {% block pm_content %}
   <div class="read-pm">
-    <table class="message-info">
+    <div class="message-info">
+    <table >
       <tr>
         <td>Subject:</td>
         <td>{{ message.subject }}</td>
@@ -33,6 +34,7 @@
         </td>
       </tr>
     </table>
+  </div>
 
     <div class="message-body">
       {{ message.content|bbc:embed_images }}
