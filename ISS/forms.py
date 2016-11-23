@@ -295,10 +295,11 @@ class NewPrivateMessageForm(forms.Form):
             pm.save()
             sent_copies.append(pm)
 
-            # Sender's copy
-            opts['inbox'] = self._author
-            pm = PrivateMessage(**opts)
-            pm.save()
-            kept_copies.append(pm)
+            if self._author != receiver:
+                # Sender's copy
+                opts['inbox'] = self._author
+                pm = PrivateMessage(**opts)
+                pm.save()
+                kept_copies.append(pm)
 
         return (sent_copies, kept_copies)
