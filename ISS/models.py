@@ -224,8 +224,10 @@ class Thread(models.Model):
         if post is None:
             post = self.get_last_post()
 
-        flag.last_read_post = post
-        flag.last_read_date = post.created
+        if (not flag.last_read_post or
+                flag.last_read_post.created < post.created):
+            flag.last_read_post = post
+            flag.last_read_date = post.created
 
         flag.save()
 
