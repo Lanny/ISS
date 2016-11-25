@@ -36,7 +36,15 @@
 
             {% if user.is_authenticated %}
               <li>
-                <a href="{% url 'inbox' %}">Inbox</a>
+                <a href="{% url 'inbox' %}">
+                  Inbox
+
+                  {% if private_messages_count > 0 %}
+                    <span class="inbox-badge">
+                      {{ private_messages_count }}
+                    </span>
+                  {% endif %}
+                </a>
               </li>
 
               <li>

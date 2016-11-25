@@ -58,9 +58,6 @@ def sent(request):
 
     return render(request, 'private_messages/pm_list.html', ctx)
 
-
-
-
 @login_required
 def read_pm(request, pm_id):
     message = get_object_or_404(PrivateMessage, pk=pm_id)

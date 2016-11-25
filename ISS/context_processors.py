@@ -37,3 +37,12 @@ def user_config(request):
         ctx['allow_js'] = request.user.allow_js
 
     return ctx
+
+def private_messages(request):
+    ctx = {}
+
+    if not isinstance(request.user, AnonymousUser):
+        ctx['private_messages_count'] = request.user.get_inbox_badge_count()
+
+    return ctx
+

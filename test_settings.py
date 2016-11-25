@@ -67,7 +67,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'ISS.context_processors.banner',
                 'ISS.context_processors.forum_config',
-                'ISS.context_processors.user_config'
+                'ISS.context_processors.user_config',
+                'ISS.context_processors.private_messages'
             ],
         },
     },

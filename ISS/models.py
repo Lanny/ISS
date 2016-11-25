@@ -81,6 +81,12 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def get_nojs(self):
         return self.allow_js
 
+    def get_inbox_badge_count(self):
+        import pdb; pdb.set_trace();
+        return (self.pms_received
+            .filter(read=False)
+            .count())
+
     @classmethod
     def normalize_username(cls, username):
         norm = username.lower()
