@@ -82,8 +82,8 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         return self.allow_js
 
     def get_inbox_badge_count(self):
-        import pdb; pdb.set_trace();
         return (self.pms_received
+            .filter(inbox=self)
             .filter(read=False)
             .count())
 
