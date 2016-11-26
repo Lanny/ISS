@@ -74,6 +74,8 @@ def read_pm(request, pm_id):
     elif is_receiver:
         active_tab = 'inbox'
 
+    message.mark_read()
+
     ctx = {
         'message': message,
         'page_name': 'Message: %s' % message.subject,

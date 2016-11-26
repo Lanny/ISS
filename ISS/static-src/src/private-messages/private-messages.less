@@ -61,6 +61,24 @@
           }
         }
 
+        tr {
+          &.read {
+            .subject {
+              a {
+                font-weight: normal;
+              }
+            }
+          }
+
+          &.unread {
+            .subject {
+              a {
+                font-weight: bold;
+              }
+            }
+          }
+        }
+
         .no-messages[colspan] {
           text-align: center;
           background-color: @bg_dark;

@@ -314,6 +314,12 @@ class PrivateMessage(models.Model):
         template = '[quote author=%s]\n%s\n[/quote]'
         return template % (self.sender.username, body)
 
+    def mark_read(self, commit=True):
+        self.read = True
+
+        if commit:
+            self.save()
+
     def __unicode__(self):
         return self.subject
 

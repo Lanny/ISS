@@ -16,10 +16,9 @@
     </thead>
     <tbody>
       {% for message in messages %}
-        <tr>
-          <td>
-            <a href="{% url 'read-pm' message.pk %}"
-               {% if not message.read %}class="unread"{% endif %}>
+      <tr class="{% if message.read %}read{% else %}unread{% endif %}">
+          <td class="subject">
+            <a href="{% url 'read-pm' message.pk %}">
               {{ message.subject }}
             </a>
           </td>
