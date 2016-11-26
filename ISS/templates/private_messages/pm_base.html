@@ -30,9 +30,11 @@
           <li {% if active_tab == 'sent' %}class="active"{% endif %}>
             <a href="{% url 'sent-pms' %}">Sent Items</a>
           </li>
+          {% comment %}
           <li>
             <a href="#">Messaging Settings</a>
           </li>
+          {% endcomment %}
         </ul>
       </section>
       <section class="content-pane">
