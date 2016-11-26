@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block page_name %}
+  {{ page_name|default:"Private Messages" }} -
+{% endblock %}
+
+{% block breadcrumb %}
+  {% for name, url_name in breadcrumbs %}
+    &gt;
+    {% if url_name %}
+      <a href="{% url url_name %}">{{ name }}</a>
+    {% else %}
+      <span>{{ name }}</span>
+    {% endif %}
+  {% endfor %}
+{% endblock %}
+
+{% block content %}
+  <div class="private-messages">
+    <h1>{{ page_name }}</h1>
+    <div class="content">
+      <section class="nav-pane">
+        <ul>
+          <li {% if active_tab == 'compose' %}class="active"{% endif %}>
+            <a href="{% url 'compose-pm' %}">Compose</a>
+          </li>
+          <li {% if active_tab == 'inbox' %}class="active"{% endif %}>
+            <a href="{% url 'inbox' %}">Inbox</a>
+          </li>
+          <li {% if active_tab == 'sent' %}class="active"{% endif %}>
+            <a href="{% url 'sent-pms' %}">Sent Items</a>
+          </li>
+          {% comment %}
+          <li>
+            <a href="#">Messaging Settings</a>
+          </li>
+          {% endcomment %}
+        </ul>
+      </section>
+      <section class="content-pane">
+        {% block pm_content %}
+        {% endblock %}
+      </section>
+    </div>
+  </div>
+{% endblock %}

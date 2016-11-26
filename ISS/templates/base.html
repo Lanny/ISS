@@ -32,14 +32,29 @@
             <li>
               <a href="{% url 'latest-threads' %}">Latest Threads</a>
             </li>
+
+
             {% if user.is_authenticated %}
-            <li>
-              <form method="POST" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <input type="submit" value="Logout">
-                <input type="hidden" name="next" value="{{ request.get_full_path }}">
-              </form>
-            </li>
+              <li>
+                <a href="{% url 'inbox' %}">
+                  Inbox
+
+                  {% if private_messages_count > 0 %}
+                    <span class="inbox-badge">
+                      {{ private_messages_count }}
+                    </span>
+                  {% endif %}
+                </a>
+              </li>
+
+              <li>
+                <form method="POST" action="{% url 'logout' %}">
+                  {% csrf_token %}
+                  <input type="submit" value="Logout">
+                  <input type="hidden" name="next"
+                         value="{{ request.get_full_path }}">
+                </form>
+              </li>
             {% else %}
               <li>
                 <a href="{% url 'register' %}">Register</a>
@@ -47,23 +62,23 @@
             {% endif %}
           </ul>
 
-        {% if user.is_authenticated %}
-          <div class="welcome-block">
-            <span>
-              Welcome, <a href="{{ user.get_url }}">{{ user.username }}</a>
-            </span>
-          </div>
-
-        {% else %}
-          <form class="inline-login" action="{% url 'login' %}" method="POST">
-            <div class="fields">
-              {{ login_form.as_p }}
-              {% csrf_token %}
-              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          {% if user.is_authenticated %}
+            <div class="welcome-block">
+              <span>
+                Welcome, <a href="{{ user.get_url }}">{{ user.username }}</a>
+              </span>
             </div>
-            <input type="submit" value="Login" />
-          </form>
-        {% endif %}
+
+          {% else %}
+            <form class="inline-login" action="{% url 'login' %}" method="POST">
+              <div class="fields">
+                {{ login_form.as_p }}
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              </div>
+              <input type="submit" value="Login" />
+            </form>
+          {% endif %}
         </div>
       </div>
 

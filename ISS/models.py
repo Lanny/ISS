@@ -1,4 +1,5 @@
 import re
+import uuid
 import pytz
 
 from django.contrib import auth
@@ -79,6 +80,12 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     def get_nojs(self):
         return self.allow_js
+
+    def get_inbox_badge_count(self):
+        return (self.pms_received
+            .filter(inbox=self)
+            .filter(read=False)
+            .count())
 
     @classmethod
     def normalize_username(cls, username):
@@ -289,6 +296,34 @@ class ForumFlag(models.Model):
     poster = models.ForeignKey(Poster)
 
     last_read_date = models.DateTimeField(null=True)
+
+class PrivateMessage(models.Model):
+    chain = models.UUIDField(default=uuid.uuid4, editable=False)
+    created = models.DateTimeField(default=timezone.now)
+
+    sender = models.ForeignKey(Poster, related_name='pms_sent')
+    receiver = models.ForeignKey(Poster, related_name='pms_received')
+    inbox = models.ForeignKey(Poster)
+
+    subject = models.CharField(max_length=256)
+    content = models.TextField()
+    read = models.BooleanField(default=False)
+
+    def quote_content(self):
+        parser = utils.get_closure_bbc_parser()
+        body = parser.format(self.content)
+
+        template = '[quote author=%s]\n%s\n[/quote]'
+        return template % (self.sender.username, body)
+
+    def mark_read(self, commit=True):
+        self.read = True
+
+        if commit:
+            self.save()
+
+    def __unicode__(self):
+        return self.subject
 
 @receiver(models.signals.post_save, sender=Post)
 def update_thread_last_update(sender, instance, created, **kwargs):

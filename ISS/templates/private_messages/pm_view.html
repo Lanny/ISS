@@ -1,0 +1,51 @@
+{% extends "private_messages/pm_base.html" %}
+
+{% load bbc %}
+
+{% block pm_content %}
+  <div class="read-pm">
+    <div class="message-info">
+      <table>
+        <tr>
+          <td>Subject:</td>
+          <td>{{ message.subject }}</td>
+        </tr>
+        <tr>
+          <td>To:</td>
+          <td>
+            <a href="{{ message.receiver.get_url }}">
+              {{ message.receiver.username }}
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td>From:</td>
+          <td>
+            <a href="{{ message.sender.get_url }}">
+              {{ message.sender.username }}
+            </a>
+            </td>
+        </tr>
+        <tr>
+          <td>Sent:</td>
+          <td>
+            {{ message.created|date:"o-m-d" }} at
+            {{ message.created|time:"f A e" }}
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="message-body">
+      {{ message.content|bbc:embed_images }}
+    </div>
+
+    <div class="message-controls">
+      <a class="reply"
+        href="{% url "compose-pm" %}?replyto={{ message.pk }}">
+        Reply
+      </a>
+    </div>
+
+  </div>
+{% endblock %}

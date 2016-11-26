@@ -1,0 +1,60 @@
+{% extends "private_messages/pm_base.html" %}
+
+{% block pm_content %}
+  <table class="private-message-list">
+    <thead>
+      <tr>
+        <th>Subject</th>
+        {% if show_from %}
+          <th>From</th>
+        {% endif %}
+        {% if show_to %}
+          <th>To</th>
+        {% endif %}
+        <th>Sent</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for message in messages %}
+      <tr class="{% if message.read %}read{% else %}unread{% endif %}">
+          <td class="subject">
+            <a href="{% url 'read-pm' message.pk %}">
+              {{ message.subject }}
+            </a>
+          </td>
+
+          {% if show_from %}
+          <td>
+            <a href="{{ message.sender.get_url }}">
+              {{ message.sender.username }}
+            </a>
+          </td>
+          {% endif %}
+
+          {% if show_to %}
+          <td>
+            <a href="{{ message.receiver.get_url }}">
+              {{ message.receiver.username }}
+            </a>
+          </td>
+          {% endif %}
+
+          <td>
+            {{ message.created|date:"o-m-d" }} at
+            {{ message.created|time:"f A e" }}
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="3" class="no-messages">
+            No messages.
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if messages %}
+    {% include "page_list.html" with page=messages %}
+  {% endif %}
+{% endblock %}

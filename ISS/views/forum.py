@@ -2,32 +2,16 @@ from django.contrib.auth import login, logout, authenticate, _get_backends
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
+from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.http import (HttpResponseRedirect, HttpResponseBadRequest,
     JsonResponse, HttpResponseForbidden)
 from django.shortcuts import render, get_object_or_404
 
-import utils
-import forms
-from .models import *
+from ISS import utils, forms
+from ISS.models import *
 
-class MethodSplitView(object):
-    def __call__(self, request, *args, **kwargs):
-        meth = getattr(self, request.method, None)
-
-        if not meth:
-            return HttpResponseBadRequest('Request method %s not supported'
-                                          % request.method)
-        
-        return meth(request, *args, **kwargs)
-
-    @classmethod
-    def as_view(cls):
-        if getattr(cls, 'require_login', False):
-            return login_required(cls())
-        else:
-            return cls()
 
 def forum_index(request):
     forums = Forum.objects.all().order_by('priority')
@@ -145,7 +129,7 @@ def user_list(request):
 
     return render(request, 'user_list.html', ctx)
 
-class UserProfile(MethodSplitView):
+class UserProfile(utils.MethodSplitView):
     def GET(self, request, user_id):
         poster = get_object_or_404(Poster, pk=user_id)
 
@@ -167,7 +151,7 @@ class UserProfile(MethodSplitView):
         poster = get_object_or_404(Poster, pk=user_id)
 
         if poster.pk != request.user.pk:
-            raise HttpResponseForbidden()
+            raise PermissionDenied()
 
         form = forms.UserSettingsForm(request.POST)
 
@@ -183,8 +167,9 @@ class UserProfile(MethodSplitView):
 
             return render(request, 'user_profile.html', ctx)
 
-class NewThread(MethodSplitView):
+class NewThread(utils.MethodSplitView):
     login_required = True
+    active_required = True
 
     def GET(self, request, forum_id):
         forum = get_object_or_404(Forum, pk=forum_id)
@@ -213,8 +198,9 @@ class NewThread(MethodSplitView):
 
             return render(request, 'new_thread.html', ctx)
 
-class NewReply(MethodSplitView):
+class NewReply(utils.MethodSplitView):
     login_required = True
+    active_required = True
 
     def GET(self, request, thread_id):
         thread = get_object_or_404(Thread, pk=thread_id)
@@ -257,15 +243,16 @@ class NewReply(MethodSplitView):
 
             return render(request, 'new_post.html', ctx)
 
-class EditPost(MethodSplitView):
+class EditPost(utils.MethodSplitView):
     login_required = True
+    active_required = True
     
     def GET(self, request, post_id):
         post = get_object_or_404(Post, pk=post_id)
         form_initials = { 'content': post.content, 'post': post }
 
         if (not request.user == post.author) and (not request.user.is_staff):
-            raise HttpResponseForbidden()
+            raise PermissionDenied()
 
         form = forms.EditPostForm(initial=form_initials)
         ctx = {
@@ -279,7 +266,7 @@ class EditPost(MethodSplitView):
         post = get_object_or_404(Post, pk=post_id)
 
         if (not request.user == post.author) and (not request.user.is_staff):
-            raise HttpResponseForbidden()
+            raise PermissionDenied()
 
         form = forms.EditPostForm(request.POST)
 
@@ -294,7 +281,7 @@ class EditPost(MethodSplitView):
         form.save(editor=request.user)
         return HttpResponseRedirect(post.get_url())
 
-class GetQuote(MethodSplitView):
+class GetQuote(utils.MethodSplitView):
     def GET(self, request, post_id):
         post = get_object_or_404(Post, pk=post_id)
         BBC = post.quote_content()
@@ -303,7 +290,7 @@ class GetQuote(MethodSplitView):
             'content': BBC
         })
 
-class LoginUser(MethodSplitView):
+class LoginUser(utils.MethodSplitView):
     def GET(self, request):
         form = forms.ISSAuthenticationForm()
         ctx = {'form': form}
@@ -323,14 +310,14 @@ class LoginUser(MethodSplitView):
                 ctx = {'form': form}
                 return render(request, 'login.html', ctx)
 
-class LogoutUser(MethodSplitView):
+class LogoutUser(utils.MethodSplitView):
     def POST(self, request):
         logout(request)
 
         next_url = request.POST.get('next', '/')
         return HttpResponseRedirect(next_url)
 
-class RegisterUser(MethodSplitView):
+class RegisterUser(utils.MethodSplitView):
     def GET(self, request):
         form = forms.RegistrationForm()
         ctx = {'form': form}
@@ -355,8 +342,9 @@ class RegisterUser(MethodSplitView):
             return render(request, 'register.html', ctx)
 
 
-class ThankPost(MethodSplitView):
+class ThankPost(utils.MethodSplitView):
     require_login = True
+    active_required = True
 
     def POST(self, request, post_id):
         post = get_object_or_404(Post, pk=post_id)
@@ -376,8 +364,9 @@ class ThankPost(MethodSplitView):
         else:
             return HttpResponseRedirect(post.get_url())
 
-class UnthankPost(MethodSplitView):
+class UnthankPost(utils.MethodSplitView):
     require_login = True
+    active_required = True
 
     def POST(self, request, post_id):
         post = get_object_or_404(Post, pk=post_id)
