@@ -168,6 +168,33 @@ a {
         text-align: right;
       }
     }
+
+    @media (max-width: @breakpoint) {
+      flex-direction: column-reverse;
+
+      .welcome-block {
+        width: 100%;
+        padding: 10px 5px;
+      }
+
+      .control-links {
+        flex-direction: column;
+
+        li {
+          a, input[type="submit"] {
+            display: block;
+            width: 100%;
+            text-align: center;
+            border-top: 1px solid @seperator_color;
+            padding: 10px 5px;
+          }
+
+          form {
+            width: 100%;
+          }
+        }
+      }
+    }
   }
 
   .inline-login {
