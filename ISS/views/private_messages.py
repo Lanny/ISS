@@ -123,6 +123,10 @@ class NewPrivateMessage(utils.MethodSplitView):
             initials['to'] = rt.sender.username
             initials['content'] = rt.quote_content()
 
+        elif 'to' in request.GET:
+            recipient = get_object_or_404(Poster, pk=request.GET['to'])
+            initials['to'] = recipient.username
+
         form = forms.NewPrivateMessageForm(author=request.user, initial=initials)
         
         ctx = { 'form': form }

@@ -65,6 +65,12 @@
             </span>
           </div>
         </div>
+
+        {% if not user.pk == poster.pk %}
+          <a href="{% url 'compose-pm' %}?to={{ poster.pk }}">
+            Send Private Message to {{ poster.username }}
+          </a>
+        {% endif %}
       </div>
     </div>
 
