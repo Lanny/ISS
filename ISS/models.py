@@ -33,7 +33,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         default='UTC',
         choices=[(tz, tz) for tz in pytz.common_timezones])
 
-    allow_js = models.BooleanField(default=False)
+    allow_js = models.BooleanField(default=True)
     allow_image_embed = models.BooleanField(default=True)
     allow_avatars = models.BooleanField(default=True)
 
