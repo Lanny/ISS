@@ -1,3 +1,6 @@
+import urlparse
+import urllib
+
 from django import template
 
 register = template.Library()
@@ -23,3 +26,20 @@ def nice_page_set(page):
         elip_pages.append(n)
 
     return elip_pages
+
+@register.filter
+def mixin_page_param(base_url, page_number):
+    parsed_url = urlparse.urlparse(base_url)
+    query = urlparse.parse_qs(parsed_url.query)
+    query['p'] = [page_number]
+
+    one_pairs = []
+    for key, values in query.items():
+        for value in values:
+            one_pairs.append((key, value))
+
+    qs = urllib.urlencode(one_pairs)
+    url_dict = parsed_url._asdict()
+    url_dict['query'] = qs
+
+    return urlparse.urlunparse(urlparse.ParseResult(**url_dict))
