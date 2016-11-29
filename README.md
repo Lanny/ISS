@@ -16,7 +16,11 @@ through your OS's package manager.
 
 Start by cloning the project. Copy the `test_settings.py` file into the ISS app
 directory and rename it `settings.py`. This defines a test forum and uses the
-sqlite driver, if you'd like to use a different DB edit the file appropriately.
+postgres driver. ~~If you'd like to use a different DB edit the file
+appropriately~~ the search functionality depends on postgres' text search and
+indexing behavior in a non-driver-portable way. If you disable migration 0014
+the rest of the code should work in theory but this configuration is not
+"officially" supported.
 
 Next install serverside dependencies from the top level of the project:
 
@@ -104,7 +108,7 @@ In no particular order:
     - ~~Make it work~~
     - ~~video embedding~~
     - autolinking that doesn't break other stuff
-    - Quotes
+    - ~~Quotes~~
         - ~~Fix quote pyramids~~
         - ~~In quick reply (ajax)~~
         - ~~no-js mode over to new-reply page~~
@@ -114,30 +118,33 @@ In no particular order:
     - ~~profile page~~
       - posts per day
       - avatar
-      - thanked posts
+      - ~~thanked posts~~
     - avatars
     - ~~list of posts~~
-    - make user titles work
+    - ~~make user titles work~~
       - ~~custom usertitles~~
-      - determine by post count
+      - ~~determine by post count~~
     - settings
       - ~~nojs~~
       - ~~image embed~~
       - ~~timezone~~
       - email display?
+      - subscriptions
 - ~~Unread Posts in Thread / Thread Subscriptions~~
 - View Subscriptions (UserCP) 
 - Private Messages
-    - View
-    - New
-    - Reply
-    - "Alerts"
+    - ~~View~~
+    - ~~New~~
+    - ~~Reply~~
+    - ~~"Alerts"~~
+    - Chain context
 - Navigation
     - ~~Breadcrumbs~~
     - Sitemap? Whatever SEO magic the cool kids are into these days
-- Thanks
+- ~~Thanks~~
     - ~~AJAX~~
     - ~~nojs reload~~
+    - Order by thanks created date instead of post date
 - Static pages (FAQ, whatever)
 - ~~New posts~~
 - Flood control
