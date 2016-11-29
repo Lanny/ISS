@@ -129,6 +129,32 @@ def user_list(request):
 
     return render(request, 'user_list.html', ctx)
 
+def search(request):
+    q = request.GET.get('q', None)
+
+    if not q:
+        return render(request, 'search_results.html', {})
+
+    #sql = ('SELECT content FROM "%s" WHERE to_tsvector(\'english\', content) '
+    #    '@@ to_tsquery(\'english\', %%s);') % (Post._meta.db_table,)
+    #qs = Post.objects.raw(sql, (terms,))
+
+    terms = ' & '.join(q.split(' '))
+    qs = Post.objects.filter(content__tsmatch=terms)
+
+    posts_per_page = utils.get_config('general_items_per_page')
+
+    paginator = Paginator(qs, posts_per_page)
+
+    page = utils.page_by_request(paginator, request)
+
+    ctx = {
+        'q': q,
+        'posts': page
+    }
+
+    return render(request, 'search_results.html', ctx)
+
 class UserProfile(utils.MethodSplitView):
     def GET(self, request, user_id):
         poster = get_object_or_404(Poster, pk=user_id)

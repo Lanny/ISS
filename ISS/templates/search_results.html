@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load bbc %}
+
+{% block page_name %}
+  Posts by {{ poster.username }} - 
+{% endblock %}
+
+{% block breadcrumb %}
+  &gt; Search
+  {% if q %}
+  &gt; <a href="{{ request.get_full_path }}">{{ q }}</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  {% if posts %}
+    {% include "page_list.html" with page=posts %}
+  {% endif %}
+
+  <div class="search-results">
+    <h1>Search Results for "{{ q }}"</h1>
+
+    <form method="GET" action="">
+      <div class="inline-submit-container">
+        <input type="text" name="q" {% if q %}value="{{ q }}"{% endif %}>
+        <input type="submit" value="Search">
+      </div>
+    </form>
+    {% if posts %}
+      {% include "post_list.html" with posts=posts show_thread_context=True show_post_controls=False %}
+    {% endif %}
+  </div>
+
+  {% if posts %}
+    {% include "page_list.html" with page=posts %}
+  {% endif %}
+{% endblock %}

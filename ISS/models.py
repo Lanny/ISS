@@ -13,6 +13,20 @@ from ISS import utils
 min_time = timezone.make_aware(timezone.datetime.min,
                                timezone.get_default_timezone())
 
+@models.fields.Field.register_lookup
+class TSVectorLookup(models.Lookup):
+    lookup_name = 'tsmatch'
+
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        params = lhs_params + rhs_params
+        sql = 'to_tsvector(\'english\', %s) @@ to_tsquery(\'english\', %s)' % (
+            lhs, rhs)
+
+        return sql, params
+    
+
 class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = [ 'email' ]

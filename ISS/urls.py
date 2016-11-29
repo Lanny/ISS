@@ -68,6 +68,11 @@ urlpatterns = [
     url(r'^post/(?P<post_id>\d+)/edit$',
         views.forum.EditPost.as_view(),
         name='edit-post'),
+    url('^search$',
+        views.forum.search,
+        name='search'),
+
+
     url(r'^pms/inbox$',
         views.private_messages.inbox,
         name='inbox'),
