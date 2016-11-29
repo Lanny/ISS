@@ -18,16 +18,20 @@
   {% endif %}
 
   <div class="search-results">
-    <h1>Search Results for "{{ q }}"</h1>
 
-    <form method="GET" action="">
+    <form method="GET" action="" class="search-form">
       <div class="inline-submit-container">
         <input type="text" name="q" {% if q %}value="{{ q }}"{% endif %}>
         <input type="submit" value="Search">
       </div>
     </form>
+
     {% if posts %}
-      {% include "post_list.html" with posts=posts show_thread_context=True show_post_controls=False %}
+      <div class="results">
+        <h1>Search Results for "{{ q }}"</h1>
+
+        {% include "post_list.html" with posts=posts show_thread_context=True show_post_controls=False %}
+      </div>
     {% endif %}
   </div>
 

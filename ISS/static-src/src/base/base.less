@@ -313,3 +313,27 @@ pre.code-block {
   }
   
 }
+
+.inline-submit-container {
+  .rounded();
+
+  display: flex;
+  width: 100%;
+
+  [type="text"] {
+    flex: 1;
+    padding: 5px 10px ;
+    border: 1px solid @seperator_color;
+  }
+
+  [type="submit"] {
+    .teal();
+    padding: 10px 15px;
+    border: none;
+  }
+
+  input {
+    font-size: 14px;
+    border-radius: none;
+  }
+}
