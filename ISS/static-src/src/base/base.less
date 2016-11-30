@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+input[type="submit"] {
+  -webkit-appearance: none;
+}
+
 body {
   background: @bg_teal url(/static/img/bg.jpg) repeat 0 0;
   font: 12px Verdana, Lucida, Arial, Helvetica, sans-serif;
@@ -115,7 +119,7 @@ a {
 
   .user-controls-content {
     .flex-stretch();
-    flex-direction: row;
+    .-flex-direction(row);
 
     .control-links {
       .flex-stretch();
@@ -130,9 +134,9 @@ a {
 
         a, input[type="submit"] { 
           .link-style();
+          .-display-flex();
 
           font-size: 12px;
-          display: flex;
           align-items: center;
           text-decoration: none;
           padding: 7px 20px;
@@ -159,8 +163,8 @@ a {
     }
 
     .welcome-block {
+      .-display-flex();
       padding-right: @std_lr_padding;
-      display: flex;
       align-items: center;
 
       > * {
@@ -170,7 +174,7 @@ a {
     }
 
     @media (max-width: @breakpoint) {
-      flex-direction: column-reverse;
+      .-flex-direction(column-reverse);
 
       .welcome-block {
         width: 100%;
@@ -178,7 +182,7 @@ a {
       }
 
       .control-links {
-        flex-direction: column;
+        .-flex-direction(column);
 
         li {
           a, input[type="submit"] {
@@ -198,9 +202,10 @@ a {
   }
 
   .inline-login {
+    .-display-flex();
+    .-flex-direction(row);
+
     flex: 1;
-    display: flex;
-    flex-direction: row;
     justify-content: flex-end;
     padding: 5px 5px 5px;
 
@@ -217,6 +222,7 @@ a {
 
         & > * {
           display: table-cell;
+          vertical-align: middle;
         }
 
         label {
@@ -257,7 +263,7 @@ blockquote {
 }
 
 .read-status {
-  display: flex;
+  .-display-flex();
   justify-content: center;
   align-content: center;
 }
@@ -316,8 +322,8 @@ pre.code-block {
 
 .inline-submit-container {
   .rounded();
+  .-display-flex();
 
-  display: flex;
   width: 100%;
 
   [type="text"] {

@@ -173,11 +173,6 @@
   }
 }
 
-.flex-stretch() {
-  display: flex;
-  align-items: stretch;
-}
-
 .icn-btn() {
   display: inline-block;
   width: 16px;
@@ -202,3 +197,22 @@
   width: @size;
   height: @size;
 }
+
+.-flex-direction(@direction) {
+  flex-direction: @direction;
+  -webkit-flex-direction: @direction;
+}
+
+.-display-flex {
+  display: box;
+  display: -webkit-flex;
+  display: flexbox;
+  display: flex;
+}
+
+.flex-stretch() {
+  .-display-flex();
+  align-items: stretch;
+}
+
+
