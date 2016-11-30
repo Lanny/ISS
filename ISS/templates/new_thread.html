@@ -11,7 +11,7 @@
 
 {% block content %}
   <div class="new-thread">
-    <form method="POST" action="">
+    <form method="POST" action="" class="editor">
       <h1>
         Create New Thread in
         <a href="{{ forum.get_url }}">{{ forum.name }}</a>
@@ -23,4 +23,8 @@
       </fieldset>
      </form>
    </div>
+{% endblock %}
+
+{% block js %}
+  {% include "require.html" with bootstrap="editor-bootstrap" %}
 {% endblock %}

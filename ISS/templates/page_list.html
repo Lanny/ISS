@@ -5,12 +5,13 @@
   <ol>
     {% if page.has_previous %}
     <li class="arrow">
-      <a href="{{ base_url }}?p=1" class="first-page">
+      <a href="{{ request.get_full_path|mixin_page_param:"1"  }}"
+         class="first-page">
         <i></i>
       </a>
     </li>
     <li class="arrow">
-      <a href="{{ base_url }}?p={{ page.previous_page_number }}"
+      <a href="{{ request.get_full_path|mixin_page_param:page.previous_page_number  }}"
          class="previous-page">
         <i></i>
       </a>
@@ -25,7 +26,7 @@
           ...
         </span>
         {% else %}
-        <a href="{{ base_url }}?p={{ page_num }}">
+        <a href="{{ request.get_full_path|mixin_page_param:page_num  }}">
           {{ page_num }}
         </a>
         {% endif %}
@@ -34,13 +35,13 @@
 
     {% if page.has_next %}
     <li class="arrow">
-      <a href="{{ base_url }}?p={{ page.next_page_number }}"
+      <a href="{{ request.get_full_path|mixin_page_param:page.next_page_number  }}"
          class="next-page">
         <i></i>
       </a>
     </li>
     <li class="arrow">
-      <a href="{{ base_url }}?p={{ page.paginator.num_pages }}"
+      <a href="{{ request.get_full_path|mixin_page_param:page.paginator.num_pages  }}"
          class="last-page">
         <i></i>
       </a>
