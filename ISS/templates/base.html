@@ -48,6 +48,10 @@
               </li>
 
               <li>
+                <a href="{% url 'search' %}">Search</a>
+              </li>
+
+              <li>
                 <form method="POST" action="{% url 'logout' %}">
                   {% csrf_token %}
                   <input type="submit" value="Logout">
@@ -56,6 +60,9 @@
                 </form>
               </li>
             {% else %}
+              <li>
+                <a href="{% url 'search' %}">Search</a>
+              </li>
               <li>
                 <a href="{% url 'register' %}">Register</a>
               </li>
