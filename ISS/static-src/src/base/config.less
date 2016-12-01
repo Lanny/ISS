@@ -198,6 +198,14 @@
   height: @size;
 }
 
+.vcenter(@height) {
+  display: block;
+  height: unit(@height, px);
+  position: relative;
+  top: 50%;
+  margin-top: unit(@height/-2, px);
+}
+
 .-flex-direction(@direction) {
   flex-direction: @direction;
   -webkit-flex-direction: @direction;
