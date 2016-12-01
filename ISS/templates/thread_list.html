@@ -41,6 +41,25 @@
       <a class="thread-author" href="{{ thread.get_author.get_url }}">
         {{ thread.get_author.username }}
       </a>
+
+      <ul class="mobile-thread-controls">
+        {% with oldest_undread_post=thread.get_jump_post %}
+          {% if oldest_undread_post %}
+            <li>
+              <a href="{{ oldest_undread_post.get_url }}"
+                 class="oldest-unread-post"></a>
+            </li>
+          {% endif %}
+        {% endwith %}
+
+        {% if user.is_staff %}
+          <li>
+            <a href="{% url 'admin:ISS_thread_change' thread.pk %}"
+               class="edit-thread">
+            </a>
+          </li>
+        {% endif %}
+      </ul>
     </td>
     <td>
       {% with last_post=thread.get_last_post %}
