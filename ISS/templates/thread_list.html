@@ -42,6 +42,7 @@
         {{ thread.get_author.username }}
       </a>
 
+      {% spaceless %}
       <ul class="mobile-thread-controls">
         {% with oldest_undread_post=thread.get_jump_post %}
           {% if oldest_undread_post %}
@@ -60,6 +61,7 @@
           </li>
         {% endif %}
       </ul>
+      {% endspaceless %}
     </td>
     <td>
       {% with last_post=thread.get_last_post %}
