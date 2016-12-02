@@ -34,7 +34,7 @@ gulp.task('less', ['icons'], function() {
       this.emit('end');
     });
 
-  var stream = gulp.src('./src/**/*.less');
+  var stream = gulp.src('./src/combined/combined.less');
 
   stream = argv.optimize ? stream : stream.pipe(sourcemaps.init());
   stream = stream.pipe(lessStream);
