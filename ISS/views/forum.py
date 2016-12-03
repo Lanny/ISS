@@ -5,6 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db import IntegrityError
+from django.db.models import Max
 from django.http import (HttpResponseRedirect, HttpResponseBadRequest,
     JsonResponse, HttpResponseForbidden)
 from django.shortcuts import render, get_object_or_404
@@ -84,11 +85,19 @@ def posts_by_user(request, user_id):
 
 def thanked_posts(request, user_id):
     poster = get_object_or_404(Poster, pk=user_id)
-    posts = (poster.post_set
-        .filter(thanks__isnull=False)
-        .order_by('-created')
+    posts = (Post.objects.filter(
+        id__in=poster.post_set
+            .filter(thanks__isnull=False)
+            .order_by('-thanks__given')
+        )
         .distinct()
         .select_related('thread'))
+
+    posts = (poster.post_set
+        .filter(thanks__isnull=False)
+        .annotate(Max('thanks__given'))
+        .order_by('-thanks__given__max'))
+
     posts_per_page = utils.get_config('general_items_per_page')
     paginator = Paginator(posts, posts_per_page)
 
