@@ -4,6 +4,10 @@
   Create Account -
 {% endblock %}
 
+{% block head_extra %}
+  <script src='https://www.google.com/recaptcha/api.js'></script>
+{% endblock %}
+
 {% block content %}
   <div class="registration">
     <form method="POST" action="">
@@ -14,6 +18,9 @@
       <fieldset>
         {% csrf_token %}
         {{ form.as_p }}
+        <div class="g-recaptcha"
+             data-sitekey="{{ config.recaptcha_settings.0 }}">
+        </div>
         <input type="submit" value="Submit" />
       </fieldset>
      </form>

@@ -1,5 +1,8 @@
+import json
 import pytz
 import uuid
+import urllib
+import urllib2
 
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -9,6 +12,45 @@ from django.utils import timezone
 
 import utils
 from models import *
+
+class UnrenderedInput(forms.widgets.Input):
+    def render(self, name, value, attrs=None):
+        return ""
+
+class CaptchaForm(forms.Form):
+    def clean(self, *args, **kwargs):
+        if not utils.get_config('recaptcha_settings'):
+            return self.cleaned_data
+
+        captcha_response = self.data.get('g-recaptcha-response', None)
+
+        if not captcha_response:
+            raise ValidationError('Please solve the captcha first.')
+
+        req_data = urllib.urlencode({
+            'secret': utils.get_config('recaptcha_settings')[1],
+            'response': captcha_response
+        })
+
+        try:
+            resp = urllib2.urlopen(
+                'https://www.google.com/recaptcha/api/siteverify',
+                req_data,
+                1000)
+
+            resp_data = json.load(resp)
+
+            if not resp_data.get('success', False):
+                raise ValidationError('Invalid captcha submitted.')
+
+        except ValidationError, e:
+            raise
+        except e:
+            raise ValidationError(
+                'Unexpected error occured while validating captcha. Please '
+                'try again later.')
+
+        return self.cleaned_data
 
 class NewThreadForm(forms.Form):
     error_css_class = 'in-error'
@@ -145,7 +187,7 @@ class ISSAuthenticationForm(AuthenticationForm):
         else:
             return user.username
 
-class RegistrationForm(UserCreationForm):
+class RegistrationForm(UserCreationForm, CaptchaForm):
     error_css_class = 'in-error'
 
     class Meta:
@@ -165,6 +207,9 @@ class RegistrationForm(UserCreationForm):
                 code='TOO_SIMILAR')
 
         return username
+
+    def clean(self, *args, **kwargs):
+        CaptchaForm.clean(self, *args, **kwargs)
 
     def save(self, commit=True):   
         poster = super(RegistrationForm, self).save(commit = False)

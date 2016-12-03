@@ -23,7 +23,8 @@ config_defaults = {
         (100, 'Regular'),
         (10, 'Acolyte'),
         (0, 'Novice')
-    )
+    ),
+    'recaptcha_settings': None
 }
 
 config = config_defaults.copy()

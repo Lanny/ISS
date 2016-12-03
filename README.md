@@ -91,4 +91,4 @@ and what each does:
 - `ninja_edit_grace_time` - The amount of time, in seconds, after post creation that a user can edit their post without it being branded with an edit notice and timestamp.
 - `private_message_flood_control` - The number of seconds users must wait after sending a private message before they can send a new one.
 - `title_ladder` - A sequence of 2-tuples in (int, string) format. Indicates the user title a user without a custom user title will receive after having made that many posts.
-
+- `recaptcha_settings` - Either `None` or a 2-tuple with your reCAPTCHA site(public) and secret keys in that order to be used at registration time. If this is None users will be able to register without solving a captcha.
