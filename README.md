@@ -76,84 +76,19 @@ If you want rotating banners drop them in `ISS/static/banners` and restart the
 server. You can make up some test data using thing admin interface (url
 `/admin/`)
 
-# TODO
-In no particular order:
+# Configuration
+Every ISS instance must define a `FORUM_CONFIG` setting. Default values exist
+for every key so it may be empty. Here is a list of the recognized properties
+and what each does:
 
-- ~~Login~~
-- Registartion
-  - ~~base functionality~~
-  - email verificiation
-  - password reset
-- ~~Forum index~~
-    - ~~make it work~~
-    - ~~admin configurable ordering~~
-    - ~~figure out what to do with that "new" column that isn't slow~~
-- ~~Thread locks~~
-- Links to admin site
-  - ~~poster profile page~~
-  - on posts
-  - ~~on threads~~
-- User active status check before thread/post creation
-- ~~Thread page~~
-    - ~~make it work~~
-    - ~~pagination~~
-- Forum thread list
-    - ~~make it work~~
-    - ~~order by updated time~~
-    - ~~pagination~~
-    - ~~go to newest post~~
-    - ~~go to oldest unread post~~
-- ~~New Thread~~
-- New Post
-    - ~~Make it work~~
-    - ~~video embedding~~
-    - autolinking that doesn't break other stuff
-    - ~~Quotes~~
-        - ~~Fix quote pyramids~~
-        - ~~In quick reply (ajax)~~
-        - ~~no-js mode over to new-reply page~~
-        - ~~Make nojs a user config option rather than requiring the use of noscript~~
-- Users
-    - ~~image embed option(s?)~~
-    - ~~profile page~~
-      - posts per day
-      - avatar
-      - ~~thanked posts~~
-    - avatars
-    - ~~list of posts~~
-    - ~~make user titles work~~
-      - ~~custom usertitles~~
-      - ~~determine by post count~~
-    - settings
-      - ~~nojs~~
-      - ~~image embed~~
-      - ~~timezone~~
-      - email display?
-      - subscriptions
-- ~~Unread Posts in Thread / Thread Subscriptions~~
-- View Subscriptions (UserCP) 
-- Private Messages
-    - ~~View~~
-    - ~~New~~
-    - ~~Reply~~
-    - ~~"Alerts"~~
-    - Chain context
-- Navigation
-    - ~~Breadcrumbs~~
-    - Sitemap? Whatever SEO magic the cool kids are into these days
-- ~~Thanks~~
-    - ~~AJAX~~
-    - ~~nojs reload~~
-    - Order by thanks created date instead of post date
-- Static pages (FAQ, whatever)
-- ~~New posts~~
-- Flood control
-  - Max posts per time period
-  - ~~deduplication~~
-- Usernames need to be printable
-    - should probably do some char juking prevention as well.
-- ~~Add a footer~~
-- hambergerify user controls at some point
-- ~~video embed that respects start time~~
-- ~~make usernames at login case insensitive~~
-- Custom user title celebrating the time honored tradition of front page flush
+- `forum_name` - The name of the site as presented to users. Used in a couple of places, notably breadcrumbs and page titles.
+- `banner_dir` - A path, relative to the static dir (in the src tree) that contains an arbitrary number of forum banners in jpg, gif, or png format. One of the files from this dir will be randomly selected for the page banner on each page load.
+- `min_post_chars` - The minimum length, in characters, of a post. Validation is only done when making a post through the typical web form.
+- `min_thread_title_chars` - The minimum length, in characters, of a thread title. Validation is only done when making a post through the new thread form.
+- `threads_per_forum_page` - The number of threads to show on the thread list for a forum.
+- `posts_per_thread_page` - The number of posts to show on each page of a thread. Note that changing this breaks post links that were generated previously.
+- `general_items_per_page` - The number of items per page for lists of things that don't have their own per-page config property.
+- `ninja_edit_grace_time` - The amount of time, in seconds, after post creation that a user can edit their post without it being branded with an edit notice and timestamp.
+- `private_message_flood_control` - The number of seconds users must wait after sending a private message before they can send a new one.
+- `title_ladder` - A sequence of 2-tuples in (int, string) format. Indicates the user title a user without a custom user title will receive after having made that many posts.
+
