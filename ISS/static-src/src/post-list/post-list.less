@@ -26,6 +26,16 @@
 
     .user-block {
       background-color: @bg_light;
+      overflow: hidden;
+
+      .avatar {
+        padding-right: 10px;
+        float: left;
+
+        > img {
+          max-width: 75px;
+        }
+      }
 
       .author-name {
         font-size: 16px;

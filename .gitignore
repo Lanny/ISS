@@ -93,3 +93,4 @@ ENV/
 
 db.sqlite3
 fabfile.py
+media/

@@ -39,6 +39,8 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
 
+    avatar = models.ImageField(upload_to='avatars', null=True)
+
     custom_user_title = models.CharField(max_length=256, null=True,
                                          default=None, blank=True)
     timezone = models.CharField(
