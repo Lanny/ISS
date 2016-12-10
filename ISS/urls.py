@@ -75,6 +75,9 @@ urlpatterns = [
         views.forum.search,
         name='search'),
 
+    url(r'^admin/assume-identity/(?P<user_id>\d+)$',
+        views.forum.assume_identity,
+        name='assume-identity'),
 
     url(r'^pms/inbox$',
         views.private_messages.inbox,

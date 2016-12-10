@@ -173,6 +173,22 @@
   }
 }
 
+.icn-btn-scaleable(@size, @padding: 3px) {
+  display: inline-block;
+  background-color: @bg_teal;
+  border: 1px solid @white;
+  border-radius: 3px;
+  padding: unit(@padding, px);
+  cursor: pointer;
+
+  &:before {
+    content: "";
+    width: unit(@size - (@padding * 2) - 2, px);
+    height: unit(@size - (@padding * 2) - 2, px);
+    display: block;
+  }
+}
+
 .icn-btn() {
   display: inline-block;
   width: 16px;
@@ -216,7 +232,7 @@
   flex: @value;
 }
 
-.-display-flex {
+.-display-flex() {
   display: box;
   display: -webkit-flex;
   display: flexbox;

@@ -316,6 +316,21 @@ class EditPost(utils.MethodSplitView):
         form.save(editor=request.user)
         return HttpResponseRedirect(post.get_url())
 
+def assume_identity(request, user_id):
+    if not request.user.is_authenticated() or not request.user.is_admin:
+        raise PermissionDenied()
+
+    if not request.method == 'POST':
+        return HttpResponseBadRequest('Method not supported.')
+
+    target_user = get_object_or_404(Poster, pk=user_id)
+    next_url = request.POST.get('next', '/')
+
+    logout(request)
+    login(request, target_user)
+
+    return HttpResponseRedirect(next_url)
+
 class GetQuote(utils.MethodSplitView):
     def GET(self, request, post_id):
         post = get_object_or_404(Post, pk=post_id)

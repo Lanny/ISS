@@ -23,9 +23,20 @@
               {{ poster.username }}
 
               {% if user.is_staff %}
-                <a href={% url 'admin:ISS_poster_change' poster.pk %}
-                   class="moderation-action">
+                <a href="{% url 'admin:ISS_poster_change' poster.pk %}"
+                   class="edit-user">
                 </a>
+              {% endif %}
+
+              {% if user.is_admin and not user.pk == poster.pk%}
+                <form action="{% url 'assume-identity' poster.pk %}" 
+                      method="POST"
+                      class="assume-identity">
+                  {% csrf_token %}
+                  <input type="hidden" name="next"
+                         value="{{ request.get_full_path }}" />
+                  <button type="submit"></button>
+                </form>
               {% endif %}
             </h1>
             <small class="user-title">
