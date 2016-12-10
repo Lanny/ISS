@@ -30,11 +30,13 @@ def user_config(request):
 
     if isinstance(request.user, AnonymousUser):
         ctx['embed_images'] = True
+        ctx['allow_avatars'] = True
         ctx['allow_js'] = False
         ctx['login_form'] = AuthenticationForm()
     else:
         ctx['embed_images'] = request.user.embed_images()
         ctx['allow_js'] = request.user.allow_js
+        ctx['allow_avatars'] = request.user.allow_avatars
 
     return ctx
 

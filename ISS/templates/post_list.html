@@ -25,7 +25,7 @@
 
     <div class="user-block">
       <div class="avatar">
-        {% if user.allow_avatars and post.author.avatar %}
+        {% if allow_avatars and post.author.avatar %}
           <img src="{{ post.author.avatar.url }}">
         {% endif %}
       </div>
