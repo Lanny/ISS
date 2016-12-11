@@ -17,7 +17,11 @@
 
       <div class="profile-content">
         <div class="face-block">
-          <div class="avatar"></div>
+          <div class="avatar">
+            {% if allow_avatars and poster.avatar %}
+              <img src="{{ poster.avatar.url }}">
+            {% endif %}
+          </div>
           <div>
             <h1>
               {{ poster.username }}
