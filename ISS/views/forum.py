@@ -173,12 +173,8 @@ class UserProfile(utils.MethodSplitView):
         }
 
         if poster.pk == request.user.pk:
-            ctx['settings_form'] = forms.UserSettingsForm(initial={
-                'email': request.user.email,
-                'allow_js': request.user.allow_js,
-                'allow_avatars': request.user.allow_avatars,
-                'allow_image_embed': request.user.allow_image_embed,
-                'timezone': request.user.timezone})
+            ctx['settings_form'] = self._base_settings_form(poster)
+            ctx['avatar_form'] = self._base_avatar_form(poster)
 
         return render(request, 'user_profile.html', ctx)
 
@@ -188,6 +184,14 @@ class UserProfile(utils.MethodSplitView):
         if poster.pk != request.user.pk:
             raise PermissionDenied()
 
+        if request.POST.get('form_name') == 'SETTINGS':
+            return self._process_settings_form(request, poster)
+        elif request.POST.get('form_name') == 'AVATAR':
+            return self._process_avatar_form(request, poster)
+        else:
+            return HttpResponseBadRequest('Invalid `form_name`')
+
+    def _process_settings_form(self, request, poster):
         form = forms.UserSettingsForm(request.POST)
 
         if form.is_valid():
@@ -197,10 +201,45 @@ class UserProfile(utils.MethodSplitView):
         else:
             ctx = {
                 'poster': poster,
-                'settings_form': form
+                'settings_form': form,
+                'avatar_form': self._base_avatar_form(poster)
             }
 
             return render(request, 'user_profile.html', ctx)
+
+    def _process_avatar_form(self, request, poster):
+        form = forms.UserAvatarForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            print poster.avatar
+            print form.cleaned_data
+            form.save(poster)
+            print form.cleaned_data
+            print poster.avatar
+            poster.save()
+            print poster.avatar
+            return HttpResponseRedirect(poster.get_url())
+
+        else:
+            ctx = {
+                'poster': poster,
+                'settings_form': self._base_settings_form(poster),
+                'avatar_form': form
+            }
+
+            return render(request, 'user_profile.html', ctx)
+
+    def _base_settings_form(self, poster):
+        return forms.UserSettingsForm(initial={
+            'email': poster.email,
+            'allow_js': poster.allow_js,
+            'allow_avatars': poster.allow_avatars,
+            'allow_image_embed': poster.allow_image_embed,
+            'timezone': poster.timezone})
+
+    def _base_avatar_form(self, poster):
+        return forms.UserAvatarForm()
+        
 
 class NewThread(utils.MethodSplitView):
     login_required = True

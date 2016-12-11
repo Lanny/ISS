@@ -24,7 +24,8 @@ config_defaults = {
         (10, 'Acolyte'),
         (0, 'Novice')
     ),
-    'recaptcha_settings': None
+    'recaptcha_settings': None,
+    'max_avatar_size': 128*1024
 }
 
 config = config_defaults.copy()

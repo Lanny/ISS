@@ -9,6 +9,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import transaction
 from django.forms import ValidationError
 from django.utils import timezone
+from PIL import Image
 
 import utils
 from models import *
@@ -238,6 +239,41 @@ class UserSettingsForm(forms.Form):
         poster.timezone = self.cleaned_data['timezone']
 
         poster.save()
+
+        return poster
+
+class UserAvatarForm(forms.Form):
+    error_css_class = 'in-error'
+
+    avatar = forms.ImageField(required=False)
+
+    def clean_avatar(self):
+        avatar = self.cleaned_data.get('avatar')
+
+        if not avatar:
+            raise ValidationError('Invalid image.')
+
+        max_size = utils.get_config('max_avatar_size')
+        if avatar.size > max_size:
+            raise ValidationError(
+                'Image muse be less than %d bytes.' % max_size)
+
+        try:
+            image = Image.open(avatar)
+            height, width = image.size
+        except:
+            raise ValidationError('Unexpected error intrepreting image.')
+        finally:
+            if height > 75 or width > 75:
+                raise ValidationError(
+                    'Image must be less than or equal to 75px in both width '
+                    'and height.')
+
+        return avatar
+
+    def save(self, poster, save=True):
+        poster.avatar.delete(save=save)
+        poster.avatar = self.cleaned_data['avatar']
 
         return poster
 

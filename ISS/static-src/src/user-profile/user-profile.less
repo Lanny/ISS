@@ -35,6 +35,7 @@
         }
 
         .edit-user {
+          cursor: pointer;
           .icn-btn-scaleable(27);
           &:before { .icn-pencil(); }
         }
@@ -62,6 +63,8 @@
   }
 
   .profile-settings {
+    margin-bottom: 15px;
+
     form {
       .standard-form();
       background-color: @bg_dark;
@@ -69,6 +72,13 @@
       .bool-field(allow_js);
       .bool-field(allow_avatars);
       .bool-field(allow_image_embed);
+    }
+  }
+
+  .avatar-controls {
+    form {
+      .standard-form();
+      background-color: @bg_dark;
     }
   }
 }

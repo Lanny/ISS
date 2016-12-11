@@ -96,8 +96,29 @@
 
           <fieldset>
             {% csrf_token %}
+            <input type="hidden" name="form_name" value="SETTINGS" />
             {{ settings_form.as_p }}
             <input type="submit" value="Submit" />
+          </fieldset>
+        </form>
+      </div>
+
+      <div class="avatar-controls">
+        <form action="{% url 'user-profile' poster.pk %}" method="POST"
+              enctype="multipart/form-data">
+          <h3>Change Avatar</h3>
+
+          <fieldset>
+            {% csrf_token %}
+            <input type="hidden" name="form_name" value="AVATAR" />
+            {{ avatar_form.as_p }}
+
+            <p class="hint">
+              Click "Submit" without picking a file to unset your avatar.
+            </p>
+
+            <input type="submit" value="Submit" />
+
           </fieldset>
         </form>
       </div>
