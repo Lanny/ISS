@@ -251,7 +251,7 @@ class UserAvatarForm(forms.Form):
         avatar = self.cleaned_data.get('avatar')
 
         if not avatar:
-            raise ValidationError('Invalid image.')
+            return
 
         max_size = utils.get_config('max_avatar_size')
         if avatar.size > max_size:
