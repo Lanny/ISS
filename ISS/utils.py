@@ -9,6 +9,8 @@ from django.http import JsonResponse, HttpResponseForbidden
 
 from django.shortcuts import render
 
+DO_NOT_LINK_TAGS = { 'video', 'pre' }
+
 config_defaults = {
     'forum_name': 'INTERNATIONAL SPACE STATION',
     'banner_dir': 'banners',
@@ -85,7 +87,13 @@ def render_mixed_mode(request, templates, additional={}):
     return JsonResponse(data)
     
 def get_standard_bbc_parser(embed_images=True, escape_html=True):
-    parser = bbcode.Parser(escape_html=escape_html, replace_links=False)
+    def context_sensitive_linker(url, context):
+        return '<a href="%s">%s</a>' % (url, url)
+
+    parser = bbcode.Parser(
+        escape_html=escape_html,
+        linker_takes_context=True,
+        linker=context_sensitive_linker)
 
     if embed_images:
         parser.add_simple_formatter(
@@ -152,7 +160,8 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
         else:
             return '[video]%s[/video]' % value
 
-    parser.add_formatter('video', render_video, replace_cosmetic=False)
+    parser.add_formatter('video', render_video, render_embedded=False,
+                         replace_cosmetic=False, replace_links=False)
 
     def render_code(tag_name, value, options, parent, context):
         return '<pre class="code-block">%s</pre>' % value
