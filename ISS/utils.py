@@ -85,10 +85,56 @@ def render_mixed_mode(request, templates, additional={}):
     data.update(additional)
 
     return JsonResponse(data)
-    
+
+class EmbeddingNotSupportedException(Exception):
+    pass
+
+def _video_markup_for_url(urlstr):
+    """
+    Given a link to an embedable video, returns markup to embed that video in
+    a page. If the link it malformed or to an unknown video hosting service
+    throws EmbeddingNotSupportedException.
+    """
+    url = urlparse.urlparse(urlstr)
+
+    embed_pattern = ('<iframe width="640" height="480" '
+        'src="https://www.youtube.com/embed/%s?start=%s" frameborder="0" '
+        'allowfullscreen></iframe>')
+
+    if url.netloc in ('www.youtube.com', 'youtube.com', 'm.youtube.com'):
+        query = urlparse.parse_qs(url.query, keep_blank_values=False)
+
+        if 'v' not in query:
+            raise EmbeddingNotSupportedException('No video ID provided.')
+
+        v = query['v'][0]
+
+        if not re.match('[\-_0-9a-zA-Z]+', v):
+            raise EmbeddingNotSupportedException('Bad video ID.')
+
+        return embed_pattern % (v, '0')
+
+    elif url.netloc in ('youtu.be',):
+        query = urlparse.parse_qs(url.query, keep_blank_values=False)
+        stripped_path = url.path[1:]
+        t = query.get('t', ['0'])[0]
+
+        if not re.match('[\-_0-9a-zA-Z]+', stripped_path):
+            raise EmbeddingNotSupportedException('Bad video ID.')
+        if t and not re.match(r'\d+', t):
+            raise EmbeddingNotSupportedException('Bad time stamp.')
+
+        return embed_pattern % (stripped_path, t)
+
+    else:
+        raise EmbeddingNotSupportedException('Unrecognized service.')
+
 def get_standard_bbc_parser(embed_images=True, escape_html=True):
     def context_sensitive_linker(url, context):
-        return '<a href="%s">%s</a>' % (url, url)
+        try:
+            return _video_markup_for_url(url)
+        except EmbeddingNotSupportedException:
+            return '<a href="%s">%s</a>' % (url, url)
 
     parser = bbcode.Parser(
         escape_html=escape_html,
@@ -126,40 +172,11 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
                          swallow_trailing_newline=True)
 
     def render_video(tag_name, value, options, parent, context):
-        url = urlparse.urlparse(value)
-
-        embed_pattern = ('<iframe width="640" height="480" '
-            'src="https://www.youtube.com/embed/%s?start=%s" frameborder="0" '
-            'allowfullscreen></iframe>')
-
-        if url.netloc in ('www.youtube.com', 'youtube.com', 'm.youtube.com'):
-            query = urlparse.parse_qs(url.query, keep_blank_values=False)
-
-            if 'v' not in query:
-                return '[video]%s[/video]' % value
-
-            v = query['v'][0]
-
-            if not re.match('[\-_0-9a-zA-Z]+', v):
-                return '[video]%s[/video]' % value
-
-            return embed_pattern % (v, '0')
-
-        elif url.netloc in ('youtu.be',):
-            query = urlparse.parse_qs(url.query, keep_blank_values=False)
-            stripped_path = url.path[1:]
-            t = query.get('t', ['0'])[0]
-
-            if not re.match('[\-_0-9a-zA-Z]+', stripped_path):
-                return '[video]%s[/video]' % value
-            if t and not re.match(r'\d+', t):
-                return '[video]%s[/video]' % value
-
-            return embed_pattern % (stripped_path, t)
-
-        else:
+        try:
+            return _video_markup_for_url(value)
+        except EmbeddingNotSupportedException:
             return '[video]%s[/video]' % value
-
+    
     parser.add_formatter('video', render_video, render_embedded=False,
                          replace_cosmetic=False, replace_links=False)
 
