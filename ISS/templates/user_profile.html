@@ -30,6 +30,16 @@
                 <a href="{% url 'admin:ISS_poster_change' poster.pk %}"
                    class="edit-user">
                 </a>
+
+                <form action="" 
+                      method="POST"
+                      class="spam-can">
+                  {% csrf_token %}
+                  <input type="hidden" name="next"
+                         value="{{ request.get_full_path }}" />
+                  <button type="submit"></button>
+                </form>
+
               {% endif %}
 
               {% if user.is_admin and not user.pk == poster.pk%}

@@ -28,7 +28,7 @@
           font-size: 12px;
         }
 
-        .edit-user, .assume-identity {
+        .edit-user, .assume-identity, .spam-can {
           vertical-align: middle;
           float: right;
           margin-left: 3px;
@@ -36,13 +36,23 @@
 
         .edit-user {
           cursor: pointer;
-          .icn-btn-scaleable(27);
+          .icn-btn-scaleable(35);
           &:before { .icn-pencil(); }
+        }
+
+
+        .spam-can {
+          button {
+            .icn-btn-scaleable(35);
+            display: block; 
+
+            &:before { .icn-spam-can(); }
+          }
         }
 
         .assume-identity {
           button {
-            .icn-btn-scaleable(27);
+            .icn-btn-scaleable(35);
             display: block;
 
             &:before { .icn-shady-dude(); }
