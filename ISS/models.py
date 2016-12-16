@@ -116,8 +116,9 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 class Forum(models.Model):
     name = models.TextField()
     description = models.TextField()
-    priority = models.IntegerField(default=2147483647, null=False)
+    priority = models.IntegerField(default=0, null=False)
     last_update = models.DateTimeField(default=timezone.now)
+    is_trash = models.BooleanField(default=False)
 
     _flag_cache = None
 

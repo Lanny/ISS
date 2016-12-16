@@ -111,7 +111,9 @@ def thanked_posts(request, user_id):
     return render(request, 'thanked_posts.html', ctx)
 
 def latest_threads(request):
-    threads = Thread.objects.all().order_by('-last_update')
+    threads = (Thread.objects.all()
+        .filter(forum__is_trash=False)
+        .order_by('-last_update'))
     threads_per_page = utils.get_config('threads_per_forum_page')
     paginator = utils.MappingPaginator(threads, threads_per_page)
 
@@ -265,7 +267,6 @@ class NewThread(utils.MethodSplitView):
                 'forum': forum,
                 'form': form
             }
-
             return render(request, 'new_thread.html', ctx)
 
 class NewReply(utils.MethodSplitView):
@@ -365,6 +366,7 @@ def assume_identity(request, user_id):
     login(request, target_user)
 
     return HttpResponseRedirect(next_url)
+
 
 class GetQuote(utils.MethodSplitView):
     def GET(self, request, post_id):
