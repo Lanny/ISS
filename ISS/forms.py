@@ -79,7 +79,8 @@ class NewThreadForm(forms.Form):
     def save(self, author):
         self.thread = Thread(
             title=self.cleaned_data['title'],
-            forum=self.cleaned_data['forum'])
+            forum=self.cleaned_data['forum'],
+            author=author)
 
         self.thread.save()
 
@@ -384,3 +385,11 @@ class NewPrivateMessageForm(forms.Form):
                 kept_copies.append(pm)
 
         return (sent_copies, kept_copies)
+
+class SpamCanUserForm(forms.Form):
+    poster = forms.ModelChoiceField(queryset=Forum.objects.all(),
+                                    widget=forms.HiddenInput())
+    target_form = forms.ModelChoiceField(
+        queryset=Forum.objects.filter(is_trash=True),
+        required=True)
+    next_page = forms.HiddenInput()

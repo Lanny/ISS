@@ -161,6 +161,7 @@ class Thread(models.Model):
     locked = models.BooleanField(default=False)
 
     forum = models.ForeignKey(Forum)
+    author = models.ForeignKey(Poster)
     title = models.TextField()
     log = models.TextField(blank=True)
 

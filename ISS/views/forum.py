@@ -476,6 +476,41 @@ class UnthankPost(utils.MethodSplitView):
 
 class SpamCanUser(utils.MethodSplitView):
     require_login = True
+    require_admin = True
+
+    def _get_threads_and_posts(poster):
+        threads = poster.thread_set.all()
+        posts = poster.post_set.exclude(thread__in=threads)
+
+        return threads, posts
 
     def GET(self, request, poster_id):
         poster = get_object_or_404(Post, pk=poster_id)
+        next_page = request.GET.get('next', reverse('user-profile', poster.pk))
+        form = forms.SpamCanUserForm(initial={
+            'poster': poster,
+            'next_page': next_page
+        })
+
+        ctx = {
+            'form': form,
+            'next_page': next_page,
+            'poster': poster
+        }
+
+        return render(request, 'spam_can_user.html', ctx)
+
+    def POST(self, request, poster_id):
+        poster = get_object_or_404(Post, pk=poster_id)
+        form = utils.SpamCanUserForm(request.POST)
+
+        if form.is_valid():
+            pass
+        else:
+            ctx = {
+                'form': form,
+                'next_page': form.cleaned_data['next_page'],
+                'poster': poster
+            }
+
+            return render(request, 'spam_can_user.html', ctx)
