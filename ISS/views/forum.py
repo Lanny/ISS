@@ -9,11 +9,13 @@ from django.db.models import Max
 from django.http import (HttpResponseRedirect, HttpResponseBadRequest,
     JsonResponse, HttpResponseForbidden)
 from django.shortcuts import render, get_object_or_404
+from django.views.decorators.cache import cache_control
 
 from ISS import utils, forms
 from ISS.models import *
 
 
+@cache_control(no_cache=True, max_age=0, must_revalidate=True, no_store=True)
 def forum_index(request):
     forums = Forum.objects.all().order_by('priority')
     ctx = {
@@ -22,6 +24,7 @@ def forum_index(request):
 
     return render(request, 'forum_index.html', ctx)
 
+@cache_control(no_cache=True, max_age=0, must_revalidate=True, no_store=True)
 def thread_index(request, forum_id):
     forum = get_object_or_404(Forum, pk=forum_id)
     threads = forum.thread_set.order_by('-last_update')
@@ -110,6 +113,7 @@ def thanked_posts(request, user_id):
 
     return render(request, 'thanked_posts.html', ctx)
 
+@cache_control(no_cache=True, max_age=0, must_revalidate=True, no_store=True)
 def latest_threads(request):
     threads = (Thread.objects.all()
         .filter(forum__is_trash=False)
@@ -469,3 +473,9 @@ class UnthankPost(utils.MethodSplitView):
                 additional={'status': 'SUCCESS'})
 
         return HttpResponseRedirect(post.get_url())
+
+class SpamCanUser(utils.MethodSplitView):
+    require_login = True
+
+    def GET(self, request, poster_id):
+        poster = get_object_or_404(Post, pk=poster_id)
