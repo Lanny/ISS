@@ -387,7 +387,7 @@ class NewPrivateMessageForm(forms.Form):
         return (sent_copies, kept_copies)
 
 class SpamCanUserForm(forms.Form):
-    poster = forms.ModelChoiceField(queryset=Forum.objects.all(),
+    poster = forms.ModelChoiceField(queryset=Poster.objects.all(),
                                     widget=forms.HiddenInput())
     target_forum = forms.ModelChoiceField(
         queryset=Forum.objects.filter(is_trash=True),
