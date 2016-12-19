@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block page_name %}
+  {{ poster.username }} -
+{% endblock %}
+
+{% block breadcrumb %}
+  &gt; Users
+  &gt; <a href="{{ poster.get_url }}">{{ poster.username }}</a>
+  &gt; <a href="{% url 'spam-can-user' poster.pk %}">Spam Can</a>
+{% endblock %}
+
+{% block content %}
+  <section class="spam-can-user">
+
+    <form method="POST" action="{% url 'spam-can-user' poster.pk %}">
+      <h3>Ban User as Spam Bot</h3>
+
+      <fieldset>
+        <p class="explanation">
+          Taking this action with ban this user, move all the threads they
+          started into the trash form (or a trash forum of your choosing, if
+          there is more than one) and move theirs posts in threads into a new
+          thread in the trash forum. Below is a list of threads this user has
+          started for spam verification purposes.
+        </p>
+
+        <span class="detail">
+          User: {{ poster.username }}
+        </span>
+
+        <span class="detail">
+          Thread Count: {{ poster.thread_set.count }}
+        </span>
+
+        <span class="detail">
+          Post Count: {{ poster.post_set.count }}
+        </span>
+
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <input type="submit" value="Submit" />
+      </fieldset>
+    </form>
+
+    <div class="thread-index">
+      <div class="threads">
+        {% include 'thread_list.html' with threads=threads %}
+      </div>
+    </div>
+
+  </section>
+{% endblock %}

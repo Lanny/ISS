@@ -178,7 +178,7 @@ class Thread(models.Model):
                     .select_related('author'))[0]
 
     def get_author(self):
-        return self.get_first_post().author
+        return self.author
 
     def get_post_count(self):
         return self.post_set.count()

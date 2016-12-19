@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.db.models import Max
 from django.http import (HttpResponseRedirect, HttpResponseBadRequest,
     JsonResponse, HttpResponseForbidden)
@@ -476,41 +476,67 @@ class UnthankPost(utils.MethodSplitView):
 
 class SpamCanUser(utils.MethodSplitView):
     require_login = True
-    require_admin = True
+    require_staff = True
 
-    def _get_threads_and_posts(poster):
+    def _get_threads(self, poster):
         threads = poster.thread_set.all()
-        posts = poster.post_set.exclude(thread__in=threads)
 
-        return threads, posts
+        return threads
 
     def GET(self, request, poster_id):
-        poster = get_object_or_404(Post, pk=poster_id)
-        next_page = request.GET.get('next', reverse('user-profile', poster.pk))
+        poster = get_object_or_404(Poster, pk=poster_id)
+        next_page = request.GET.get(
+            'next',
+            reverse('user-profile', kwargs={'user_id':poster.pk}))
         form = forms.SpamCanUserForm(initial={
             'poster': poster,
             'next_page': next_page
         })
+        threads = self._get_threads(poster)
 
         ctx = {
             'form': form,
             'next_page': next_page,
-            'poster': poster
+            'poster': poster,
+            'threads': threads
         }
 
         return render(request, 'spam_can_user.html', ctx)
 
+    @transaction.atomic
     def POST(self, request, poster_id):
-        poster = get_object_or_404(Post, pk=poster_id)
-        form = utils.SpamCanUserForm(request.POST)
+        poster = get_object_or_404(Poster, pk=poster_id)
+        threads = self._get_threads(poster)
+        form = forms.SpamCanUserForm(request.POST)
 
         if form.is_valid():
-            pass
+            move_posts = poster.post_set.exclude(thread__in=threads)
+
+            poster.is_active = False
+            poster.is_staff = False
+            poster.is_admin = False
+
+            poster.save()
+
+            threads.update(forum=form.cleaned_data['target_forum'])
+
+            if move_posts.count():
+                new_thread = Thread(
+                    title='Deleted posts for: %s' % poster.username,
+                    forum=form.cleaned_data['target_forum'],
+                    author=poster)
+                new_thread.save()
+
+                move_posts.update(thread=new_thread)
+
+            return HttpResponseRedirect(form.cleaned_data['next_page'])
+
         else:
             ctx = {
                 'form': form,
                 'next_page': form.cleaned_data['next_page'],
-                'poster': poster
+                'poster': poster,
+                'threads': threads
             }
 
             return render(request, 'spam_can_user.html', ctx)

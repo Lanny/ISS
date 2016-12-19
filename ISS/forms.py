@@ -389,7 +389,8 @@ class NewPrivateMessageForm(forms.Form):
 class SpamCanUserForm(forms.Form):
     poster = forms.ModelChoiceField(queryset=Forum.objects.all(),
                                     widget=forms.HiddenInput())
-    target_form = forms.ModelChoiceField(
+    target_forum = forms.ModelChoiceField(
         queryset=Forum.objects.filter(is_trash=True),
-        required=True)
-    next_page = forms.HiddenInput()
+        required=True,
+        empty_label=None)
+    next_page = forms.CharField(widget=forms.HiddenInput())

@@ -75,9 +75,12 @@ urlpatterns = [
         views.forum.search,
         name='search'),
 
-    url(r'^admin/assume-identity/(?P<user_id>\d+)$',
+    url(r'^admin/user/(?P<user_id>\d+)/assume-identity$',
         views.forum.assume_identity,
         name='assume-identity'),
+    url(r'^admin/user/(?P<poster_id>\d+)/spam-can$',
+        views.forum.SpamCanUser.as_view(),
+        name='spam-can-user'),
 
     url(r'^pms/inbox$',
         views.private_messages.inbox,
