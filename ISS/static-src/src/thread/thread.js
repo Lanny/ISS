@@ -31,7 +31,8 @@
   define([
     'jquery',
     'thanks',
-    'editor'
+    'editor',
+    'base'
   ], wrap);
 })();
 

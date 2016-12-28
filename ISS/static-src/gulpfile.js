@@ -13,7 +13,8 @@ var staticDir = '../static',
   jsDir = path.join(staticDir, 'js'),
   optimizeModules = [
     'thread.js',
-    'editor-bootstrap.js'
+    'editor-bootstrap.js',
+    'base.js'
   ];
  
 gulp.task('icons', function() {

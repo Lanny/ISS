@@ -111,12 +111,15 @@
       {% endblock %}
 
       <footer class="page-footer">
-        Oldschool forum software, made with &#127866;, in space.
+        Oldschool forum software, made with
+        <a href="#" class="hyper-drive">&#127866;</a>
+        , in space.
         <a href="https://github.com/RyanJenkins/ISS">Fork me hard baby.</a>
       </footer>
     </div>
 
     {% block js %}
+      {% include "require.html" with bootstrap="base" %} 
     {% endblock %}
   </body>
 </html>
