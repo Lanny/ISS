@@ -66,7 +66,7 @@
     <td>
       {% with last_post=thread.get_last_post %}
         <span class="last-post-date">
-          {{ last_post.created|date:"o-m-d" }} at
+          {{ last_post.created|date:"Y-m-d" }} at
           {{ last_post.created|time:"f A e" }}
         </span>
         <span "last-post-autor">
