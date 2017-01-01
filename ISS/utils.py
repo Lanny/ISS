@@ -188,7 +188,8 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
     def render_code(tag_name, value, options, parent, context):
         return '<pre class="code-block">%s</pre>' % value
 
-    parser.add_formatter('code', render_code, replace_cosmetic=False)
+    parser.add_formatter('code', render_code, replace_cosmetic=False,
+                         render_embedded=False)
 
 
 
