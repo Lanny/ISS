@@ -53,6 +53,12 @@
                 <a href="{% url 'search' %}">Search</a>
               </li>
 
+              {% if user.is_admin %}
+                <li>
+                  <a href="{% url 'admin:index' %}">Admin</a>
+                </li>
+              {% endif %}
+
               <li>
                 <form method="POST" action="{% url 'logout' %}">
                   {% csrf_token %}
