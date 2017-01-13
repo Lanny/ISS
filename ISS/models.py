@@ -30,6 +30,11 @@ class TSVectorLookup(models.Lookup):
 class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = [ 'email' ]
+    SUBSCRIBE_CHOICES = (
+        (0, 'Never'),
+        (1, 'On Post'),
+        (2, 'On View'),
+    )
 
     username = models.CharField(max_length=256, unique=True)
     normalized_username = models.CharField(max_length=256)
@@ -52,6 +57,11 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     allow_js = models.BooleanField(default=True)
     allow_image_embed = models.BooleanField(default=True)
     allow_avatars = models.BooleanField(default=True)
+    auto_subscribe = models.IntegerField(
+        choices=SUBSCRIBE_CHOICES,
+        default=1,
+        blank=False,
+        null=False)
 
     # For support of vB backends
     backend = models.TextField(

@@ -65,9 +65,10 @@ def thread(request, thread_id):
 
     # Update thread flag
     if request.user.is_authenticated():
-        print 'mag'
         thread.mark_read(request.user, page[-1])
-        print 'lag'
+
+        if request.user.auto_subscribe == 2:
+            thread.subscribe(request.user)
 
     return response
 
@@ -336,6 +337,10 @@ class NewReply(utils.MethodSplitView):
 
         if form.is_valid():
             post = form.save()
+
+            if request.user.auto_subscribe == 1:
+                thread.subscribe(request.user)
+            
             return HttpResponseRedirect(post.get_url())
 
         else:
