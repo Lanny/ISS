@@ -31,6 +31,12 @@
 
         <div class="user-controls-content">
           <ul class="control-links">
+            {% if user.is_authenticated %}
+              <li>
+                <a href="{% url 'usercp' %}">Subscriptions</a>
+              </li>
+            {% endif %}
+
             <li>
               <a href="{% url 'latest-threads' %}">Latest Threads</a>
             </li>

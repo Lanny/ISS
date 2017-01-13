@@ -79,5 +79,13 @@
       {{ thread.get_post_count }}
     </td>
   </tr>
+  {% empty %}
+    {% if empty_message %}
+      <tr>
+        <td class="empty-message" colspan="4">
+          {{ empty_message }}
+        </td>
+      </tr>
+    {% endif %}
   {% endfor %}
 </table>
