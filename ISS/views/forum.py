@@ -5,7 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
-from django.db.models import Max
+from django.db.models import Max, F
 from django.http import (HttpResponseRedirect, HttpResponseBadRequest,
     JsonResponse, HttpResponseForbidden)
 from django.shortcuts import render, get_object_or_404
@@ -65,7 +65,9 @@ def thread(request, thread_id):
 
     # Update thread flag
     if request.user.is_authenticated():
+        print 'mag'
         thread.mark_read(request.user, page[-1])
+        print 'lag'
 
     return response
 
@@ -130,6 +132,32 @@ def latest_threads(request):
     }
 
     return render(request, 'latest_threads.html', ctx)
+
+@login_required
+@cache_control(no_cache=True, max_age=0, must_revalidate=True, no_store=True)
+def usercp(request):
+    threads = (Thread.objects.all()
+        .filter(
+            threadflag__poster_id=request.user.id,
+            threadflag__subscribed=True,
+            last_update__gt=F('threadflag__last_read_date'))
+        .order_by('-last_update'))
+
+    threads_per_page = utils.get_config('threads_per_forum_page')
+    paginator = utils.MappingPaginator(threads, threads_per_page)
+
+    paginator.install_map_func(lambda t: utils.ThreadFascet(t, request))
+
+    page = utils.page_by_request(paginator, request)
+
+    ctx = {
+        'threads': page
+    }
+
+    return render(request, 'user_cp.html', ctx)
+
+
+
 
 def user_list(request):
     posters = Poster.objects.all().order_by('username')

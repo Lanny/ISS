@@ -2,9 +2,10 @@ Django==1.8
 bbcode==1.0.24
 pytz==2016.7
 Pillow==3.4.2
-
-# Can be removed if you're using a different DB
 psycopg2==2.6.2
+
+# Dev dependencies
+django-debug-toolbar==1.6
 
 # Regardless of the forum db, this is required for migrations. Can be removed
 # if you are not migrating from a vB forum.

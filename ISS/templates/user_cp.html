@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static from staticfiles %} 
+
+{% block page_name %}
+  Subscriptions -
+{% endblock %}
+
+{% block breadcrumb %}
+  &gt; <a href="{{ user.get_url }}">{{ user.username }}</a>
+  &gt; <a href="{{ request.get_full_path }}">Subscriptions</a>
+{% endblock %}
+
+{% block content %}
+  <div class="thread-index">
+    {% include "page_list.html" with page=threads %}
+
+    {% include 'thread_list.html' with threads=threads empty_message="No new subscribed threads." %}
+
+    {% include "page_list.html" with page=threads %}
+  </div>
+{% endblock %}

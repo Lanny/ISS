@@ -258,7 +258,7 @@ class Thread(models.Model):
 
     def subscribe(self, user):
         flag = self._get_flag(user, save=False)
-        flag.subscribed = False
+        flag.subscribed = True
 
         flag.save()
 
