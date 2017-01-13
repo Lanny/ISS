@@ -227,16 +227,21 @@ class UserSettingsForm(forms.Form):
             choices=[(tz, tz) for tz in pytz.common_timezones])
     allow_js = forms.BooleanField(label="Enable javascript", required=False)
     allow_avatars = forms.BooleanField(label="Show user avatars", required=False)
-
     allow_image_embed = forms.BooleanField(
         label="Enable images embedded in posts",
         required=False)
+    auto_subscribe = forms.ChoiceField(
+        label="Auto-subscribe",
+        required=True,
+        choices=Poster.SUBSCRIBE_CHOICES,
+        widget=forms.RadioSelect)
 
     def save(self, poster):
         poster.email = self.cleaned_data['email']
         poster.allow_js = self.cleaned_data['allow_js']
         poster.allow_avatars = self.cleaned_data['allow_avatars']
         poster.allow_image_embed = self.cleaned_data['allow_image_embed']
+        poster.auto_subscribe = self.cleaned_data['auto_subscribe']
         poster.timezone = self.cleaned_data['timezone']
 
         poster.save()

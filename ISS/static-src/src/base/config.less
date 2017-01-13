@@ -178,6 +178,20 @@
   }
 }
 
+.radio-field(@name) {
+  #id_@{name} {
+    list-style: none;
+    padding-left: 5px;
+
+    li {
+      input {
+        display: inline;
+        width: auto;
+      }
+    }
+  }
+}
+
 .icn-btn-scaleable(@size, @padding: 3px) {
   display: inline-block;
   background-color: @bg_teal;

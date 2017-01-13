@@ -266,6 +266,7 @@ class UserProfile(utils.MethodSplitView):
             'allow_js': poster.allow_js,
             'allow_avatars': poster.allow_avatars,
             'allow_image_embed': poster.allow_image_embed,
+            'auto_subscribe': poster.auto_subscribe,
             'timezone': poster.timezone})
 
     def _base_avatar_form(self, poster):
