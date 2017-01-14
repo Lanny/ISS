@@ -592,6 +592,11 @@ def get_bc_embed_code(request):
             'status': 'FAILURE',
             'reason': 'Url is not embeddable'
         })
+    except:
+        return JsonResponse({
+            'status': 'FAILURE',
+            'reason': 'Unexpected failure'
+        })
     else:
         return JsonResponse({
             'status': 'SUCCESS',
