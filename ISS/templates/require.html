@@ -1,6 +1,11 @@
 {% load staticfiles %}
 
 {% if allow_js %}
+  <script>
+    window.config = {
+      'bandcamp-embed-url': "{% url 'embed-bandcamp' %}"
+    };
+  </script>
   <script type="text/javascript" src="{% static 'js/require.js' %}"></script>
   <script type="text/javascript">
     requirejs.config({

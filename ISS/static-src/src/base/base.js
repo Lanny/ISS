@@ -106,20 +106,41 @@
         s = degree - s;
       }
 
-      console.log('mak');
       $(document.documentElement).css('filter', 'blur(' + s + 'px)');
 
       window.setTimeout(blurShit, 1000/24);
     })();
   };
 
-  function wrap($) {
+  function wrap($, config) {
+
+    function embedBandcampLinks(target) {
+      $(target).find('.unproc-embed')
+        .each(function(i, e) {
+          var $e = $(e),
+            href = $e.attr('href');
+
+          $.getJSON(config.getConfig('bandcamp-embed-url'), {url: href})
+            .done(function(data) {
+              if (data.status && data.status === 'SUCCESS') {
+                $e.replaceWith($(data.embedCode));
+              }
+            })
+        });
+    }
+
     $(document).on('click', '.hyper-drive', function() {
       startHyperDrive();
     });
+
+    $(function() {
+      embedBandcampLinks(document);
+    })
   }
 
   require([
-    'jquery'
+    'jquery',
+    'config'
   ], wrap);
 })();
+

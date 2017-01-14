@@ -1,6 +1,9 @@
 import bbcode
 import urlparse
+import urllib2
 import re
+
+from lxml import etree
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator, Page
 from django.conf import settings
@@ -132,6 +135,24 @@ def _video_markup_for_url(urlstr):
     else:
         raise EmbeddingNotSupportedException('Unrecognized service.')
 
+
+def bandcamp_markup_for_url(urlstr):
+    url = urlparse.urlparse(urlstr)
+
+    parser = etree.HTMLParser(no_network=False)
+    req = urllib2.urlopen(urlstr)
+    tree = etree.parse(req, parser)
+    embed_meta = tree.xpath('//meta[@property="og:video:secure_url"]')
+    embed_url = embed_meta[0].get('content')
+
+    markup = ('<iframe class="bandcamp-embed" '
+        + 'src="%s" ' % embed_url
+        + 'seamless>'
+        + '<a href="%s">Embedded Bandcamp Link</a>' % urlstr
+        + '</iframe>')
+
+    return markup
+
 def get_standard_bbc_parser(embed_images=True, escape_html=True):
     def context_sensitive_linker(url, context):
         try:
@@ -191,7 +212,12 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
     parser.add_formatter('code', render_code, replace_cosmetic=False,
                          render_embedded=False)
 
+    def render_bc(tag_name, value, options, parent, context):
+        return ('<a class="unproc-embed" href="%s">embedded bandcamp link</a>'
+                % value)
 
+    parser.add_formatter('bc', render_bc, replace_cosmetic=False,
+                         replace_links=False)
 
     default_url_hanlder, _ = parser.recognized_tags['url']
     parser.add_formatter('link', default_url_hanlder, replace_cosmetic=False)

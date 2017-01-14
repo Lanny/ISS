@@ -78,6 +78,10 @@ urlpatterns = [
         views.forum.usercp,
         name='usercp'),
 
+    url('^embed/bandcamp',
+        views.forum.get_bc_embed_code,
+        name='embed-bandcamp'),
+
     url(r'^admin/user/(?P<user_id>\d+)/assume-identity$',
         views.forum.assume_identity,
         name='assume-identity'),

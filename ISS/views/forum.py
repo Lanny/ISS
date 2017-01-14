@@ -9,7 +9,7 @@ from django.db.models import Max, F
 from django.http import (HttpResponseRedirect, HttpResponseBadRequest,
     JsonResponse, HttpResponseForbidden)
 from django.shortcuts import render, get_object_or_404
-from django.views.decorators.cache import cache_control
+from django.views.decorators.cache import cache_control, cache_page
 
 from ISS import utils, forms
 from ISS.models import *
@@ -574,3 +574,27 @@ class SpamCanUser(utils.MethodSplitView):
             }
 
             return render(request, 'spam_can_user.html', ctx)
+
+@cache_page(60 * 24 * 3, cache='db_cache')
+def get_bc_embed_code(request):
+    url = request.GET.get('url')
+
+    if not url:
+        return JsonResponse({
+            'status': 'FAILURE',
+            'reason': 'No url supplied'
+        })
+
+    try:
+        embed_code = utils.bandcamp_markup_for_url(url)
+    except utils.EmbeddingNotSupportedException:
+        return JsonResponse({
+            'status': 'FAILURE',
+            'reason': 'Url is not embeddable'
+        })
+    else:
+        return JsonResponse({
+            'status': 'SUCCESS',
+            'embedCode': embed_code
+        })
+    
