@@ -176,6 +176,10 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
             'img',
             '<a class="img-link" href="%(value)s">embedded image</a>')
 
+    parser.add_simple_formatter(
+        'byusingthistagIaffirmlannyissupercool',
+        '<span class="ex">%(value)s</span>')
+
     def render_quote(tag_name, value, options, parent, context):
         author = options.get('author', None)
 
@@ -236,6 +240,10 @@ def get_closure_bbc_parser():
         return value
 
     c_parser.add_formatter('quote', depyramiding_quote_render)
+
+    c_parser.add_simple_formatter(
+        'byusingthistagIaffirmlannyissupercool',
+        '%(value)s')
 
     return c_parser
 

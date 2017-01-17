@@ -1,4 +1,14 @@
 ;(function() {
+  function shakeBaby(baby, intensity) {
+    baby.css({
+      position: 'relative',
+      top: ~~((Math.random() - 0.5) * intensity),
+      left: ~~((Math.random() - 0.5) * intensity)
+    });
+
+    window.setTimeout(shakeBaby.bind(this, baby, intensity), 50);
+  };
+
   function genCircle(color, size) {
     return $('<div class="hyper-circle">')
       .css({
@@ -82,17 +92,7 @@
       })();
     }
 
-    var shakeIntensity = 20;
-
-    ;(function shakeContent() {
-      $('.page-content').css({
-        position: 'relative',
-        top: ~~((Math.random() - 0.5) * shakeIntensity),
-        left: ~~((Math.random() - 0.5) * shakeIntensity)
-      });
-
-      window.setTimeout(shakeContent, 50);
-    })();
+    shakeBaby($('.page-content'), 20);
 
     var blurPeriod = 2000,
       degree = 4,
@@ -135,6 +135,7 @@
 
     $(function() {
       embedBandcampLinks(document);
+      shakeBaby($('.ex'), 10);
     })
   }
 
@@ -143,4 +144,5 @@
     'config'
   ], wrap);
 })();
+
 
