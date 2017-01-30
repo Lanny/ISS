@@ -161,6 +161,13 @@
 
       float: right;
       margin-top: 20px;
+
+      @media (max-width: @breakpoint) {
+        width: 100%;
+        float: none;
+        display: block;
+        text-align: center;
+      }
     }
   }
 }
