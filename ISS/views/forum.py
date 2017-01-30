@@ -603,3 +603,18 @@ def get_bc_embed_code(request):
             'embedCode': embed_code
         })
     
+
+class AutoAnonymize(utils.MethodSplitView):
+    require_login = True
+
+    def GET(self, request):
+        return render(request, 'auto_anonymize.html', {})
+
+    def POST(self, request):
+        junk_user = Poster.get_or_create_junk_user()
+        request.user.merge_into(junk_user)
+        request.user.is_active = False
+        request.user.save()
+        logout(request)
+
+        return HttpResponseRedirect(reverse('forum-index'))

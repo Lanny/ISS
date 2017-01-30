@@ -30,7 +30,8 @@ config_defaults = {
         (0, 'Novice')
     ),
     'recaptcha_settings': None,
-    'max_avatar_size': 128*1024
+    'max_avatar_size': 128*1024,
+    'junk_user_username': 'The Self Taught Man'
 }
 
 config = config_defaults.copy()

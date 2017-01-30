@@ -103,6 +103,9 @@
             {% csrf_token %}
             <input type="hidden" name="form_name" value="SETTINGS" />
             {{ settings_form.as_p }}
+            <a href="{% url 'auto-anonymize' %}">
+              Anonymize your account
+            </a>
             <input type="submit" value="Submit" />
           </fieldset>
         </form>

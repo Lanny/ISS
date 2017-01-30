@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block page_name %}
+Auto-anonymize account -
+{% endblock %}
+
+{% block breadcrumb %}
+  &gt; Users
+  &gt; <a href="{{ user.get_url }}">{{ user.username }}</a>
+  &gt; Auto-anonymize
+{% endblock %}
+
+{% block content %}
+  <div class="auto-anonymize">
+    <form method="POST" action="{% url 'auto-anonymize' %}">
+      <h1>
+        Auto-anonymize Account
+      </h1>
+      <fieldset>
+        {% csrf_token %}
+        <p>
+          You can use this form to "anonymize" you account. This means a few
+          things:
+        </p>
+        <ul>
+          <li>
+            Your posts, threads, and thanks will be transfered to a different
+            user. They will appear as if someone else submitted them. Your
+            account will have no records associated with it.
+          </li>
+          <li>
+            Your account will be banned. You will not be able to log in again.
+            This also means <strong>you will not be able to edit your posts
+            </strong> any more.
+          </li>
+          <li>
+            It does nothing to deal with other posters identifying you and your
+            posts. You should assume a determined adversary will be able to
+            divine your authorship of a post based on reactions and other posts.
+          </li>
+          <li>
+            <span class="ex">This process is not reversable</span>
+          </li>
+        </ul>
+        <p>
+          Be super mega sure this is what you want to do before clicking submit,
+          I will not be undoing this if you change your mind later. Also bear
+          in mind that while this action will not be reversed, it doesn't mean
+          it can't be.
+        </p>
+        <input type="submit" value="Submit" />
+      </fieldset>
+     </form>
+   </div>
+{% endblock %}
+

@@ -199,6 +199,14 @@ class RegistrationForm(UserCreationForm, CaptchaForm):
     def clean_username(self):
         username = self.cleaned_data['username']
         norm_username = Poster.normalize_username(username)
+        forbidden_names = {
+            Poster.normalize_username(utils.get_config('junk_user_username'))
+        }
+
+
+        if normalize_username in forbidden_names:
+            raise ValidationError('You may not register that username.',
+                                  code='FORBIDDEN_USERNAME')
 
         if len(norm_username) < 1:
             raise ValidationError('Invalid username', code='INVALID_GENERAL')

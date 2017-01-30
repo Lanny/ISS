@@ -4,7 +4,7 @@ import pytz
 
 from django.contrib import auth
 from django.core.urlresolvers import reverse
-from django.db import models, IntegrityError
+from django.db import models, IntegrityError, transaction
 from django.dispatch import receiver
 from django.utils import timezone
 
@@ -112,6 +112,37 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
             .filter(inbox=self)
             .filter(read=False)
             .count())
+
+    @transaction.atomic
+    def merge_into(self, other):
+        """
+        Reassigns all the records that tie to this user to another one and
+        disables this user afterwards.
+        """
+        
+        Thread.objects.filter(author=self).update(author=other)
+        Post.objects.filter(author=self).update(author=other)
+        Thanks.objects.filter(thanker=self).update(thanker=other)
+        Thanks.objects.filter(thankee=self).update(thankee=other)
+
+        self.save()
+
+    @classmethod
+    def get_or_create_junk_user(cls):
+        norm_username = cls.normalize_username(
+                utils.get_config('junk_user_username'))
+
+        try:
+            user = cls.objects.get(normalized_username=norm_username)
+
+        except cls.DoesNotExist:
+            user = cls(
+                username = utils.get_config('junk_user_username'),
+                email = 'not.a.email.address@nowhere.space',
+                is_active = False)
+            user.save()
+
+        return user
 
     @classmethod
     def normalize_username(cls, username):

@@ -77,6 +77,9 @@ urlpatterns = [
     url('^usercp$',
         views.forum.usercp,
         name='usercp'),
+    url('^auto-anonymize$',
+        views.forum.AutoAnonymize.as_view(),
+        name='auto-anonymize'),
 
     url('^embed/bandcamp',
         views.forum.get_bc_embed_code,
