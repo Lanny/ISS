@@ -203,8 +203,7 @@ class RegistrationForm(UserCreationForm, CaptchaForm):
             Poster.normalize_username(utils.get_config('junk_user_username'))
         }
 
-
-        if normalize_username in forbidden_names:
+        if norm_username in forbidden_names:
             raise ValidationError('You may not register that username.',
                                   code='FORBIDDEN_USERNAME')
 
