@@ -99,23 +99,12 @@ def posts_by_user(request, user_id):
 
 def thanked_posts(request, user_id):
     poster = get_object_or_404(Poster, pk=user_id)
-    posts = (Post.objects.filter(
-        id__in=poster.post_set
-            .filter(thanks__isnull=False)
-            .order_by('-thanks__given')
-        )
-        .distinct()
-        .select_related('thread'))
-
     posts = (poster.post_set
         .filter(thanks__isnull=False)
         .annotate(Max('thanks__given'))
         .order_by('-thanks__given__max'))
 
-    posts_per_page = utils.get_config('general_items_per_page')
-    paginator = Paginator(posts, posts_per_page)
-
-    page = utils.page_by_request(paginator, request)
+    page = utils.get_posts_page(posts, request)
 
     ctx = {
         'poster': poster,
@@ -123,6 +112,21 @@ def thanked_posts(request, user_id):
     }
 
     return render(request, 'thanked_posts.html', ctx)
+
+def posts_thanked(request, user_id):
+    poster = get_object_or_404(Poster, pk=user_id)
+    posts = (Post.objects.filter(thanks__thanker__id=user_id)
+        .order_by('-created'))
+
+    page = utils.get_posts_page(posts, request)
+
+    ctx = {
+        'poster': poster,
+        'posts': page
+    }
+
+    return render(request, 'thanked_posts.html', ctx)
+
 
 @cache_control(no_cache=True, max_age=0, must_revalidate=True, no_store=True)
 def latest_threads(request):

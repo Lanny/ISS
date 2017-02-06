@@ -81,7 +81,9 @@
           <div class="stat">
             <span class="label">Thanks Given</span>
             <span class="value">
-              {{ poster.thanks_given.count }}
+              <a href="{% url 'posts-thanked' poster.pk %}">
+                {{ poster.thanks_given.count }}
+              </a>
             </span>
           </div>
         </div>
