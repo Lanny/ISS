@@ -48,12 +48,9 @@ def thread_index(request, forum_id):
 def thread(request, thread_id):
     thread = get_object_or_404(Thread, pk=thread_id)
     posts = thread.post_set.order_by('created')
-    posts_per_page = utils.get_config('posts_per_thread_page')
-    paginator = Paginator(posts, posts_per_page)
+    page = utils.get_posts_page(posts, request)
     reply_form = forms.NewPostForm(author=request.user,
                                    initial={ 'thread': thread })
-
-    page = utils.page_by_request(paginator, request)
 
     ctx = {
         'thread': thread,
@@ -267,7 +264,8 @@ class UserProfile(utils.MethodSplitView):
             'allow_avatars': poster.allow_avatars,
             'allow_image_embed': poster.allow_image_embed,
             'auto_subscribe': poster.auto_subscribe,
-            'timezone': poster.timezone})
+            'timezone': poster.timezone,
+            'posts_per_page': poster.posts_per_page})
 
     def _base_avatar_form(self, poster):
         return forms.UserAvatarForm()

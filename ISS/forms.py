@@ -116,6 +116,7 @@ class NewPostForm(forms.Form):
 
         self.post = None
 
+
     def clean_thread(self):
         thread = self.cleaned_data['thread']
 
@@ -232,6 +233,10 @@ class UserSettingsForm(forms.Form):
     timezone = forms.ChoiceField(
             label="Timezone",
             choices=[(tz, tz) for tz in pytz.common_timezones])
+    posts_per_page = forms.IntegerField(
+            label="Posts to show per page",
+            max_value=50,
+            min_value=10)
     allow_js = forms.BooleanField(label="Enable javascript", required=False)
     allow_avatars = forms.BooleanField(label="Show user avatars", required=False)
     allow_image_embed = forms.BooleanField(
@@ -250,6 +255,7 @@ class UserSettingsForm(forms.Form):
         poster.allow_image_embed = self.cleaned_data['allow_image_embed']
         poster.auto_subscribe = self.cleaned_data['auto_subscribe']
         poster.timezone = self.cleaned_data['timezone']
+        poster.posts_per_page = self.cleaned_data['posts_per_page']
 
         poster.save()
 

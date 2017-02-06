@@ -46,6 +46,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     avatar = models.ImageField(upload_to='avatars', null=True)
 
+    posts_per_page = models.PositiveSmallIntegerField(default=20)
     custom_user_title = models.CharField(max_length=256, null=True,
                                          default=None, blank=True)
     timezone = models.CharField(

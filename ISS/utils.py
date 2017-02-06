@@ -82,6 +82,17 @@ def page_by_request(paginator, request):
 
     return page
 
+def get_posts_page(qs, request):
+    posts_per_page = 20
+
+    if request.user.is_authenticated():
+        posts_per_page = request.user.posts_per_page
+
+    paginator = Paginator(qs, posts_per_page)
+    page = page_by_request(paginator, request)
+
+    return page
+
 def render_mixed_mode(request, templates, additional={}):
     data = {}
 
