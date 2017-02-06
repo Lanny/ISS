@@ -228,19 +228,8 @@ class Thread(models.Model):
     def get_posts_in_thread_order(self):
         return self.post_set.order_by('created')
 
-    def get_url(self, post=None):
-        self_url = reverse('thread', kwargs={'thread_id': self.pk})
-
-        if post:
-            predecessors = (self.get_posts_in_thread_order()
-                .filter(created__lt=post.created)
-                .count())
-
-            page_num = predecessors / utils.get_config('posts_per_thread_page')
-
-            self_url += '?p=%d#post-%d' % (page_num + 1, post.pk)
-
-        return self_url
+    def get_url(self):
+        return reverse('thread', kwargs={'thread_id': self.pk})
 
     def get_jump_post(self, user):
         """
@@ -322,7 +311,7 @@ class Post(models.Model):
         return template % (self.author.username, body)
 
     def get_url(self):
-        return self.thread.get_url(self)
+        return reverse('post', kwargs={'post_id': self.pk})
 
     def get_thanker_pks(self):
         return {t.thanker_id for t in self.thanks_set.all()}

@@ -82,12 +82,14 @@ def page_by_request(paginator, request):
 
     return page
 
+def get_posts_per_page(poster):
+    if poster.is_authenticated():
+        return poster.posts_per_page
+    else:
+        return get_config('posts_per_thread_page')
+
 def get_posts_page(qs, request):
-    posts_per_page = 20
-
-    if request.user.is_authenticated():
-        posts_per_page = request.user.posts_per_page
-
+    posts_per_page = get_posts_per_page(request.user)
     paginator = Paginator(qs, posts_per_page)
     page = page_by_request(paginator, request)
 

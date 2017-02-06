@@ -69,6 +69,17 @@ def thread(request, thread_id):
 
     return response
 
+def redirect_to_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    thread = post.thread
+    predecessors = (thread.get_posts_in_thread_order()
+            .filter(created__lt=post.created)
+            .count())
+    page_num = predecessors / utils.get_posts_per_page(request.user)
+    target_url = thread.get_url() + '?p=%d#post-%d' % (page_num + 1, post.pk)
+
+    return HttpResponseRedirect(target_url)
+
 def posts_by_user(request, user_id):
     poster = get_object_or_404(Poster, pk=user_id)
     posts = (poster.post_set
