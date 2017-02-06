@@ -6,6 +6,7 @@ import re
 from lxml import etree
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator, Page
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseForbidden
@@ -196,16 +197,30 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
 
     def render_quote(tag_name, value, options, parent, context):
         author = options.get('author', None)
+        pk = options.get('pk', None)
 
         if author:
+            attribution = 'Originally posted by %s' % author
+
+            if pk:
+                try:
+                    url = reverse('post', kwargs={'post_id': pk})
+                except:
+                    # Almost certianly NoReverseMatch in which case roll on
+                    # but let's catch everything just in case
+                    pass
+                else:
+                    attribution = 'Originally posted by <a href="%s">%s</a>' % (
+                        url, author)
+
             template = """
                 <blockquote>
-                  <small class="attribution">Originally posted by %s</small>
+                  <small class="attribution">%s</small>
                   %s
                 </blockquote>
             """
 
-            return template % (author, value)
+            return template % (attribution, value)
 
         else:
             return '<blockquote>%s</blockquote>' % value

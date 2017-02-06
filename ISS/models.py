@@ -307,8 +307,8 @@ class Post(models.Model):
         parser = utils.get_closure_bbc_parser()
         body = parser.format(self.content)
 
-        template = '[quote author=%s]\n%s\n[/quote]'
-        return template % (self.author.username, body)
+        template = '[quote pk=%d author=%s]\n%s\n[/quote]'
+        return template % (self.pk, self.author.username, body)
 
     def get_url(self):
         return reverse('post', kwargs={'post_id': self.pk})
