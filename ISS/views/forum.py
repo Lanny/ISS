@@ -125,7 +125,7 @@ def posts_thanked(request, user_id):
         'posts': page
     }
 
-    return render(request, 'thanked_posts.html', ctx)
+    return render(request, 'posts_thanked.html', ctx)
 
 
 @cache_control(no_cache=True, max_age=0, must_revalidate=True, no_store=True)

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load bbc %}
+
+{% block page_name %}
+  Posts by {{ poster.username }} - 
+{% endblock %}
+
+{% block breadcrumb %}
+  &gt; Users
+  &gt; <a href="{{ poster.get_url }}">{{ poster.username }}</a>
+  &gt; <a href="{{ request.path }}">Posts Thanked</a>
+{% endblock %}
+
+{% block content %}
+  {% include "page_list.html" with page=posts %}
+
+  <div class="thanked-posts">
+    <h1>
+      Posts That Were Thanked by
+      <a href="{{ poster.get_url }}">{{ poster.username }}</a>
+    </h1>
+
+    {% include "post_list.html" with posts=posts show_thread_context=True show_post_controls=False show_thanks_block=True %}
+  </div>
+
+  {% include "page_list.html" with page=posts %}
+{% endblock %}
