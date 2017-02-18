@@ -184,7 +184,7 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
         parser.add_simple_formatter(
             'img',
             ('<a class="img-embed" href="%(value)s">'
-                '<img crossorigin="anonymous" src="%(value)s">'
+                '<img src="%(value)s">'
             '</a>'),
             replace_links=False,
             replace_cosmetic=False)
