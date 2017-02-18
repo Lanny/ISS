@@ -19,6 +19,7 @@ config_defaults = {
     'forum_name': 'INTERNATIONAL SPACE STATION',
     'banner_dir': 'banners',
     'min_post_chars': 1,
+    'max_post_chars': 19475, # No. characters in the first chapter of Dune
     'min_thread_title_chars': 1,
     'threads_per_forum_page': 20,
     'posts_per_thread_page': 20,
@@ -32,7 +33,7 @@ config_defaults = {
     ),
     'recaptcha_settings': None,
     'max_avatar_size': 128*1024,
-    'junk_user_username': 'The Self Taught Man'
+    'junk_user_username': 'The Self Taught Man',
 }
 
 config = config_defaults.copy()

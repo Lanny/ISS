@@ -57,6 +57,7 @@ class NewThreadForm(forms.Form):
     error_css_class = 'in-error'
     thread_min_len = utils.get_config('min_thread_title_chars')
     post_min_len = utils.get_config('min_post_chars')
+    post_max_len = utils.get_config('max_post_chars')
 
     title = forms.CharField(label='Title',
                             max_length=1000,
@@ -64,6 +65,7 @@ class NewThreadForm(forms.Form):
 
     content = forms.CharField(label='Post Body',
                               min_length=post_min_len,
+                              max_length=post_max_len,
                               widget=forms.Textarea())
 
     forum = forms.ModelChoiceField(queryset=Forum.objects.all(),
@@ -96,9 +98,11 @@ class NewThreadForm(forms.Form):
 class NewPostForm(forms.Form):
     error_css_class = 'in-error'
     post_min_len = utils.get_config('min_post_chars')
+    post_max_len = utils.get_config('max_post_chars')
 
     content = forms.CharField(label='Reply',
                               min_length=post_min_len,
+                              max_length=post_max_len,
                               widget=forms.Textarea())
 
     thread = forms.ModelChoiceField(queryset=Thread.objects.all(),
