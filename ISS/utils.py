@@ -191,7 +191,9 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
     else:
         parser.add_simple_formatter(
             'img',
-            '<a class="img-link" href="%(value)s">embedded image</a>')
+            '<a class="img-link" href="%(value)s">embedded image</a>',
+            replace_links=False,
+            replace_cosmetic=False)
 
     parser.add_simple_formatter(
         'byusingthistagIaffirmlannyissupercool',
