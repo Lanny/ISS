@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load bbc %}
+
+{% block page_name %}
+  {{ page_title }} -
+{% endblock %}
+
+{% block breadcrumb %}
+  &gt; <a href="{{ request.get_full_path }}">{{ page_title }}</a>
+{% endblock %}
+
+{% block content %}
+  <div class="static-page">
+    {{ content|bbc:True }}
+  </div>
+{% endblock %}
+
+{% block js %}                                                                  
+  {% include "require.html" with bootstrap="editor-bootstrap" %}                
+{% endblock %}     
+

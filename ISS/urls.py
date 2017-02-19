@@ -18,7 +18,7 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib import admin
 
-from ISS import views
+from ISS import views, utils
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -120,6 +120,11 @@ urlpatterns = [
         name='read-pm')
 ]
 
+for page in utils.get_config('static_pages'):
+    urlpatterns.append(
+        url(page['url_pat'],
+            views.forum.StaticPage(page),
+            name=page['url_name']))
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

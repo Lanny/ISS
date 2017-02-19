@@ -49,7 +49,8 @@ config_defaults = {
         ('RLINK', 'Admin', 'admin:index', 'is_admin', None),
         ('FORM', 'Logout', 'logout', 'is_authenticated', None),
         ('RLINK', 'Register', 'register', 'is_not_authenticated', None),
-    )
+    ),
+    'static_pages': ()
 }
 
 config = config_defaults.copy()

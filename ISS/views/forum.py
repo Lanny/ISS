@@ -678,3 +678,10 @@ class ReportPost(utils.MethodSplitView):
             }
 
             return render(request, 'report_post.html', ctx)
+
+class StaticPage(utils.MethodSplitView):
+    def __init__(self, page_config):
+        self.page_config = page_config
+    
+    def __call__(self, request):
+        return render(request, 'static_page.html', self.page_config)
