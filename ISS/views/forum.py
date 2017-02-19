@@ -9,6 +9,7 @@ from django.db.models import Max, F
 from django.http import (HttpResponseRedirect, HttpResponseBadRequest,
     JsonResponse, HttpResponseForbidden)
 from django.shortcuts import render, get_object_or_404
+from django.template.loader import render_to_string
 from django.views.decorators.cache import cache_control, cache_page
 
 from ISS import utils, forms
@@ -658,7 +659,7 @@ class ReportPost(utils.MethodSplitView):
                 request.user.username,
                 form.cleaned_data['post'].author.username)
 
-            content = remder_to_string('pmt/report_post.bbc', form.clened_data,
+            content = render_to_string('pmt/report_post.bbc', form.cleaned_data,
                                        request=request)
 
             PrivateMessage.send_pm(
@@ -667,7 +668,7 @@ class ReportPost(utils.MethodSplitView):
                 subject,
                 content)
 
-            return HttpResponseRedirect(form.clened_data['post'].get_url())
+            return HttpResponseRedirect(form.cleaned_data['post'].get_url())
 
 
         else:

@@ -140,7 +140,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     @classmethod
     def get_or_create_system_user(cls):
-        return self._get_or_create_user(utils.get_config('system_user_username'))
+        return cls._get_or_create_user(utils.get_config('system_user_username'))
 
     @classmethod
     def _get_or_create_user(cls, username):
@@ -155,15 +155,12 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
         except cls.DoesNotExist:
             user = cls(
-                username = utils.get_config('junk_user_username'),
+                username = username,
                 email = 'not.a.email.address@nowhere.space',
                 is_active = False)
             user.save()
 
         return user
-
-
-
 
     @classmethod
     def normalize_username(cls, username):
@@ -415,9 +412,9 @@ class PrivateMessage(models.Model):
             pm.save()
             sent_copies.append(pm)
 
-            if self._author != receiver:
+            if sender != receiver:
                 # Sender's copy
-                opts['inbox'] = self._author
+                opts['inbox'] = sender
                 pm = PrivateMessage(**opts)
                 pm.save()
                 kept_copies.append(pm)

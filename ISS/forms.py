@@ -247,7 +247,7 @@ class ReportPostForm(CaptchaForm):
                                   widget=forms.Textarea())
 
     def clean_post(self):
-        author = self.cleaned_data['post']
+        author = self.cleaned_data['post'].author
 
         if author.is_banned():
             raise ValidationError('This poster has already been banned.',
@@ -409,7 +409,7 @@ class NewPrivateMessageForm(forms.Form):
             self._author,
             self.cleaned_data['to'],
             self.cleaned_data['subject'],
-            self.clened_data['content'])
+            self.cleaned_data['content'])
 
 class SpamCanUserForm(forms.Form):
     poster = forms.ModelChoiceField(queryset=Poster.objects.all(),
