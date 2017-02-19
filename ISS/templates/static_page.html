@@ -11,7 +11,10 @@
 
 {% block content %}
   <div class="static-page">
-    {{ content|bbc:True }}
+    <h1>{{ page_title}}</h1>
+    <div class="static-content">
+      {{ content|bbc:True }}
+    </div>
   </div>
 {% endblock %}
 

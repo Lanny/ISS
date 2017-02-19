@@ -5,6 +5,8 @@
                                                                                 
 {{ post.quote_content }}                                                        
                                                                                 
-in the thread [url={{ post.thread.get_url }}]{{ post.thread.title }}[/url] for the following reason: [b]{{ reason }}[/b].
+in the thread [url={{ post.thread.get_url }}]{{ post.thread.title }}[/url] for the following reason: [b]{{ reason }}[/b]. They provided the following as part of the report:
+
+{{ explanation }}
                                                                                 
 Please review the report and take appropriate action.           
