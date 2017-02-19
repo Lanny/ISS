@@ -1,0 +1,10 @@
+[b]Abuse Report[/b]                                                             
+[i]generated at {% now "DATETIME_FORMAT" %}[/i]                                 
+                                                                                
+[url={{ request.user.get_url }}]{{ request.user.username }}[/url] has reported [url={{ post.author.get_url }}]{{ post.author.username }}[/url] for the following post:
+                                                                                
+{{ post.quote_content }}                                                        
+                                                                                
+in the thread [url={{ post.thread.get_url }}]{{ post.thread.title }}[/url] for the following reason: [b]{{ reason }}[/b].
+                                                                                
+Please review the report and take appropriate action.           

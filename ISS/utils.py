@@ -34,6 +34,13 @@ config_defaults = {
     'recaptcha_settings': None,
     'max_avatar_size': 128*1024,
     'junk_user_username': 'The Self Taught Man',
+    'system_user_username': 'Wintermute',
+    'report_message': 'Select a reason for reporting this post:',
+    'report_reasons': (
+        ('SPAM_BOT', 'Spam bot/spamming script'),
+        ('ILLEGAL_CONTENT', 'Illegal content'),
+        ('INTENTIONAL_DISRUPTION', 'Intentional disruption')
+    )
 }
 
 config = config_defaults.copy()

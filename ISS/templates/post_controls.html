@@ -27,4 +27,11 @@
       Edit
     </a>
   {% endif %}
+
+  {% if user.can_report and user.pk != post.author.pk %}
+    <a href="{% url 'report-post' post.pk %}" class="report">
+      Report
+    </a>
+  {% endif %}
+    
 </div>

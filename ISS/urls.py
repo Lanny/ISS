@@ -32,12 +32,14 @@ urlpatterns = [
     url('^thread/(?P<thread_id>\d+)/new-reply/?$',
         views.forum.NewReply.as_view(),
         name='new-reply'),
+
     url('^forum/(?P<forum_id>\d+)/new-thread$',
         views.forum.NewThread.as_view(),
         name='new-thread'),
     url('^forum/(?P<forum_id>\d+)/?$',
         views.forum.thread_index,
         name='thread-index'),
+
     url('^latest-threads/?$',
         views.forum.latest_threads,
         name='latest-threads'),
@@ -53,6 +55,7 @@ urlpatterns = [
     url(r'^logout/$',
         views.forum.LogoutUser.as_view(),
         name='logout'),
+
     url(r'^user/(?P<user_id>\d+)/?$',
         views.forum.UserProfile.as_view(),
         name='user-profile'),
@@ -65,6 +68,7 @@ urlpatterns = [
     url(r'^user/(?P<user_id>\d+)/poststhanked/?$',
         views.forum.posts_thanked,
         name='posts-thanked'),
+
     url(r'^post/(?P<post_id>\d+)/get-quote$', 
         views.forum.GetQuote.as_view(),
         name='get-quote'),
@@ -77,6 +81,10 @@ urlpatterns = [
     url(r'^post/(?P<post_id>\d+)/edit$',
         views.forum.EditPost.as_view(),
         name='edit-post'),
+    url(r'^post/(?P<post_id>\d+)/report$', 
+        views.forum.ReportPost.as_view(),
+        name='report-post'),
+
     url('^search$',
         views.forum.search,
         name='search'),

@@ -1,6 +1,5 @@
 import json
 import pytz
-import uuid
 import urllib
 import urllib2
 
@@ -205,7 +204,8 @@ class RegistrationForm(UserCreationForm, CaptchaForm):
         username = self.cleaned_data['username']
         norm_username = Poster.normalize_username(username)
         forbidden_names = {
-            Poster.normalize_username(utils.get_config('junk_user_username'))
+            Poster.normalize_username(utils.get_config('junk_user_username')),
+            Poster.normalize_username(utils.get_config('system_user_username'))
         }
 
         if norm_username in forbidden_names:
@@ -229,6 +229,31 @@ class RegistrationForm(UserCreationForm, CaptchaForm):
         poster = super(RegistrationForm, self).save(commit = False)
         poster.save()
         return poster
+
+class ReportPostForm(CaptchaForm):
+    post_min_len = utils.get_config('min_post_chars')
+    post_max_len = utils.get_config('max_post_chars')
+
+    post = forms.ModelChoiceField(queryset=Post.objects.all(),
+                                  widget=forms.HiddenInput())
+    reason = forms.ChoiceField(
+        label='Reason for reporting',
+        choices=utils.get_config('report_reasons'),
+        required=True)
+
+    explanation = forms.CharField(label='Explanation for reporting',
+                                  min_length=post_min_len,
+                                  max_length=post_max_len,
+                                  widget=forms.Textarea())
+
+    def clean_post(self):
+        author = self.cleaned_data['post']
+
+        if author.is_banned():
+            raise ValidationError('This poster has already been banned.',
+                                  code='ALREADY_BANNED')
+
+        return self.cleaned_data['post']
     
 class UserSettingsForm(forms.Form):
     error_css_class = 'in-error'
@@ -380,33 +405,11 @@ class NewPrivateMessageForm(forms.Form):
 
     @transaction.atomic
     def save(self):
-        chain_id = uuid.uuid4()
-        sent_copies = []
-        kept_copies = []
-
-        for receiver in self.cleaned_data['to']:
-            opts = {
-                'sender': self._author,
-                'receiver': receiver,
-                'inbox': receiver,
-                'subject': self.cleaned_data['subject'],
-                'content': self.cleaned_data['content'],
-                'chain': chain_id
-            }
-
-            # Receiver's copy
-            pm = PrivateMessage(**opts) 
-            pm.save()
-            sent_copies.append(pm)
-
-            if self._author != receiver:
-                # Sender's copy
-                opts['inbox'] = self._author
-                pm = PrivateMessage(**opts)
-                pm.save()
-                kept_copies.append(pm)
-
-        return (sent_copies, kept_copies)
+        return PrivateMessage.send_pm(
+            self._author,
+            self.cleaned_data['to'],
+            self.cleaned_data['subject'],
+            self.clened_data['content'])
 
 class SpamCanUserForm(forms.Form):
     poster = forms.ModelChoiceField(queryset=Poster.objects.all(),

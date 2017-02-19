@@ -631,3 +631,49 @@ class AutoAnonymize(utils.MethodSplitView):
         logout(request)
 
         return HttpResponseRedirect(reverse('forum-index'))
+
+
+class ReportPost(utils.MethodSplitView):
+    require_login = True
+
+    def GET(self, request, post_id):
+        post = get_object_or_404(Post, pk=post_id)
+        form = forms.ReportPostForm(initial={'post': post})
+
+        ctx = {
+            'form': form,
+            'post': post
+        }
+
+        return render(request, 'report_post.html', ctx)
+
+    def POST(self, request, post_id):
+        if not request.user.can_report():
+            return HttpResponseForbidden('You can not report posts.')
+
+        form = forms.ReportPostForm(request.POST)
+
+        if form.is_valid():
+            subject = '%s has reported a post by %s' % (
+                request.user.username,
+                form.cleaned_data['post'].author.username)
+
+            content = remder_to_string('pmt/report_post.bbc', form.clened_data,
+                                       request=request)
+
+            PrivateMessage.send_pm(
+                Poster.get_or_create_system_user(),
+                Poster.objects.filter(is_staff=True),
+                subject,
+                content)
+
+            return HttpResponseRedirect(form.clened_data['post'].get_url())
+
+
+        else:
+            ctx = {
+                'form': form,
+                'post': get_object_or_404(Post, pk=post_id)
+            }
+
+            return render(request, 'report_post.html', ctx)

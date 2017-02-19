@@ -114,6 +114,12 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
             .filter(read=False)
             .count())
 
+    def is_banned(self):
+        return not self.is_active
+
+    def can_report(self):
+        return True
+
     @transaction.atomic
     def merge_into(self, other):
         """
@@ -130,11 +136,22 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     @classmethod
     def get_or_create_junk_user(cls):
-        norm_username = cls.normalize_username(
-                utils.get_config('junk_user_username'))
+        return self._get_or_create_user(utils.get_config('junk_user_username'))
+
+    @classmethod
+    def get_or_create_system_user(cls):
+        return self._get_or_create_user(utils.get_config('system_user_username'))
+
+    @classmethod
+    def _get_or_create_user(cls, username):
+        norm_username = cls.normalize_username(username)
 
         try:
             user = cls.objects.get(normalized_username=norm_username)
+
+            if user.is_active:
+                user.is_active = False
+                user.save()
 
         except cls.DoesNotExist:
             user = cls(
@@ -144,6 +161,9 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
             user.save()
 
         return user
+
+
+
 
     @classmethod
     def normalize_username(cls, username):
@@ -373,6 +393,37 @@ class PrivateMessage(models.Model):
 
     def __unicode__(self):
         return self.subject
+
+    @classmethod
+    def send_pm(cls, sender, receivers, subject, content, chain=None):
+        chain_id = chain_id if chain else uuid.uuid4()
+        sent_copies = []
+        kept_copies = []
+
+        for receiver in receivers:
+            opts = {
+                'sender': sender,
+                'receiver': receiver,
+                'inbox': receiver,
+                'subject': subject,
+                'content': content,
+                'chain': chain_id
+            }
+
+            # Receiver's copy
+            pm = PrivateMessage(**opts) 
+            pm.save()
+            sent_copies.append(pm)
+
+            if self._author != receiver:
+                # Sender's copy
+                opts['inbox'] = self._author
+                pm = PrivateMessage(**opts)
+                pm.save()
+                kept_copies.append(pm)
+
+        return (sent_copies, kept_copies)
+        
 
 @receiver(models.signals.post_save, sender=Post)
 def update_thread_last_update(sender, instance, created, **kwargs):
