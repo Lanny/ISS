@@ -30,58 +30,7 @@
         <h3>User Controls</h3>
 
         <div class="user-controls-content">
-          <ul class="control-links">
-            {% if user.is_authenticated %}
-              <li>
-                <a href="{% url 'usercp' %}">Subscriptions</a>
-              </li>
-            {% endif %}
-
-            <li>
-              <a href="{% url 'latest-threads' %}">Latest Threads</a>
-            </li>
-
-
-            {% if user.is_authenticated %}
-              <li>
-                <a href="{% url 'inbox' %}">
-                  Inbox
-
-                  {% if private_messages_count > 0 %}
-                    <span class="inbox-badge">
-                      {{ private_messages_count }}
-                    </span>
-                  {% endif %}
-                </a>
-              </li>
-
-              <li>
-                <a href="{% url 'search' %}">Search</a>
-              </li>
-
-              {% if user.is_admin %}
-                <li>
-                  <a href="{% url 'admin:index' %}">Admin</a>
-                </li>
-              {% endif %}
-
-              <li>
-                <form method="POST" action="{% url 'logout' %}">
-                  {% csrf_token %}
-                  <input type="submit" value="Logout">
-                  <input type="hidden" name="next"
-                         value="{{ request.get_full_path }}">
-                </form>
-              </li>
-            {% else %}
-              <li>
-                <a href="{% url 'search' %}">Search</a>
-              </li>
-              <li>
-                <a href="{% url 'register' %}">Register</a>
-              </li>
-            {% endif %}
-          </ul>
+          {% include 'control-links.html' %}
 
           {% if user.is_authenticated %}
             <div class="welcome-block">

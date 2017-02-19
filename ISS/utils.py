@@ -40,6 +40,15 @@ config_defaults = {
         ('SPAM_BOT', 'Spam bot/spamming script'),
         ('ILLEGAL_CONTENT', 'Illegal content'),
         ('INTENTIONAL_DISRUPTION', 'Intentional disruption')
+    ),
+    'control_links': (
+        ('RLINK', 'Subscriptions', 'usercp', 'is_authenticated', None),
+        ('RLINK', 'Latest Threads', 'latest-threads', 'always', None),
+        ('PMS', 'Inbox', 'inbox', 'is_authenticated', None),
+        ('RLINK', 'Search', 'search', 'always', None),
+        ('RLINK', 'Admin', 'admin:index', 'is_admin', None),
+        ('FORM', 'Logout', 'logout', 'is_authenticated', None),
+        ('RLINK', 'Register', 'register', 'is_not_authenticated', None),
     )
 }
 

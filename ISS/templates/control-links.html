@@ -1,0 +1,34 @@
+{% load util_tags %}
+
+
+<ul class="control-links">
+  {% for link_type, name, pat, test, extra in config.control_links %}
+    {% test_link test user as test_passed %}
+    {% if test_passed %}
+      <li>
+        {% if link_type == 'RLINK' %}
+          <a href="{% url pat %}">
+            {{ name }}
+          </a>
+        {% elif link_type == 'PMS' %}
+          <a href="{% url pat %}">
+            {{ name }}
+
+            {% if private_messages_count > 0 %}
+              <span class="inbox-badge">
+                {{ private_messages_count }}
+              </span>
+            {% endif %}
+          </a>
+        {% elif link_type == 'FORM' %}
+          <form method="POST" action="{% url pat %}">
+            {% csrf_token %}
+            <input type="submit" value="{{ name }}">
+            <input type="hidden" name="next"
+                   value="{{ request.get_full_path }}">
+          </form>
+        {% endif %}
+      </li>
+    {% endif %}
+  {% endfor %}
+</ul>
