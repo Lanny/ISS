@@ -255,13 +255,8 @@ class UserProfile(utils.MethodSplitView):
         form = forms.UserAvatarForm(request.POST, request.FILES)
 
         if form.is_valid():
-            print poster.avatar
-            print form.cleaned_data
             form.save(poster)
-            print form.cleaned_data
-            print poster.avatar
             poster.save()
-            print poster.avatar
             return HttpResponseRedirect(poster.get_url())
 
         else:

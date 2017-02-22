@@ -136,7 +136,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     @classmethod
     def get_or_create_junk_user(cls):
-        return self._get_or_create_user(utils.get_config('junk_user_username'))
+        return cls._get_or_create_user(utils.get_config('junk_user_username'))
 
     @classmethod
     def get_or_create_system_user(cls):
