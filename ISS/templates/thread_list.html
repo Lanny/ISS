@@ -1,3 +1,4 @@
+{% load util_tags %}
 {% load static from staticfiles %} 
 
 <table class="threads">
@@ -21,7 +22,7 @@
     <td>
       <div class="title-line">
         <a href="{% url 'thread' thread.pk %}" class="thread-name">
-          {{ thread.title|truncatechars:100 }}{% comment %}
+          {{ thread.title|word_filter|truncatechars:100 }}{% comment %}
         {% endcomment %}</a>
 
         {% with oldest_undread_post=thread.get_jump_post %}

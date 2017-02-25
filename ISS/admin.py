@@ -24,3 +24,6 @@ class PostAdmin(admin.ModelAdmin):
 class PrivateMessageAdmin(admin.ModelAdmin):
     list_display = ('subject', 'sender', 'receiver', 'created')
 
+@admin.register(FilterWord)
+class FilterWordAdmin(admin.ModelAdmin):
+    list_display = ('pattern', 'replacement', 'active')

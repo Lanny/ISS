@@ -1,3 +1,4 @@
+{% load util_tags %}
 {% load bbc %}
 
 <ol class="post-list">
@@ -11,7 +12,7 @@
         {% if show_thread_context %}
           in
           <a href="{{ post.get_url }}">
-            {{ post.thread.title }}
+            {{ post.thread.title|word_filter }}
           </a>
         {% endif %}
       </span>

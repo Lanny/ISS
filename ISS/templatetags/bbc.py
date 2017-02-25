@@ -2,11 +2,14 @@ from django import template
 from django.utils import safestring
 from django.utils.html import conditional_escape
 from ISS import utils
+from ISS.models import *
 
 register = template.Library()
 
 @register.filter(name='bbc', needs_autoescape=True)
 def bbc_format(value, embed_images=True, autoescape=True):
+    value = FilterWord.do_all_replacements(value)
+
     if autoescape:
         value = conditional_escape(value)
 

@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 
+{% load util_tags %}
+
 
 {% block page_name %}
-  {{ thread.title }} -
+  {{ thread.title|word_filter }} -
 {% endblock %}
 
 {% block breadcrumb %}
   &gt; <a href="{{ thread.forum.get_url }}">{{ thread.forum.name }}</a>
-  &gt; <a href="{{ thread.get_url }}">{{ thread.title }}</a>
+  &gt; <a href="{{ thread.get_url }}">{{ thread.title|word_filter }}</a>
 {% endblock %}
 
 {% block content %}
@@ -16,7 +18,7 @@
     {% include "page_list.html" with page=posts %}
 
     <div class="thread-content">
-      <h1>{{ thread.title }}</h1>
+      <h1>{{ thread.title|word_filter }}</h1>
 
       {% include "post_list.html" with posts=posts thread_context=False show_post_controls=True show_thanks_block=True %}
     </div>
