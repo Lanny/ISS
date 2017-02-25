@@ -9,7 +9,7 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator, Page
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponseForbidden
+from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
 from django.shortcuts import render
 
 from ISS.models import *
@@ -75,7 +75,15 @@ class MethodSplitView(object):
             return HttpResponseBadRequest('Request method %s not supported'
                                           % request.method)
         
+        response_maybe = self.pre_method_check(request, *args, **kwargs)
+
+        if isinstance(response_maybe, HttpResponse):
+            return response_maybe
+
         return meth(request, *args, **kwargs)
+
+    def pre_method_check(request, *args, **kwargs):
+        return None
 
     @classmethod
     def as_view(cls):

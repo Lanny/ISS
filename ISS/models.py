@@ -44,6 +44,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
+    has_report_privilege = models.BooleanField(default=True)
 
     avatar = models.ImageField(upload_to='avatars', null=True)
 
@@ -119,7 +120,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         return not self.is_active
 
     def can_report(self):
-        return True
+        return not self.is_banned() and self.has_report_privilege
 
     @transaction.atomic
     def merge_into(self, other):

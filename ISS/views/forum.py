@@ -632,6 +632,11 @@ class AutoAnonymize(utils.MethodSplitView):
 class ReportPost(utils.MethodSplitView):
     require_login = True
 
+    def pre_method_check(self, request, *args, **kwargs):
+        if not request.user.can_report():
+            raise PermissionDenied(
+                'Your permission to report posts has been revoked.')
+
     def GET(self, request, post_id):
         post = get_object_or_404(Post, pk=post_id)
         form = forms.ReportPostForm(initial={'post': post})
