@@ -1,5 +1,5 @@
 # ISS
-Oldschool Forum Software. Design tennants are:
+Oldschool Forum Software. Design tenets are:
 
 - Performance and correctness over feature richness
 - Django admin is an acceptable moderation tool in most cases
