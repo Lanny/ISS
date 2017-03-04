@@ -12,10 +12,10 @@
     requirejs.config({
       baseUrl: '{% static "js" %}',
       paths: {
-        bootstrap: '{% static "js/"|add:bootstrap|add:".js" %}'.split('.').slice(0,-1).join('.')
+      '{{ bootstrap }}': '{% static "js/"|add:bootstrap|add:".js" %}'.split('.').slice(0,-1).join('.')
       }
     });
 
-    requirejs(['bootstrap'], function() {});
+    requirejs(['{{ bootstrap }}'], function() {});
   </script>
 {% endif %}
