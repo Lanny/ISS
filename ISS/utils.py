@@ -1,4 +1,3 @@
-import bbcode
 import urlparse
 import urllib2
 import re
@@ -13,6 +12,7 @@ from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
 from django.shortcuts import render
 
 from ISS.models import *
+from ISS import iss_bbcode as bbcode
 
 DO_NOT_LINK_TAGS = { 'video', 'pre' }
 
@@ -134,50 +134,6 @@ def render_mixed_mode(request, templates, additional={}):
 
     return JsonResponse(data)
 
-class EmbeddingNotSupportedException(Exception):
-    pass
-
-def _video_markup_for_url(urlstr):
-    """
-    Given a link to an embedable video, returns markup to embed that video in
-    a page. If the link it malformed or to an unknown video hosting service
-    throws EmbeddingNotSupportedException.
-    """
-    url = urlparse.urlparse(urlstr)
-
-    embed_pattern = ('<iframe width="640" height="480" '
-        'src="https://www.youtube.com/embed/%s?start=%s" frameborder="0" '
-        'allowfullscreen></iframe>')
-
-    if url.netloc in ('www.youtube.com', 'youtube.com', 'm.youtube.com'):
-        query = urlparse.parse_qs(url.query, keep_blank_values=False)
-
-        if 'v' not in query:
-            raise EmbeddingNotSupportedException('No video ID provided.')
-
-        v = query['v'][0]
-
-        if not re.match('[\-_0-9a-zA-Z]+', v):
-            raise EmbeddingNotSupportedException('Bad video ID.')
-
-        return embed_pattern % (v, '0')
-
-    elif url.netloc in ('youtu.be',):
-        query = urlparse.parse_qs(url.query, keep_blank_values=False)
-        stripped_path = url.path[1:]
-        t = query.get('t', ['0'])[0]
-
-        if not re.match('[\-_0-9a-zA-Z]+', stripped_path):
-            raise EmbeddingNotSupportedException('Bad video ID.')
-        if t and not re.match(r'\d+', t):
-            raise EmbeddingNotSupportedException('Bad time stamp.')
-
-        return embed_pattern % (stripped_path, t)
-
-    else:
-        raise EmbeddingNotSupportedException('Unrecognized service.')
-
-
 def bandcamp_markup_for_url(urlstr):
     url = urlparse.urlparse(urlstr)
 
@@ -195,98 +151,17 @@ def bandcamp_markup_for_url(urlstr):
 
     return markup
 
+
 def get_standard_bbc_parser(embed_images=True, escape_html=True):
-    def context_sensitive_linker(url, context):
-        try:
-            return _video_markup_for_url(url)
-        except EmbeddingNotSupportedException:
-            return '<a href="%s">%s</a>' % (url, url)
-
-    parser = bbcode.Parser(
-        escape_html=escape_html,
-        linker_takes_context=True,
-        linker=context_sensitive_linker)
-
-    if embed_images:
-        parser.add_simple_formatter(
-            'img',
-            ('<a class="img-embed" href="%(value)s">'
-                '<img src="%(value)s">'
-            '</a>'),
-            replace_links=False,
-            replace_cosmetic=False)
-    else:
-        parser.add_simple_formatter(
-            'img',
-            '<a class="img-link" href="%(value)s">embedded image</a>',
-            replace_links=False,
-            replace_cosmetic=False)
-
-    parser.add_simple_formatter(
-        'byusingthistagIaffirmlannyissupercool',
-        '<span class="ex">%(value)s</span>')
-
-    def render_quote(tag_name, value, options, parent, context):
-        author = options.get('author', None)
-        pk = options.get('pk', None)
-
-        if author:
-            attribution = 'Originally posted by %s' % author
-
-            if pk:
-                try:
-                    url = reverse('post', kwargs={'post_id': pk})
-                except:
-                    # Almost certianly NoReverseMatch in which case roll on
-                    # but let's catch everything just in case
-                    pass
-                else:
-                    attribution = 'Originally posted by <a href="%s">%s</a>' % (
-                        url, author)
-
-            template = """
-                <blockquote>
-                  <small class="attribution">%s</small>
-                  %s
-                </blockquote>
-            """
-
-            return template % (attribution, value)
-
-        else:
-            return '<blockquote>%s</blockquote>' % value
-
-    parser.add_formatter('quote',
-                         render_quote,
-                         strip=True,
-                         swallow_trailing_newline=True)
-
-    def render_video(tag_name, value, options, parent, context):
-        try:
-            return _video_markup_for_url(value)
-        except EmbeddingNotSupportedException:
-            return '[video]%s[/video]' % value
-    
-    parser.add_formatter('video', render_video, render_embedded=False,
-                         replace_cosmetic=False, replace_links=False)
-
-    def render_code(tag_name, value, options, parent, context):
-        return '<pre class="code-block">%s</pre>' % value
-
-    parser.add_formatter('code', render_code, replace_cosmetic=False,
-                         render_embedded=False)
-
-    def render_bc(tag_name, value, options, parent, context):
-        return ('<a class="unproc-embed" href="%s">embedded bandcamp link</a>'
-                % value)
-
-    parser.add_formatter('bc', render_bc, replace_cosmetic=False,
-                         replace_links=False)
-
-    default_url_hanlder, _ = parser.recognized_tags['url']
-    parser.add_formatter('link', default_url_hanlder, replace_cosmetic=False)
-        
-    return parser
+    return bbcode.build_parser((
+            'IMG' if embed_images else 'NO_IMG',
+            'VIDEO' if embed_images else 'NO_IMG',
+            'BYUSINGTHISTAGIAFFIRMLANNYISSUPERCOOL',
+            'QUOTE',
+            'CODE',
+            'BC',
+            'LINK'
+        ), escape_html=escape_html)
 
 def get_closure_bbc_parser():
     c_parser = bbcode.Parser(
@@ -306,7 +181,6 @@ def get_closure_bbc_parser():
         '%(value)s')
 
     return c_parser
-
 
 class ThreadFascet(object):
     """
