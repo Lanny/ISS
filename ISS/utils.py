@@ -64,11 +64,11 @@ class MethodSplitView(object):
     def __call__(self, request, *args, **kwargs):
         if getattr(self, 'active_required', False):
             if not request.user.is_active:
-                raise HttpResponseForbidden('You must be an active user '
-                                            'to do this')
+                return HttpResponseForbidden('You must be an active user '
+                                             'to do this')
         if getattr(self, 'staff_required', False):
             if not request.user.is_staff:
-                raise HttpResponseForbidden('You must be staff to do this.')
+                return HttpResponseForbidden('You must be staff to do this.')
 
         meth = getattr(self, request.method, None)
 
