@@ -17,9 +17,17 @@
       requirejs([{{ bootstrap }}], function() {});
     </script>
   {% else %}
-    <script type="text/javascript"
-            src="{% static 'js/require.js' %}"
-            data-main="{% static "js/"|add:bootstrap|add:".js" %}">
+    <script type="text/javascript" src="{% static 'js/require.js' %}">
     </script>
+    <script type="text/javascript">
+      requirejs.config({
+        paths: {
+          bootstrap: '{% static "js/"|add:bootstrap|add:".js" %}'
+        }
+      });
+
+      requirejs(['bootstrap'], function() {});
+    </script>
+
   {% endif %}
 {% endif %}
