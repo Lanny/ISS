@@ -3,6 +3,7 @@ import traceback
 
 from django.conf import settings
 from django.utils import timezone
+from django.http import Http404
 
 from ISS.models import *
 
@@ -18,6 +19,10 @@ class TimezoneMiddleware(object):
 class PMAdminMiddleware(object):
     def process_exception(self, request, exception):
         if settings.DEBUG:
+            return None
+        
+        if isinstance(exception, Http404):
+            # No need to report 404s
             return None
 
         message = '''
