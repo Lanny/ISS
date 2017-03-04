@@ -17,6 +17,9 @@ class TimezoneMiddleware(object):
 
 class PMAdminMiddleware(object):
     def process_exception(self, request, exception):
+        if settings.DEBUG:
+            return None
+
         message = '''
             Encountered exception when processing request.
             Request Path: %s
