@@ -49,7 +49,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'ISS.middleware.TimezoneMiddleware'
+    'ISS.middleware.TimezoneMiddleware',
+    'ISS.middleware.PMAdminMiddleware'
 )
 
 ROOT_URLCONF = 'ISS.urls'
