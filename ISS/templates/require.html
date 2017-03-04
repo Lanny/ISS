@@ -6,15 +6,20 @@
       'bandcamp-embed-url': "{% url 'embed-bandcamp' %}"
     };
   </script>
-  <script type="text/javascript" src="{% static 'js/require.js' %}"></script>
-  <script type="text/javascript">
-    requirejs.config({
-      baseUrl: '{% static "js" %}',
-      paths: {
-        bootstrap: '{% static "js/"|add:bootstrap %}'
-      }
-    });
 
-    requirejs(['bootstrap'], function() {});
-  </script>
+  {% if DEBUG %}
+    <script type="text/javascript" src="{% static 'js/require.js' %}"></script>
+    <script type="text/javascript">
+      requirejs.config({
+        baseUrl: '{% static "js" %}',
+      });
+
+      requirejs([{{ bootstrap }}], function() {});
+    </script>
+  {% else %}
+    <script type="text/javascript"
+            src="{% static 'js/require.js' %}"
+            data-start="{% static "js/"|add:bootstrap|add:".js" %}">
+    </script>
+  {% endif %}
 {% endif %}
