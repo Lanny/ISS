@@ -19,7 +19,7 @@
   {% else %}
     <script type="text/javascript"
             src="{% static 'js/require.js' %}"
-            data-start="{% static "js/"|add:bootstrap|add:".js" %}">
+            data-main="{% static "js/"|add:bootstrap|add:".js" %}">
     </script>
   {% endif %}
 {% endif %}
