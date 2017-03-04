@@ -7,27 +7,15 @@
     };
   </script>
 
-  {% if DEBUG %}
-    <script type="text/javascript" src="{% static 'js/require.js' %}"></script>
-    <script type="text/javascript">
-      requirejs.config({
-        baseUrl: '{% static "js" %}',
-      });
+  <script type="text/javascript" src="{% static 'js/require.js' %}"></script>
+  <script type="text/javascript">
+    requirejs.config({
+      baseUrl: '{% static "js" %}',
+      paths: {
+        bootstrap: '{% static "js/"|add:bootstrap|add:".js" %}'.split('.').slice(0,-1).join('.')
+      }
+    });
 
-      requirejs([{{ bootstrap }}], function() {});
-    </script>
-  {% else %}
-    <script type="text/javascript" src="{% static 'js/require.js' %}">
-    </script>
-    <script type="text/javascript">
-      requirejs.config({
-        paths: {
-          bootstrap: '{% static "js/"|add:bootstrap|add:".js" %}'
-        }
-      });
-
-      requirejs(['bootstrap'], function() {});
-    </script>
-
-  {% endif %}
+    requirejs(['bootstrap'], function() {});
+  </script>
 {% endif %}
