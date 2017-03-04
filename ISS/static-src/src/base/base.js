@@ -113,6 +113,15 @@
   };
 
   function wrap($, config) {
+    function peek() {
+      var peekaboo = $('.peekaboo').first();
+
+      peekaboo.animate({'left': -100}, 1500, 'linear', function() {
+        window.setTimeout(function() {
+          peekaboo.animate({'left': 0}, 500);
+        }, 250);
+      });
+    }
 
     function embedBandcampLinks(target) {
       $(target).find('.unproc-embed')
@@ -136,6 +145,7 @@
     $(function() {
       embedBandcampLinks(document);
       shakeBaby($('.ex'), 10);
+      window.setTimeout(peek, Math.random()*1000*60*60);
     })
   }
 
