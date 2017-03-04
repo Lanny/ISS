@@ -43,7 +43,8 @@ def _embed_youtube_shortcode(url):
 
 def _embed_html5_video(url):
     url_str = urlparse.urlunparse(url)
-    return '<video controls loop muted src="%s"></video>' % url_str
+    template = '<video controls loop muted class="video-embed" src="%s"></video>' 
+    return template % url_str
 
 def _video_markup_for_url(urlstr):
     """
