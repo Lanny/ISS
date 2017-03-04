@@ -1,6 +1,7 @@
 import urlparse
 import urllib2
 import re
+import bbcode
 
 from lxml import etree
 
@@ -12,7 +13,7 @@ from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
 from django.shortcuts import render
 
 from ISS.models import *
-from ISS import iss_bbcode as bbcode
+from ISS import iss_bbcode
 
 DO_NOT_LINK_TAGS = { 'video', 'pre' }
 
@@ -153,7 +154,7 @@ def bandcamp_markup_for_url(urlstr):
 
 
 def get_standard_bbc_parser(embed_images=True, escape_html=True):
-    return bbcode.build_parser((
+    return iss_bbcode.build_parser((
             'IMG' if embed_images else 'NO_IMG',
             'VIDEO' if embed_images else 'NO_IMG',
             'BYUSINGTHISTAGIAFFIRMLANNYISSUPERCOOL',
