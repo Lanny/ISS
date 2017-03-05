@@ -22,6 +22,7 @@ from ISS import views, utils
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^houston/', include('Houston.urls')),
 
     url('^thread/(?P<thread_id>\d+)/?$',
         views.forum.thread,
