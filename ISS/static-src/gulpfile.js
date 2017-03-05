@@ -35,7 +35,10 @@ gulp.task('less', ['icons'], function() {
       this.emit('end');
     });
 
-  var stream = gulp.src('./src/combined/combined.less');
+  var stream = gulp.src([
+    './src/combined/combined.less',
+    './src/combined/blood-dragon.less'
+  ]);
 
   stream = argv.optimize ? stream : stream.pipe(sourcemaps.init());
   stream = stream.pipe(lessStream);

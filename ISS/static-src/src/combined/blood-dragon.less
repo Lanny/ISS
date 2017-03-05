@@ -1,0 +1,116 @@
+@import "combined.less";
+
+@black: rgba(0, 0, 0, .6);
+@white: #FFFFFF;
+@magenta: #FA056F;
+@seafoam: #05EAFA;
+@gecko: #32FA05;
+
+* {
+  font-variant: small-caps !important;
+  font-weight: lighter !important;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  background: @black url(/static/img/bdbg.jpg);
+  background-size: auto 100%;
+  background-position: center;
+
+  a {
+    color: @seafoam;
+  }
+
+  .user-controls {
+    background-color: @black;
+    border: 1px solid @white;
+
+    > h3 {
+      background-color: @magenta;
+      color: @white;
+    }
+
+    .user-controls-content {
+      .control-links {
+        li {
+          border-right-color: @white;
+
+          a {
+            background-color: transparent;
+            color: @seafoam;
+            font-weight: lighter;
+          }
+        }
+      }
+    }
+
+    .inline-login {
+      .fields {
+        p {
+          label {
+            color: @white;
+          }
+
+          input {
+            background-color: transparent;
+            color: @white;
+            border: 1px solid white;
+            border-radius: 3px;
+          }
+        }
+      }
+
+      input[type="submit"] {
+        border: 1px solid @magenta;
+        border-radius: 3px;
+        color: @magenta;
+        background-color: black;
+      }
+    }
+  }
+
+  .breadcrumb {
+    background-color: @black;
+    border: 1px solid @white;
+
+    h3 {
+      background-color: @magenta;
+      color: @white;
+    }
+  }
+
+  .forum-index {
+    background-color: @black;
+    border: 1px solid @white;
+
+    table {
+      tr {
+        th {
+          background-color: @magenta;
+          color: @white;
+        }
+
+        td:nth-child(odd), td:nth-child(even) {
+          background-color: transparent;
+          color: @white;
+          border-color: @white !important;
+
+          .forum-name {
+            color: @seafoam;
+          }
+        }
+      }
+    }
+  }
+
+  footer {
+    background-color: @black;
+    border-color: @white;
+    color: @white;
+  }
+}
+
