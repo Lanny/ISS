@@ -328,6 +328,7 @@ class UserAvatarForm(forms.Form):
 class NewPrivateMessageForm(forms.Form):
     error_css_class = 'in-error'
     post_min_len = utils.get_config('min_post_chars')
+    post_max_len = utils.get_config('max_post_chars')
     title_min_len = utils.get_config('min_thread_title_chars')
 
     subject = forms.CharField(label='Title',
@@ -338,6 +339,7 @@ class NewPrivateMessageForm(forms.Form):
 
     content = forms.CharField(label='Reply',
                               min_length=post_min_len,
+                              max_length=post_max_len,
                               widget=forms.Textarea())
 
 
