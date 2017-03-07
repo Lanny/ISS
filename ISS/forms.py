@@ -332,7 +332,7 @@ class NewPrivateMessageForm(forms.Form):
     title_min_len = utils.get_config('min_thread_title_chars')
 
     subject = forms.CharField(label='Title',
-                              max_length=1000,
+                              max_length=255,
                               min_length=title_min_len)
 
     to = forms.CharField(label='To', max_length=512)
