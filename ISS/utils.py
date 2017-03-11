@@ -1,6 +1,7 @@
 import urlparse
 import urllib2
 import re
+import datetime
 import bbcode
 
 from lxml import etree
@@ -17,6 +18,7 @@ from ISS.models import *
 from ISS import iss_bbcode
 
 DO_NOT_LINK_TAGS = { 'video', 'pre' }
+TIME_DELTA_FORMAT = re.compile(r'^\s*((?P<days>\d+)d)?\s*((?P<hours>\d+?)h)?\s*((?P<minutes>\d+?)m)?\s*$')
 
 config_defaults = {
     'forum_name': 'INTERNATIONAL SPACE STATION',
@@ -70,6 +72,10 @@ class MethodSplitView(object):
         if getattr(self, 'staff_required', False):
             if not request.user.is_staff:
                 return HttpResponseForbidden('You must be staff to do this.')
+
+        if getattr(self, 'unbanned_required', False):
+            if request.user.is_banned():
+                return HttpResponseForbidden('Tell lanny to fix this lol.')
 
         meth = getattr(self, request.method, None)
 
@@ -241,3 +247,16 @@ class MappingPaginator(Paginator):
         object_list = map(self._map_function, object_list)
 
         return Page(object_list, number, paginator)
+
+def parse_duration(time_str):
+    parts = TIME_DELTA_FORMAT.match(time_str)
+    if not parts:
+        return
+
+    parts = parts.groupdict()
+    time_params = {}
+    for (name, param) in parts.iteritems():
+        if param:
+            time_params[name] = int(param)
+
+    return datetime.timedelta(**time_params)

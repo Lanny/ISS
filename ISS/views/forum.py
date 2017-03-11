@@ -48,7 +48,7 @@ def thread_index(request, forum_id):
 
 def thread(request, thread_id):
     thread = get_object_or_404(Thread, pk=thread_id)
-    posts = thread.post_set.order_by('created')
+    posts = thread.post_set.order_by('created').select_related('author')
     page = utils.get_posts_page(posts, request)
     reply_form = forms.NewPostForm(author=request.user,
                                    initial={ 'thread': thread })
@@ -631,6 +631,7 @@ class AutoAnonymize(utils.MethodSplitView):
 
 class ReportPost(utils.MethodSplitView):
     require_login = True
+    require_unbanned = True
 
     def pre_method_check(self, request, *args, **kwargs):
         if not request.user.can_report():
@@ -678,6 +679,43 @@ class ReportPost(utils.MethodSplitView):
             }
 
             return render(request, 'report_post.html', ctx)
+
+class BanPoster(utils.MethodSplitView):
+    def pre_method_check(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            raise PermissionDenied('You are not authorized to ban posters.')
+
+    def GET(self, request, user_id):
+        poster = get_object_or_404(Poster, pk=user_id)
+        form = forms.IssueBanForm(initial={'poster': poster})
+
+        ctx = {
+            'poster': poster,
+            'form': form
+        }
+
+        return render(request, 'ban_poster.html', ctx)
+
+    def POST(self, request, user_id):
+        form = forms.IssueBanForm(request.POST)
+
+        if form.is_valid():
+            ban = Ban(
+                subject=form.cleaned_data['poster'],
+                end_date=timezone.now() + form.cleaned_data['duration'],
+                reason=form.cleaned_data['reason'])
+
+            ban.save()
+
+            return HttpResponseRedirect(form.cleaned_data['poster'].get_url())
+
+        else:
+            ctx = {
+                'form': form,
+                'poster': get_object_or_404(Poster, pk=user_id)
+            }
+
+            return render(request, 'ban_poster.html', ctx)
 
 class StaticPage(utils.MethodSplitView):
     def __init__(self, page_config):
