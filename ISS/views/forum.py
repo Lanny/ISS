@@ -314,7 +314,7 @@ class NewThread(utils.MethodSplitView):
 
 class NewReply(utils.MethodSplitView):
     login_required = True
-    active_required = True
+    unbanned_required = True
 
     def GET(self, request, thread_id):
         thread = get_object_or_404(Thread, pk=thread_id)
@@ -364,6 +364,7 @@ class NewReply(utils.MethodSplitView):
 class EditPost(utils.MethodSplitView):
     login_required = True
     active_required = True
+    unbanned_required = True
     
     def GET(self, request, post_id):
         post = get_object_or_404(Post, pk=post_id)
@@ -479,6 +480,7 @@ class RegisterUser(utils.MethodSplitView):
 class ThankPost(utils.MethodSplitView):
     require_login = True
     active_required = True
+    unbanned_required = True
 
     def POST(self, request, post_id):
         post = get_object_or_404(Post, pk=post_id)
@@ -631,7 +633,7 @@ class AutoAnonymize(utils.MethodSplitView):
 
 class ReportPost(utils.MethodSplitView):
     require_login = True
-    require_unbanned = True
+    unbanned_required = True
 
     def pre_method_check(self, request, *args, **kwargs):
         if not request.user.can_report():
