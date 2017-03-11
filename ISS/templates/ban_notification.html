@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block page_name %}
+  You're Banned!
+{% endblock %}
+
+{% block content %}
+  <div class="static-page">
+    <h1>You're Banned!</h1>
+    <div class="static-content">
+      <p>
+        You've been banned from {{ config.forum_name }} for the following
+        reason(s):
+      </p>
+
+      <ul>
+        {% for reason in reasons %}
+          <li>
+            <em>
+              {% if reason %}
+                {{ reason }}
+              {% else %}
+                No reason listed.
+              {% endif %}
+            </em>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <p>
+        You won't be able to submit content (or shitposts) while the ban is in
+        effect. Your ban will expire on {{ end_date|date:"Y-m-d" }} at
+        {{ end_date|time:"f A e" }}. If you think this ban is in error you can
+        contact <strong>one</strong> of the following posters who has the right
+        (but probably not the intent) to reverse your ban:
+      </p>
+
+      <ul>
+        {% for staffer in staff %}
+          <li>
+            <a href="{% url 'compose-pm' %}?to={{ staffer.pk }}">
+              {{ staffer.username }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+
+    </div>
+  </div>
+{% endblock %}
+
+

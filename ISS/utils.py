@@ -9,6 +9,7 @@ from lxml import etree
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator, Page
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse, \
     HttpResponseForbidden
@@ -75,7 +76,7 @@ class MethodSplitView(object):
 
         if getattr(self, 'unbanned_required', False):
             if request.user.is_banned():
-                return HttpResponseForbidden('Tell lanny to fix this lol.')
+                return get_ban_403_response(request)
 
         meth = getattr(self, request.method, None)
 
@@ -105,6 +106,17 @@ def get_config(key=None):
         return config
     else:
         return config.get(key)
+
+def get_ban_403_response(request):
+    bans = request.user.get_pending_bans().order_by('-end_date')
+
+    ctx = {
+        'end_date': bans[0].end_date,
+        'reasons': [ban.reason for ban in bans],
+        'staff': auth.get_user_model().objects.filter(is_staff=True)
+    }
+
+    return render(request, 'ban_notification.html', ctx, status=403)
 
 def page_by_request(paginator, request):
     page_num = request.GET.get('p')
