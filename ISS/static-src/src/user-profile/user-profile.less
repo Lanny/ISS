@@ -28,10 +28,17 @@
           font-size: 12px;
         }
 
-        .edit-user, .assume-identity, .spam-can {
+        .edit-user, .assume-identity, .spam-can, .ban-user {
           vertical-align: middle;
           float: right;
           margin-left: 3px;
+        }
+
+        .ban-user {
+          .icn-btn-scaleable(35);
+          display: block; 
+
+          &:before { .icn-ban-circle(); }
         }
 
         .edit-user {
