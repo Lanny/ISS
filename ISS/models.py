@@ -92,6 +92,11 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def can_post(self):
         return self.is_active
 
+    def clean(self):
+        # Django decided to declare their own normalize_username and this calls
+        # into that so we'll just skip this step all together.
+        pass
+
     def invalidate_user_title_cache(self):
         cache_key = self._user_title_cache_key % self.pk
         cache.delete(cache_key)
