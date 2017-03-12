@@ -69,6 +69,9 @@ urlpatterns = [
     url(r'^user/(?P<user_id>\d+)/poststhanked/?$',
         views.forum.posts_thanked,
         name='posts-thanked'),
+    url(r'^user/(?P<user_id>\d+)/ban$',
+        views.forum.BanPoster.as_view(),
+        name='ban-poster'),
 
     url(r'^post/(?P<post_id>\d+)/get-quote$', 
         views.forum.GetQuote.as_view(),

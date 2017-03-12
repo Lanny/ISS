@@ -48,7 +48,7 @@ def thread_index(request, forum_id):
 
 def thread(request, thread_id):
     thread = get_object_or_404(Thread, pk=thread_id)
-    posts = thread.post_set.order_by('created')
+    posts = thread.post_set.order_by('created').select_related('author')
     page = utils.get_posts_page(posts, request)
     reply_form = forms.NewPostForm(author=request.user,
                                    initial={ 'thread': thread })
@@ -213,7 +213,8 @@ class UserProfile(utils.MethodSplitView):
         poster = get_object_or_404(Poster, pk=user_id)
 
         ctx = {
-            'poster': poster
+            'poster': poster,
+            'bans': poster.bans.order_by('-start_date')
         }
 
         if poster.pk == request.user.pk:
@@ -314,7 +315,7 @@ class NewThread(utils.MethodSplitView):
 
 class NewReply(utils.MethodSplitView):
     login_required = True
-    active_required = True
+    unbanned_required = True
 
     def GET(self, request, thread_id):
         thread = get_object_or_404(Thread, pk=thread_id)
@@ -364,6 +365,7 @@ class NewReply(utils.MethodSplitView):
 class EditPost(utils.MethodSplitView):
     login_required = True
     active_required = True
+    unbanned_required = True
     
     def GET(self, request, post_id):
         post = get_object_or_404(Post, pk=post_id)
@@ -479,6 +481,7 @@ class RegisterUser(utils.MethodSplitView):
 class ThankPost(utils.MethodSplitView):
     require_login = True
     active_required = True
+    unbanned_required = True
 
     def POST(self, request, post_id):
         post = get_object_or_404(Post, pk=post_id)
@@ -631,6 +634,7 @@ class AutoAnonymize(utils.MethodSplitView):
 
 class ReportPost(utils.MethodSplitView):
     require_login = True
+    unbanned_required = True
 
     def pre_method_check(self, request, *args, **kwargs):
         if not request.user.can_report():
@@ -678,6 +682,44 @@ class ReportPost(utils.MethodSplitView):
             }
 
             return render(request, 'report_post.html', ctx)
+
+class BanPoster(utils.MethodSplitView):
+    def pre_method_check(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            raise PermissionDenied('You are not authorized to ban posters.')
+
+    def GET(self, request, user_id):
+        poster = get_object_or_404(Poster, pk=user_id)
+        form = forms.IssueBanForm(initial={'poster': poster})
+
+        ctx = {
+            'poster': poster,
+            'form': form
+        }
+
+        return render(request, 'ban_poster.html', ctx)
+
+    def POST(self, request, user_id):
+        form = forms.IssueBanForm(request.POST)
+
+        if form.is_valid():
+            ban = Ban(
+                subject=form.cleaned_data['poster'],
+                given_by=request.user,
+                end_date=timezone.now() + form.cleaned_data['duration'],
+                reason=form.cleaned_data['reason'])
+
+            ban.save()
+
+            return HttpResponseRedirect(form.cleaned_data['poster'].get_url())
+
+        else:
+            ctx = {
+                'form': form,
+                'poster': get_object_or_404(Poster, pk=user_id)
+            }
+
+            return render(request, 'ban_poster.html', ctx)
 
 class StaticPage(utils.MethodSplitView):
     def __init__(self, page_config):

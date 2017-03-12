@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load bbc %}
+
+{% block page_name %}
+Report Post -
+{% endblock %}
+
+{% block breadcrumb %}
+  &gt; Users
+  &gt; <a href="{{ poster.get_url }}">{{ poster.username }}</a>
+  &gt; <a href="{% url 'ban-poster' poster.pk %}">Ban Poster</a>
+{% endblock %}
+
+{% block content %}
+  <div class="form-page">
+    <form method="POST" action="{% url 'ban-poster' poster.pk %}">
+      <h1>
+        Ban Poster
+      </h1>
+      <fieldset>
+        <p>
+          You are about to issue a temporary ban on
+          <a href="{{ poster.get_url }}">{{ poster.username }}</a>. The ban
+          will prevent this poster from making new posts and threads and
+          submitting reports. They will be able to log in and use the PM system
+          normally. Enter the ban duration and an optional reason for the ban
+          (will be presented to users and site staff) below. Duration
+          should entered in the format of "Nd Nh Nm" so a ban of 1 day and 30
+          minutes would look like "1d 30m".
+        </p>
+
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <input type="submit" value="Issue Ban" />
+      </fieldset>
+     </form>
+   </div>
+{% endblock %}

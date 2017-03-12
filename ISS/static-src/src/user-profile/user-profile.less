@@ -28,10 +28,17 @@
           font-size: 12px;
         }
 
-        .edit-user, .assume-identity, .spam-can {
+        .edit-user, .assume-identity, .spam-can, .ban-user {
           vertical-align: middle;
           float: right;
           margin-left: 3px;
+        }
+
+        .ban-user {
+          .icn-btn-scaleable(35);
+          display: block; 
+
+          &:before { .icn-ban-circle(); }
         }
 
         .edit-user {
@@ -85,9 +92,34 @@
   }
 
   .avatar-controls {
+    margin-bottom: 15px;
+
     form {
       .standard-form();
       background-color: @bg_dark;
+    }
+  }
+
+  .ban-log {
+    .rounded();
+
+    h3 {
+      .title-box();
+    }
+
+    & > div {
+      table {
+        .index-table();
+
+        thead th {
+          background-color: @bg_teal;
+          color: @white;
+        }
+
+        td:nth-child(1) {
+          text-align: center;
+        }
+      }
     }
   }
 }

@@ -37,6 +37,8 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         (2, 'On View'),
     )
 
+    _user_title_cache_key = 'posters:%d:usertitle'
+
     username = models.CharField(max_length=256, unique=True)
     normalized_username = models.CharField(max_length=256)
     email = models.EmailField()
@@ -90,7 +92,17 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def can_post(self):
         return self.is_active
 
+    def invalidate_user_title_cache(self):
+        cache_key = self._user_title_cache_key % self.pk
+        cache.delete(cache_key)
+
     def get_user_title(self):
+        cache_key = self._user_title_cache_key % self.pk
+        cached_value = cache.get(cache_key)
+
+        if cached_value:
+            return cached_value
+
         if self.custom_user_title:
             title = self.custom_user_title
         else:
@@ -102,9 +114,10 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
                     title = rank_title
                     break
 
-        if not self.is_active:
+        if self.is_banned():
             title += ' (banned)'
 
+        cache.set(cache_key, title, 60*30)
         return title
 
     def get_nojs(self):
@@ -116,11 +129,20 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
             .filter(read=False)
             .count())
 
+    def get_pending_bans(self):
+       return Ban.objects.filter(subject=self, end_date__gt=timezone.now())
+
     def is_banned(self):
-        return not self.is_active
+        pending_bans = self.get_pending_bans()
+        return bool(pending_bans.count() or not self.is_active)
+
+    def get_ban_reason(self):
+        pending_bans = self.get_pending_bans().order_by('-end_date')
+
+        return pending_bans[0].reason
 
     def can_report(self):
-        return not self.is_banned() and self.has_report_privilege
+        return self.has_report_privilege
 
     @transaction.atomic
     def merge_into(self, other):
@@ -455,6 +477,21 @@ class FilterWord(models.Model):
 
         return text
 
+class Ban(models.Model):
+    subject = models.ForeignKey(Poster, related_name="bans")
+    given_by = models.ForeignKey(Poster, null=True, related_name="bans_given")
+    start_date = models.DateTimeField(auto_now_add=True)
+    end_date = models.DateTimeField()
+    reason = models.CharField(max_length=1024)
+
+    def is_active(self, now=None):
+        if not now:
+            now = timezone.now()
+
+        print now,
+        print self.end_date
+        return self.end_date > now
+
 @receiver(models.signals.post_save, sender=Post)
 def update_thread_last_update(sender, instance, created, **kwargs):
     if not created:
@@ -488,3 +525,7 @@ def reject_auto_erotic_athanksication(sender, instance, **kwargs):
 @receiver(models.signals.pre_save, sender=FilterWord)
 def invalidate_filter_cache(sender, instance, **kwargs):
     cache.delete('active_filters')
+
+@receiver(models.signals.post_save, sender=Ban)
+def invalidate_user_title_cache(sender, instance, *args, **kwargs):
+    instance.subject.invalidate_user_title_cache()

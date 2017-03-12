@@ -1,6 +1,7 @@
 import urlparse
 import urllib2
 import re
+import datetime
 import bbcode
 
 from lxml import etree
@@ -8,14 +9,17 @@ from lxml import etree
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator, Page
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.contrib import auth
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse, \
+    HttpResponseForbidden
 from django.shortcuts import render
 
 from ISS.models import *
 from ISS import iss_bbcode
 
 DO_NOT_LINK_TAGS = { 'video', 'pre' }
+TIME_DELTA_FORMAT = re.compile(r'^\s*((?P<days>\d+)d)?\s*((?P<hours>\d+?)h)?\s*((?P<minutes>\d+?)m)?\s*$')
 
 config_defaults = {
     'forum_name': 'INTERNATIONAL SPACE STATION',
@@ -70,6 +74,10 @@ class MethodSplitView(object):
             if not request.user.is_staff:
                 return HttpResponseForbidden('You must be staff to do this.')
 
+        if getattr(self, 'unbanned_required', False):
+            if request.user.is_banned():
+                return get_ban_403_response(request)
+
         meth = getattr(self, request.method, None)
 
         if not meth:
@@ -98,6 +106,17 @@ def get_config(key=None):
         return config
     else:
         return config.get(key)
+
+def get_ban_403_response(request):
+    bans = request.user.get_pending_bans().order_by('-end_date')
+
+    ctx = {
+        'end_date': bans[0].end_date,
+        'reasons': [ban.reason for ban in bans],
+        'staff': auth.get_user_model().objects.filter(is_staff=True)
+    }
+
+    return render(request, 'ban_notification.html', ctx, status=403)
 
 def page_by_request(paginator, request):
     page_num = request.GET.get('p')
@@ -240,3 +259,16 @@ class MappingPaginator(Paginator):
         object_list = map(self._map_function, object_list)
 
         return Page(object_list, number, paginator)
+
+def parse_duration(time_str):
+    parts = TIME_DELTA_FORMAT.match(time_str)
+    if not parts:
+        return
+
+    parts = parts.groupdict()
+    time_params = {}
+    for (name, param) in parts.iteritems():
+        if param:
+            time_params[name] = int(param)
+
+    return datetime.timedelta(**time_params)

@@ -13,9 +13,14 @@ from PIL import Image
 import utils
 from models import *
 
-class UnrenderedInput(forms.widgets.Input):
-    def render(self, name, value, attrs=None):
-        return ""
+class DurationField(forms.Field):
+    def clean(self, value):
+        delta = utils.parse_duration(value)
+
+        if not delta:
+            raise ValidationError('Invalid duration format.')
+
+        return delta
 
 class CaptchaForm(forms.Form):
     def clean(self, *args, **kwargs):
@@ -328,16 +333,18 @@ class UserAvatarForm(forms.Form):
 class NewPrivateMessageForm(forms.Form):
     error_css_class = 'in-error'
     post_min_len = utils.get_config('min_post_chars')
+    post_max_len = utils.get_config('max_post_chars')
     title_min_len = utils.get_config('min_thread_title_chars')
 
     subject = forms.CharField(label='Title',
-                              max_length=1000,
+                              max_length=255,
                               min_length=title_min_len)
 
     to = forms.CharField(label='To', max_length=512)
 
     content = forms.CharField(label='Reply',
                               min_length=post_min_len,
+                              max_length=post_max_len,
                               widget=forms.Textarea())
 
 
@@ -419,3 +426,11 @@ class SpamCanUserForm(forms.Form):
         required=True,
         empty_label=None)
     next_page = forms.CharField(widget=forms.HiddenInput())
+
+class IssueBanForm(forms.Form):
+    _ban_targets = Poster.objects.filter(is_admin=False)
+    poster = forms.ModelChoiceField(queryset=_ban_targets,
+                                    required=True,
+                                    widget=forms.HiddenInput())
+    duration = DurationField(required=True)
+    reason = forms.CharField(max_length=1024)
