@@ -5,6 +5,7 @@ Pillow==3.4.2
 psycopg2==2.6.2
 lxml==3.7.2
 django-houston==0.1a0
+-e git+https://github.com/RyanJenkins/Houston.git@semi-stable\#egg\=django-houston
 
 # Dev dependencies
 django-debug-toolbar==1.6
