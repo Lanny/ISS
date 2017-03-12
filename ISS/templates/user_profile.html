@@ -170,6 +170,10 @@
                 {{ ban.end_date|date:"Y-m-d" }} at {{ ban.end_date|time:"f A e" }}
               </td>
             </tr>
+          {% empty %}
+            <tr>
+              <td colspan="999">No bans on record</td>
+            </tr>
           {% endfor %}
           </tbody>
         </table>
