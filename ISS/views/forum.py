@@ -213,7 +213,8 @@ class UserProfile(utils.MethodSplitView):
         poster = get_object_or_404(Poster, pk=user_id)
 
         ctx = {
-            'poster': poster
+            'poster': poster,
+            'bans': poster.bans.order_by('-start_date')
         }
 
         if poster.pk == request.user.pk:
@@ -704,6 +705,7 @@ class BanPoster(utils.MethodSplitView):
         if form.is_valid():
             ban = Ban(
                 subject=form.cleaned_data['poster'],
+                given_by=request.user,
                 end_date=timezone.now() + form.cleaned_data['duration'],
                 reason=form.cleaned_data['reason'])
 

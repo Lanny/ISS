@@ -85,9 +85,34 @@
   }
 
   .avatar-controls {
+    margin-bottom: 15px;
+
     form {
       .standard-form();
       background-color: @bg_dark;
+    }
+  }
+
+  .ban-log {
+    .rounded();
+
+    h3 {
+      .title-box();
+    }
+
+    & > div {
+      table {
+        .index-table();
+
+        thead th {
+          background-color: @bg_teal;
+          color: @white;
+        }
+
+        td:nth-child(1) {
+          text-align: center;
+        }
+      }
     }
   }
 }

@@ -133,5 +133,47 @@
         </form>
       </div>
     {% endif %}
+
+    <div class="ban-log">
+      <h3>Ban Log</h3>
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Active</th>
+              <th>Reason</th>
+              <th>Given By</th>
+              <th>Given At</th>
+              <th>Ends</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for ban in bans %}
+            <tr>
+              <td>
+                <strong>
+                  {% if ban.is_active %} Yes {% else %} No {% endif %}
+                </strong>
+              </td>
+              <td>
+                {{ ban.reason }}
+              </td>
+              <td>
+                <a href="{{ ban.given_by.get_url }}">
+                  {{ ban.given_by.username }}
+                </a>
+              </td>
+              <td>
+                {{ ban.start_date|date:"Y-m-d" }} at {{ ban.start_date|time:"f A e" }}
+              </td>
+              <td>
+                {{ ban.end_date|date:"Y-m-d" }} at {{ ban.end_date|time:"f A e" }}
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
   </section>
 {% endblock %}

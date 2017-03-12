@@ -129,15 +129,15 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
             .filter(read=False)
             .count())
 
-    def _get_pending_bans(self):
+    def get_pending_bans(self):
        return Ban.objects.filter(subject=self, end_date__gt=timezone.now())
 
     def is_banned(self):
-        pending_bans = self._get_pending_bans()
+        pending_bans = self.get_pending_bans()
         return bool(pending_bans.count() or not self.is_active)
 
     def get_ban_reason(self):
-        pending_bans = self._get_pending_bans().order_by('-end_date')
+        pending_bans = self.get_pending_bans().order_by('-end_date')
 
         return pending_bans[0].reason
 
@@ -478,9 +478,19 @@ class FilterWord(models.Model):
         return text
 
 class Ban(models.Model):
-    subject = models.ForeignKey(Poster)
+    subject = models.ForeignKey(Poster, related_name="bans")
+    given_by = models.ForeignKey(Poster, null=True, related_name="bans_given")
+    start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField()
     reason = models.CharField(max_length=1024)
+
+    def is_active(self, now=None):
+        if not now:
+            now = timezone.now()
+
+        print now,
+        print self.end_date
+        return self.end_date > now
 
 @receiver(models.signals.post_save, sender=Post)
 def update_thread_last_update(sender, instance, created, **kwargs):
