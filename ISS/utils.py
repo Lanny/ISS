@@ -3,6 +3,7 @@ import urllib2
 import re
 import datetime
 import bbcode
+import collections
 
 from lxml import etree
 
@@ -32,6 +33,7 @@ config_defaults = {
     'general_items_per_page': 20,
     'ninja_edit_grace_time': 120,
     'private_message_flood_control': 30,
+    'max_embedded_items': 7,
     'title_ladder': (
         (100, 'Regular'),
         (10, 'Acolyte'),
@@ -201,6 +203,22 @@ def get_closure_bbc_parser():
         '%(value)s')
 
     return c_parser
+
+def get_tag_distribution(data):
+    """
+    Parses a BBCode string and returns a dictionary with keys being tags
+    (possibly ones not recognized by the parser) and values being a count
+    of how many times that type of tag occurs. Both paired and standalone
+    tags are counted exactly once.
+    """
+    tag_counts = collections.defaultdict(int)
+    parser = get_standard_bbc_parser()
+
+    for token_type, tag_name, _, _ in parser.tokenize(data):
+        if token_type == parser.TOKEN_TAG_START:
+            tag_counts[tag_name] += 1
+
+    return tag_counts
 
 class ThreadFascet(object):
     """
