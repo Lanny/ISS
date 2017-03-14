@@ -142,7 +142,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
             return True
 
         pending_bans = self.get_pending_bans()
-        if pending_bans.count() > 1:
+        if pending_bans.count() > 0:
             return True
 
         return False
