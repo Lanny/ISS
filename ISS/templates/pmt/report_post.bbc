@@ -1,7 +1,7 @@
 [b]Abuse Report[/b]                                                             
 [i]generated at {% now "DATETIME_FORMAT" %}[/i]                                 
                                                                                 
-[url={{ request.user.get_url }}]{{ request.user.username }}[/url] has reported [url={{ post.author.get_url }}]{{ post.author.username }}[/url] for the following post:
+[url={{ request.user.get_url }}]{{ request.user.username }}[/url] has reported [url={{ post.author.get_url }}]{{ post.author.username }}[/url] for the following post ([url={{ post.get_url }}]link[/url]):
                                                                                 
 {{ post.quote_content }}                                                        
                                                                                 
