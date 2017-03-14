@@ -23,7 +23,7 @@
         </a>
       {% endif %}
 
-      {% if user.is_admin %}
+      {% if user.is_authenticated and user.is_admin %}
         <a href="{% url 'admin:ISS_post_change' post.pk %}"
            class="admin-edit-post">
           admin
