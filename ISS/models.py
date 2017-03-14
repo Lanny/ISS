@@ -138,8 +138,14 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
        return Ban.objects.filter(subject=self, end_date__gt=timezone.now())
 
     def is_banned(self):
+        if not self.is_active:
+            return True
+
         pending_bans = self.get_pending_bans()
-        return bool(pending_bans.count() or not self.is_active)
+        if pending_bans.count() > 1:
+            return True
+
+        return False
 
     def get_ban_reason(self):
         pending_bans = self.get_pending_bans().order_by('-end_date')
