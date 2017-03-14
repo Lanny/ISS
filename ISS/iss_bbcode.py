@@ -5,12 +5,6 @@ import re
 class EmbeddingNotSupportedException(Exception):
     pass
 
-def context_sensitive_linker(url, context):
-    try:
-        return _video_markup_for_url(url)
-    except EmbeddingNotSupportedException:
-        return '<a href="%s">%s</a>' % (url, url)
-
 _yt_embed_pattern = ('<iframe width="640" height="480" '
     'src="https://www.youtube.com/embed/%s?start=%s" frameborder="0" '
     'allowfullscreen></iframe>')
@@ -178,9 +172,7 @@ _supported_tags = {
 
 def build_parser(tags, escape_html=True):
     parser = bbcode.Parser(
-        escape_html=escape_html,
-        linker_takes_context=True,
-        linker=context_sensitive_linker)
+        escape_html=escape_html)
 
     for tag in tags:
         _supported_tags[tag](parser)

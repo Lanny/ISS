@@ -22,6 +22,28 @@ class DurationField(forms.Field):
 
         return delta
 
+class BBCodeField(forms.CharField):
+    def clean(self, value):
+        value = super(BBCodeField, self).clean(value)
+
+        if not isinstance(value, basestring):
+            # Probably none, field might be optional, in any case there's no
+            # use trying to parse this thing.
+            return value
+
+        counts = utils.get_tag_distribution(value)
+        embedded_tags = counts['video'] + counts['img'] + counts['bc']
+        max_embeds = utils.get_config('max_embedded_items')
+
+        if embedded_tags > max_embeds:
+            raise ValidationError(
+                ('BBCode must contain %d or fewer embedded items. '
+                 'Contained %d.') % (max_embeds, embedded_tags),
+                code='TOO_MANY_EMBEDS')
+
+        return value
+
+
 class CaptchaForm(forms.Form):
     def clean(self, *args, **kwargs):
         if not utils.get_config('recaptcha_settings'):
@@ -67,10 +89,10 @@ class NewThreadForm(forms.Form):
                             max_length=1000,
                             min_length=thread_min_len)
 
-    content = forms.CharField(label='Post Body',
-                              min_length=post_min_len,
-                              max_length=post_max_len,
-                              widget=forms.Textarea())
+    content = BBCodeField(label='Post Body',
+                           min_length=post_min_len,
+                           max_length=post_max_len,
+                           widget=forms.Textarea())
 
     forum = forms.ModelChoiceField(queryset=Forum.objects.all(),
                                    widget=forms.HiddenInput())
@@ -104,10 +126,10 @@ class NewPostForm(forms.Form):
     post_min_len = utils.get_config('min_post_chars')
     post_max_len = utils.get_config('max_post_chars')
 
-    content = forms.CharField(label='Reply',
-                              min_length=post_min_len,
-                              max_length=post_max_len,
-                              widget=forms.Textarea())
+    content = BBCodeField(label='Reply',
+                           min_length=post_min_len,
+                           max_length=post_max_len,
+                           widget=forms.Textarea())
 
     thread = forms.ModelChoiceField(queryset=Thread.objects.all(),
                                     widget=forms.HiddenInput())
@@ -165,9 +187,9 @@ class EditPostForm(forms.Form):
     post = forms.ModelChoiceField(queryset=Post.objects.all(),
                                   widget=forms.HiddenInput())
     
-    content = forms.CharField(label='Content',
-                              min_length=post_min_len,
-                              widget=forms.Textarea())
+    content = BBCodeField(label='Content',
+                          min_length=post_min_len,
+                          widget=forms.Textarea())
 
     def save(self, editor=None):
         post = self.cleaned_data['post']
@@ -246,10 +268,10 @@ class ReportPostForm(CaptchaForm):
         choices=utils.get_config('report_reasons'),
         required=True)
 
-    explanation = forms.CharField(label='Explanation for reporting',
-                                  min_length=post_min_len,
-                                  max_length=post_max_len,
-                                  widget=forms.Textarea())
+    explanation = BBCodeField(label='Explanation for reporting',
+                               min_length=post_min_len,
+                               max_length=post_max_len,
+                               widget=forms.Textarea())
 
     def clean_post(self):
         author = self.cleaned_data['post'].author
@@ -342,10 +364,10 @@ class NewPrivateMessageForm(forms.Form):
 
     to = forms.CharField(label='To', max_length=512)
 
-    content = forms.CharField(label='Reply',
-                              min_length=post_min_len,
-                              max_length=post_max_len,
-                              widget=forms.Textarea())
+    content = BBCodeField(label='Reply',
+                           min_length=post_min_len,
+                           max_length=post_max_len,
+                           widget=forms.Textarea())
 
 
     _author = None
