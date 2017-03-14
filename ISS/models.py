@@ -291,7 +291,8 @@ class Thread(models.Model):
             return None
 
         post = (self.get_posts_in_thread_order()
-            .filter(created__gt=preceeding_date))[0]
+            .filter(created__gt=preceeding_date)
+            .first())
 
         return post
 
