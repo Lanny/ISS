@@ -284,8 +284,7 @@ class UserProfile(utils.MethodSplitView):
         
 
 class NewThread(utils.MethodSplitView):
-    login_required = True
-    active_required = True
+    unbanned_required = True
 
     def GET(self, request, forum_id):
         forum = get_object_or_404(Forum, pk=forum_id)
@@ -363,8 +362,6 @@ class NewReply(utils.MethodSplitView):
             return render(request, 'new_post.html', ctx)
 
 class EditPost(utils.MethodSplitView):
-    login_required = True
-    active_required = True
     unbanned_required = True
     
     def GET(self, request, post_id):
@@ -480,7 +477,6 @@ class RegisterUser(utils.MethodSplitView):
 
 class ThankPost(utils.MethodSplitView):
     require_login = True
-    active_required = True
     unbanned_required = True
 
     def POST(self, request, post_id):
@@ -503,7 +499,7 @@ class ThankPost(utils.MethodSplitView):
 
 class UnthankPost(utils.MethodSplitView):
     require_login = True
-    active_required = True
+    unbanned_required = True
 
     def POST(self, request, post_id):
         post = get_object_or_404(Post, pk=post_id)
