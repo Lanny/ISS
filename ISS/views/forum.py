@@ -5,9 +5,9 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
-from django.db.models import Max, F
+from django.db.models import Count, Max, F
 from django.http import (HttpResponseRedirect, HttpResponseBadRequest,
-    JsonResponse, HttpResponseForbidden)
+    JsonResponse, HttpResponseForbidden, HttpResponse)
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.views.decorators.cache import cache_control, cache_page
@@ -723,3 +723,24 @@ class StaticPage(utils.MethodSplitView):
     
     def __call__(self, request):
         return render(request, 'static_page.html', self.page_config)
+
+def humans(request):
+    humans = utils.get_config('humans')
+
+    s = '/* THOSE RESPONSIBLE */\n\n'
+
+    for role, name, contact in humans:
+        s += '%s: %s\nContact: %s\n\n' % (role, name, contact)
+
+    top_posters = (Poster.objects.all()
+        .annotate(num_posts=Count('post'))
+        .order_by('num_posts'))[:3]
+
+    if top_posters:
+        s += '\n/* TOP SHITPOSTERS */\n\n'
+
+        for poster in top_posters:
+            s += 'Top Shitposter: %s\nContact: %s\nDamage Done: %d\n\n' % (
+                poster.username, poster.get_url(), poster.num_posts)
+
+    return HttpResponse(s, content_type='text/plain')

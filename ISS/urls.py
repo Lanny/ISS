@@ -24,6 +24,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^houston/', include('Houston.urls')),
 
+    url(r'^humans.txt$', views.forum.humans, name='humans'),
+
     url('^thread/(?P<thread_id>\d+)/?$',
         views.forum.thread,
         name='thread'),
@@ -44,7 +46,7 @@ urlpatterns = [
     url('^latest-threads/?$',
         views.forum.latest_threads,
         name='latest-threads'),
-    url(r'^/?$',
+    url(r'^$',
         views.forum.forum_index,
         name='forum-index'), 
     url(r'^register/$',

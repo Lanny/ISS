@@ -58,13 +58,20 @@ config_defaults = {
         ('FORM', 'Logout', 'logout', 'is_authenticated', None),
         ('RLINK', 'Register', 'register', 'is_not_authenticated', None),
     ),
-    'static_pages': ()
+    'static_pages': (),
+    'humans': (
+        ('Lead Alcoholic', 'Ryan "Lanny" Jenkins', 'lan.rogers.book@gmail.com'),
+        ('Pedophile Tech Support', 'Sophie', ''),
+    )
 }
 
 config = config_defaults.copy()
 config.update(settings.FORUM_CONFIG)
 config['title_ladder'] = sorted(config['title_ladder'], key=lambda x: x[0],
                                 reverse=True)
+our_humans = config_defaults['humans'] 
+their_humans = settings.FORUM_CONFIG.get('humans', ()) 
+config['humans'] = our_humans + their_humans
 
 class MethodSplitView(object):
     def __call__(self, request, *args, **kwargs):
