@@ -734,7 +734,7 @@ def humans(request):
 
     top_posters = (Poster.objects.all()
         .annotate(num_posts=Count('post'))
-        .order_by('num_posts'))[:3]
+        .order_by('-num_posts'))[:3]
 
     if top_posters:
         s += '\n/* TOP SHITPOSTERS */\n\n'
