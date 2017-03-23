@@ -28,10 +28,10 @@
 
               if (e.hasClass('closed')) {
                 e.removeClass('closed').addClass('open')
-                tab.find('.label').text('Show');
+                tab.find('.label').text('Hide');
               } else {
                 e.removeClass('open').addClass('closed')
-                tab.find('.label').text('Hide');
+                tab.find('.label').text('Show');
               }
             })
           });
