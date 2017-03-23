@@ -118,7 +118,6 @@ def _add_quote_tag(parser):
             return '<blockquote>%s</blockquote>' % value
 
     parser.add_formatter('quote',
-
                          render_quote,
                          strip=True,
                          swallow_trailing_newline=True)
@@ -162,7 +161,7 @@ def _add_link_tag(parser):
 
 def _add_spoiler_tag(parser):
     template = '''
-        <div class="spoiler">
+        <div class="spoiler closed">
             <div class="tab">
                 <span class="label">Show</span>
                 <span class="name">%s</span>

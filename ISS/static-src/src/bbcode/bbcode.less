@@ -3,18 +3,28 @@
 .spoiler {
   display: block;
 
-  .tab {
+  &.open {
+    > .tab {
+      border-bottom-left-radius: 0px;
+      border-bottom-right-radius: 0px;
+    }
+
+    > .content {
+      display: block;
+    }
+  }
+
+  > .tab {
     display: inline-block;
     background-color: @bg_teal;
     color: white;
-    border-top-right-radius: 5px;
-    border-top-left-radius: 5px;
+    border-radius: 5px;
     padding: 5px 15px;
     text-align: center;
     cursor: pointer;
   }
 
-  .content {
+  > .content {
     display: none;
 
     background-color: @bg_light;

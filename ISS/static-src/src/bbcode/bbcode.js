@@ -3,36 +3,35 @@
     var Module = {
       bindRegion: function(region) {
         region = $(region);
-        this.bindSpoilerHandlers(region);
-        this.embedBandcampLinks(region);
+        Module.bindSpoilerHandlers(region);
+        Module.embedBandcampLinks(region);
       },
       bindSpoilerHandlers: function(region) {
         region.find('.spoiler')
           .each(function(_, e) {
             e = $(e);
 
-            if (e.data('contentVisible') !== undefined) {
+            if (e.data('spoilerInited') !== undefined) {
               return;
             }
+            e.data('spoilerInited', true);
 
-            e.data('contentVisible', false);
             var tab = e.children('.tab'),
               content = e.children('.content');
 
             tab.on('click', function() {
               if (content.attr('data-content')) {
                 content.html(content.attr('data-content'));
-                content.removeAttr('data-content')
+                content.removeAttr('data-content');
+                Module.bindRegion(content);
               }
 
-              if (e.data('contentVisible')) {
+              if (e.hasClass('closed')) {
+                e.removeClass('closed').addClass('open')
                 tab.find('.label').text('Show');
-                content.css('display', 'none');
-                e.data('contentVisible', false);
               } else {
+                e.removeClass('open').addClass('closed')
                 tab.find('.label').text('Hide');
-                content.css('display', 'block');
-                e.data('contentVisible', true);
               }
             })
           });
