@@ -193,7 +193,8 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
             'QUOTE',
             'CODE',
             'BC',
-            'LINK'
+            'LINK',
+            'SPOILER'
         ), escape_html=escape_html)
 
 def get_closure_bbc_parser():

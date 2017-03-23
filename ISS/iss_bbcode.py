@@ -1,6 +1,7 @@
 import bbcode
 import urlparse
 import re
+from django.utils import html
 
 class EmbeddingNotSupportedException(Exception):
     pass
@@ -159,6 +160,25 @@ def _add_link_tag(parser):
 
     return parser
 
+def _add_spoiler_tag(parser):
+    template = '''
+        <div class="spoiler">
+            <div class="tab">
+                <span class="label">Show</span>
+                <span class="name">%s</span>
+            </div>
+            <div class="content" data-content="%s"></div>
+        </div>
+    '''
+
+    def render_spoiler(tag_name, value, options, parent, context):
+       return template % (options.get(tag_name, 'spoiler'), html.escape(value))
+
+    parser.add_formatter('spoiler', render_spoiler)
+    return parser
+
+
+
 _supported_tags = {
     'IMG': _add_img_tag,
     'NO_IMG': _add_img_stub_tag,
@@ -167,7 +187,8 @@ _supported_tags = {
     'VIDEO': _add_video_tag,
     'CODE': _add_code_tag,
     'BC': _add_bc_tag,
-    'LINK': _add_link_tag
+    'LINK': _add_link_tag,
+    'SPOILER': _add_spoiler_tag
 }
 
 def build_parser(tags, escape_html=True):

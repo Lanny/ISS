@@ -112,7 +112,7 @@
     })();
   };
 
-  function wrap($, config) {
+  function wrap($, config, bbcode) {
     function peek() {
       var peekaboo = $('.peekaboo').first();
 
@@ -123,27 +123,12 @@
       });
     }
 
-    function embedBandcampLinks(target) {
-      $(target).find('.unproc-embed')
-        .each(function(i, e) {
-          var $e = $(e),
-            href = $e.attr('href');
-
-          $.getJSON(config.getConfig('bandcamp-embed-url'), {url: href})
-            .done(function(data) {
-              if (data.status && data.status === 'SUCCESS') {
-                $e.replaceWith($(data.embedCode));
-              }
-            })
-        });
-    }
-
     $(document).on('click', '.hyper-drive', function() {
       startHyperDrive();
     });
 
     $(function() {
-      embedBandcampLinks(document);
+      bbcode.bindRegion($('.page-content'));
       shakeBaby($('.ex'), 10);
       window.setTimeout(peek, Math.random()*1000*60*60);
     })
@@ -151,7 +136,8 @@
 
   require([
     'jquery',
-    'config'
+    'config',
+    'bbcode'
   ], wrap);
 })();
 
