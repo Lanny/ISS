@@ -114,7 +114,8 @@
 
   function wrap($, config, bbcode) {
     function peek() {
-      var peekaboo = $('.peekaboo').first();
+      var peekaboo = $('.peekaboo').first()
+        .css('display', 'block');
 
       peekaboo.animate({'left': -100}, 1500, 'linear', function() {
         window.setTimeout(function() {
