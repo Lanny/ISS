@@ -1,5 +1,5 @@
 ;(function() {
-  function wrap($) {
+  function wrap($, config) {
     var Module = {
       bindRegion: function(region) {
         region = $(region);
@@ -56,6 +56,7 @@
   }
 
   define([
-    'jquery'
+    'jquery',
+    'config'
   ], wrap);
 })();
