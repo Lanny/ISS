@@ -8,7 +8,6 @@ from django.contrib.auth.models import AnonymousUser
 
 from ISS import utils
 
-
 banners = os.listdir(os.path.join('ISS/static', utils.get_config('banner_dir')))
 banners = [x for x in banners if re.match(r'.*\.(gif|png|jpg)', x)]
 

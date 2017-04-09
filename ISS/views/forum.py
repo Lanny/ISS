@@ -744,3 +744,8 @@ def humans(request):
                 poster.username, poster.get_url(), poster.num_posts)
 
     return HttpResponse(s, content_type='text/plain')
+
+@cache_page(60 * 24 * 7)
+@cache_control(max_age=60*24)
+def smilies_css(request):
+    return render(request, 'smilies.css', content_type='text/css')

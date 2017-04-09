@@ -26,6 +26,8 @@ urlpatterns = [
 
     url(r'^humans.txt$', views.forum.humans, name='humans'),
 
+    url(r'^smilies.css', views.forum.smilies_css, name='smilies-css'),
+
     url('^thread/(?P<thread_id>\d+)/?$',
         views.forum.thread,
         name='thread'),

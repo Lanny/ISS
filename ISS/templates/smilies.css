@@ -1,0 +1,6 @@
+{% load static %}
+@charset "UTF-8";
+
+{% for code, file in config.shortcode_map.items %}
+  .shortcode.{{ code }} {content:url('{% static 'img/gif/'|add:file %}');}
+{% endfor %}

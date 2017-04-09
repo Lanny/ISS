@@ -87,7 +87,7 @@
       {% include "require.html" with bootstrap="base" %} 
     {% endblock %}
 
-    {% include "smilies.html" %}
+    <link rel="stylesheet" href="{% url 'smilies-css' %}">
     {% include "Houston/tracking.html" %} 
   </body>
 </html>

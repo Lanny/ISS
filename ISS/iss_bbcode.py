@@ -18,10 +18,7 @@ class PreprocessingParser(bbcode.Parser):
 
     def format(self, data, **context):
         data = reduce(lambda a, f: f(a), self._preprocessors, data)
-        print 'hai'
-        print data
         return super(PreprocessingParser, self).format(data, **context)
-
 
 _yt_embed_pattern = ('<iframe width="640" height="480" '
     'src="https://www.youtube.com/embed/%s?start=%s" frameborder="0" '
