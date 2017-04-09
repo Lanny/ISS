@@ -1,0 +1,41 @@
+{% load static %}
+
+<!-- doctype html -->
+<html>
+  <head>
+  </head>
+
+
+{% load staticfiles %}
+
+<!doctype html>
+<html>
+  <head>
+    <title>
+      {{ config.forum_name }} - Smilies
+    </title>
+    
+    <link rel="author" href="{% url 'humans' %}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <style>
+    </style>
+  </head>
+  <body>
+    <h1>Smiley Refrence</h1>
+    <table>
+      <tr>
+        <th>Smiley</th>
+        <th>Shortcode</th>
+      </tr>
+
+      {% for code, file in config.shortcode_map.items|dictsort:0 %}
+        <tr>
+          <td><img src="{% static 'img/gif/'|add:file %}"></td>
+          <td>:{{ code }}:</td>
+        </tr>
+      {% endfor %}
+    </table>
+    {% include "Houston/tracking.html" %} 
+  </body>
+</html>
+

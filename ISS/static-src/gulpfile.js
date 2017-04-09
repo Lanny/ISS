@@ -8,14 +8,22 @@ var minifyCSS = require('gulp-minify-css');
 var requirejsOptimize = require('gulp-requirejs-optimize');
 var concat = require('gulp-concat');
 var svg = require('gulp-svg-inline-css');
+var clean = require('gulp-clean');
 
 var staticDir = '../static',
-  jsDir = path.join(staticDir, 'js'),
+  jsDir = path.join(staticDir, '/js'),
+  cssDir = path.join(staticDir, '/css'),
+  gifDir = path.join(staticDir, '/img/gif'),
   optimizeModules = [
     'thread.js',
     'editor-bootstrap.js',
     'base.js'
   ];
+
+gulp.task('clean', function() {
+  return gulp.src([ gifDir, cssDir, jsDir ])
+    .pipe(clean({read: false, force: true}));
+});
  
 gulp.task('icons', function() {
   return gulp.src('src/assets/svg/*.svg')
@@ -28,7 +36,7 @@ gulp.task('icons', function() {
 
 gulp.task('smilies', function() {
   return gulp.src('src/assets/gif/*')
-    .pipe(gulp.dest('../static/img/gif'));
+    .pipe(gulp.dest(gifDir));
 });
 
 gulp.task('less', ['icons'], function() {
@@ -47,7 +55,7 @@ gulp.task('less', ['icons'], function() {
   stream = argv.optimize ? stream : stream.pipe(sourcemaps.write());
   stream = stream.pipe(flatten());
   stream = argv.optimize ? stream.pipe(minifyCSS()) : stream;
-  stream = stream.pipe(gulp.dest('../static/css'));
+  stream = stream.pipe(gulp.dest(cssDir));
 
   return stream;
 });
@@ -71,7 +79,7 @@ gulp.task('optimize-js', ['javascript'], function() {
     .pipe(gulp.dest('../static/js'));
 });
 
-var generateTasks = ['less', 'smilies']
+var generateTasks = ['clean', 'less', 'smilies']
 generateTasks.push(argv.optimize ? 'optimize-js' : 'javascript');
 gulp.task('generate', generateTasks);
 

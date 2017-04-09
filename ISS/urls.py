@@ -17,6 +17,7 @@ from django.conf import settings
 from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.views.generic import TemplateView
 
 from ISS import views, utils
 
@@ -27,6 +28,9 @@ urlpatterns = [
     url(r'^humans.txt$', views.forum.humans, name='humans'),
 
     url(r'^smilies.css', views.forum.smilies_css, name='smilies-css'),
+    url(r'^smiley-refrence',
+        TemplateView.as_view(template_name="smilies_refrence.html"),
+        name='smilies-refrence'),
 
     url('^thread/(?P<thread_id>\d+)/?$',
         views.forum.thread,
