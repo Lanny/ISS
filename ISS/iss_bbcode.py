@@ -1,10 +1,27 @@
 import bbcode
 import urlparse
 import re
+import utils
 from django.utils import html
+
+shortcode_pat = None
+shortcode_map = None
 
 class EmbeddingNotSupportedException(Exception):
     pass
+
+class PreprocessingParser(bbcode.Parser):
+    _preprocessors = []
+
+    def add_preprocessor(self, preprocessor):
+        self._preprocessors.append(preprocessor)
+
+    def format(self, data, **context):
+        data = reduce(lambda a, f: f(a), self._preprocessors, data)
+        print 'hai'
+        print data
+        return super(PreprocessingParser, self).format(data, **context)
+
 
 _yt_embed_pattern = ('<iframe width="640" height="480" '
     'src="https://www.youtube.com/embed/%s?start=%s" frameborder="0" '
@@ -176,7 +193,47 @@ def _add_spoiler_tag(parser):
     parser.add_formatter('spoiler', render_spoiler)
     return parser
 
+def _add_shortcode_preprocessor(parser):
+    global shortcode_pat
+    global shortcode_map
 
+    if not shortcode_map:
+        shortcode_map = utils.get_config('shortcode_map')
+
+    if not shortcode_pat:
+        scp = []
+        for name, _ in shortcode_map.items():
+            scp.append(name)
+
+        shortcode_pat = re.compile(':(%s):' % '|'.join(scp), flags=re.IGNORECASE)
+
+
+    def _preprocess_shortcode(text):
+        def _repl(match):
+            name = match.group(1)
+            if name in shortcode_map:
+                return '[shortcode]%s[/shortcode]' % name
+            else:
+                return match.group(0)
+
+        return re.sub(shortcode_pat, _repl, text)
+
+    parser.add_preprocessor(_preprocess_shortcode)
+    return parser
+
+def _add_shortcode_tag(parser):
+    global shortcode_map
+
+    def render_shortcode(tag_name, value, options, parent, context):
+        if value in shortcode_map:
+            return '<img class="shortcode %s"></img>' % value
+        else:
+            return value
+
+    parser = _add_shortcode_preprocessor(parser)
+    parser.add_formatter('shortcode', render_shortcode)
+
+    return parser
 
 _supported_tags = {
     'IMG': _add_img_tag,
@@ -187,12 +244,12 @@ _supported_tags = {
     'CODE': _add_code_tag,
     'BC': _add_bc_tag,
     'LINK': _add_link_tag,
-    'SPOILER': _add_spoiler_tag
+    'SPOILER': _add_spoiler_tag,
+    'SHORTCODE': _add_shortcode_tag
 }
 
 def build_parser(tags, escape_html=True):
-    parser = bbcode.Parser(
-        escape_html=escape_html)
+    parser = PreprocessingParser(escape_html=escape_html)
 
     for tag in tags:
         _supported_tags[tag](parser)

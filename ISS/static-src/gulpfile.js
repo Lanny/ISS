@@ -26,6 +26,11 @@ gulp.task('icons', function() {
     .pipe(gulp.dest('src/base'));
 });
 
+gulp.task('smilies', function() {
+  return gulp.src('src/assets/gif/*')
+    .pipe(gulp.dest('../static/img/gif'));
+});
+
 gulp.task('less', ['icons'], function() {
 
   var lessStream = less({
@@ -66,12 +71,13 @@ gulp.task('optimize-js', ['javascript'], function() {
     .pipe(gulp.dest('../static/js'));
 });
 
-var generateTasks = ['less']
+var generateTasks = ['less', 'smilies']
 generateTasks.push(argv.optimize ? 'optimize-js' : 'javascript');
 gulp.task('generate', generateTasks);
 
 gulp.task('watch', ['generate'], function() {
   gulp.watch([ './src/assets/svg/*.svg' ], ['icons']);
+  gulp.watch([ './src/assets/gif/*' ], ['smilies']);
   gulp.watch([ './src/**/*.less' ], ['less']);
   gulp.watch([ './src/**/*.js' ], ['javascript']);
 });

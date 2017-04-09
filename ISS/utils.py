@@ -1,6 +1,7 @@
 import urlparse
 import urllib2
 import re
+import os
 import datetime
 import bbcode
 import collections
@@ -21,6 +22,27 @@ from ISS import iss_bbcode
 
 DO_NOT_LINK_TAGS = { 'video', 'pre' }
 TIME_DELTA_FORMAT = re.compile(r'^\s*((?P<days>\d+)d)?\s*((?P<hours>\d+?)h)?\s*((?P<minutes>\d+?)m)?\s*$')
+
+class GlobShortcodeRegistrar(object):
+    _directory = None
+
+    def __init__(self, directory):
+        self._directory = directory
+
+    def get_shortcode_map(self):
+        sc_map = {}
+
+        files = os.listdir(os.path.join('ISS/static', self._directory))
+        for filename in files:
+            match = re.match(r'(.+)\.(gif|png|jpg)', filename)
+
+            if not match:
+                continue
+            
+            name, ext = match.groups()
+            sc_map[name] = name + '.' + ext
+
+        return sc_map
 
 config_defaults = {
     'forum_name': 'INTERNATIONAL SPACE STATION',
@@ -62,16 +84,21 @@ config_defaults = {
     'humans': (
         ('Lead Alcoholic', 'Ryan "Lanny" Jenkins', 'lan.rogers.book@gmail.com'),
         ('Pedophile Tech Support', 'Sophie', ''),
-    )
+    ),
+    'shortcode_registrar': GlobShortcodeRegistrar('img/gif/')
 }
 
 config = config_defaults.copy()
 config.update(settings.FORUM_CONFIG)
+
 config['title_ladder'] = sorted(config['title_ladder'], key=lambda x: x[0],
                                 reverse=True)
+
 our_humans = config_defaults['humans'] 
 their_humans = settings.FORUM_CONFIG.get('humans', ()) 
 config['humans'] = our_humans + their_humans
+
+config['shortcode_map'] = config['shortcode_registrar'].get_shortcode_map()
 
 class MethodSplitView(object):
     def __call__(self, request, *args, **kwargs):
@@ -194,7 +221,8 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
             'CODE',
             'BC',
             'LINK',
-            'SPOILER'
+            'SPOILER',
+            'SHORTCODE'
         ), escape_html=escape_html)
 
 def get_closure_bbc_parser():
