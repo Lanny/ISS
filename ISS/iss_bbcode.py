@@ -223,7 +223,7 @@ def _add_shortcode_tag(parser):
 
     def render_shortcode(tag_name, value, options, parent, context):
         if value in shortcode_map:
-            return '<img class="shortcode %s"></img>' % value
+            return '<i class="shortcode %s"></i>' % value
         else:
             return value
 
