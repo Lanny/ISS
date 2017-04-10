@@ -277,8 +277,8 @@ class Thread(models.Model):
     def get_post_count(self):
         return self.post_set.count()
 
-    def get_posts_in_thread_order(self):
-        return self.post_set.order_by('created')
+    def get_posts_in_thread_order(self, reverse=False):
+        return self.post_set.order_by('-created' if reverse else 'created')
 
     def get_url(self):
         return reverse('thread', kwargs={'thread_id': self.pk})
@@ -505,7 +505,7 @@ class Ban(models.Model):
         return self.end_date > now
 
 @receiver(models.signals.post_save, sender=Post)
-def update_thread_last_update(sender, instance, created, **kwargs):
+def update_thread_last_update_on_insert(sender, instance, created, **kwargs):
     if not created:
         # Edits don't bump threads.
         return
@@ -515,6 +515,13 @@ def update_thread_last_update(sender, instance, created, **kwargs):
     if thread.last_update < instance.created:
         thread.last_update = instance.created
         thread.save()
+
+@receiver(models.signals.post_delete, sender=Post)
+def update_thread_last_update_on_delete(sender, instance, **kwargs):
+    thread = instance.thread
+    instance = thread.get_posts_in_thread_order(reverse=True)[0]
+    thread.last_update = instance.created
+    thread.save()
 
 @receiver(models.signals.post_save, sender=Thread)
 def update_forum_last_update(sender, instance, created, **kwargs):
