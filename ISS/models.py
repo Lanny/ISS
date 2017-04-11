@@ -500,8 +500,6 @@ class Ban(models.Model):
         if not now:
             now = timezone.now()
 
-        print now,
-        print self.end_date
         return self.end_date > now
 
 @receiver(models.signals.post_save, sender=Post)
