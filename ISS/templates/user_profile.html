@@ -98,7 +98,7 @@
       </div>
     </div>
 
-    {% if settings_form %}
+    {% if user.pk == poster.pk %}
       <div class="profile-settings">
         <form action="{% url 'user-profile' poster.pk %}" method="POST">
           <h3>User Settings</h3>
