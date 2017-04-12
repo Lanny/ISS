@@ -7,16 +7,24 @@ from django.http import Http404
 
 from ISS.models import *
 
-class TimezoneMiddleware(object):
-    def process_request(self, request):
+class BaseMiddleware(object):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        return self.get_response(request)
+    
+
+class TimezoneMiddleware(BaseMiddleware):
+    def __call__(self, request):
         if request.user.is_authenticated():
             timezone.activate(pytz.timezone(request.user.timezone))
         else:
             timezone.activate('UTC')
 
-        return None
+        return self.get_response(request)
 
-class PMAdminMiddleware(object):
+class PMAdminMiddleware(BaseMiddleware):
     def process_exception(self, request, exception):
         if settings.DEBUG:
             return None
