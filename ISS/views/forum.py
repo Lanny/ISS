@@ -70,6 +70,15 @@ def thread(request, thread_id):
 
     return response
 
+class UnsubscribeFromThread(utils.MethodSplitView):
+    login_required = True
+
+    def POST(self, request, thread_id):
+        thread = get_object_or_404(Thread, pk=thread_id)
+        thread.unsubscribe(request.user)
+
+        return HttpResponseRedirect(request.POST.get('next', '/'))
+
 def redirect_to_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     thread = post.thread

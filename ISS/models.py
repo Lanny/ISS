@@ -340,10 +340,17 @@ class Thread(models.Model):
 
         flag.save()
 
+    def is_subscribed(self, user):
+        return self._get_flag(user, save=False).subscribed
+
     def subscribe(self, user):
         flag = self._get_flag(user, save=False)
         flag.subscribed = True
+        flag.save()
 
+    def unsubscribe(self, user):
+        flag = self._get_flag(user, save=False)
+        flag.subscribed = False
         flag.save()
 
     def __unicode__(self):

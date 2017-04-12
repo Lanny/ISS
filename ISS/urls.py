@@ -41,6 +41,9 @@ urlpatterns = [
     url('^thread/(?P<thread_id>\d+)/new-reply/?$',
         views.forum.NewReply.as_view(),
         name='new-reply'),
+    url('^thread/(?P<thread_id>\d+)/unsubscribe$',
+        views.forum.UnsubscribeFromThread.as_view(),
+        name='unsubscribe'),
 
     url('^forum/(?P<forum_id>\d+)/new-thread$',
         views.forum.NewThread.as_view(),

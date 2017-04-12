@@ -273,7 +273,7 @@ class ThreadFascet(object):
     def __getitem__(self, field):
         prop = getattr(self._thread, field)
 
-        if field in ('has_unread_posts', 'get_jump_post'):
+        if field in ('has_unread_posts', 'is_subscribed', 'get_jump_post'):
             return prop(self._request.user)
 
         elif callable(prop):

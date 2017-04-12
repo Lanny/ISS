@@ -79,7 +79,7 @@ gulp.task('optimize-js', ['javascript'], function() {
     .pipe(gulp.dest('../static/js'));
 });
 
-var generateTasks = ['clean', 'less', 'smilies']
+var generateTasks = ['less', 'smilies']
 generateTasks.push(argv.optimize ? 'optimize-js' : 'javascript');
 gulp.task('generate', generateTasks);
 

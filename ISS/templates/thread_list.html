@@ -43,6 +43,17 @@
         {{ thread.get_author.username }}
       </a>
 
+      {% if user.is_authenticated and thread.is_subscribed %}
+        <form class="unsubscribe-form"
+              action="{% url 'unsubscribe' thread.pk %}"
+              method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          (<input type="submit" value="unsubscribe" />)
+        </form>
+      {% endif %}
+      
+
       {% spaceless %}
       <ul class="mobile-thread-controls">
         {% with oldest_undread_post=thread.get_jump_post %}
