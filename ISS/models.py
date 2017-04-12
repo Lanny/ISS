@@ -22,7 +22,7 @@ class TSVectorLookup(models.Lookup):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params = lhs_params + rhs_params
-        sql = 'to_tsvector(\'english\', %s) @@ to_tsquery(\'english\', %s)' % (
+        sql = 'to_tsvector(\'english\', %s) @@ plainto_tsquery(\'english\', %s)' % (
             lhs, rhs)
 
         return sql, params
