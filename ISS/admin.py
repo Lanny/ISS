@@ -6,9 +6,15 @@ admin.site.register(Forum)
 admin.site.register(Thread)
 admin.site.register(Thanks)
 
+class BanInline(admin.TabularInline):
+    model = Ban
+    fk_name = 'subject'
+    extra = 0
+
 @admin.register(Poster)
 class PosterAdmin(admin.ModelAdmin):
     exclude = ('avatar',)
+    inlines = [BanInline]
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
@@ -27,3 +33,7 @@ class PrivateMessageAdmin(admin.ModelAdmin):
 @admin.register(FilterWord)
 class FilterWordAdmin(admin.ModelAdmin):
     list_display = ('pattern', 'replacement', 'active')
+
+@admin.register(Ban)
+class BanAdmin(admin.ModelAdmin):
+    list_display = ('subject', 'reason', 'start_date', 'end_date', 'given_by')

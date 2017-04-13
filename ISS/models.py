@@ -509,6 +509,10 @@ class Ban(models.Model):
 
         return self.end_date > now
 
+    def __unicode__(self):
+        return u'Ban on %s for reason: %s' % (
+            self.subject.username, self.reason)
+
 @receiver(models.signals.post_save, sender=Post)
 def update_thread_last_update_on_insert(sender, instance, created, **kwargs):
     if not created:
