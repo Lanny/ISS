@@ -20,7 +20,7 @@ class PreprocessingParser(bbcode.Parser):
         data = reduce(lambda a, f: f(a), self._preprocessors, data)
         return super(PreprocessingParser, self).format(data, **context)
 
-_yt_embed_pattern = ('<iframe width="640" height="480" '
+_yt_embed_pattern = ('<iframe width="640" height="480" class="yt-embed" '
     'src="https://www.youtube.com/embed/%s?start=%s" frameborder="0" '
     'allowfullscreen></iframe>')
 
