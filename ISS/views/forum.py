@@ -375,7 +375,10 @@ class NewReply(utils.MethodSplitView):
         form = forms.NewPostForm(request.POST, author=author)
 
         if form.is_valid():
-            post = form.save()
+            post = form.get_post()
+            post.posted_from = request.META.get(
+                    utils.get_config('client_ip_field'), None)
+            post.save()
 
             if request.user.auto_subscribe == 1:
                 thread.subscribe(request.user)

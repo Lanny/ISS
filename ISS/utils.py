@@ -85,7 +85,8 @@ config_defaults = {
         ('Lead Alcoholic', 'Ryan "Lanny" Jenkins', 'lan.rogers.book@gmail.com'),
         ('Pedophile Tech Support', 'Sophie', ''),
     ),
-    'shortcode_registrar': GlobShortcodeRegistrar('img/gif/')
+    'shortcode_registrar': GlobShortcodeRegistrar('img/gif/'),
+    'client_ip_field': 'REMOTE_ADDR'
 }
 
 config = config_defaults.copy()

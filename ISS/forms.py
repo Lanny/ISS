@@ -169,14 +169,11 @@ class NewPostForm(forms.Form):
 
         return self.cleaned_data
 
-    @transaction.atomic
-    def save(self):
+    def get_post(self):
         self.post = Post(
             thread=self.cleaned_data['thread'],
             content=self.cleaned_data['content'],
             author=self._author)
-
-        self.post.save()
 
         return self.post
 

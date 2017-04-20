@@ -363,6 +363,8 @@ class Post(models.Model):
     content = models.TextField()
     author = models.ForeignKey(Poster)
 
+    posted_from = models.GenericIPAddressField(null=True)
+
     def quote_content(self):
         parser = utils.get_closure_bbc_parser()
         body = parser.format(self.content)
