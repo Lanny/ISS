@@ -203,6 +203,14 @@ class EditPostForm(forms.Form):
 
         post.save()
 
+
+class ThreadActionForm(forms.Form):
+    action = forms.ChoiceField(
+        label="Action",
+        required=True,
+        choices=(('edit-thread', 'Edit Thread'),))
+
+
 class ISSAuthenticationForm(AuthenticationForm):
     def clean_username(self):
         """

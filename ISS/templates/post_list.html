@@ -1,64 +1,66 @@
 {% load util_tags %}
 {% load bbc %}
 
-<ol class="post-list">
-{% for post in posts %}
-  <li class="post" id="post-{{ post.pk }}">
-    <div class="post-hat">
-      <span class="post-data">
-        {{ post.created|date:"Y-m-d" }} at
-        {{ post.created|time:"f A e" }}
+{% with selectable=request.user.is_staff %}
+  <ol class="post-list">
+  {% for post in posts %}
+    <li class="post" id="post-{{ post.pk }}">
+      <div class="post-hat">
+        <span class="post-data">
+          {{ post.created|date:"Y-m-d" }} at
+          {{ post.created|time:"f A e" }}
 
-        {% if show_thread_context %}
-          in
-          <a href="{{ post.get_url }}">
-            {{ post.thread.title|word_filter }}
+          {% if show_thread_context %}
+            in
+            <a href="{{ post.get_url }}">
+              {{ post.thread.title|word_filter }}
+            </a>
+          {% endif %}
+        </span>
+
+        {% if not show_thread_context %}
+          <input type="checkbox" class="select-post" name="select-{{ post.pk }}" />
+          <a href="{{ post.get_url }}" class="post-number">
+            #{{ forloop.counter0|add:posts.start_index }}
           </a>
         {% endif %}
-      </span>
 
-      {% if not show_thread_context %}
-        <a href="{{ post.get_url }}" class="post-number">
-          #{{ forloop.counter0|add:posts.start_index }}
-        </a>
-      {% endif %}
-
-      {% if user.is_authenticated and user.is_admin %}
-        <a href="{% url 'admin:ISS_post_change' post.pk %}"
-           class="admin-edit-post">
-          admin
-        </a>
-      {% endif %}
-    </div>
-
-    <div class="user-block">
-      <div class="avatar">
-        {% if allow_avatars and post.author.avatar %}
-          <img src="{{ post.author.avatar.url }}">
+        {% if user.is_authenticated and user.is_admin %}
+          <a href="{% url 'admin:ISS_post_change' post.pk %}"
+             class="admin-edit-post">
+            admin
+          </a>
         {% endif %}
       </div>
-      <a class="author-name" href="{{ post.author.get_url }}">
-        {{ post.author.username }}
-      </a>
-      <span class="user-title">
-        {{ post.author.get_user_title }}
-      </span>
-    </div>
 
-    <div class="post-block">
-      <div class="post-body">
-        {{ post.content|bbc:embed_images }}
+      <div class="user-block">
+        <div class="avatar">
+          {% if allow_avatars and post.author.avatar %}
+            <img src="{{ post.author.avatar.url }}">
+          {% endif %}
+        </div>
+        <a class="author-name" href="{{ post.author.get_url }}">
+          {{ post.author.username }}
+        </a>
+        <span class="user-title">
+          {{ post.author.get_user_title }}
+        </span>
       </div>
 
-      {% if user.is_authenticated and show_post_controls %}
-        {% include 'post_controls.html' with post=post %}
+      <div class="post-block">
+        <div class="post-body">
+          {{ post.content|bbc:embed_images }}
+        </div>
+
+        {% if user.is_authenticated and show_post_controls %}
+          {% include 'post_controls.html' with post=post %}
+        {% endif %}
+      </div>
+
+      {% if show_thanks_block %}
+        {% include "thanks_block.html" with post=post %}
       {% endif %}
-    </div>
-
-    {% if show_thanks_block %}
-      {% include "thanks_block.html" with post=post %}
-    {% endif %}
-  </li>
-{% endfor %}
-</ol>
-
+    </li>
+  {% endfor %}
+  </ol>
+{% endwith %}

@@ -56,7 +56,8 @@ def thread(request, thread_id):
     ctx = {
         'thread': thread,
         'posts': page,
-        'reply_form': reply_form
+        'reply_form': reply_form,
+        'thread_action_form': forms.ThreadActionForm()
     }
 
     response = render(request, 'thread.html', ctx)
@@ -69,6 +70,25 @@ def thread(request, thread_id):
             thread.subscribe(request.user)
 
     return response
+
+class ThreadActions(utils.MethodSplitView):
+    staff_required = True
+    unbanned_required = True
+
+    def POST(self, request, thread_id):
+        thread = get_object_or_404(Thread, pk=thread_id)
+        form = forms.ThreadActionForm(request.POST)
+
+        if form.is_valid():
+            action = form.cleaned_data['action']
+            if action == 'edit-thread':
+                target = reverse('admin:ISS_thread_change',
+                                 args=[thread.pk])
+                return HttpResponseRedirect(target)
+            else:
+                raise Exception('Unexpected action.')
+        else:
+            return HttpResponseBadRequest('Invalid form.')
 
 class UnsubscribeFromThread(utils.MethodSplitView):
     login_required = True
