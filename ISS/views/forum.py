@@ -304,9 +304,10 @@ class UserProfile(utils.MethodSplitView):
             'allow_js': poster.allow_js,
             'allow_avatars': poster.allow_avatars,
             'allow_image_embed': poster.allow_image_embed,
+            'enable_tripphrase': not (poster.tripphrase == None),
             'auto_subscribe': poster.auto_subscribe,
             'timezone': poster.timezone,
-            'posts_per_page': poster.posts_per_page})
+            'posts_per_page': poster.posts_per_page })
 
     def _base_avatar_form(self, poster):
         return forms.UserAvatarForm()

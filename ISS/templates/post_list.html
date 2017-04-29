@@ -44,6 +44,10 @@
         </a>
         <span class="user-title">
           {{ post.author.get_user_title }}
+
+          {% if post.author.tripphrase %}
+            <span class="tripphrase">[{{ post.author.tripphrase }}]</span>
+          {% endif %}
         </span>
       </div>
 

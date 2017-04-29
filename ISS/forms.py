@@ -10,6 +10,8 @@ from django.forms import ValidationError
 from django.utils import timezone
 from PIL import Image
 
+from tripphrase import tripphrase
+
 import utils
 from models import *
 
@@ -303,6 +305,7 @@ class UserSettingsForm(forms.Form):
     allow_image_embed = forms.BooleanField(
         label="Enable images embedded in posts",
         required=False)
+    enable_tripphrase = forms.BooleanField(label="Enable tripphrase", required=False)
     auto_subscribe = forms.ChoiceField(
         label="Auto-subscribe",
         required=True,
@@ -317,6 +320,11 @@ class UserSettingsForm(forms.Form):
         poster.auto_subscribe = self.cleaned_data['auto_subscribe']
         poster.timezone = self.cleaned_data['timezone']
         poster.posts_per_page = self.cleaned_data['posts_per_page']
+
+        if self.cleaned_data['enable_tripphrase']:
+            poster.tripphrase = tripphrase(poster.username)
+        else:
+            poster.tripphrase = None
 
         poster.save()
 

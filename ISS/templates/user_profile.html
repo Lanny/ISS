@@ -52,6 +52,9 @@
             </h1>
             <small class="user-title">
               {{ poster.get_user_title }}
+              {% if poster.tripphrase %}
+                <span class="tripphrase">[{{ poster.tripphrase }}]</span>
+              {% endif %}
             </small>
           </div>
         </div>
