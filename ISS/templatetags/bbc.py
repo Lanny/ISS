@@ -10,11 +10,8 @@ register = template.Library()
 def bbc_format(value, embed_images=True, autoescape=True):
     value = FilterWord.do_all_replacements(value)
 
-    if autoescape:
-        value = conditional_escape(value)
-
     parser = utils.get_standard_bbc_parser(
-            escape_html=False, 
+            escape_html=True, 
             embed_images=embed_images)
     markup = parser.format(value)
 

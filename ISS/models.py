@@ -370,7 +370,7 @@ class Post(models.Model):
         parser = utils.get_closure_bbc_parser()
         body = parser.format(self.content)
 
-        template = '[quote pk=%d author=%s]\n%s\n[/quote]'
+        template = '[quote pk=%d author="%s"]\n%s\n[/quote]'
         return template % (self.pk, self.author.username, body)
 
     def get_url(self):
