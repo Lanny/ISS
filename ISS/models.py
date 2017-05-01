@@ -165,8 +165,22 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         
         Thread.objects.filter(author=self).update(author=other)
         Post.objects.filter(author=self).update(author=other)
-        Thanks.objects.filter(thanker=self).update(thanker=other)
-        Thanks.objects.filter(thankee=self).update(thankee=other)
+
+        for thanks in self.thanks_given.all():
+            try:
+                with transaction.atomic():
+                    thanks.thanker = other
+                    thanks.save()
+            except IntegrityError:
+                thanks.delete()
+
+        for thanks in self.thanks_received.all():
+            try:
+                with transaction.atomic():
+                    thanks.thankee = other
+                    thanks.save()
+            except IntegrityError:
+                thanks.delete()
 
         self.save()
 
