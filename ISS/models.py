@@ -517,7 +517,7 @@ class Ban(models.Model):
     subject = models.ForeignKey(Poster, related_name="bans")
     given_by = models.ForeignKey(Poster, null=True, related_name="bans_given")
     start_date = models.DateTimeField(auto_now_add=True)
-    end_date = models.DateTimeField()
+    end_date = models.DateTimeField(null=True)
     reason = models.CharField(max_length=1024)
 
     def is_active(self, now=None):

@@ -551,7 +551,7 @@ class UnthankPost(utils.MethodSplitView):
 
 class SpamCanUser(utils.MethodSplitView):
     require_login = True
-    require_staff = True
+    staff_required = True
 
     def _get_threads(self, poster):
         threads = poster.thread_set.all()
