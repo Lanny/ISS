@@ -22,6 +22,12 @@
 
     float: left;
     margin-bottom: @content_margin_bottom;
+
+    @media(max-width: @breakpoint) {
+      display: block;
+      float: none;
+      text-align: center;
+    }
   }
 
   .threads {
@@ -57,7 +63,12 @@
         }
 
         .edit-thread {
+          .icn-btn-scaleable(32);
           float: right;
+
+          &:before {
+            .icn-pencil();
+          }
         }
 
         .title-line {
@@ -168,10 +179,6 @@
 
           .edit-thread {
             display: block;
-
-            &:before {
-              .icn-pencil();
-            }
           }
         }
       }
