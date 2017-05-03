@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from django.contrib.auth import login, logout, authenticate, _get_backends
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.decorators import login_required
@@ -16,12 +18,19 @@ from ISS import utils, forms
 from ISS.models import *
 
 
-@cache_control(no_cache=True, max_age=0, must_revalidate=True, no_store=True)
+@cache_control(max_age=60)
 def forum_index(request):
+    categories = Category.objects.all().order_by('priority')
     forums = Forum.objects.all().order_by('priority')
+
     ctx = {
-        'forums': [utils.ForumFascet(f, request) for f in forums]
+        'categories': categories,
+        'forums_by_category': defaultdict(list)
     }
+
+    for forum in forums:
+        fasceted = utils.ForumFascet(forum, request)
+        ctx['forums_by_category'][forum.category_id].append(fasceted)
 
     return render(request, 'forum_index.html', ctx)
 

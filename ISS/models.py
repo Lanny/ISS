@@ -222,7 +222,12 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def embed_images(self):
         return self.allow_image_embed
 
+class Category(models.Model):
+    name = models.CharField(max_length=256)
+    priority = models.IntegerField(default=0, null=False)
+
 class Forum(models.Model):
+    category = models.ForeignKey(Category, null=True, default=None)
     name = models.TextField()
     description = models.TextField()
     priority = models.IntegerField(default=0, null=False)
