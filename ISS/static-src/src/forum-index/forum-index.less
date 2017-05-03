@@ -7,6 +7,14 @@
     .index-table;
 
     tr {
+      td, th {
+        &:nth-child(n+3) {
+          @media(max-width: @breakpoint) {
+            display: none;
+          }
+        }
+      }
+
       th {
         .teal;
       }
@@ -28,9 +36,9 @@
 
         &.category-divider {
           .teal();
-          text-align: center;
           border-top: 1px solid @white;
           border-bottom: 1px solid @white;
+          font-weight: bold;
         }
 
         .forum-name {
