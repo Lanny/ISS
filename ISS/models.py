@@ -226,6 +226,9 @@ class Category(models.Model):
     name = models.CharField(max_length=256)
     priority = models.IntegerField(default=0, null=False)
 
+    def __unicode__(self):
+        return self.name
+
 class Forum(models.Model):
     category = models.ForeignKey(Category, null=True, default=None)
     name = models.TextField()

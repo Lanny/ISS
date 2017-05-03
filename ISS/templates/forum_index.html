@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load static from staticfiles %} 
+{% load util_tags %}
 
 {% block page_name %}
   Forums -
@@ -15,7 +16,15 @@
         <th>Threads</th>
         <th>Posts</th>
       </tr>
-      {% for forum in forums %}
+      {% for category in categories %}
+      <tr>
+        <td colspan="4" class="category-divider">
+          {{ category.name }}
+        </td>
+      </tr>
+
+
+      {% for forum in forums_by_category|get_item:category.pk %}
       <tr>
         <td>
           <div class="read-status">
@@ -36,6 +45,7 @@
         <td>{{ forum.get_thread_count }}</td>
         <td>{{ forum.get_post_count }}</td>
       </tr>
+      {% endfor %}
       {% endfor %}
     </table>
   </section>

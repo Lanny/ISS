@@ -2,6 +2,14 @@ from django.contrib import admin
 
 from .models import *
 
+class ForumInline(admin.TabularInline):
+    model = Forum
+    extra = 0
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'priority')
+
 admin.site.register(Forum)
 admin.site.register(Thread)
 admin.site.register(Thanks)
@@ -37,3 +45,5 @@ class FilterWordAdmin(admin.ModelAdmin):
 @admin.register(Ban)
 class BanAdmin(admin.ModelAdmin):
     list_display = ('subject', 'reason', 'start_date', 'end_date', 'given_by')
+
+

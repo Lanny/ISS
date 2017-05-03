@@ -19,3 +19,6 @@ def test_link(test, user):
 def word_filter(value):
     return FilterWord.do_all_replacements(value)
 
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
