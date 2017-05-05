@@ -2,7 +2,9 @@ import bbcode
 import urlparse
 import re
 import utils
+
 from django.utils import html
+from django.urls import reverse, NoReverseMatch
 
 shortcode_pat = None
 shortcode_map = None
@@ -111,13 +113,13 @@ def _add_quote_tag(parser):
             if pk:
                 try:
                     url = reverse('post', kwargs={'post_id': pk})
-                except:
-                    # Almost certianly NoReverseMatch in which case roll on
-                    # but let's catch everything just in case
+                except NoReverseMatch:
                     pass
                 else:
-                    attribution = 'Originally posted by <a href="%s">%s</a>' % (
-                        url, author)
+                    attribution = """
+                        Originally posted by %s
+                        <a class="jump-to-post" href="%s"></a>
+                    """ % (author, url)
 
             template = """
                 <blockquote>
