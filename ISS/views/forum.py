@@ -341,7 +341,11 @@ class NewThread(utils.MethodSplitView):
         form = forms.NewThreadForm(request.POST)
 
         if form.is_valid():
-            thread = form.save(request.user)
+            ip_addr = request.META.get(
+                    utils.get_config('client_ip_field'), None)
+
+            thread = form.save(request.user, ip_addr)
+
             return HttpResponseRedirect(thread.get_url())
 
         else:

@@ -106,7 +106,7 @@ class NewThreadForm(forms.Form):
         self.post = None
 
     @transaction.atomic
-    def save(self, author):
+    def save(self, author, ip_addr):
         self.thread = Thread(
             title=self.cleaned_data['title'],
             forum=self.cleaned_data['forum'],
@@ -117,6 +117,7 @@ class NewThreadForm(forms.Form):
         self.post = Post(
             thread=self.thread,
             content=self.cleaned_data['content'],
+            posted_from=ip_addr,
             author=author)
 
         self.post.save()
