@@ -45,6 +45,15 @@
   text-decoration: none;
 }
 
+.resp-btn() {
+  .btn();
+
+  @media (max-width: @breakpoint) {
+    display: block;
+    text-align: center;
+  }
+}
+
 .small-btn() {
   .btn();
   border-radius: 3px;

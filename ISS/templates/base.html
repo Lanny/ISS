@@ -23,7 +23,7 @@
   </head>
   <body>
     <div class="page-content">
-      <a href="/">
+      <a href="/" id='top-banner'>
         <div class="peekaboo-container">
           <img src="{% static "img/peekaboo.png" %}" class="peekaboo" >
         </div>
@@ -74,6 +74,12 @@
       {% block content %}
         Base Template.
       {% endblock %}
+
+      <a class="jump-to-top" href="#top-banner">
+        <i class="up-arrow"></i>
+        <span>Jump to Top</span>
+        <i class="up-arrow"></i>
+      </a>
 
       <footer class="page-footer">
         Oldschool forum software, made with

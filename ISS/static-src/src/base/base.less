@@ -387,7 +387,6 @@ pre.code-block {
     left: 0px;
     font-size: 10px;
   }
-  
 }
 
 .inline-submit-container {
@@ -435,5 +434,28 @@ pre.code-block {
 
   &:before {
     .icn-right-arrow();
+  }
+}
+
+.jump-to-top {
+  .btn();
+  .teal();
+
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+
+  @media (min-width: @breakpoint) {
+    display: none;
+  }
+
+  .up-arrow {
+    .icn(13px);
+    .icn-up-arrow(); 
+  }
+
+  span {
+    flex: 1;
+    text-align: center;
   }
 }
