@@ -154,7 +154,11 @@ def _add_video_tag(parser):
 
 def _add_code_tag(parser):
     def render_code(tag_name, value, options, parent, context):
-        return '<pre class="code-block">%s</pre>' % value
+        return ("""
+            <div class="code-block">
+                <pre>%s</pre>
+            </div>
+        """ % value)
 
     parser.add_formatter('code', render_code, replace_cosmetic=False,
                          render_embedded=False)

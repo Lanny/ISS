@@ -371,14 +371,17 @@ footer {
   max-height: 500px;
 }
 
-pre.code-block {
-  background-color: @bg_light;
-  border: 1px solid @seperator_color;
-  padding: 0px 1.5em 1em;
-  border-radius: 3px;
-  position: relative;
+.code-block {
   margin-top: 2em;
-  overflow-y: auto;
+  position: relative;
+
+  pre {
+    background-color: @bg_light;
+    border: 1px solid @seperator_color;
+    padding: 1em 1.5em;
+    border-radius: 3px;
+    overflow: auto;
+  }
 
   &:before {
     content: 'Code:';
@@ -456,6 +459,5 @@ pre.code-block {
 
   span {
     flex: 1;
-    text-align: center;
   }
 }
