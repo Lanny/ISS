@@ -1,4 +1,6 @@
 # ISS
+[![Build Status](https://travis-ci.org/RyanJenkins/ISS.svg?branch=master)](https://travis-ci.org/RyanJenkins/ISS)
+
 Oldschool Forum Software. Design tenets are:
 
 - Performance and correctness over feature richness
