@@ -1,0 +1,26 @@
+language: python
+
+python:
+  - 2.7
+
+services: postgresql
+
+env:
+  global:
+  - DJANGO_SETTINGS_MODULE="test_settings"
+  - PIP_USE_MIRRORS=true
+
+install:
+  - pip install -r requirements.txt
+
+before_script:
+  - psql -c "CREATE DATABASE travisdb;" -U postgres
+
+script:
+  - python manage.py migrate
+  - python manage.py test ISS.tests
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always

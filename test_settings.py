@@ -25,8 +25,7 @@ SECRET_KEY = '%ve+iy6_#4jxw7n#(&n1yyqbr*%!(9v=634@u_u!a*03j3bca5'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['localhost']
 
 # Application definition
 
@@ -41,7 +40,9 @@ INSTALLED_APPS = (
     'ISS'
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -49,10 +50,9 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
     'ISS.middleware.TimezoneMiddleware',
     'ISS.middleware.PMAdminMiddleware'
-)
+]
 
 ROOT_URLCONF = 'ISS.urls'
 
@@ -84,11 +84,14 @@ WSGI_APPLICATION = 'ISS.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE':   'django.db.backends.postgresql_psycopg2',
+        'NAME':     'travisdb',
+        'USER':     'postgres',
+        'PASSWORD': '',
+        'HOST':     'localhost',
+        'PORT':     '',
     }
 }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -118,3 +121,18 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 LOGIN_URL = '/login'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'NIS-default',
+    },
+    'db_cache': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'NIS-db',
+    }
+}
+
+MEDIA_ROOT = '/media'
+MEDIA_URL = '/media/'
+

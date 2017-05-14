@@ -32,7 +32,11 @@ class GlobShortcodeRegistrar(object):
     def get_shortcode_map(self):
         sc_map = {}
 
-        files = os.listdir(os.path.join('ISS/static', self._directory))
+        try:
+            files = os.listdir(os.path.join('ISS/static', self._directory))
+        except OSError:
+            files = []
+
         for filename in files:
             match = re.match(r'(.+)\.(gif|png|jpg)', filename)
 
