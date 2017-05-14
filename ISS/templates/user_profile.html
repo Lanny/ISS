@@ -139,6 +139,41 @@
       </div>
     {% endif %}
 
+    {% if user.is_staff %}
+    <div class="alts">
+      <h3>Alternative Accounts</h3>
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Poster</th>
+              <th>Shared Address</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for alt in poster.get_alts %}
+            <tr>
+              <td>
+                <a href="{{ alt.poster.get_url }}">
+                  {{ alt.poster.username }}
+                </a>
+              </td>
+              <td>
+                {{ alt.addr }}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="999">No alts found</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
+
     <div class="ban-log">
       <h3>Ban Log</h3>
       <div>

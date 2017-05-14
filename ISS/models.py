@@ -156,6 +156,17 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def can_report(self):
         return self.has_report_privilege
 
+    def get_alts(self):
+        ip_addrs = (Post.objects.filter(author=self)
+            .distinct('posted_from')
+            .values_list('posted_from', flat=True))
+
+        evidence = (Post.objects.filter(posted_from__in=ip_addrs)
+            .exclude(author=self)
+            .distinct('author'))
+
+        return [{'poster': p.author, 'addr': p.posted_from} for p in evidence]
+
     @transaction.atomic
     def merge_into(self, other):
         """
