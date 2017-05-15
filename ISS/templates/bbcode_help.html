@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% load static from staticfiles %} 
+{% load bbc %}
+
+{% block page_name %}
+  BBCode Reference -
+{% endblock %}
+
+{% block content %}
+  <section class="bbcode-help">
+    <h1>BBCode Reference</h1>
+    <div>
+      <p>
+        {{ config.forum_name }} allows users to post using a lightweight markup language called <a href="https://en.wikipedia.org/wiki/BBCode">BBCode</a>. BBCode is non-standardized and implementations are idiosyncratic. This page documents the most common BBCode tags available to users.
+      </p>
+
+      <table id="bbcode-reference-table">
+        <thead>
+          <tr>
+            <th>Function</th>
+            <th>BBCode</th>
+            <th>Rendered Output</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Bold</td>
+            <td>[b]bold text[/b]</td>
+            <td>{{ "[b]bold text[/b]"|bbc }}</td>
+          </tr>
+
+          <tr>
+            <td>Oblique</td>
+            <td>[i]oblique text[/i]</td>
+            <td>{{ "[i]oblique text[/i]"|bbc }}</td>
+          </tr>
+
+          <tr>
+            <td>Underline</td>
+            <td>[u]underline text[/u]</td>
+            <td>{{ "[u]underline text[/u]"|bbc }}</td>
+          </tr>
+
+          <tr>
+            <td>Quoting</td>
+            <td>[quote author=Diogenes]<br />Dogs and philosophers do the greatest good and get the fewest rewards.<br />[/quote]</td>
+            <td>{{ "[quote author=Diogenes]Dogs and philosophers do the greatest good and get the fewest rewards.[/quote]"|bbc }}</td>
+          </tr>
+          <tr class="code-row">
+            <td>Code</td>
+            <td>
+[code]
+  (define Y
+    (lambda (h)
+      ((lambda (x) (x x))
+       (lambda (g)
+         (h (lambda args (apply (g g) args)))))))
+ [/code]
+             </td>
+             <td>{% filter bbc %}
+[code]
+(define Y
+  (lambda (h)
+    ((lambda (x) (x x))
+     (lambda (g)
+       (h (lambda args (apply (g g) args)))))))
+[/code]
+               {% endfilter %}
+             </td>
+          </tr>
+
+
+
+          <tr>
+            <td>Image Embedding*</td>
+            <td>[img]http://i.imgur.com/oe6rnCW.png[/img]</td>
+            <td>{{ "[img]http://i.imgur.com/oe6rnCW.png[/img]"|bbc }}</td>
+          </tr>
+
+          <tr>
+            <td>Youtube Embedding</td>
+            <td>[video]https://www.youtube.com/watch?v=1rmo3fKeveo[/video]</td>
+            <td>{{ "[video]https://www.youtube.com/watch?v=1rmo3fKeveo[/video]"|bbc }}</td>
+          </tr>
+
+          <tr>
+            <td>Bandcamp Embedding</td>
+            <td>[bc]https://nounss.bandcamp.com/track/dogs[/bc]</td>
+            <td>{{ "[bc]https://nounss.bandcamp.com/track/dogs[/bc]"|bbc }}</td>
+          </tr>
+
+          <tr>
+            <td>Spoilers</td>
+            <td>[spoiler]Ritsu is best girl[/spoiler]</td>
+            <td>{{ "[spoiler]Ritsu is best girl[/spoiler]"|bbc }}</td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <h2>A Note on Image Embedding*</h2>
+
+      <p>
+        Images embedded using bbcode are not hosted on {{ config.forum_name }}, they are hosted on other servers and the bbcode renderer simply presents them to you. Most browsers will request images from other servers without prompting you. Since users can embed arbitrary images this behavior can induce your browser to give up some information, most significantly your publicly visible IP address and the approximate time you loaded a given page. If this is unacceptable to you then you should disable image embedding on your user profile page.
+      </p>
+
+      <h2>Smilies</h2>
+      
+      <p>
+        You can also use a fixed set of emoticons in your posts using shortcode. To use a smiley, type a colon, followed by a smiley's name, followed by another colon. For example :hai: produces {{ ":hai:"|bbc }}.
+      </p>
+      <p>
+        You can find a list of all the supported emoticons <a href="{% url 'smilies-refrence' %}">here</a>.
+      </p>
+
+    </div>
+  </section>
+{% endblock %}

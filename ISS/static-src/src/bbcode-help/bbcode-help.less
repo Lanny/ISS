@@ -1,0 +1,40 @@
+@import "../base/config.less";
+
+.bbcode-help {
+  .rounded();
+  overflow: hidden;
+
+  h1 {
+    .title-box();
+  }
+
+  & > div {
+    padding: 10px @std_lr_padding;
+    background-color: @bg_dark;
+    overflow: auto;
+  }
+
+  #bbcode-reference-table {
+    .index-table();
+    .rounded();
+    border: 1px solid lightgrey;
+
+    thead th {
+      background-color: @bg_teal;
+      color: @white;
+    }
+
+    tbody td:nth-child(2) {
+      font-family: monospace;
+    }
+
+    tbody .code-row td:nth-child(2) {
+      white-space: pre;
+    }
+  }
+
+  h2 {
+    margin-top: 20px;
+  }
+}
+

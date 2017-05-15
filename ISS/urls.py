@@ -103,6 +103,10 @@ urlpatterns = [
         views.forum.ReportPost.as_view(),
         name='report-post'),
 
+    url(r'^help/bbcode',
+        TemplateView.as_view(template_name="bbcode_help.html"),
+        name='bbcode-help'),
+
     url('^search$',
         views.forum.search,
         name='search'),
