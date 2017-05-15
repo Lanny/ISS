@@ -41,6 +41,11 @@
         <fieldset>
           {% csrf_token %}
           {{ reply_form }}
+
+          <a href="{% url 'bbcode-help' %}" class="bbcode-ref-link" target="_blank">
+            BBCode Refrence
+          </a>
+
           <input type="submit" value="Submit" />
         </fieldset>
       </form>

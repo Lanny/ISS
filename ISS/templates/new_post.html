@@ -20,6 +20,11 @@ Reply to {{ thread.title }} -
       <fieldset>
         {% csrf_token %}
         {{ form }}
+
+        <a href="{% url 'bbcode-help' %}" class="bbcode-ref-link" target="_blank">
+          BBCode Refrence
+        </a>
+
         <input type="submit" value="Submit" />
       </fieldset>
      </form>
