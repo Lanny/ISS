@@ -47,7 +47,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     has_report_privilege = models.BooleanField(default=True)
-    tripphrase = models.CharField(max_length=256, null=True)
+    tripphrase = models.CharField(max_length=256, null=True, blank=True)
 
     avatar = models.ImageField(upload_to='avatars', null=True)
 
