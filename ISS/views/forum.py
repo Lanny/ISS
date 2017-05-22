@@ -119,6 +119,21 @@ def redirect_to_post(request, post_id):
 
     return HttpResponseRedirect(target_url)
 
+def threads_by_user(request, user_id):
+    poster = get_object_or_404(Poster, pk=user_id)
+    threads = Thread.objects.filter(author=poster)
+    threads_per_page = utils.get_config('general_items_per_page')
+    paginator = Paginator(threads, threads_per_page)
+
+    page = utils.page_by_request(paginator, request)
+
+    ctx = {
+        'poster': poster,
+        'threads': page
+    }
+
+    return render(request, 'threads_started.html', ctx)
+
 def posts_by_user(request, user_id):
     poster = get_object_or_404(Poster, pk=user_id)
     posts = (poster.post_set
@@ -795,3 +810,5 @@ def humans(request):
 @cache_control(max_age=60*24)
 def smilies_css(request):
     return render(request, 'smilies.css', content_type='text/css')
+
+

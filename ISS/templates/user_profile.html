@@ -75,6 +75,16 @@
           </div>
 
           <div class="stat">
+            <span class="label">Threads Started</span>
+            <span class="value">
+              <a href="{% url 'threads-by-user' poster.pk %}">
+                {{ poster.thread_set.count }}
+              </a>
+            </span>
+          </div>
+
+
+          <div class="stat">
             <span class="label">Thanks Received</span>
             <span class="value">
               <a href="{% url 'thanked-posts' poster.pk %}">
