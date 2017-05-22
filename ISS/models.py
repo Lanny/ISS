@@ -293,8 +293,6 @@ class Thread(models.Model):
     title = models.TextField()
     log = models.TextField(blank=True)
 
-    _flag_cache = None
-
     def get_last_post(self):
         return (self.post_set
                     .order_by('-created')
@@ -340,21 +338,20 @@ class Thread(models.Model):
         return not self.locked
 
     def _get_flag(self, user, save=True):
-        if not self._flag_cache:
-            self._flag_cache, created = ThreadFlag.objects.get_or_create(
-                poster=user,
-                thread=self)
+        flag, created = ThreadFlag.objects.get_or_create(
+            poster=user,
+            thread=self)
 
-            if created and save:
-                self._flag_cache.save()
+        if created and save:
+            flag.save()
 
-        return self._flag_cache
+        return flag
 
     def has_unread_posts(self, user):
         if not user.is_authenticated():
             return True
 
-        flag = self._get_flag(user)
+        flag = self._get_flag(user, False)
 
         if not flag.last_read_date or flag.last_read_date < self.last_update:
             return True
@@ -387,6 +384,9 @@ class Thread(models.Model):
         flag.subscribed = False
         flag.save()
 
+    def update_subscriptions_on_post_deletion(self, post):
+        pass
+
     def __unicode__(self):
         return self.title
 
@@ -412,6 +412,30 @@ class Post(models.Model):
     def get_thanker_pks(self):
         return {t.thanker_id for t in self.thanks_set.all()}
 
+    def delete(self, *args, **kwargs):
+        """
+        Somewhat complex. When a post is deleted some ThreadFlags will have an
+        FK to it on their last_read_post key. We need to set last_read_post to
+        the prior post in thread order (or delete the sub if the last read was
+        the op).
+        """
+        impacted_flags = ThreadFlag.objects.filter(last_read_post=self)
+        thread = self.thread
+
+        if impacted_flags.count():
+            posts_in_thread = list(thread.get_posts_in_thread_order(reverse=True))
+
+            for idx, post in enumerate(posts_in_thread):
+                if post.pk == self.pk:
+                    try:
+                        prior = posts_in_thread[idx+1]
+                        impacted_flags.update(last_read_post=prior)
+                    except IndexError:
+                        # Subscription pointed to the OP. Burn it.
+                        impacted_flags.delete()
+            
+        super(Post, self).delete(*args, **kwargs)
+
 class Thanks(models.Model):
     class Meta:
         unique_together = ('thanker', 'post')
@@ -429,7 +453,9 @@ class ThreadFlag(models.Model):
     thread = models.ForeignKey(Thread)
     poster = models.ForeignKey(Poster)
 
-    last_read_post = models.ForeignKey(Post, null=True)
+    last_read_post = models.ForeignKey(Post,
+                                       null=True,
+                                       on_delete=models.SET_NULL)
     last_read_date = models.DateTimeField(null=True)
     subscribed = models.BooleanField(default=False)
 

@@ -1,6 +1,8 @@
 from django.test import TestCase
 from ISS.models import *
 
+import test_utils
+
 class PosterTestCase(TestCase):
     def setUp(self):
         self.lanny = Poster(username='Lanny')
@@ -58,3 +60,66 @@ class PosterTestCase(TestCase):
 
         self.assertEqual(dons_alts[0]['poster'].pk, self.lanny.pk)
         self.assertEqual(dons_alts[0]['addr'], '8.8.8.4')
+
+class SubscriptionTestCase(TestCase):
+    def setUp(self):
+        test_utils.create_std_forums()
+
+        self.tu_1 = test_utils.create_user(thread_count=1)
+        self.tu_2 = test_utils.create_user()
+
+        self.thread = Thread.objects.filter(author=self.tu_1)[0]
+        self.thread.subscribe(self.tu_1)
+        self.thread.mark_read(self.tu_1)
+
+    def _mkpost(self):
+        post = Post(author=self.tu_2,
+                    content='lorem ipsum',
+                    thread=self.thread,
+                    posted_from='8.8.8.4')
+        post.save()
+
+        return post
+
+    def test_subscription_no_update(self):
+        self.assertFalse(self.thread.has_unread_posts(self.tu_1))
+
+    def test_subscription_with_update(self):
+        self._mkpost()
+        self.assertTrue(self.thread.has_unread_posts(self.tu_1))
+
+    def test_subscription_after_delete(self):
+        post = self._mkpost()
+        op = self.thread.get_posts_in_thread_order()[0]
+        self.assertTrue(self.thread.has_unread_posts(self.tu_1))
+        
+        self.thread.mark_read(self.tu_1)
+        self.assertFalse(self.thread.has_unread_posts(self.tu_1))
+
+        post.delete()
+
+        self.assertTrue(self.thread.is_subscribed(self.tu_1))
+        self.assertFalse(self.thread.has_unread_posts(self.tu_1))
+        self.assertEqual(self.thread._get_flag(self.tu_1).last_read_post.pk,
+                         op.pk)
+
+    def test_subscription_after_multi_add_then_delete(self):
+        first_post = self._mkpost()
+        second_post = self._mkpost()
+        op = self.thread.get_posts_in_thread_order()[0]
+
+        self.assertTrue(self.thread.has_unread_posts(self.tu_1))
+
+        second_post.delete()
+
+        self.assertTrue(self.thread.is_subscribed(self.tu_1))
+        self.assertTrue(self.thread.has_unread_posts(self.tu_1))
+        self.assertEqual(self.thread._get_flag(self.tu_1).last_read_post.pk,
+                         op.pk)
+
+    def test_thread_get_jump_post(self):
+        first_post = self._mkpost()
+        second_post = self._mkpost()
+
+        self.assertEqual(self.thread.get_jump_post(self.tu_1).pk, first_post.pk)
+ 
