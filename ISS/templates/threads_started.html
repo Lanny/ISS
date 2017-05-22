@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block page_name %}
+  {{ poster.username }} -
+{% endblock %}
+
+{% block breadcrumb %}
+  &gt; Users
+  &gt; <a href="{{ poster.get_url }}">{{ poster.username }}</a>
+  &gt; <a href="{% url 'threads-by-user' poster.pk %}">Threads Started</a>
+{% endblock %}
+
+{% block content %}
+  <div class="thread-index">
+    {% include "page_list.html" with page=threads %}
+    
+    {% include 'thread_list.html' with threads=threads %}
+
+    {% include "page_list.html" with page=threads %}
+  </div>
+{% endblock %}
