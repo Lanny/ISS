@@ -121,7 +121,7 @@ def redirect_to_post(request, post_id):
 
 def threads_by_user(request, user_id):
     poster = get_object_or_404(Poster, pk=user_id)
-    threads = Thread.objects.filter(author=poster)
+    threads = Thread.objects.filter(author=poster).order_by('-created')
     threads_per_page = utils.get_config('general_items_per_page')
     paginator = Paginator(threads, threads_per_page)
 
