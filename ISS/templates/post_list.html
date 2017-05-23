@@ -19,7 +19,8 @@
         </span>
 
         {% if not show_thread_context %}
-          <input type="checkbox" class="select-post" name="select-{{ post.pk }}" />
+          <input type="checkbox" class="select-post" form="post-actions"
+                 name="post" value="{{ post.pk }}" />
           <a href="{{ post.get_url }}" class="post-number">
             #{{ forloop.counter0|add:posts.start_index }}
           </a>

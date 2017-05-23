@@ -208,7 +208,8 @@ class ThreadActionForm(forms.Form):
     action = forms.ChoiceField(
         label="Action",
         required=True,
-        choices=(('edit-thread', 'Edit Thread'),))
+        choices=(('edit-thread', 'Edit Thread'),
+                 ('delete-posts', 'Delete Posts')))
 
 
 class ISSAuthenticationForm(AuthenticationForm):

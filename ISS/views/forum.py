@@ -91,13 +91,30 @@ class ThreadActions(utils.MethodSplitView):
         if form.is_valid():
             action = form.cleaned_data['action']
             if action == 'edit-thread':
-                target = reverse('admin:ISS_thread_change',
-                                 args=[thread.pk])
-                return HttpResponseRedirect(target)
+                return self._handle_edit_thread(request, thread)
+            elif action == 'delete-posts':
+                return self._handle_delete_posts(request, thread)
             else:
                 raise Exception('Unexpected action.')
         else:
             return HttpResponseBadRequest('Invalid form.')
+
+    def _handle_edit_thread(self, request, thread):
+        target = reverse('admin:ISS_thread_change',
+                         args=[thread.pk])
+        return HttpResponseRedirect(target)
+
+    @transaction.atomic
+    def _handle_delete_posts(self, request, thread):
+        post_pks = request.POST.getlist('post', [])
+        posts = [get_object_or_404(Post, pk=pk) for pk in post_pks]
+
+        for post in posts:
+            post.delete()
+
+        target = request.POST.get('next', None)
+        target = target or reverse('thread', kwargs={'thread_id': thread.pk})
+        return HttpResponseRedirect(target)
 
 class UnsubscribeFromThread(utils.MethodSplitView):
     login_required = True

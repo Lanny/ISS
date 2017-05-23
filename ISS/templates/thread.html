@@ -22,6 +22,8 @@
             id="post-actions">
         {% csrf_token %}
         {{ thread_action_form }}
+
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
         <input type="submit" value="Go" />
       </form>
     {% endif %}
@@ -36,7 +38,7 @@
 
     {% if user.is_authenticated and thread.can_reply %}
       <form class="quick-reply editor" method="POST"
-        action="{% url 'new-reply' thread.pk %}">
+            action="{% url 'new-reply' thread.pk %}">
         <h2>Quick Reply</h2>
         <fieldset>
           {% csrf_token %}
