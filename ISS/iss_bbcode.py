@@ -47,7 +47,12 @@ def _embed_youtube_shortcode(url):
 
     if not re.match('[\-_0-9a-zA-Z]+', stripped_path):
         raise EmbeddingNotSupportedException('Bad video ID.')
-    if t and not re.match(r'\d+', t):
+
+    if re.match(utils.TIME_DELTA_FORMAT, t):
+        t = int(utils.parse_duration(t).total_seconds())
+    elif re.match(r'^\d+$', t):
+        pass
+    else:
         raise EmbeddingNotSupportedException('Bad time stamp.')
 
     return _yt_embed_pattern % (stripped_path, t)

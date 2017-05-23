@@ -21,7 +21,7 @@ from ISS.models import *
 from ISS import iss_bbcode
 
 DO_NOT_LINK_TAGS = { 'video', 'pre' }
-TIME_DELTA_FORMAT = re.compile(r'^\s*((?P<days>\d+)d)?\s*((?P<hours>\d+?)h)?\s*((?P<minutes>\d+?)m)?\s*$')
+TIME_DELTA_FORMAT = re.compile(r'^\s*((?P<days>\d+)d)?\s*((?P<hours>\d+?)h)?\s*((?P<minutes>\d+?)m)?\s*((?P<seconds>\d+?)s)?\s*$')
 
 class GlobShortcodeRegistrar(object):
     _directory = None
