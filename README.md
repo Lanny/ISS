@@ -41,7 +41,16 @@ Next run the migrations to init the DB:
 $ ./manage.py migrate
 ```
 
-And create yourself an account:
+We also use a DB cache so you need to create that table seperately:
+
+```
+$ ./manage.py ISS_cache
+```
+
+The default settings also specify a `default` cache as a LocMemCache. If you're
+running in a production environment you're encouraged to use Redis or memcahced
+as these will be significantly more performant if you're running multiple WS
+instances. After setting up caches you can create yourself an account:
 
 ```
 $ ./manage.py createsuperuser
@@ -88,9 +97,18 @@ and what each does:
 - `min_post_chars` - The minimum length, in characters, of a post. Validation is only done when making a post through the typical web form.
 - `min_thread_title_chars` - The minimum length, in characters, of a thread title. Validation is only done when making a post through the new thread form.
 - `threads_per_forum_page` - The number of threads to show on the thread list for a forum.
-- `posts_per_thread_page` - The number of posts to show on each page of a thread. Note that changing this breaks post links that were generated previously.
+- `posts_per_thread_page` - The number of posts to show on each page of a thread by default. Users may configure choose their own values here.
 - `general_items_per_page` - The number of items per page for lists of things that don't have their own per-page config property.
 - `ninja_edit_grace_time` - The amount of time, in seconds, after post creation that a user can edit their post without it being branded with an edit notice and timestamp.
 - `private_message_flood_control` - The number of seconds users must wait after sending a private message before they can send a new one.
 - `title_ladder` - A sequence of 2-tuples in (int, string) format. Indicates the user title a user without a custom user title will receive after having made that many posts.
 - `recaptcha_settings` - Either `None` or a 2-tuple with your reCAPTCHA site(public) and secret keys in that order to be used at registration time. If this is None users will be able to register without solving a captcha.
+- `max_avatar_size` - The maximum filesize for avatars, in bytes. Regardless of this value the display size of avarars is constrained to 75px in either dimension.
+- `junk_user_username` - The username for the user that will receive the posts of auto-anonymized users.
+- `system_user_username` - The username for the system daemon.
+- `report_reasons` - A list of 2-tuples of (string, string) where if 0th item is a system code (can be anything) and 1th is a human readable description for a valid reason for reporting a post.
+- `control_links` - A sequence type of 5-tuples describing the controls presented in the header. Advanced configuration option, read the code if you want to edit it. (help wanted TODO: actually document this)
+- `control_links` - A sequence type of dicts describing static pages. Advanced configuration option, read the code if you want to edit it. (help wanted TODO: actually document this)
+- `humans` - Sequence type of 3-tuples of strings of the form (role, name, contact) to be presented at `/humans.txt`.
+- `shortcode_registrar` - An object with a `get_shortcode_map()` method that returns a dict from shortcode names to asset names which are used with `django.contrib.staticfiles.templatetags.static` to embed shortcode smileys. (TODO: better documentation)
+- `client_ip_field` - The WSGI env var to consult to find a correct IP address from which a given request originates. This is useful if you're using a reverse proxy, DDoS protection, or load balancer which identifies itself rather than the client in the `REMOTE_ADDR` param.
