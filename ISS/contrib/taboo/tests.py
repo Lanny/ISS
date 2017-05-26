@@ -37,7 +37,6 @@ class TabooProfileTest(TestCase):
 
         self.assertFalse(self.profile.matches_post(post))
 
-
     def test_TabooProfile_dot_matches_post_matches(self):
         post = iss_models.Post(
             author=self.mark,
@@ -45,4 +44,15 @@ class TabooProfileTest(TestCase):
 
         self.assertTrue(self.profile.matches_post(post))
 
+    def test_post_save_handler(self):
+        thread = iss_models.Thread.objects.all()[0]
+        post_content = 'this is fOObar man'
+        post = iss_models.Post.objects.create(
+            author=self.mark,
+            content=post_content,
+            thread=thread)
+        post = iss_models.Post.objects.get(pk=post.pk)
 
+        self.assertTrue(self.mark.is_banned())
+        self.assertTrue(post_content in post.content and post_content != post.content)
+                

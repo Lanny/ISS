@@ -5,6 +5,7 @@ import os
 import datetime
 import bbcode
 import collections
+import importlib
 
 from lxml import etree
 
@@ -90,11 +91,20 @@ config_defaults = {
         ('Pedophile Tech Support', 'Sophie', ''),
     ),
     'shortcode_registrar': GlobShortcodeRegistrar('img/gif/'),
-    'client_ip_field': 'REMOTE_ADDR'
+    'client_ip_field': 'REMOTE_ADDR',
+    'extensions': [],
+    'extension_config': {}
 }
 
 config = config_defaults.copy()
 config.update(settings.FORUM_CONFIG)
+
+for extension in config['extensions']:
+    module = importlib.import_module(extension)
+    ext_config = getattr(module, 'ISS_config', {}).copy()
+    ext_config.update(config['extension_config'].get(extension, {}))
+
+    config['extension_config'][extension] = ext_config
 
 config['title_ladder'] = sorted(config['title_ladder'], key=lambda x: x[0],
                                 reverse=True)
@@ -151,6 +161,12 @@ def get_config(key=None):
         return config
     else:
         return config.get(key)
+
+def get_ext_config(ext, key=None):
+    if not key:
+        return config['extension_config'][ext]
+    else:
+        return config['extension_config'][ext].get(key)
 
 def get_ban_403_response(request):
     bans = request.user.get_pending_bans().order_by('-end_date')
