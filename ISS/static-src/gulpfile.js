@@ -9,6 +9,7 @@ var requirejsOptimize = require('gulp-requirejs-optimize');
 var concat = require('gulp-concat');
 var svg = require('gulp-svg-inline-css');
 var clean = require('gulp-clean');
+var execSync = require('child_process').execSync;
 
 var staticDir = '../static',
   jsDir = path.join(staticDir, '/js'),
@@ -19,6 +20,13 @@ var staticDir = '../static',
     'editor-bootstrap.js',
     'base.js'
   ];
+
+var ISSConfig = JSON.parse(
+    execSync('python manage.py dump_iss_config',
+             {
+               cwd: '../..',
+               encoding: 'UTF-8'
+             }));
 
 gulp.task('clean', function() {
   return gulp.src([ gifDir, cssDir, jsDir ])
@@ -79,7 +87,19 @@ gulp.task('optimize-js', ['javascript'], function() {
     .pipe(gulp.dest('../static/js'));
 });
 
-var generateTasks = ['less', 'smilies']
+gulp.task('generate-extensions', [], function() {
+  for (var i=0; i<ISSConfig.extensions.length; i++) {
+    var ext = ISSConfig.extensions[i],
+      extConfig = ISSConfig.extension_config[ext];
+
+    if ('gulp_dir' in extConfig) {
+      console.log(extConfig.gulp_dir);
+      execSync('npm run-script build', {cwd: extConfig.gulp_dir});
+    }
+  }
+});
+
+var generateTasks = ['less', 'smilies', 'generate-extensions'];
 generateTasks.push(argv.optimize ? 'optimize-js' : 'javascript');
 gulp.task('generate', generateTasks);
 

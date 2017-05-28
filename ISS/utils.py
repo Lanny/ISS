@@ -6,6 +6,7 @@ import datetime
 import bbcode
 import collections
 import importlib
+import json
 
 from lxml import etree
 
@@ -350,3 +351,10 @@ def parse_duration(time_str):
             time_params[name] = int(param)
 
     return datetime.timedelta(**time_params)
+
+class TolerantJSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        try:
+            return super(self, json.JSONEncoder).default(o)
+        except TypeError:
+            return None

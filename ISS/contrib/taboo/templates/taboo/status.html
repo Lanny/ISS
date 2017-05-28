@@ -1,5 +1,12 @@
 {% extends "base.html" %}
 
+{% load static %}
+
+{% block css %}
+  <link rel="stylesheet" href="{% static "taboo/css/taboo.css" %}">
+{% endblock %}
+
+
 {% block content %}
 <div class="taboo-status static-page">
   <h1>Taboo</h1>

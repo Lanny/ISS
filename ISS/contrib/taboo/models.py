@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import random
 
 from django.db import models, transaction
 from django.utils import timezone
@@ -16,6 +17,7 @@ class TabooProfile(models.Model):
                              related_name='marked_by')
     phrase = models.CharField(max_length=1024)
     active = models.BooleanField(default=True)
+    last_registration = models.DateTimeField(default=timezone.now)
     created = models.DateTimeField(default=timezone.now)
 
     def matches_post(self, post):
@@ -30,7 +32,15 @@ class TabooProfile(models.Model):
         return self.phrase.lower() in content.lower()
 
     def choose_mark_and_phrase(self):
-        pass
+        self.phrase = 'foobar'
+        candidates = (TabooProfile.objects.all()
+            .filter(mark_id__not=self.pk))
+        ccount = candidates.count()
+
+        if ccount < 1:
+            self.mark = None
+        else:
+            self.mark = candidates[random.randint(0, ccount-1)]
 
     @transaction.atomic
     def execute_taboo(self, post):
