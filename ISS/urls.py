@@ -151,6 +151,13 @@ for page in utils.get_config('static_pages'):
             views.forum.StaticPage(page),
             name=page['url_name']))
 
+# Install urls for extensions.
+for ext in utils.get_config('extensions'):
+    base_path = utils.get_ext_config(ext, 'base_path')
+
+    if base_path:
+        urlpatterns.append(url(base_path, include(ext + '.urls')))
+
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

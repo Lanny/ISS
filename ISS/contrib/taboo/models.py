@@ -11,7 +11,7 @@ from apps import TabooConfig
 EXT = TabooConfig.name
 
 class TabooProfile(models.Model):
-    poster = models.OneToOneField(iss_models.Poster)
+    poster = models.OneToOneField(iss_models.Poster, related_name='taboo_profile')
     mark = models.ForeignKey(iss_models.Poster, null=True,
                              related_name='marked_by')
     phrase = models.CharField(max_length=1024)

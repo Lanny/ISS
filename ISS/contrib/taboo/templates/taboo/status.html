@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="taboo-status static-page">
+  <h1>Taboo</h1>
+  <div class="static-content">
+    <p>
+      Taboo is a forum game. Players are given the name of another player and a
+      word or phrase. If they can induce the other player to use that term in
+      their post then the other player will be banned for a short period of time
+      and the surviving player will be given a new target and phrase. Some details:
+    </p>
+    <ul>
+      <li>
+        Entering the game means you will be marked by another play and possibly banned.
+      </li>
+      <li>
+        Depending on the number and distribution of players you may be marked by zero or more other players. You will not be told how many phrases are taboo to you.
+      </li>
+      <li>
+        Depending on the number and distribution of players you may not always have a mark. You will be notified when one is assigned to you.
+      </li>
+      <li>
+        You must meet some criteria to play to prevent abuse.
+        {% if eligible %}
+          You are eligible.
+        {% else %}
+          You are not eligible. Actively and constructively participating in the community is the best way to become eligible.
+        {% endif %}
+      </li>
+    </ul>
+
+    {% if user.taboo_profile and user.taboo_profile.active %}
+      <p>
+        You are currently registered. Your mark is <a href="{{ user.taboo_profile.mark.get_url }}">{{ user.taboo_profile.mark.username }}</a>, their phrase is "{{ user.taboo_profile.mark.username }}".
+      </p>
+      <p>
+        If you want to stop participating you may
+        <form method="POST" action="{% url "unregister" %}">
+          {% csrf_token %}
+          <input type="submit" value="unregister" />
+        </form>
+      </p>
+    {% else %}
+      <p>
+        You are not currently registered. If you would like to participate you may 
+        <form method="POST" action="{% url "register" %}">
+          {% csrf_token %}
+          <input type="submit" value="register" />
+        </form>
+        .
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
