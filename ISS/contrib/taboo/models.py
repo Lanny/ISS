@@ -4,6 +4,7 @@ import random
 from django.db import models, transaction
 from django.utils import timezone
 from django.dispatch import receiver
+from django.template.loader import render_to_string
 
 from ISS import models as iss_models
 from ISS import utils as iss_utils 
@@ -32,15 +33,17 @@ class TabooProfile(models.Model):
         return self.phrase.lower() in content.lower()
 
     def choose_mark_and_phrase(self):
-        self.phrase = 'foobar'
+        self.phrase = random.choice(
+                iss_utils.get_ext_config(EXT, 'phrases'))
         candidates = (TabooProfile.objects.all()
-            .filter(mark_id__not=self.pk))
+            .filter(active=True)
+            .exclude(pk=self.pk))
         ccount = candidates.count()
 
         if ccount < 1:
             self.mark = None
         else:
-            self.mark = candidates[random.randint(0, ccount-1)]
+            self.mark = candidates[random.randint(0, ccount-1)].poster
 
     @transaction.atomic
     def execute_taboo(self, post):
@@ -56,7 +59,7 @@ class TabooProfile(models.Model):
             end_date=timezone.now() + duration,
             reason=ban_reason)
 
-        self.choose_mark_and_phrase()
+        self.mark = None
         self.save()
 
         post.content += post_msg
@@ -67,9 +70,44 @@ def check_taboo_violation(sender, instance, created, **kwargs):
     if not created:
         return
 
-    assassins = TabooProfile.objects.filter(mark=instance.author)
+    assassins = TabooProfile.objects.filter(mark=instance.author, active=True)
 
     for assassin in assassins:
         if assassin.matches_post(instance):
             assassin.execute_taboo(instance)
             return
+
+@receiver(models.signals.post_save, sender=TabooProfile)
+def taboo_profiles_changed(sender, instance, created, **kwargs):
+    # Something changed, let's try finding a mark for every player
+    needs_mark = TabooProfile.objects.all().filter(mark=None)
+    print 'JAM' + str(instance.pk)
+
+    for prof in needs_mark:
+        # Recheck because this process changes the contents of the QS
+        prof = TabooProfile.objects.get(pk=prof.pk)
+
+        if prof.mark:
+            # Looks like the profile has gotten a mark since we started
+            return
+
+        prof.choose_mark_and_phrase()
+
+        if prof.mark:
+            # Update instead of save as to avoid doing this recursively
+            (TabooProfile.objects
+                .filter(pk=prof.pk)
+                .update(mark=prof.mark, phrase=prof.phrase))
+
+            # Send out PM
+            content = render_to_string(
+                'taboo/bbc/new_mark.bbc',
+                { 'mark': prof.mark, 'phrase': prof.phrase })
+
+            iss_models.PrivateMessage.send_pm(
+                iss_models.Poster.get_or_create_system_user(),
+                [prof.poster],
+                'Taboo: You\'ve received a new mark.',
+                content)
+            
+    PROFILE_PROCESSING_IN_PROGRESS = False

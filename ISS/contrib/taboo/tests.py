@@ -1,9 +1,18 @@
+import datetime
+
 from django.test import TestCase, Client
 from django.urls import reverse
 
+from ISS import utils as iss_utils
 from ISS import models as iss_models
 from ISS.tests import test_utils
 from ISS.contrib.taboo.models import *
+from apps import TabooConfig
+
+EXT = TabooConfig.name
+
+iss_utils.get_ext_config(EXT)['min_posts_to_reg'] = 0
+iss_utils.get_ext_config(EXT)['min_age_to_reg'] = datetime.timedelta(days=0)
 
 class TabooProfileTest(TestCase):
     def setUp(self):
@@ -85,20 +94,20 @@ class TabooViewTest(TestCase):
     def test_register_once(self):
         path = reverse('taboo-register')
         response = self.tu_1_client.post(path, {})
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(TabooProfile.objects.all().count(), 1)
 
         prof = TabooProfile.objects.all()[0]
         self.assertEqual(prof.poster.pk, self.tu_1.pk)
-        self.assertEqual(prof.target, None)
+        self.assertEqual(prof.mark, None)
 
     def test_register_twice(self):
         path = reverse('taboo-register')
         response = self.tu_1_client.post(path, {})
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
         response = self.tu_2_client.post(path, {})
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
         self.assertEqual(TabooProfile.objects.all().count(), 2)
         self.assertEqual(self.tu_1.taboo_profile.mark.pk, self.tu_2.pk)
@@ -124,11 +133,38 @@ class TabooViewTest(TestCase):
  
         path = reverse('taboo-unregister')
         response = self.tu_1_client.post(path, {})
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
-        self.assertEqual(
-            TabooProfile.objects.filter(id=tu_1_profile.pk).count(),
-            0)
+        tu_1_profile = TabooProfile.objects.get(pk=tu_1_profile.pk)
+        self.assertFalse(tu_1_profile.active)
 
         tu_3_profile = TabooProfile.objects.get(pk=tu_3_profile.pk)
         self.assertEqual(tu_3_profile.mark.pk, self.tu_2.pk)
+
+    def test_quick_reregister(self):
+        r_path = reverse('taboo-register')
+        u_path = reverse('taboo-unregister')
+
+        response = self.tu_1_client.post(r_path, {})
+        self.assertEqual(response.status_code, 302)
+
+        response = self.tu_1_client.post(u_path, {})
+        self.assertEqual(response.status_code, 302)
+
+        response = self.tu_1_client.post(r_path, {})
+        self.assertEqual(response.status_code, 400)
+
+    def test_slow_reregister(self):
+        r_path = reverse('taboo-register')
+        u_path = reverse('taboo-unregister')
+
+        response = self.tu_1_client.post(r_path, {})
+        self.assertEqual(response.status_code, 302)
+
+        response = self.tu_1_client.post(u_path, {})
+        self.assertEqual(response.status_code, 302)
+
+        prof = TabooProfile.objects.get(poster=self.tu_1)
+        prof.last_registration -= datetime.timedelta(days=42)
+
+        response = self.tu_1_client.post(r_path, {})

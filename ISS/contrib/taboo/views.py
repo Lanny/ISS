@@ -1,7 +1,34 @@
-from django.shortcuts import render
-from ISS.utils import MethodSplitView
+from django.urls import reverse
+from django.http import HttpResponseRedirect, HttpResponseBadRequest
+from django.utils import timezone
+from django.shortcuts import render, get_object_or_404
 
-# Create your views here.
+from ISS.utils import MethodSplitView
+from models import *
+from apps import TabooConfig
+
+EXT = TabooConfig.name
+
+def is_eligible(user):
+    min_posts = iss_utils.get_ext_config(EXT, 'min_posts_to_reg')
+    min_age = iss_utils.get_ext_config(EXT, 'min_age_to_reg')
+
+    if (timezone.now() - user.date_joined) < min_age:
+        return False
+
+    if user.post_set.count() < min_posts:
+        return False
+
+    try:
+        profile = TabooProfile.objects.get(poster=user)
+
+        cooldown = iss_utils.get_ext_config(EXT, 'reregister_cooldown')
+        if timezone.now() - profile.last_registration < cooldown:
+            return False
+        else:
+            return True
+    except TabooProfile.DoesNotExist:
+        return True
 
 class Status(MethodSplitView):
     require_login = True
@@ -11,7 +38,38 @@ class Status(MethodSplitView):
         return render(request, 'taboo/status.html', {})
 
 class Register(MethodSplitView):
-    pass
+    require_login = True
+    unbanned_required = True
+
+    def POST(self, request):
+        if not is_eligible(request.user):
+            return HttpResponseBadRequest('Not eligible.')
+
+        profile = None
+        try:
+            profile = TabooProfile.objects.get(poster=request.user)
+        except TabooProfile.DoesNotExist:
+            profile = TabooProfile(poster=request.user)
+
+        profile.last_registration = timezone.now()
+        profile.mark = None
+        profile.save()
+
+        return HttpResponseRedirect(reverse('taboo-status'))
 
 class Unregister(MethodSplitView):
-    pass
+    require_login = True
+    unbanned_required = True
+
+    def POST(self, request):
+        profile = get_object_or_404(TabooProfile, poster=request.user)
+        profile.active = False
+        profile.save()
+
+        those_marking = TabooProfile.objects.filter(mark=profile.poster)
+        for prof in those_marking:
+            print 'JAZZ'
+            prof.mark = None
+            prof.save()
+
+        return HttpResponseRedirect(reverse('taboo-status'))
