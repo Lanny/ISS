@@ -69,6 +69,12 @@ class TabooProfile(models.Model):
             'usertitle_reward')
         self.poster.save()
 
+        TabooViolationRecord.objects.create(
+            phrase=self.phrase,
+            poster=self.poster,
+            mark=self.mark,
+            violating_post=post)
+
         self.mark = None
         self.save()
 
@@ -77,9 +83,6 @@ class TabooProfile(models.Model):
 
     def get_successes(self):
         return TabooViolationRecord.objects.filter(poster=self.poster)
-
-        #record = TabooViolationRecord(M
-
 
 class TabooViolationRecord(models.Model):
     created = models.DateTimeField(default=timezone.now)

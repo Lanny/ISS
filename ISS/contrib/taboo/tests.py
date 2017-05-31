@@ -77,10 +77,10 @@ class TabooModelsTest(TestCase):
 
         self.assertEqual(self.profile.get_successes().count(), 1)
 
-        vrecord = self.profile.get_successes[-1]
+        vrecord = self.profile.get_successes()[0]
         self.assertEqual(vrecord.mark.pk, self.mark.pk)
         self.assertEqual(vrecord.poster.pk, self.assassin.pk)
-        self.assertEqual(crecord.violating_post.pk, post.pk)
+        self.assertEqual(vrecord.violating_post.pk, post.pk)
 
     def test_usertitle_change(self):
         thread = iss_models.Thread.objects.all()[0]
