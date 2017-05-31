@@ -68,7 +68,6 @@ class Unregister(MethodSplitView):
 
         those_marking = TabooProfile.objects.filter(mark=profile.poster)
         for prof in those_marking:
-            print 'JAZZ'
             prof.mark = None
             prof.save()
 

@@ -81,7 +81,6 @@ def check_taboo_violation(sender, instance, created, **kwargs):
 def taboo_profiles_changed(sender, instance, created, **kwargs):
     # Something changed, let's try finding a mark for every player
     needs_mark = TabooProfile.objects.all().filter(mark=None)
-    print 'JAM' + str(instance.pk)
 
     for prof in needs_mark:
         # Recheck because this process changes the contents of the QS

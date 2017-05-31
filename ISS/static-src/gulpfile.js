@@ -93,7 +93,6 @@ gulp.task('generate-extensions', [], function() {
       extConfig = ISSConfig.extension_config[ext];
 
     if ('gulp_dir' in extConfig) {
-      console.log(extConfig.gulp_dir);
       execSync('npm install', {cwd: extConfig.gulp_dir});
       execSync('npm run-script build', {cwd: extConfig.gulp_dir});
     }
