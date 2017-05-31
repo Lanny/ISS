@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load hooks %}
 
 {% block page_name %}
   {{ poster.username }} -
@@ -101,6 +102,8 @@
               </a>
             </span>
           </div>
+
+          {% render_hook user_profile_stats %}
         </div>
 
         {% if not user.pk == poster.pk %}

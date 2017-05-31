@@ -16,6 +16,7 @@ from django.views.decorators.cache import cache_control, cache_page
 
 from ISS import utils, forms
 from ISS.models import *
+from ISS.hooks import HookManager
 
 
 @cache_control(max_age=60)
@@ -290,6 +291,8 @@ class UserProfile(utils.MethodSplitView):
         if poster.pk == request.user.pk:
             ctx['settings_form'] = self._base_settings_form(poster)
             ctx['avatar_form'] = self._base_avatar_form(poster)
+
+        HookManager.add_ctx_for_hook(ctx, 'user_profile_stats', poster)
 
         return render(request, 'user_profile.html', ctx)
 
