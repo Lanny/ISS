@@ -13,10 +13,8 @@ class HookNode(template.Node):
     def render(self, context):
         catch_outputs = []
 
-        #import pdb; pdb.set_trace()
         for catch in self.manager.get_catches(self.hook_name):
             template = loader.get_template(catch.template)
-            print context
             c_ctx = context['_hooks_%s' % self.hook_name][catch._id]
             output = template.render(c_ctx)
             catch_outputs.append(output)
