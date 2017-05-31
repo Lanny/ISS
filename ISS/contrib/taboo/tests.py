@@ -14,7 +14,7 @@ EXT = TabooConfig.name
 iss_utils.get_ext_config(EXT)['min_posts_to_reg'] = 0
 iss_utils.get_ext_config(EXT)['min_age_to_reg'] = datetime.timedelta(days=0)
 
-class TabooProfileTest(TestCase):
+class TabooModelsTest(TestCase):
     def setUp(self):
         test_utils.create_std_forums()
 
@@ -66,6 +66,38 @@ class TabooProfileTest(TestCase):
         self.assertTrue(self.mark.is_banned())
         self.assertTrue(post_content in post.content)
         self.assertTrue(post_content != post.content)
+
+    def test_record_generated(self):
+        thread = iss_models.Thread.objects.all()[0]
+        post_content = 'this is fOObar man'
+        post = iss_models.Post.objects.create(
+            author=self.mark,
+            content=post_content,
+            thread=thread)
+
+        self.assertEqual(self.profile.get_successes().count(), 1)
+
+        vrecord = self.profile.get_successes[-1]
+        self.assertEqual(vrecord.mark.pk, self.mark.pk)
+        self.assertEqual(vrecord.poster.pk, self.assassin.pk)
+        self.assertEqual(crecord.violating_post.pk, post.pk)
+
+    def test_usertitle_change(self):
+        thread = iss_models.Thread.objects.all()[0]
+        post_content = 'this is fOObar man'
+        post = iss_models.Post.objects.create(
+            author=self.mark,
+            content=post_content,
+            thread=thread)
+
+        self.mark = iss_models.Poster.objects.get(pk=self.mark.pk)
+        self.assassin = iss_models.Poster.objects.get(pk=self.assassin.pk)
+
+        self.assertEqual(self.mark.custom_user_title,
+                         iss_utils.get_ext_config(EXT, 'usertitle_punishment'))
+        self.assertEqual(self.assassin.custom_user_title,
+                         iss_utils.get_ext_config(EXT, 'usertitle_reward'))
+
 
 class TabooViewTest(TestCase):
     def setUp(self):

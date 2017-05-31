@@ -37,7 +37,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Houston',
-    'ISS'
+    'ISS',
+    'ISS.contrib.taboo'
 )
 
 MIDDLEWARE = [
@@ -113,7 +114,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'ISS.Poster'
-FORUM_CONFIG = {}
+FORUM_CONFIG = {
+    'extensions': [
+        'ISS.contrib.taboo'
+    ]
+}
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',

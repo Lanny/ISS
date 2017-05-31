@@ -59,11 +59,37 @@ class TabooProfile(models.Model):
             end_date=timezone.now() + duration,
             reason=ban_reason)
 
+        self.mark.custom_user_title = iss_utils.get_ext_config(
+            EXT,
+            'usertitle_punishment')
+        self.mark.save()
+
+        self.poster.custom_user_title = iss_utils.get_ext_config(
+            EXT,
+            'usertitle_reward')
+        self.poster.save()
+
         self.mark = None
         self.save()
 
         post.content += post_msg
         post.save()
+
+    def get_successes(self):
+        return TabooViolationRecord.objects.filter(poster=self.poster)
+
+        #record = TabooViolationRecord(M
+
+
+class TabooViolationRecord(models.Model):
+    created = models.DateTimeField(default=timezone.now)
+    phrase = models.CharField(max_length=1024)
+
+    poster = models.ForeignKey(iss_models.Poster, related_name='taboo_successes')
+    mark = models.ForeignKey(iss_models.Poster, related_name='taboo_failures')
+    violating_post = models.ForeignKey(iss_models.Post, null=True,
+                                       on_delete=models.SET_NULL)
+
 
 @receiver(models.signals.post_save, sender=iss_models.Post)
 def check_taboo_violation(sender, instance, created, **kwargs):
