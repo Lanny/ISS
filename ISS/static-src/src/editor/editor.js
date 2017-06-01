@@ -5,19 +5,22 @@
         name: 'bold',
         pre: '[b]',
         post: '[/b]',
-        hotKeyCode: 66
+        hotKeyCode: 66,
+        buttonClass: 'bold'
       },
       {
         name: 'underline',
         pre: '[u]',
         post: '[/u]',
-        hotKeyCode: 85
+        hotKeyCode: 85,
+        buttonClass: 'underline'
       },
       {
         name: 'oblique',
         pre: '[i]',
         post: '[/i]',
-        hotKeyCode: 73
+        hotKeyCode: 73,
+        buttonClass: 'oblique'
       }
     ];
 
@@ -44,10 +47,28 @@
       this._ta = this._el.find('textarea');
 
       this._el.data('editor', this);
+
+      if (window.config['editor-buttons']) {
+        this._edButtonContainer = $('<div class="editor-buttons">');
+
+        for (var i=0; i<wrapOperations.length; i++) {
+          var button = $('<button>')
+            .addClass('wrap-operation')
+            .addClass(wrapOperations[i].buttonClass)
+            .attr('title', wrapOperations[i].name)
+            .data('wrapOp', wrapOperations[i])
+            .appendTo(this._edButtonContainer);
+        }
+
+        this._ta.before(this._edButtonContainer);
+      }
+
       this._bindHandlers();
     }
 
     Editor.prototype = {
+      _populateControls: function() {
+      },
       _bindHandlers: function() {
         var self = this;
 
@@ -63,6 +84,11 @@
               }
             }
           }
+        });
+
+        self._el.on('click', '.editor-buttons .wrap-operation', function(e) {
+          self.executeWrapIntension($(e.target).data('wrapOp'));
+          return false;
         });
       },
       executeWrapIntension: function(wrapOp) {
@@ -116,4 +142,3 @@
 
   define(['jquery'], wrap);
 })();
-

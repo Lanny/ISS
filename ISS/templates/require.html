@@ -3,7 +3,8 @@
 {% if allow_js %}
   <script>
     window.config = {
-      'bandcamp-embed-url': "{% url 'embed-bandcamp' %}"
+      'bandcamp-embed-url': "{% url 'embed-bandcamp' %}",
+      'editor-buttons': {% if editor_buttons %}true{% else %}false{% endif %}
     };
   </script>
 

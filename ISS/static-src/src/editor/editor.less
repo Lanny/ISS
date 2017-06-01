@@ -1,6 +1,48 @@
 @import "../base/config.less";
 
 .editor {
+  fieldset > label[for="id_content"] {
+    @media(min-width: @breakpoint) {
+      float: left;
+      width: auto;
+    }
+  }
+
+  .editor-buttons {
+    padding: 5px 0;
+    display: flex;
+
+    // Compensate for copy/cut/whatever popup thing
+    margin-bottom: 45px;
+
+    @media(min-width: @breakpoint) {
+      flex-direction: row-reverse;
+      margin-bottom: 0;
+    }
+
+    button {
+      cursor: pointer;
+
+      @media(min-width: @breakpoint) {
+        .icn-btn-scaleable(18);
+        padding: 4px;
+      }
+
+      @media(max-width: @breakpoint) {
+        .icn-btn-scaleable(36);
+        padding: 6px;
+      }
+
+      &:before { 
+        cursor: pointer;
+      }
+
+      &.bold:before { .icn-bold-b(); }
+      &.underline:before { .icn-underlined-u(); }
+      &.oblique:before { .icn-oblique-i(); }
+    }
+  }
+
   textarea {
     resize: vertical;
 

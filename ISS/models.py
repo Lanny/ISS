@@ -62,6 +62,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     allow_js = models.BooleanField(default=True)
     allow_image_embed = models.BooleanField(default=True)
+    enable_editor_buttons = models.BooleanField(default=False)
     allow_avatars = models.BooleanField(default=True)
     auto_subscribe = models.IntegerField(
         choices=SUBSCRIBE_CHOICES,

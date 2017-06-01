@@ -304,6 +304,9 @@ class UserSettingsForm(forms.Form):
             min_value=10)
     allow_js = forms.BooleanField(label="Enable javascript", required=False)
     allow_avatars = forms.BooleanField(label="Show user avatars", required=False)
+    enable_editor_buttons = forms.BooleanField(
+        label="Enable editor buttons",
+        required=False)
     allow_image_embed = forms.BooleanField(
         label="Enable images embedded in posts",
         required=False)
@@ -319,6 +322,7 @@ class UserSettingsForm(forms.Form):
         poster.allow_js = self.cleaned_data['allow_js']
         poster.allow_avatars = self.cleaned_data['allow_avatars']
         poster.allow_image_embed = self.cleaned_data['allow_image_embed']
+        poster.enable_editor_buttons = self.cleaned_data['enable_editor_buttons']
         poster.auto_subscribe = self.cleaned_data['auto_subscribe']
         poster.timezone = self.cleaned_data['timezone']
         poster.posts_per_page = self.cleaned_data['posts_per_page']
