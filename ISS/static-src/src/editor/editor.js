@@ -21,7 +21,21 @@
         post: '[/i]',
         hotKeyCode: 73,
         buttonClass: 'oblique'
-      }
+      },
+      {
+        name: 'image',
+        pre: '[img]',
+        post: '[/img]',
+        hotKeyCode: null,
+        buttonClass: 'image'
+      },
+      {
+        name: 'video',
+        pre: '[video]',
+        post: '[/video]',
+        hotKeyCode: null,
+        buttonClass: 'video'
+      },
     ];
 
     var promptDefaults = {
