@@ -10,6 +10,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from ISS import utils
+from auth_package import AuthPackage
 
 min_time = timezone.make_aware(timezone.datetime.min,
                                timezone.get_default_timezone())
@@ -241,6 +242,9 @@ class Category(models.Model):
     def __unicode__(self):
         return self.name
 
+def default_auth_pack():
+    return AuthPackage.objects.create().pk
+
 class Forum(models.Model):
     category = models.ForeignKey(Category, null=True, default=None)
     name = models.TextField()
@@ -248,6 +252,16 @@ class Forum(models.Model):
     priority = models.IntegerField(default=0, null=False)
     last_update = models.DateTimeField(default=timezone.now)
     is_trash = models.BooleanField(default=False)
+
+    create_thread_pack = models.ForeignKey(
+        AuthPackage,
+        related_name='thread_creation_pack',
+        default=default_auth_pack)
+
+    create_post_pack = models.ForeignKey(
+        AuthPackage,
+        related_name='post_creation_pack',
+        default=default_auth_pack)
 
     _flag_cache = None
 

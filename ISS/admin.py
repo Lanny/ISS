@@ -13,6 +13,7 @@ class CategoryAdmin(admin.ModelAdmin):
 admin.site.register(Forum)
 admin.site.register(Thread)
 admin.site.register(Thanks)
+admin.site.register(AuthPackage)
 
 class BanInline(admin.TabularInline):
     model = Ban

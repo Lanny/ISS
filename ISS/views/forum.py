@@ -48,7 +48,8 @@ def thread_index(request, forum_id):
 
     ctx = {
         'forum': forum,
-        'threads': page
+        'threads': page,
+        'can_start_thread': forum.create_thread_pack.check_request(request)
     }
 
     if request.user.is_authenticated():
@@ -364,6 +365,8 @@ class NewThread(utils.MethodSplitView):
     def GET(self, request, forum_id):
         forum = get_object_or_404(Forum, pk=forum_id)
         form = forms.NewThreadForm(initial={ 'forum': forum })
+
+        forum.create_thread_pack.validate_request(request)
         
         ctx = {
             'forum': forum,
@@ -375,6 +378,8 @@ class NewThread(utils.MethodSplitView):
     def POST(self, request, forum_id):
         forum = get_object_or_404(Forum, pk=forum_id)
         form = forms.NewThreadForm(request.POST)
+
+        forum.create_thread_pack.validate_request(request)
 
         if form.is_valid():
             ip_addr = request.META.get(

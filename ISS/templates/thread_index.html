@@ -16,7 +16,7 @@
       <span class="forum-description">{{ forum.description }}</span>
     </div>
 
-    {% if user.is_authenticated %}
+    {% if can_start_thread %}
       <a class="new-thread" href="{% url 'new-thread' forum.pk %}">
         New Thread
       </a>
