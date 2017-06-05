@@ -324,6 +324,8 @@ class UserProfile(utils.MethodSplitView):
                 'avatar_form': self._base_avatar_form(poster)
             }
 
+            HookManager.add_ctx_for_hook(ctx, 'user_profile_stats', poster)
+
             return render(request, 'user_profile.html', ctx)
 
     def _process_avatar_form(self, request, poster):
@@ -340,6 +342,8 @@ class UserProfile(utils.MethodSplitView):
                 'settings_form': self._base_settings_form(poster),
                 'avatar_form': form
             }
+
+            HookManager.add_ctx_for_hook(ctx, 'user_profile_stats', poster)
 
             return render(request, 'user_profile.html', ctx)
 

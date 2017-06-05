@@ -65,7 +65,7 @@ class AuthPackage(models.Model):
             raise PermissionDenied('Not authorized.')
 
     def __unicode__(self):
-        return u'%s(%d)' % (self.logic_package, self.pk)
+        return u'%s (%d)' % (self.logic_package, self.pk)
 
 
 
