@@ -14,6 +14,7 @@ admin.site.register(Forum)
 admin.site.register(Thread)
 admin.site.register(Thanks)
 admin.site.register(AuthPackage)
+admin.site.register(IPBan)
 
 class BanInline(admin.TabularInline):
     model = Ban

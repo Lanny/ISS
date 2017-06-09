@@ -4,7 +4,9 @@ import traceback
 from django.conf import settings
 from django.utils import timezone
 from django.http import Http404
+from django.core.exceptions import PermissionDenied
 
+from ISS import utils
 from ISS.models import *
 
 class BaseMiddleware(object):
@@ -13,7 +15,16 @@ class BaseMiddleware(object):
 
     def __call__(self, request):
         return self.get_response(request)
-    
+
+class IPBanMiddleware(BaseMiddleware):
+    def __call__(self, request):
+        ip_addr = request.META.get(utils.get_config('client_ip_field'), None)
+
+        if IPBan.objects.filter(on=ip_addr).count() > 0:
+            raise PermissionDenied('Fuck right off')
+        else:
+            return self.get_response(request)
+
 
 class TimezoneMiddleware(BaseMiddleware):
     def __call__(self, request):

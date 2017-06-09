@@ -52,7 +52,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'ISS.middleware.TimezoneMiddleware',
-    'ISS.middleware.PMAdminMiddleware'
+    'ISS.middleware.PMAdminMiddleware',
+    'ISS.middleware.IPBanMiddleware'
 ]
 
 ROOT_URLCONF = 'ISS.urls'

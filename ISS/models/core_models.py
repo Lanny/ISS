@@ -590,6 +590,11 @@ class Ban(models.Model):
         return u'Ban on %s for reason: %s' % (
             self.subject.username, self.reason)
 
+class IPBan(models.Model):
+    on = models.GenericIPAddressField(null=True)
+    given = models.DateTimeField(auto_now_add=True)
+    memo = models.TextField(blank=True, default='')
+
 @receiver(models.signals.post_save, sender=Post)
 def update_thread_last_update_on_insert(sender, instance, created, **kwargs):
     if not created:
