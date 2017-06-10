@@ -121,6 +121,7 @@
           // Timeout hack so val change registers and we can set a selection
           // range
           setTimeout(function() {
+            self._ta.focus();
             self._ta[0].selectionStart = selStart;
             self._ta[0].selectionEnd = selStart + wrappedContent.length;
           }, 0);
