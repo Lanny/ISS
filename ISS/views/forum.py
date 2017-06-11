@@ -96,6 +96,8 @@ class ThreadActions(utils.MethodSplitView):
                 return self._handle_edit_thread(request, thread)
             elif action == 'delete-posts':
                 return self._handle_delete_posts(request, thread)
+            elif action == 'trash-thread':
+                return self._handle_trash_thread(request, thread)
             else:
                 raise Exception('Unexpected action.')
         else:
@@ -104,6 +106,17 @@ class ThreadActions(utils.MethodSplitView):
     def _handle_edit_thread(self, request, thread):
         target = reverse('admin:ISS_thread_change',
                          args=[thread.pk])
+        return HttpResponseRedirect(target)
+
+    def _handle_trash_thread(self, request, thread):
+        trash_forums = Forum.objects.filter(is_trash=True)
+
+        if trash_forums:
+            thread.forum = trash_forums[0]
+            thread.save()
+
+        target = request.POST.get('next', None)
+        target = target or reverse('thread', kwargs={'thread_id': thread.pk})
         return HttpResponseRedirect(target)
 
     @transaction.atomic
