@@ -26,17 +26,25 @@
         name: 'image',
         pre: '[img]',
         post: '[/img]',
-        hotKeyCode: null,
-        buttonClass: 'image'
+        hotKeyCode: 73,
+        buttonClass: 'image',
+        useAlt: true
       },
       {
         name: 'video',
         pre: '[video]',
         post: '[/video]',
-        hotKeyCode: null,
-        buttonClass: 'video'
+        hotKeyCode: 86,
+        buttonClass: 'video',
+        useAlt: true
       },
     ];
+
+    // Ensure all keys requiring an alt check occur before those that do not.
+    wrapOperations.sort(function(l, r) {
+      // i r vry smrt!
+      return !l.useAlt - !r.useAlt;
+    });
 
     var promptDefaults = {
       promptText: 'Enter text:'
@@ -93,6 +101,11 @@
           } else if (e.ctrlKey || e.metaKey) {
             for (var i=0; i<wrapOperations.length; i++) {
               if (e.keyCode === wrapOperations[i].hotKeyCode) {
+                if (wrapOperations[i].useAlt && !e.altKey) {
+                  continue;
+                }
+
+                e.preventDefault();
                 self.executeWrapIntension(wrapOperations[i]);
                 break;
               }
