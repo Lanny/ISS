@@ -14,7 +14,6 @@ admin.site.register(Forum)
 admin.site.register(Thread)
 admin.site.register(Thanks)
 admin.site.register(AuthPackage)
-admin.site.register(IPBan)
 
 class BanInline(admin.TabularInline):
     model = Ban
@@ -48,4 +47,7 @@ class FilterWordAdmin(admin.ModelAdmin):
 class BanAdmin(admin.ModelAdmin):
     list_display = ('subject', 'reason', 'start_date', 'end_date', 'given_by')
 
+@admin.register(IPBan)
+class IPBanAdmin(admin.ModelAdmin):
+    list_display = ('on', 'memo')
 
