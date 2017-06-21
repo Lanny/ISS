@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load hooks %}
+{% load humanize %}
 
 {% block page_name %}
   {{ poster.username }} -
@@ -65,7 +66,7 @@
             <span class="label">Total Posts</span>
             <span class="value">
               <a href="{% url 'posts-by-user' poster.pk %}">
-                {{ poster.post_set.count }}
+                {{ poster.post_set.count|intcomma }}
               </a>
             </span>
           </div>
@@ -79,7 +80,7 @@
             <span class="label">Threads Started</span>
             <span class="value">
               <a href="{% url 'threads-by-user' poster.pk %}">
-                {{ poster.thread_set.count }}
+                {{ poster.thread_set.count|intcomma }}
               </a>
             </span>
           </div>
@@ -89,7 +90,7 @@
             <span class="label">Thanks Received</span>
             <span class="value">
               <a href="{% url 'thanked-posts' poster.pk %}">
-                {{ poster.thanks_received.count }}
+                {{ poster.thanks_received.count|intcomma }}
               </a>
             </span>
           </div>
@@ -98,7 +99,7 @@
             <span class="label">Thanks Given</span>
             <span class="value">
               <a href="{% url 'posts-thanked' poster.pk %}">
-                {{ poster.thanks_given.count }}
+                {{ poster.thanks_given.count|intcomma }}
               </a>
             </span>
           </div>

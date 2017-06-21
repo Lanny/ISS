@@ -2,6 +2,7 @@
 
 {% load static from staticfiles %} 
 {% load util_tags %}
+{% load humanize %}
 
 {% block page_name %}
   Forums -
@@ -42,8 +43,8 @@
           </a>
           <span class="forum-description">{{ forum.description }}</a>
         </td>
-        <td>{{ forum.get_thread_count }}</td>
-        <td>{{ forum.get_post_count }}</td>
+        <td>{{ forum.get_thread_count|intcomma }}</td>
+        <td>{{ forum.get_post_count|intcomma }}</td>
       </tr>
       {% endfor %}
       {% endfor %}

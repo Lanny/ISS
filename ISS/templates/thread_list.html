@@ -1,4 +1,5 @@
 {% load util_tags %}
+{% load humanize %}
 {% load static from staticfiles %} 
 
 <table class="threads">
@@ -88,7 +89,7 @@
       {% endwith %}
     </td>
     <td>
-      {{ thread.get_post_count }}
+      {{ thread.get_post_count|intcomma }}
     </td>
   </tr>
   {% empty %}
