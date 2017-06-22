@@ -255,9 +255,6 @@ def usercp(request):
 
     return render(request, 'user_cp.html', ctx)
 
-
-
-
 def user_list(request):
     posters = Poster.objects.all().order_by('username')
     posters_per_page = 20
@@ -673,7 +670,8 @@ class SpamCanUser(utils.MethodSplitView):
                     author=poster)
                 new_thread.save()
 
-                move_posts.update(thread=new_thread)
+                for post in move_posts:
+                    post.move_to_thread(new_thread)
 
             return HttpResponseRedirect(form.cleaned_data['next_page'])
 

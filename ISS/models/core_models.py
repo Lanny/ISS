@@ -431,12 +431,12 @@ class Post(models.Model):
     def get_thanker_pks(self):
         return {t.thanker_id for t in self.thanks_set.all()}
 
-    def delete(self, *args, **kwargs):
+    def _rectify_subscriptions_on_removal_from_thread(self):
         """
-        Somewhat complex. When a post is deleted some ThreadFlags will have an
-        FK to it on their last_read_post key. We need to set last_read_post to
-        the prior post in thread order (or delete the sub if the last read was
-        the op).
+        Somewhat complex. When a post is removed from a thread some ThreadFlags
+        will have an FK to it on their last_read_post key. We need to set
+        last_read_post to the prior post in thread order (or delete the sub if
+        the last read was the op) and update thread last_updated field.
         """
         impacted_flags = ThreadFlag.objects.filter(last_read_post=self)
         thread = self.thread
@@ -452,7 +452,30 @@ class Post(models.Model):
                     except IndexError:
                         # Subscription pointed to the OP. Burn it.
                         impacted_flags.delete()
-            
+
+            # Find the last post in thread order and set thread.last_update to
+            # its create date.
+            last_post = None
+            if posts_in_thread[0].pk != self.pk:
+                last_post = posts_in_thread[0]
+            elif len(posts_in_thread) > 1:
+                last_post = posts_in_thread[1]
+            else:
+                # OP was only post in thread and just got removed. Uhh, should
+                # probably delete but this situation should be naturally
+                # possible. Let's raise an exception instead
+                raise Exception('Unexpected post removal scenario.')
+
+            thread.last_update = last_post.created
+            thread.save()
+
+    def move_to_thread(self, target_thread):
+        self._rectify_subscriptions_on_removal_from_thread()
+        self.thread = target_thread
+        self.save()
+
+    def delete(self, *args, **kwargs):
+        self._rectify_subscriptions_on_removal_from_thread()
         super(Post, self).delete(*args, **kwargs)
 
 class Thanks(models.Model):
