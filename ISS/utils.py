@@ -94,7 +94,8 @@ config_defaults = {
     'shortcode_registrar': GlobShortcodeRegistrar('img/gif/'),
     'client_ip_field': 'REMOTE_ADDR',
     'extensions': [],
-    'extension_config': {}
+    'extension_config': {},
+    'min_account_age_to_anonymize': datetime.timedelta(days=28)
 }
 
 config = config_defaults.copy()

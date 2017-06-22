@@ -719,6 +719,10 @@ def get_bc_embed_code(request):
 class AutoAnonymize(utils.MethodSplitView):
     require_login = True
 
+    def pre_method_check(self, request, *args, **kwargs):
+        if not request.user.can_auto_anonymize():
+            raise PermissionDenied('Account not old enough.')
+
     def GET(self, request):
         return render(request, 'auto_anonymize.html', {})
 
