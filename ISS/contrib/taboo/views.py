@@ -35,7 +35,9 @@ class Status(MethodSplitView):
     unbanned_required = True
 
     def GET(self, request):
-        return render(request, 'taboo/status.html', {})
+        return render(request, 'taboo/status.html', {
+            'eligible': is_eligible(request.user)
+        })
 
 class Register(MethodSplitView):
     require_login = True
@@ -51,6 +53,7 @@ class Register(MethodSplitView):
         except TabooProfile.DoesNotExist:
             profile = TabooProfile(poster=request.user)
 
+        profile.active = True
         profile.last_registration = timezone.now()
         profile.mark = None
         profile.save()

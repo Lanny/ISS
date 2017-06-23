@@ -56,7 +56,7 @@
           <input type="submit" value="unregister" />
         </form>
       </p>
-    {% else %}
+    {% elif eligible %}
       <div>
         You are not currently registered. If you would like to participate you may 
 
@@ -65,6 +65,8 @@
           <input type="submit" value="register" />
         </form>.
       </div>
+    {% else %}
+      You are not currently registered and not eligible to register.
     {% endif %}
   </div>
 </div>
