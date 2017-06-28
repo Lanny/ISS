@@ -359,3 +359,63 @@ class TolerantJSONEncoder(json.JSONEncoder):
             return super(self, json.JSONEncoder).default(o)
         except TypeError:
             return None
+
+class HomoglyphNormalizer(object):
+    @classmethod
+    def _decode_hex_repr(cls, s):
+        return ('\\U%08x' % int(s, 16)).decode('unicode-escape')
+
+    @classmethod
+    def _decode_seq(cls, s):
+        return u''.join(
+            [cls._decode_hex_repr(point) for point in s.strip().split(' ')]
+        )
+
+    def __init__(self, confusables_file=None):
+        if not confusables_file:
+            confusables_file = open('ISS/support/confusables.txt', 'r')
+
+        self._norm_graph = {}
+
+        with confusables_file:
+            for line in confusables_file:
+                # Strip off comments
+                effective_line = line.split('#', 1)[0].strip()
+
+                if effective_line.count(';') < 2:
+                    continue
+
+                confusable_seq, target_seq, _ = effective_line.split(';', 2)
+                confusable = self._decode_seq(confusable_seq)
+                target = self._decode_seq(target_seq)
+
+                if self._norm_graph.has_key(confusable):
+                    f.close()
+                    raise ValueError('One confusable codepoint has multiple '
+                                     'normalization targets.')
+
+                self._norm_graph[confusable] = target
+
+    def normalize(self, unicode_str):
+        if not isinstance(unicode_str, unicode):
+            raise ValueError('unicode_str argument must be an instance '
+                             'of `unicode`')
+
+        normalized = []
+
+        for code_point in unicode_str:
+            if self._norm_graph.has_key(code_point):
+                normalized.append(self._norm_graph[code_point])
+            else:
+                normalized.append(code_point)
+
+        return u''.join(normalized)
+
+_process_normalizer = None
+def normalize_homoglyphs(prenormalized):
+    global _process_normalizer
+    if not _process_normalizer:
+        _process_normalizer = HomoglyphNormalizer()
+
+    return _process_normalizer.normalize(prenormalized)
+
