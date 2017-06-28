@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.test import SimpleTestCase
 from ISS.models import *
 
 import test_utils
@@ -60,6 +61,27 @@ class PosterTestCase(TestCase):
 
         self.assertEqual(dons_alts[0]['poster'].pk, self.lanny.pk)
         self.assertEqual(dons_alts[0]['addr'], '8.8.8.4')
+
+class PosterUsernameNormalizationTestCase(SimpleTestCase):
+    def assertNormEqual(self, username_one, username_two):
+        return self.assertEqual(
+                Poster.normalize_username(username_one),
+                Poster.normalize_username(username_two))
+
+    def test_capitalization(self):
+        self.assertNormEqual(u'Lanny', u'lanny')
+
+    def test_spaces(self):
+        self.assertNormEqual(u'Don Knuth', u'Don Knuth')
+
+    def test_mixed_white_space(self):
+        self.assertNormEqual(u'Don Knuth', u'D on\tKnuth\n\n')
+
+    def test_mixed_white_space_and_caps(self):
+        self.assertNormEqual(u'Don Knuth', u'd On\tknuTh\n\n')
+
+    def test_homoglyph_attack(self):
+        self.assertNormEqual(u'\u216Canny', u'Lanny')
 
 class SubscriptionTestCase(TestCase):
     def setUp(self):
