@@ -400,8 +400,7 @@ class HomoglyphNormalizer(object):
 
     def normalize(self, unicode_str):
         if not isinstance(unicode_str, unicode):
-            raise ValueError('unicode_str argument must be an instance '
-                             'of `unicode`')
+            unicode_str = unicode(unicode_str)
 
         normalized = []
 

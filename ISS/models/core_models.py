@@ -654,7 +654,8 @@ def update_forum_last_update(sender, instance, created, **kwargs):
 
 @receiver(models.signals.pre_save, sender=Poster)
 def set_normalized_username(sender, instance, **kwargs):
-    instance.normalized_username = Poster.normalize_username(instance.username)
+    if not instance.normalized_username:
+        instance.normalized_username = Poster.normalize_username(instance.username)
 
 @receiver(models.signals.pre_save, sender=Thanks)
 def reject_auto_erotic_athanksication(sender, instance, **kwargs):

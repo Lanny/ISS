@@ -27,8 +27,11 @@ class Command(BaseCommand):
                        'who should remain able to log in.')
 
                 for idx, dupe in enumerate(dupes):
-                    print '%d. "%s" (%d)' % (idx+1, repr(dupe.username),
-                                            dupe.post_set.count())
+                    print '%d. "%s" (posts: %d, pk: %d)' % (
+                            idx+1,
+                            repr(dupe.username),
+                            dupe.post_set.count(),
+                            dupe.pk)
 
                 i = None
                 while type(i) != int or idx > len(dupes) or idx < 1:
