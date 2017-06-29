@@ -16,7 +16,6 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         pass
 
-    @transaction.atomic
     def handle(self, **kwargs):
         for poster in Poster.objects.all().iterator():
             normed = Poster.normalize_username(poster.username)
@@ -34,7 +33,7 @@ class Command(BaseCommand):
                             dupe.pk)
 
                 i = None
-                while type(i) != int or idx > len(dupes) or idx < 1:
+                while type(i) != int or i > len(dupes) or i < 1:
                     try:
                         i = int(raw_input('>'))
                     except ValueError:
