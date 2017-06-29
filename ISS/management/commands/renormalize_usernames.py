@@ -19,8 +19,16 @@ class Command(BaseCommand):
     def handle(self, **kwargs):
         for poster in Poster.objects.all().iterator():
             normed = Poster.normalize_username(poster.username)
-            dupes = Poster.objects.filter(normalized_username=normed)
+            poster.normalized_username = normed
+            poster.save()
 
+        encountered_pks = set([])
+        for poster in Poster.objects.all().iterator():
+            if poster.pk in encountered_pks:
+                continue
+
+            normed = Poster.normalize_username(poster.username)
+            dupes = Poster.objects.filter(normalized_username=normed)
             if len(dupes) > 1:
                 print ('Duplicate normalized username found. Select the user '
                        'who should remain able to log in.')
@@ -40,16 +48,15 @@ class Command(BaseCommand):
                         pass
 
                 for idx, dupe in enumerate(dupes):
+                    encountered_pks.add(dupe.pk)
                     if idx != i-1:
                         dupe.normalized_username = normed + str(idx)
                         dupe.save()
+                        print Poster.objects.get(pk=dupe.pk).normalized_username
 
                 true_user = dupes[i-1]
                 true_user.normalized_username = normed
                 true_user.save()
 
-            else:
-                poster.normalized_username = normed
-                poster.save()
-
         print 'Done.'
+
