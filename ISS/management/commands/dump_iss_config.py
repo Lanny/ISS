@@ -8,10 +8,8 @@ from ISS import utils
 
 
 class Command(BaseCommand):
-    help = ('Migrates a vBulletin 5 database to ISS. Source database location '
-            'and credentials must be supplied, target database info is picked '
-            'up from settings.py. NB: this process is only idempotent over '
-            'the users table.')
+    help = ('Outputs the ISS configuration options as JSON. Primarily useful '
+            'for communicating settings to frontend code.')
 
     def add_arguments(self, parser):
         pass
