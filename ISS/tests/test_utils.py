@@ -25,7 +25,7 @@ def create_user(thread_count=0, post_count=0):
     global THREADS_CREATED
 
     USERS_CREATED += 1
-    user = Poster(username='TEST_USER-%d' % USERS_CREATED)
+    user = Poster(username=u'TEST_USER-%d' % USERS_CREATED)
     user.save()
 
     for _ in range(thread_count):

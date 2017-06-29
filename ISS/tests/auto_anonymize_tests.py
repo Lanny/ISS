@@ -3,9 +3,9 @@ from ISS.models import *
 
 class AutoAnonymizeTestCase(TestCase):
     def setUp(self):
-        self.scrub = Poster(username='scrub')
-        self.aa1 = Poster(username='Autoanonymizer One')
-        self.aa2 = Poster(username='Autoanonymizer Two')
+        self.scrub = Poster(username=u'scrub')
+        self.aa1 = Poster(username=u'Autoanonymizer One')
+        self.aa2 = Poster(username=u'Autoanonymizer Two')
 
         self.scrub.save()
         self.aa1.save()

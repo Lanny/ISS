@@ -373,7 +373,9 @@ class HomoglyphNormalizer(object):
 
     def __init__(self, confusables_file=None):
         if not confusables_file:
-            confusables_file = open('ISS/support/confusables.txt', 'r')
+            base = os.path.dirname(os.path.abspath(__file__))
+            path = os.path.join(base, 'support/confusables.txt')
+            confusables_file = open(path, 'r')
 
         self._norm_graph = {}
 

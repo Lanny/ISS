@@ -211,6 +211,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     @classmethod
     def _get_or_create_user(cls, username):
+        username = unicode(username)
         norm_username = cls.normalize_username(username)
 
         try:
