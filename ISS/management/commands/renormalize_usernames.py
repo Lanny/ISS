@@ -38,11 +38,13 @@ class Command(BaseCommand):
                         pass
 
                 for idx, dupe in enumerate(dupes):
-                    if idx == i+1:
-                        dupe.normalized_username = normed
-                        dupe.save()
-                    else:
+                    if idx != i-1:
                         dupe.normalized_username = normed + str(idx)
+                        dupe.save()
+
+                true_user = dupes[i-1]
+                true_user.normalized_username = normed
+                true_user.save()
 
             else:
                 poster.normalized_username = normed
