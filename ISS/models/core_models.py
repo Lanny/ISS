@@ -171,7 +171,12 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     def can_auto_anonymize(self):
         min_age = utils.get_config('min_account_age_to_anonymize')
-        return (timezone.now() - self.date_joined) > min_age
+        min_posts = utils.get_config('min_posts_to_anonymize')
+
+        account_age = (timezone.now() - self.date_joined)
+        post_count = self.post_set.count()
+
+        return  account_age >= min_age and post_count >= min_posts
 
     @transaction.atomic
     def merge_into(self, other):

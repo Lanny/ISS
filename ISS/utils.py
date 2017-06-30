@@ -95,7 +95,8 @@ config_defaults = {
     'client_ip_field': 'REMOTE_ADDR',
     'extensions': [],
     'extension_config': {},
-    'min_account_age_to_anonymize': datetime.timedelta(days=28)
+    'min_account_age_to_anonymize': datetime.timedelta(days=28),
+    'min_posts_to_anonymize': 150
 }
 
 config = config_defaults.copy()

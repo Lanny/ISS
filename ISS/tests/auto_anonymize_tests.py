@@ -1,5 +1,11 @@
-from django.test import TestCase
+import datetime
+
+from django.test import TestCase, Client
+from django.urls import reverse
+from django.utils import timezone
+
 from ISS.models import *
+from ISS.tests import test_utils
 
 class AutoAnonymizeTestCase(TestCase):
     def setUp(self):
@@ -50,3 +56,41 @@ class AutoAnonymizeTestCase(TestCase):
         self.assertEqual(self.aa2.thanks_given.count(), 0)
 
         self.assertEqual(junk_user.thanks_given.count(), 1)
+
+
+class AutoAnonymizeViewTestCase(TestCase):
+    def setUp(self):
+        test_utils.create_std_forums()
+
+    def test_younguns_cant_autoanonymize(self):
+        tu = test_utils.create_user(1, 151)
+        client = Client()
+        client.force_login(tu)
+        url = reverse('auto-anonymize')
+        response = client.post(url)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_newbs_cant_autoanonymize(self):
+        tu = test_utils.create_user(1, 5)
+        tu.date_joined = timezone.now() - datetime.timedelta(days=365)
+        tu.save()
+
+        client = Client()
+        client.force_login(tu)
+        url = reverse('auto-anonymize')
+        response = client.post(url)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_well_aged_users_can_autoanonymize(self):
+        tu = test_utils.create_user(1, 151)
+        tu.date_joined = timezone.now() - datetime.timedelta(days=365)
+        tu.save()
+
+        client = Client()
+        client.force_login(tu)
+        url = reverse('auto-anonymize')
+        response = client.post(url)
+
+        self.assertEqual(response.status_code, 302)
