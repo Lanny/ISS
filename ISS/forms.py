@@ -81,7 +81,39 @@ class CaptchaForm(forms.Form):
 
         return self.cleaned_data
 
-class NewThreadForm(forms.Form):
+class InitialPeriodLimitingForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        if 'author' not in kwargs:
+            raise ValueError('Must be inited with a author')
+
+        self._author = kwargs['author']
+        del kwargs['author']
+
+        super(InitialPeriodLimitingForm, self).__init__(*args, **kwargs)
+
+    def clean(self, *args, **kwargs):
+        super(InitialPeriodLimitingForm, self).clean(*args, **kwargs)
+
+        post_count = self._author.post_set.count()
+        if post_count < utils.get_config('initial_account_period_total'):
+            window_start = timezone.now() - utils.get_config(
+                'initial_account_period_width')
+
+            posts_in_window = (self._author
+                                   .post_set
+                                   .order_by('-created')
+                                   .filter(created__gte=window_start)
+                                   .count())
+
+            if posts_in_window >= utils.get_config(
+                    'initial_account_period_limit'):
+                raise ValidationError(
+                    ('You\'ve made too many posts on a new account. This '
+                     'control will be removed once your account is better '
+                     'established.'),
+                    code='FLOOD_CONTROL')
+
+class NewThreadForm(InitialPeriodLimitingForm):
     error_css_class = 'in-error'
     thread_min_len = utils.get_config('min_thread_title_chars')
     post_min_len = utils.get_config('min_post_chars')
@@ -124,7 +156,7 @@ class NewThreadForm(forms.Form):
 
         return self.thread
 
-class NewPostForm(forms.Form):
+class NewPostForm(InitialPeriodLimitingForm):
     error_css_class = 'in-error'
     post_min_len = utils.get_config('min_post_chars')
     post_max_len = utils.get_config('max_post_chars')
@@ -136,19 +168,6 @@ class NewPostForm(forms.Form):
 
     thread = forms.ModelChoiceField(queryset=Thread.objects.all(),
                                     widget=forms.HiddenInput())
-    _author = None
-
-    def __init__(self, *args, **kwargs):
-        if 'author' not in kwargs:
-            raise ValueError('Must be inited with a author')
-
-        self._author = kwargs['author']
-        del kwargs['author']
-
-        super(NewPostForm, self).__init__(*args, **kwargs)
-
-        self.post = None
-
 
     def clean_thread(self):
         thread = self.cleaned_data['thread']
