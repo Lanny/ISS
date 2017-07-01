@@ -20,6 +20,24 @@ def create_std_forums():
 USERS_CREATED = 0
 THREADS_CREATED = 0
 
+def create_posts(user, count, bulk=False):
+    """
+    Create `count` posts belonging to `user`. Skips signal triggering if `bulk`
+    is True which speeds things up but may cause unexpected behavior.
+    """
+    posts = [Post(
+                author=user,
+                thread=random.choice(Thread.objects.all()),
+                content='postum ipsum',
+                posted_from='8.8.8.8')
+            for _ in xrange(count)]
+
+    if bulk:
+        Post.objects.bulk_create(posts)
+    else:
+        for post in posts:
+            post.save()
+
 def create_user(thread_count=0, post_count=0): 
     global USERS_CREATED
     global THREADS_CREATED
@@ -45,12 +63,6 @@ def create_user(thread_count=0, post_count=0):
             posted_from='8.8.8.4')
         op.save()
 
-    for _ in range(post_count):
-        post = Post(
-            author=user,
-            thread=random.choice(Thread.objects.all()),
-            content='postum ipsum',
-            posted_from='8.8.8.8')
-        post.save()
+    create_posts(user, post_count)
 
     return user

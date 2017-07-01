@@ -96,7 +96,10 @@ config_defaults = {
     'extensions': [],
     'extension_config': {},
     'min_account_age_to_anonymize': datetime.timedelta(days=28),
-    'min_posts_to_anonymize': 150
+    'min_posts_to_anonymize': 151,
+    'initial_account_period_total': 150,
+    'initial_account_period_width': datetime.timedelta(days=1),
+    'initial_account_period_limit': 20
 }
 
 config = config_defaults.copy()

@@ -1,7 +1,11 @@
+import datetime
+
 from django.test import TestCase, Client
 from django.urls import reverse
-from ISS.models import *
+from django.utils import timezone
 
+from ISS.models import *
+from ISS import utils
 import test_utils
 
 class GeneralViewTestCase(TestCase):
@@ -41,6 +45,51 @@ class GeneralViewTestCase(TestCase):
         path = reverse('user-profile', kwargs={'user_id': self.scrub.pk})
         response = self.scrub_client.get(path)
         self.assertEqual(response.status_code, 200)
+
+class PostFloodControlTestCase(TestCase):
+    def setUp(self):
+        test_utils.create_std_forums()
+        self.scrub = test_utils.create_user(thread_count=1, post_count=0)
+        self.thread = Thread.objects.get(author=self.scrub)
+        self.scrub_client = Client()
+        self.scrub_client.force_login(self.scrub)
+        self.path = reverse('new-reply', args=(self.thread.pk,))
+        self.limit = utils.get_config('initial_account_period_limit')
+
+    def _attempt_new_post(self):
+        prior_count = self.scrub.post_set.count()
+
+        response = self.scrub_client.post(self.path, {
+            'content': 'foobar!',
+            'thread': self.thread.pk
+        })
+
+        return self.scrub.post_set.count() - prior_count
+
+    def test_initial_account_period_compliance(self):
+        # Post should be created
+        self.assertEqual(self._attempt_new_post(), 1)
+
+    def test_initial_account_period_violation(self):
+        test_utils.create_posts(self.scrub, self.limit, bulk=True)
+        # Post should be rejected
+        self.assertEqual(self._attempt_new_post(), 0)
+
+    def test_initial_account_period_violation_cooldown(self):
+        test_utils.create_posts(self.scrub, self.limit, bulk=True)
+        new_created = timezone.now() - utils.get_config(
+                'initial_account_period_width')
+        self.scrub.post_set.update(created=new_created)
+
+        # Post should be created
+        self.assertEqual(self._attempt_new_post(), 1)
+
+    def test_initial_account_period_done(self):
+        # Create enough posts to get us out of the initial period
+        count = utils.get_config('initial_account_period_total')
+        test_utils.create_posts(self.scrub, count + 1, bulk=True)
+
+        self.assertEqual(self._attempt_new_post(), 1)
 
 class ThreadActionTestCase(TestCase):
     def setUp(self):
