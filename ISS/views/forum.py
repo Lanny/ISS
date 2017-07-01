@@ -378,7 +378,8 @@ class NewThread(utils.MethodSplitView):
 
     def GET(self, request, forum_id):
         forum = get_object_or_404(Forum, pk=forum_id)
-        form = forms.NewThreadForm(initial={ 'forum': forum })
+        form = forms.NewThreadForm(initial={ 'forum': forum },
+                                   author=request.user)
 
         forum.create_thread_pack.validate_request(request)
         
@@ -391,7 +392,7 @@ class NewThread(utils.MethodSplitView):
 
     def POST(self, request, forum_id):
         forum = get_object_or_404(Forum, pk=forum_id)
-        form = forms.NewThreadForm(request.POST)
+        form = forms.NewThreadForm(request.POST, author=request.user)
 
         forum.create_thread_pack.validate_request(request)
 
