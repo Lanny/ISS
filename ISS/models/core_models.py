@@ -41,7 +41,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     _user_title_cache_key = 'posters:%d:usertitle'
 
     username = models.CharField(max_length=256, unique=True)
-    normalized_username = models.CharField(max_length=256)
+    normalized_username = models.CharField(max_length=2048)
     email = models.EmailField()
     date_joined = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
