@@ -83,6 +83,9 @@ class PosterUsernameNormalizationTestCase(SimpleTestCase):
     def test_homoglyph_attack(self):
         self.assertNormEqual(u'\u216Canny', u'Lanny')
 
+    def test_case_sensitive_homoglyphs(self):
+        self.assertNormEqual(u'Willard Quine', u'willard quine')
+
 class SubscriptionTestCase(TestCase):
     def setUp(self):
         test_utils.create_std_forums()

@@ -238,7 +238,6 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     @classmethod
     def normalize_username(cls, username):
         norm = utils.normalize_homoglyphs(username)
-        norm = norm.lower()
         norm = re.sub('\s', '', norm)
 
         return norm

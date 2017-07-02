@@ -402,17 +402,20 @@ class HomoglyphNormalizer(object):
 
                 self._norm_graph[confusable] = target
 
+    def _norm_codepoint(self, code_point):
+        if self._norm_graph.has_key(code_point):
+            return self._norm_graph[code_point]
+        else:
+            return code_point
+
     def normalize(self, unicode_str):
         if not isinstance(unicode_str, unicode):
             unicode_str = unicode(unicode_str)
 
         normalized = []
-
         for code_point in unicode_str:
-            if self._norm_graph.has_key(code_point):
-                normalized.append(self._norm_graph[code_point])
-            else:
-                normalized.append(code_point)
+            normalized.append(self._norm_codepoint(code_point.lower()))
+            normalized.append(self._norm_codepoint(code_point.upper()))
 
         return u''.join(normalized)
 
