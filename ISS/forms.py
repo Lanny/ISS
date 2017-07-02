@@ -322,6 +322,13 @@ class UserSettingsForm(forms.Form):
             label="Posts to show per page",
             max_value=50,
             min_value=10)
+    new_password = forms.CharField(label='New Password',
+                                   min_length=6,
+                                   required=False,
+                                   widget=forms.PasswordInput)
+    new_password_repeat = forms.CharField(label='New Password (repeat)',
+                                          required=False,
+                                          widget=forms.PasswordInput)
     allow_js = forms.BooleanField(label="Enable javascript", required=False)
     allow_avatars = forms.BooleanField(label="Show user avatars", required=False)
     enable_editor_buttons = forms.BooleanField(
@@ -337,6 +344,19 @@ class UserSettingsForm(forms.Form):
         choices=Poster.SUBSCRIBE_CHOICES,
         widget=forms.RadioSelect)
 
+    def clean(self, *args, **kwargs):
+        ret = super(UserSettingsForm, self).clean(*args, **kwargs)
+
+        if self.cleaned_data.get('new_password', False):
+            password = self.cleaned_data.get('new_password', None)
+            repeat = self.cleaned_data.get('new_password_repeat', None)
+
+            if password != repeat: 
+                raise ValidationError('Passwords didn\'t match',
+                                      code='PASSWORD_DIDNT_MATCH')
+
+        return ret
+
     def save(self, poster):
         poster.email = self.cleaned_data['email']
         poster.allow_js = self.cleaned_data['allow_js']
@@ -351,6 +371,9 @@ class UserSettingsForm(forms.Form):
             poster.tripphrase = tripphrase(poster.username)
         else:
             poster.tripphrase = None
+
+        if self.cleaned_data['new_password']:
+            poster.set_password(self.cleaned_data['new_password'])
 
         poster.save()
 
