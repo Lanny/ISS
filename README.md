@@ -44,7 +44,7 @@ $ ./manage.py migrate
 We also use a DB cache so you need to create that table seperately:
 
 ```
-$ ./manage.py ISS_cache
+$ ./manage.py ./manage.py createcachetable
 ```
 
 The default settings also specify a `default` cache as a LocMemCache. If you're
