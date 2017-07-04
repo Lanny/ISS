@@ -45,7 +45,6 @@ class BBCodeField(forms.CharField):
 
         return value
 
-
 class CaptchaForm(forms.Form):
     def clean(self, *args, **kwargs):
         if not utils.get_config('recaptcha_settings'):

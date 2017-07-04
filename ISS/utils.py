@@ -18,6 +18,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse, \
     HttpResponseForbidden
 from django.shortcuts import render
+from captcha.fields import ReCaptchaField
 
 from ISS.models import *
 from ISS import iss_bbcode
@@ -99,7 +100,8 @@ config_defaults = {
     'min_posts_to_anonymize': 151,
     'initial_account_period_total': 150,
     'initial_account_period_width': datetime.timedelta(days=1),
-    'initial_account_period_limit': 20
+    'initial_account_period_limit': 20,
+    'captcha_period': 0
 }
 
 config = config_defaults.copy()
@@ -427,3 +429,15 @@ def normalize_homoglyphs(prenormalized):
 
     return _process_normalizer.normalize(prenormalized)
 
+def captchatize_form(form):
+    _config = get_config('recaptcha_settings')
+
+    if config:
+        class NewForm(form):
+            captcha = ReCaptchaField(public_key=_config[0],
+                                     private_key=_config[1])
+
+        return NewForm
+
+    else:
+        return form

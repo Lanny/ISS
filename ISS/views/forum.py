@@ -18,6 +18,16 @@ from ISS import utils, forms
 from ISS.models import *
 from ISS.hooks import HookManager
 
+def _get_new_post_form(request):
+    if not request.user.is_authenticated():
+        return forms.NewPostForm
+
+    post_count = request.user.post_set.count()
+
+    if post_count < utils.get_config('captcha_period'):
+        return utils.captchatize_form(forms.NewPostForm)
+    else:
+        return forms.NewPostForm
 
 @cache_control(max_age=60)
 def forum_index(request):
@@ -61,8 +71,8 @@ def thread(request, thread_id):
     thread = get_object_or_404(Thread, pk=thread_id)
     posts = thread.post_set.order_by('created').select_related('author')
     page = utils.get_posts_page(posts, request)
-    reply_form = forms.NewPostForm(author=request.user,
-                                   initial={ 'thread': thread })
+    reply_form = _get_new_post_form(request)(author=request.user,
+                                             initial={ 'thread': thread })
 
     ctx = {
         'thread': thread,
@@ -374,12 +384,21 @@ class UserProfile(utils.MethodSplitView):
         
 
 class NewThread(utils.MethodSplitView):
+    login_required = True
     unbanned_required = True
+
+    def _get_form(self, request):
+        post_count = request.user.post_set.count()
+
+        if post_count < utils.get_config('captcha_period'):
+            return utils.captchatize_form(forms.NewThreadForm)
+        else:
+            return forms.NewThreadForm
 
     def GET(self, request, forum_id):
         forum = get_object_or_404(Forum, pk=forum_id)
-        form = forms.NewThreadForm(initial={ 'forum': forum },
-                                   author=request.user)
+        form = self._get_form(request)(initial={ 'forum': forum },
+                                       author=request.user)
 
         forum.create_thread_pack.validate_request(request)
         
@@ -392,7 +411,7 @@ class NewThread(utils.MethodSplitView):
 
     def POST(self, request, forum_id):
         forum = get_object_or_404(Forum, pk=forum_id)
-        form = forms.NewThreadForm(request.POST, author=request.user)
+        form = self._get_form(request)(request.POST, author=request.user)
 
         forum.create_thread_pack.validate_request(request)
 
@@ -415,6 +434,9 @@ class NewReply(utils.MethodSplitView):
     login_required = True
     unbanned_required = True
 
+    def _get_form(self, request):
+        return _get_new_post_form(request)
+
     def GET(self, request, thread_id):
         thread = get_object_or_404(Thread, pk=thread_id)
         form_initials = { 'thread': thread }
@@ -430,7 +452,7 @@ class NewReply(utils.MethodSplitView):
             except Post.DoesNotExist:
                 pass
 
-        form = forms.NewPostForm(author=author, initial=form_initials)
+        form = self._get_form(request)(author=author, initial=form_initials)
         
         ctx = {
             'thread': thread,
@@ -442,7 +464,7 @@ class NewReply(utils.MethodSplitView):
     def POST(self, request, thread_id):
         thread = get_object_or_404(Thread, pk=thread_id)
         author = request.user
-        form = forms.NewPostForm(request.POST, author=author)
+        form = self._get_form(request)(request.POST, author=author)
 
         if form.is_valid():
             post = form.get_post()
