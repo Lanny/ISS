@@ -241,7 +241,7 @@ def bandcamp_markup_for_url(urlstr):
     return markup
 
 
-def get_standard_bbc_parser(embed_images=True, escape_html=True):
+def get_standard_bbc_parser(embed_images=True, allow_js=True, escape_html=True):
     return iss_bbcode.build_parser((
             'IMG' if embed_images else 'NO_IMG',
             'VIDEO' if embed_images else 'NO_IMG',
@@ -250,7 +250,7 @@ def get_standard_bbc_parser(embed_images=True, escape_html=True):
             'CODE',
             'BC',
             'LINK',
-            'SPOILER',
+            'SPOILER' if allow_js else 'NOJS_SPOILER',
             'SHORTCODE'
         ), escape_html=escape_html)
 

@@ -39,6 +39,11 @@ def user_config(request):
         ctx['editor_buttons'] = request.user.enable_editor_buttons
         ctx['allow_avatars'] = request.user.allow_avatars
 
+    ctx['bbcode_settings'] = {
+        'allow_js': ctx['allow_js'],
+        'embed_images': ctx['embed_images']
+    }
+
     return ctx
 
 def private_messages(request):

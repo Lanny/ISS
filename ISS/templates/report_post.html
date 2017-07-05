@@ -24,11 +24,11 @@ Report Post -
       <fieldset>
         {% csrf_token %}
         <p>
-          {{ config.report_message|bbc }}
+          {{ config.report_message|bbc:bbcode_settings }}
         </p>
 
         <p>
-          {{ post.quote_content|bbc }}
+          {{ post.quote_content|bbc:bbcode_settings }}
         </p>
 
         {{ form.as_p }}

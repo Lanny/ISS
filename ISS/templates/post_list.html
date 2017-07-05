@@ -57,7 +57,7 @@
 
       <div class="post-block">
         <div class="post-body">
-          {{ post.content|bbc:embed_images }}
+          {{ post.content|bbc:bbcode_settings }}
         </div>
 
         {% if user.is_authenticated and show_post_controls %}

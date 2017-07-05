@@ -201,6 +201,13 @@ def _add_spoiler_tag(parser):
     parser.add_formatter('spoiler', render_spoiler)
     return parser
 
+def _add_nojs_spoiler_tag(parser):
+    def render_nojs_spoiler(tag_name, value, options, parent, context):
+        return '<div class="nojs-spoiler">%s</div>' % value
+
+    parser.add_formatter('spoiler', render_nojs_spoiler)
+    return parser
+
 def _add_shortcode_preprocessor(parser):
     global shortcode_pat
     global shortcode_map
@@ -253,6 +260,7 @@ _supported_tags = {
     'BC': _add_bc_tag,
     'LINK': _add_link_tag,
     'SPOILER': _add_spoiler_tag,
+    'NOJS_SPOILER': _add_nojs_spoiler_tag,
     'SHORTCODE': _add_shortcode_tag
 }
 
