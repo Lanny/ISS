@@ -35,6 +35,29 @@
   }
 }
 
+.nojs-spoiler {
+  .label:after {
+    content: 'Show ';
+  }
+
+  .spoiler-hack-checkbox {
+    display: none;
+  }
+
+  .spoiler-hack-checkbox:checked ~ .content {
+    display: block;
+  }
+
+  .spoiler-hack-checkbox:checked ~ .tab {
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+
+    .label:after {
+      content: 'Hide ';
+    }
+  }
+}
+
 .yt-embed {
   max-width: 100%;
   max-height: 95vh;

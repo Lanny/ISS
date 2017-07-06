@@ -2,6 +2,7 @@ import bbcode
 import urlparse
 import re
 import utils
+import random
 
 from django.utils import html
 from django.urls import reverse, NoReverseMatch
@@ -202,8 +203,26 @@ def _add_spoiler_tag(parser):
     return parser
 
 def _add_nojs_spoiler_tag(parser):
+    template = '''
+        <div class="nojs-spoiler spoiler">
+            <input id="sp-%(id)s" type="checkbox" class="spoiler-hack-checkbox" />
+            <label class="tab" for="sp-%(id)s">
+                <span class="label"></span>
+                <span class="name">%(name)s</span>
+            </label>
+            <div class="content">
+                %(content)s
+            </div>
+        </div>
+    '''
+
+
     def render_nojs_spoiler(tag_name, value, options, parent, context):
-        return '<div class="nojs-spoiler">%s</div>' % value
+        return template % {
+            'content': value,
+            'id': random.randint(0,2**32),
+            'name': options.get(tag_name, 'spoiler')
+        }
 
     parser.add_formatter('spoiler', render_nojs_spoiler)
     return parser
