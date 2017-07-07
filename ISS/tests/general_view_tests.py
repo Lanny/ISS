@@ -1,4 +1,5 @@
 import datetime
+import json
 
 from django.test import TestCase, Client
 from django.urls import reverse
@@ -45,6 +46,42 @@ class GeneralViewTestCase(TestCase):
         path = reverse('user-profile', kwargs={'user_id': self.scrub.pk})
         response = self.scrub_client.get(path)
         self.assertEqual(response.status_code, 200)
+
+
+class ThanksViewTest(TestCase):
+    def setUp(self):
+        self.limit = utils.get_config()['initial_account_period_limit'] = 3
+
+        test_utils.create_std_forums()
+
+        self.thankee = test_utils.create_user(thread_count=1, post_count=4)
+        self.thanker = test_utils.create_user(post_count=4)
+        self.noob_thanker = test_utils.create_user(post_count=1)
+
+        self.thanker_client = Client()
+        self.thanker_client.force_login(self.thanker)
+
+        self.noob_thanker_client = Client()
+        self.noob_thanker_client.force_login(self.noob_thanker)
+
+
+        self.thankee_client = Client()
+        self.thankee_client.force_login(self.thankee)
+
+        self.url = reverse('thank-post',
+                           args=(self.thankee.post_set.all()[0].pk,))
+
+    def test_happy_case(self):
+        resp = self.thanker_client.post(self.url)
+        self.assertEqual(self.thankee.thanks_received.count(), 1)
+
+    def test_can_not_thank_set(self):
+        resp = self.thankee_client.post(self.url)
+        self.assertEqual(self.thankee.thanks_received.count(), 0)
+
+    def test_noobs_cant_thanksforce(self):
+        resp = self.noob_thanker_client.post(self.url)
+        self.assertEqual(self.thankee.thanks_received.count(), 0)
 
 class PostFloodControlTestCase(TestCase):
     def setUp(self):
