@@ -32,7 +32,15 @@ def _get_new_post_form(request):
 @cache_control(max_age=60)
 def forum_index(request):
     categories = Category.objects.all().order_by('priority')
-    forums = Forum.objects.all().order_by('priority')
+    forums = (Forum.objects.all()
+        .order_by('priority')
+        .annotate(thread_count=Count('thread'),
+                  post_count=Count('thread__post')))
+    d = dict([(f.pk, f) for f in forums])
+    flags = ForumFlag.objects.filter(poster=request.user, forum__in=forums)
+
+    for flag in flags:
+        d[flag.forum_id]._flag_cache = flag
 
     ctx = {
         'categories': categories,

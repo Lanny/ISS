@@ -297,10 +297,16 @@ class Forum(models.Model):
             return False
 
     def get_thread_count(self):
-        return self.thread_set.count()
+        if hasattr(self, 'thread_count'):
+            return self.thread_count
+        else:
+            return self.thread_set.count()
 
     def get_post_count(self):
-        return Post.objects.filter(thread__forum_id=self.pk).count()
+        if hasattr(self, 'post_count'):
+            return self.post_count
+        else:
+            return Post.objects.filter(thread__forum_id=self.pk).count()
 
     def get_url(self):
         return reverse('thread-index', kwargs={'forum_id': self.pk})
