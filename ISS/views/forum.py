@@ -604,6 +604,10 @@ class ThankPost(utils.MethodSplitView):
     unbanned_required = True
 
     def POST(self, request, post_id):
+        min_posts = utils.get_config('initial_account_period_total')
+        if request.user.post_set.count() < min_posts:
+            raise PermissionDenied('Not enough posts to thank.')
+
         post = get_object_or_404(Post, pk=post_id)
         thanks = Thanks(post=post, thanker=request.user, thankee=post.author)
 

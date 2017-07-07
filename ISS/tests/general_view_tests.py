@@ -50,7 +50,7 @@ class GeneralViewTestCase(TestCase):
 
 class ThanksViewTest(TestCase):
     def setUp(self):
-        self.limit = utils.get_config()['initial_account_period_limit'] = 3
+        self.limit = utils.get_config()['initial_account_period_total'] = 3
 
         test_utils.create_std_forums()
 
@@ -71,7 +71,7 @@ class ThanksViewTest(TestCase):
         self.url = reverse('thank-post',
                            args=(self.thankee.post_set.all()[0].pk,))
 
-    def test_happy_case(self):
+    def test_happy_path(self):
         resp = self.thanker_client.post(self.url)
         self.assertEqual(self.thankee.thanks_received.count(), 1)
 
@@ -185,6 +185,8 @@ class AdminThreadCreationForum(TestCase):
         self.admin_only_forum = Forum.objects.all()[0]
         self.admin_only_forum.create_thread_pack = auth_package
         self.admin_only_forum.save()
+
+        self.limit = utils.get_config()['captcha_period'] = 0
 
     def test_admin_may_make_thread(self):
         path = reverse('new-thread',
