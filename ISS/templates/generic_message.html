@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load bbc %}
+
+{% block page_name %}
+  {{ page_title }} -
+{% endblock %}
+
+{% block content %}
+  <div class="generic-section">
+    <h1>{{ heading }}</h1>
+    <p>
+      {{ message|bbc:bbcode_settings }}
+    </p>
+  </div>
+{% endblock %}

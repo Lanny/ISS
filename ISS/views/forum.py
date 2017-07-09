@@ -587,6 +587,17 @@ class LogoutUser(utils.MethodSplitView):
         return HttpResponseRedirect(next_url)
 
 class RegisterUser(utils.MethodSplitView):
+    def pre_method_check(self, request, *args, **kwargs):
+        if not utils.get_config('enable_registration'):
+            return render(request, 'generic_message.html', {
+                'page_title': 'Registration Closed',
+                'heading': 'Registration Closed',
+                'message': ('Registration is temporarily closed. Check back '
+                            'later to register a new account. If you think '
+                            'this is in error, please contact the '
+                            'administrator.')
+            })
+
     def GET(self, request):
         form = forms.RegistrationForm()
         ctx = {'form': form}
