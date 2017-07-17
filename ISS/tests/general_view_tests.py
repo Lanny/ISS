@@ -1,6 +1,8 @@
 import datetime
 import json
 
+from django.core import mail
+from django.contrib.auth import authenticate
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.utils import timezone
@@ -208,3 +210,106 @@ class AdminThreadCreationForum(TestCase):
         })
         self.assertEqual(response.status_code, 403)
 
+
+class PasswordResetTestCase(TestCase):
+    def setUp(self):
+        self.franz = test_utils.create_user()
+        self.franz.email = 'J.K@bank.gov'
+        self.franz.save()
+        
+        self.franz_client = Client()
+        self.franz_client.force_login(self.franz)
+
+        self.issue_path = reverse('recovery-initiate')
+        self.reset_path = reverse('recovery-reset')
+
+    def tearDown(self):
+        mail.outbox = []
+
+    def _update_franz(self):
+        self.franz = Poster.objects.get(pk=franz.pk)
+
+    def _set_recovery_code(self):
+        response = self.franz_client.post(self.issue_path, {
+            'email': self.franz.email
+        })
+
+    def test_recovery_code_is_initially_null(self):
+        self.assertEqual(self.scrub.recovery_code, None)
+
+    def test_get_recovery_page(self):
+        response = self.franz_client.get(self.issue_path)
+        self.assertEqual(response.status_code, 200)
+
+    def test_invalid_email_addr(self):
+        response = self.franz_client.post(self.issue_path, {
+            'email': 'not_a_real_email@lol.lol'
+        })
+        self._update_franz()
+        self.assertEqual(self.franz.recovery_code, None)
+
+    def test_initiate(self):
+        self._set_recovery_code()
+        self._update_franz()
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertNotEqual(self.franz.recovery_code, None)
+
+    def test_invalid_recovery_get(self):
+        self._set_recovery_code()
+        response = self.franz_client.get(self.reset_path + '?code=notauuid')
+        self.assertEqual(response.status_code, 404)
+
+    def test_valid_recovery_get(self):
+        self._set_recovery_code()
+        self._update_franz()
+        response = self.franz_client.get(
+            self.reset_path + '?code=' + self.franz.recovery_code)
+        self.assertEqual(response.status_code, 200)
+
+    def test_valid_recovery_post(self):
+        self._set_recovery_code()
+        self._update_franz()
+        old_pass = self.franz.password
+
+        response = self.franz_client.post(
+            self.reset_path,
+            {
+                'new_password': 'justice',
+                'new_password_repeat': 'justice',
+                'code': self.franz.recovery_code
+            })
+
+        self._update_franz()
+        new_pass = self.franz.password
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.franz.recovery_code, None)
+        self.assertEqual(new_pass, old_pass)
+
+
+    def test_invalid_recovery_post(self):
+        self._set_recovery_code()
+        self._update_franz()
+        response = self.franz_client.post(
+            self.reset_path,
+            {
+                'new_password': 'justice',
+                'new_password_repeat': 'justice',
+                'code': self.franz.recovery_code
+            })
+        self._update_franz()
+        self.assertNotEqual(self.franz.recovery_code, None)
+
+    def test_expired_recovery_post(self):
+        self._set_recovery_code()
+        self._update_franz()
+        self.franz.recovery_experation = (
+            timezone.now() - datetime.timedelta(seconds=30))
+        response = self.franz_client.post(
+            self.reset_path,
+            {
+                'new_password': 'justice',
+                'new_password_repeat': 'justice',
+                'code': self.franz.recovery_code
+            })
+        self.assertEqual(response.status_code, 404)
