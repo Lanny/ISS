@@ -76,7 +76,7 @@ class ExecutePasswordRecovery(utils.MethodSplitView):
 
     def GET(self, request):
         form = forms.ExecutePasswordRecoveryForm(initial={
-            'recovery_code': request.GET.get('code', '')
+            'code': request.GET.get('code', '')
         })
         ctx = {'form': form}
         return render(request, 'execute_password_recovery.html', ctx)
