@@ -24,7 +24,9 @@ class InitiatePasswordRecovery(utils.MethodSplitView):
         form = forms.InitiatePasswordRecoveryForm(request.POST)
 
         if form.is_valid():
-            user = Poster.objects.get(email=form.cleaned_data['email'])
+            normalized = Poster.normalize_username(
+                form.cleaned_data['username'])
+            user = Poster.objects.get(normalized_username=normalized)
             user.recovery_code = str(uuid.uuid4())
             user.recovery_expiration = (
                 timezone.now() + timedelta(days=1))

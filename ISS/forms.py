@@ -286,16 +286,17 @@ class RegistrationForm(UserCreationForm, CaptchaForm):
         return poster
 
 class InitiatePasswordRecoveryForm(forms.Form):
-    email = forms.EmailField(label='Email Address', required=True)
+    username = forms.CharField(label='Username', max_length=1024, required=True)
 
     def clean(self, *args, **kwargs):
         ret = super(InitiatePasswordRecoveryForm, self).clean(*args, **kwargs)
 
-        addr = self.cleaned_data.get('email', None)
-        posters = Poster.objects.filter(email=addr)
+        username = self.cleaned_data.get('username', None)
+        normalized = Poster.normalize_username(username)
+        posters = Poster.objects.filter(normalized_username=normalized)
 
         if posters.count() != 1:
-            raise ValidationError('No user with that email address exists.',
+            raise ValidationError('No user with that username exists.',
                                   code='UNKNOWN_EMAIL_ADDR')
 
         return ret
