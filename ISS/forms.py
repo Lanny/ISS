@@ -285,6 +285,46 @@ class RegistrationForm(UserCreationForm, CaptchaForm):
         poster.save()
         return poster
 
+class InitiatePasswordRecoveryForm(forms.Form):
+    email = forms.EmailField(label='Email Address', required=True)
+
+    def clean(self, *args, **kwargs):
+        ret = super(InitiatePasswordRecoveryForm, self).clean(*args, **kwargs)
+
+        addr = self.cleaned_data.get('email', None)
+        posters = Poster.objects.filter(email=addr)
+
+        if posters.count() != 1:
+            raise ValidationError('No user with that email address exists.',
+                                  code='UNKNOWN_EMAIL_ADDR')
+
+        return ret
+
+class ExecutePasswordRecoveryForm(forms.Form):
+    password = forms.CharField(label='New Password',
+                               min_length=6,
+                               required=True,
+                               widget=forms.PasswordInput)
+    password_repeat = forms.CharField(label='New Password (repeat)',
+                               min_length=6,
+                               required=True,
+                               widget=forms.PasswordInput)
+    code = forms.CharField(required=True, widget=forms.HiddenInput)
+
+    def clean(self, *args, **kwargs):
+        ret = super(ExecutePasswordRecoveryForm, self).clean(*args, **kwargs)
+
+        if self.cleaned_data.get('password', False):
+            password = self.cleaned_data.get('password', None)
+            repeat = self.cleaned_data.get('password_repeat', None)
+
+            if password != repeat: 
+                raise ValidationError('Passwords didn\'t match',
+                                      code='PASSWORD_DIDNT_MATCH')
+
+        return ret
+    
+
 class ReportPostForm(CaptchaForm):
     post_min_len = utils.get_config('min_post_chars')
     post_max_len = utils.get_config('max_post_chars')

@@ -50,6 +50,9 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     has_report_privilege = models.BooleanField(default=True)
     tripphrase = models.CharField(max_length=256, null=True, blank=True)
 
+    recovery_code = models.CharField(max_length=256, null=True, default=None)
+    recovery_expiration = models.DateTimeField(default=timezone.now)
+
     avatar = models.ImageField(upload_to='avatars', null=True)
 
     posts_per_page = models.PositiveSmallIntegerField(default=20)

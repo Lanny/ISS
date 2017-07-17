@@ -1,6 +1,7 @@
 import datetime
 import json
 
+from django.conf import settings
 from django.core import mail
 from django.contrib.auth import authenticate
 from django.test import TestCase, Client
@@ -227,7 +228,7 @@ class PasswordResetTestCase(TestCase):
         mail.outbox = []
 
     def _update_franz(self):
-        self.franz = Poster.objects.get(pk=franz.pk)
+        self.franz = Poster.objects.get(pk=self.franz.pk)
 
     def _set_recovery_code(self):
         response = self.franz_client.post(self.issue_path, {
@@ -235,7 +236,7 @@ class PasswordResetTestCase(TestCase):
         })
 
     def test_recovery_code_is_initially_null(self):
-        self.assertEqual(self.scrub.recovery_code, None)
+        self.assertEqual(self.franz.recovery_code, None)
 
     def test_get_recovery_page(self):
         response = self.franz_client.get(self.issue_path)
@@ -274,8 +275,8 @@ class PasswordResetTestCase(TestCase):
         response = self.franz_client.post(
             self.reset_path,
             {
-                'new_password': 'justice',
-                'new_password_repeat': 'justice',
+                'password': 'justice',
+                'password_repeat': 'justice',
                 'code': self.franz.recovery_code
             })
 
@@ -283,8 +284,8 @@ class PasswordResetTestCase(TestCase):
         new_pass = self.franz.password
 
         self.assertEqual(response.status_code, 200)
+        self.assertNotEqual(new_pass, old_pass)
         self.assertEqual(self.franz.recovery_code, None)
-        self.assertEqual(new_pass, old_pass)
 
 
     def test_invalid_recovery_post(self):
@@ -293,9 +294,9 @@ class PasswordResetTestCase(TestCase):
         response = self.franz_client.post(
             self.reset_path,
             {
-                'new_password': 'justice',
-                'new_password_repeat': 'justice',
-                'code': self.franz.recovery_code
+                'password': 'justice',
+                'password_repeat': 'justice',
+                'code': 'notauuid'
             })
         self._update_franz()
         self.assertNotEqual(self.franz.recovery_code, None)
@@ -303,8 +304,9 @@ class PasswordResetTestCase(TestCase):
     def test_expired_recovery_post(self):
         self._set_recovery_code()
         self._update_franz()
-        self.franz.recovery_experation = (
+        self.franz.recovery_expiration = (
             timezone.now() - datetime.timedelta(seconds=30))
+        self.franz.save()
         response = self.franz_client.post(
             self.reset_path,
             {

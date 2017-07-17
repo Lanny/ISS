@@ -53,6 +53,7 @@ class GlobShortcodeRegistrar(object):
 
 config_defaults = {
     'forum_name': 'INTERNATIONAL SPACE STATION',
+    'forum_domain': 'yourdomain.space',
     'banner_dir': 'banners',
     'min_post_chars': 1,
     'max_post_chars': 19475, # No. characters in the first chapter of Dune

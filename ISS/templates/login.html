@@ -14,6 +14,10 @@
         {% csrf_token %}
         {{ form }}
         <input type="submit" value="Login" />
+
+        <p>
+          If you're having difficulty logging in you can <a href="{% url 'recovery-initiate' %}">reset your password</a>.
+        </p>
       </fieldset>
      </form>
    </div>

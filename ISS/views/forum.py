@@ -586,42 +586,6 @@ class LogoutUser(utils.MethodSplitView):
         next_url = request.POST.get('next', '/')
         return HttpResponseRedirect(next_url)
 
-class RegisterUser(utils.MethodSplitView):
-    def pre_method_check(self, request, *args, **kwargs):
-        if not utils.get_config('enable_registration'):
-            return render(request, 'generic_message.html', {
-                'page_title': 'Registration Closed',
-                'heading': 'Registration Closed',
-                'message': ('Registration is temporarily closed. Check back '
-                            'later to register a new account. If you think '
-                            'this is in error, please contact the '
-                            'administrator.')
-            })
-
-    def GET(self, request):
-        form = forms.RegistrationForm()
-        ctx = {'form': form}
-
-        return render(request, 'register.html', ctx)
-
-    def POST(self, request):
-        form = forms.RegistrationForm(request.POST)
-
-        if form.is_valid():
-            poster = form.save(commit=True)
-
-            # Ceremoniously call authenticate so login will succeed
-            poster = authenticate(username = form.cleaned_data['username'],
-                                  password = form.cleaned_data['password1'])
-            login(request, poster)
-            return HttpResponseRedirect('/')
-
-        else:
-            ctx = { 'form': form }
-
-            return render(request, 'register.html', ctx)
-
-
 class ThankPost(utils.MethodSplitView):
     require_login = True
     unbanned_required = True
