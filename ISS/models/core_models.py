@@ -652,9 +652,12 @@ def update_thread_last_update_on_insert(sender, instance, created, **kwargs):
 @receiver(models.signals.post_delete, sender=Post)
 def update_thread_last_update_on_delete(sender, instance, **kwargs):
     thread = instance.thread
-    instance = thread.get_posts_in_thread_order(reverse=True)[0]
-    thread.last_update = instance.created
-    thread.save()
+    posts = thread.get_posts_in_thread_order(reverse=True)
+
+    if posts.count() > 0:
+        instance = posts[0]
+        thread.last_update = instance.created
+        thread.save()
 
 @receiver(models.signals.post_save, sender=Thread)
 def update_forum_last_update(sender, instance, created, **kwargs):
