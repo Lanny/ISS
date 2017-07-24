@@ -36,8 +36,12 @@ def forum_index(request):
 
     # Start: optimization to prefetch additional stats and flags for forums in
     # one go as opposed to querying per-forum
-    forums = forums.annotate(thread_count=Count('thread'),
-                             post_count=Count('thread__post'))
+    forums_w_posts = list(forums.annotate(post_count=Count('thread__post')))
+    forums = list(forums.annotate(thread_count=Count('thread')))
+
+    for idx, forum in enumerate(forums):
+        forums[idx].post_count = forums_w_posts[idx].post_count
+
     if request.user.is_authenticated():
         d = dict([(f.pk, f) for f in forums])
         flags = ForumFlag.objects.filter(poster=request.user, forum__in=forums)
