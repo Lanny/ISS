@@ -17,6 +17,11 @@
       }
     });
 
-    requirejs(['{{ bootstrap }}'], function() {});
+
+    // DJDT can't figure out how to play nice with require and loads
+    // intermingled with us so just wait for it to finish.
+    document.addEventListener('DOMContentLoaded', function() {
+      requirejs(['{{ bootstrap }}'], function() {});
+    });
   </script>
 {% endif %}
