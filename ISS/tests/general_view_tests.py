@@ -14,6 +14,9 @@ import test_utils
 
 class GeneralViewTestCase(TestCase):
     def setUp(self):
+        # Disable initial captcha period
+        utils.get_config()['captcha_period'] = 0
+
         test_utils.create_std_forums()
 
         self.scrub = test_utils.create_user(thread_count=5, post_count=10)
@@ -50,6 +53,36 @@ class GeneralViewTestCase(TestCase):
         response = self.scrub_client.get(path)
         self.assertEqual(response.status_code, 200)
 
+    def test_new_post(self):
+        thread = Thread.objects.all()[0]
+        path = reverse('new-reply', kwargs={'thread_id': thread.pk})
+        post_count = self.scrub.get_post_count()
+        response = self.scrub_client.post(path, {
+            'content': 'P = NP?',
+            'thread': thread.pk
+        })
+        self.assertEqual(self.scrub.get_post_count(), post_count + 1)
+
+    def test_new_post_too_long(self):
+        thread = Thread.objects.all()[0]
+        path = reverse('new-reply', kwargs={'thread_id': thread.pk})
+        post_count = self.scrub.get_post_count()
+        response = self.scrub_client.post(path, {
+            'content': 'P = NP?' * 3000,
+            'thread': thread.pk
+        })
+        self.assertEqual(self.scrub.get_post_count(), post_count)
+
+    def test_edit_post_too_long(self):
+        post = self.scrub.post_set.all()[0]
+        path = reverse('edit-post', kwargs={'post_id': post.pk})
+        long_content = 'P = NP?' * 3000
+        response = self.scrub_client.post(path, {
+            'content': long_content,
+            'post': post.pk
+        })
+        post = Post.objects.get(pk=post.pk)
+        self.assertLess(len(post.content), len(long_content))
 
 class ThanksViewTest(TestCase):
     def setUp(self):
