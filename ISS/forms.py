@@ -35,6 +35,7 @@ class BBCodeField(forms.CharField):
 
         counts = utils.get_tag_distribution(value)
         embedded_tags = counts['video'] + counts['img'] + counts['bc']
+        cool_tags = counts['byusingthistagiaffirmlannyissupercool']
         max_embeds = utils.get_config('max_embedded_items')
 
         if embedded_tags > max_embeds:
@@ -42,6 +43,11 @@ class BBCodeField(forms.CharField):
                 ('BBCode must contain %d or fewer embedded items. '
                  'Contained %d.') % (max_embeds, embedded_tags),
                 code='TOO_MANY_EMBEDS')
+
+        if cool_tags > 10:
+            raise ValidationError(
+                'Cool tag bro, but don\'t overuse it.',
+                code='TOO_MUCH_COOL')
 
         return value
 
