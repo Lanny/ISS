@@ -201,12 +201,14 @@ class NewPostForm(InitialPeriodLimitingForm):
 class EditPostForm(forms.Form):
     error_css_class = 'in-error'
     post_min_len = utils.get_config('min_post_chars')
+    post_max_len = utils.get_config('max_post_chars')
 
     post = forms.ModelChoiceField(queryset=Post.objects.all(),
                                   widget=forms.HiddenInput())
     
     content = BBCodeField(label='Content',
                           min_length=post_min_len,
+                          max_length=post_max_len,
                           widget=forms.Textarea())
 
     def save(self, editor=None):
