@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from django.core.mail import send_mail
 from django.conf import settings
+from django.contrib.auth import login, authenticate
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -126,7 +127,28 @@ class RegisterUser(utils.MethodSplitView):
         form = forms.RegistrationForm(request.POST)
 
         if form.is_valid():
-            poster = form.save(commit=True)
+            poster = form.save()
+
+            poster = authenticate(username = form.cleaned_data['username'],
+                                  password = form.cleaned_data['password1'])
+            login(request, poster)
+            return HttpResponseRedirect('/')
+
+        else:
+            ctx = { 'form': form }
+            return render(request, 'register.html', ctx)
+
+class RegisterUserWithCode(utils.MethodSplitView):
+    def GET(self, request):
+        form = forms.InviteRegistrationFrom()
+        ctx = {'form': form}
+        return render(request, 'register.html', ctx)
+
+    def POST(self, request):
+        form = forms.InviteRegistrationFrom(request.POST)
+
+        if form.is_valid():
+            poster = form.save()
 
             poster = authenticate(username = form.cleaned_data['username'],
                                   password = form.cleaned_data['password1'])

@@ -288,7 +288,7 @@ class RegistrationForm(UserCreationForm, CaptchaForm):
     def clean(self, *args, **kwargs):
         CaptchaForm.clean(self, *args, **kwargs)
 
-    def save(self, commit=True):   
+    def save(self):   
         poster = super(RegistrationForm, self).save(commit = False)
         poster.save()
         return poster
@@ -303,9 +303,20 @@ class InviteRegistrationFrom(RegistrationForm):
         candidate_codes = RegistrationCode.objects.filter(code=code,
                                                           used_by=None)
         if candidate_codes.count() < 1:
-            raise ValidationError('Unrecognized registration code')
+            raise ValidationError('Unrecognized registration code',
+                                  code='INVALID_REG_CODE')
 
         return candidate_codes[0]
+
+    def save(self):
+        poster = super(InviteRegistrationFrom, self).save()
+        reg_code = self.cleaned_data['registration_code']
+
+        reg_code.used_by = poster
+        reg_code.used_on = timezone.now()
+        reg_code.save()
+
+        return poster
 
 class InitiatePasswordRecoveryForm(forms.Form):
     username = forms.CharField(label='Username', max_length=1024, required=True)
