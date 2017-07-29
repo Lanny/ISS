@@ -103,7 +103,8 @@ config_defaults = {
     'initial_account_period_width': datetime.timedelta(days=1),
     'initial_account_period_limit': 20,
     'captcha_period': 0,
-    'enable_registration': True
+    'enable_registration': True,
+    'enable_invites': False
 }
 
 config = config_defaults.copy()
