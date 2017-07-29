@@ -12,11 +12,10 @@ from ISS.models import *
 from ISS import utils
 import test_utils
 
-class GeneralViewTestCase(TestCase):
-    def setUp(self):
-        # Disable initial captcha period
-        utils.get_config()['captcha_period'] = 0
+class GeneralViewTestCase(test_utils.ForumConfigTestCase):
+    forum_config = {'captcha_period': 0}
 
+    def setUp(self):
         test_utils.create_std_forums()
 
         self.scrub = test_utils.create_user(thread_count=5, post_count=10)
@@ -348,3 +347,17 @@ class PasswordResetTestCase(TestCase):
                 'code': self.franz.recovery_code
             })
         self.assertEqual(response.status_code, 404)
+
+"""
+class RegistrationByInvite(TestCase):
+    def setUp(self):
+        # Disable initial captcha period
+        utils.get_config()['captcha_period'] = 0
+
+        test_utils.create_std_forums()
+
+        self.scrub = test_utils.create_user(thread_count=5, post_count=10)
+
+        self.scrub_client = Client()
+        self.scrub_client.force_login(self.scrub)
+"""

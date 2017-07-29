@@ -1,5 +1,7 @@
 import random
 
+from django.test import TestCase
+
 from ISS.models import *
 
 def create_std_forums():
@@ -66,3 +68,16 @@ def create_user(thread_count=0, post_count=0):
     create_posts(user, post_count)
 
     return user
+
+class ForumConfigTestCase(TestCase):
+    _stored_values = {}
+    forum_config = {}
+
+    def setUp(self):
+        for key in self.forum_config:
+            self._stored_values[key] = utils.get_config()[key]
+            utils.get_config()[key] = self.forum_config[key]
+
+    def tearDown(self):
+        for key in self._stored_values:
+            utils.get_config()[key] = self._stored_values[key] 
