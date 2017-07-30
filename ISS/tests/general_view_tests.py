@@ -15,7 +15,7 @@ import test_utils
 class GeneralViewTestCase(test_utils.ForumConfigTestCase):
     forum_config = {'captcha_period': 0}
 
-    def setUp(self):
+    def setUp2(self):
         test_utils.create_std_forums()
 
         self.scrub = test_utils.create_user(thread_count=5, post_count=10)
@@ -354,7 +354,7 @@ class RegistrationTestCase(test_utils.ForumConfigTestCase):
         'enable_registration': True
     }
 
-    def setUp(self):
+    def setUp2(self):
         test_utils.create_std_forums()
         self.anon_client = Client()
         self.path = reverse('register')
@@ -373,6 +373,31 @@ class RegistrationTestCase(test_utils.ForumConfigTestCase):
 
         self.assertEqual(Poster.objects.count(), initial_user_count + 1)
 
+class RegistrationDisabledTestCase(test_utils.ForumConfigTestCase):
+    forum_config = {
+        'recaptcha_settings': None,
+        'enable_registration': False
+    }
+
+    def setUp2(self):
+        test_utils.create_std_forums()
+        self.anon_client = Client()
+        self.path = reverse('register')
+
+    def test_only_path(self):
+        initial_user_count = Poster.objects.count()
+
+        response = self.anon_client.post(
+            self.path,
+            {
+                'username': 'Groucho Marx',
+                'password1': 'BD08081890',
+                'password2': 'BD08081890',
+                'email': 'gmarx@contrarian.club'
+            })
+
+        self.assertEqual(Poster.objects.count(), initial_user_count)
+
 class RegistrationByInviteTestCase(test_utils.ForumConfigTestCase):
     forum_config = {
         'recaptcha_settings': None,
@@ -381,7 +406,7 @@ class RegistrationByInviteTestCase(test_utils.ForumConfigTestCase):
         'enable_invites': True
     }
 
-    def setUp(self):
+    def setUp2(self):
         test_utils.create_std_forums()
 
         self.admin = test_utils.create_user()

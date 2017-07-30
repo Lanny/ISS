@@ -71,13 +71,35 @@ def create_user(thread_count=0, post_count=0):
 
 class ForumConfigTestCase(TestCase):
     _stored_values = {}
+    _setup_called = False
     forum_config = {}
 
     def setUp(self):
+        if self._setup_called:
+            raise Exception('tearDown wasn\'t called. tearDown most likely '
+                            'errantly overridden')
+        self._setup_called = True
+
         for key in self.forum_config:
             self._stored_values[key] = utils.get_config()[key]
             utils.get_config()[key] = self.forum_config[key]
 
+
+        self.setUp2()
+
+    def setUp2(self):
+        pass
+
     def tearDown(self):
+        if not self._setup_called:
+            raise Exception('setUp wasn\'t called. setUp most likely '
+                            'errantly overridden')
+        self.setup_called = False
+
         for key in self._stored_values:
             utils.get_config()[key] = self._stored_values[key] 
+
+        self.tearDown2()
+
+    def tearDown2(self):
+        pass

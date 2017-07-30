@@ -109,13 +109,19 @@ class ExecutePasswordRecovery(utils.MethodSplitView):
 class RegisterUser(utils.MethodSplitView):
     def pre_method_check(self, request, *args, **kwargs):
         if not utils.get_config('enable_registration'):
+            message = ('Registration is temporarily closed. Check back later '
+                       'to register a new account. If you think this is in '
+                       'error, please contact the administrator.')
+
+            if utils.get_config('enable_invites'):
+                url = reverse('register-with-code')
+                message += (' If you have a regsitration code, you may use it '
+                            'by clicking [url="%s"]here[/url].') % url
+
             return render(request, 'generic_message.html', {
                 'page_title': 'Registration Closed',
                 'heading': 'Registration Closed',
-                'message': ('Registration is temporarily closed. Check back '
-                            'later to register a new account. If you think '
-                            'this is in error, please contact the '
-                            'administrator.')
+                'message': message
             })
 
     def GET(self, request):

@@ -127,6 +127,18 @@ config['humans'] = our_humans + their_humans
 config['shortcode_map'] = config['shortcode_registrar'].get_shortcode_map()
 
 class MethodSplitView(object):
+    """
+    A flexible class for splitting handling of different HTTP methods being
+    dispatched to the same view into separate class methods. Subclasses may
+    define a separate class method for each HTTP method the view handles (e.g.
+    GET(self, request, ...), POST(self, request, ...) which will be called with
+    the usual view signature when that sort of request is made.
+    
+    Subclasses may also define a `pre_method_check` method which, if it returns
+    a HttpResponse, will be used to response to the request instead of
+    delegating to the corresponding method.
+    """
+
     def __call__(self, request, *args, **kwargs):
         if getattr(self, 'active_required', False):
             if not request.user.is_active:
