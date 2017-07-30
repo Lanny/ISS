@@ -146,7 +146,9 @@ class RegisterUser(utils.MethodSplitView):
 
 class RegisterUserWithCode(utils.MethodSplitView):
     def GET(self, request):
-        form = forms.InviteRegistrationFrom()
+        form = forms.InviteRegistrationFrom(initial={
+            'registration_code': request.GET.get('code', '')
+        })
         ctx = {'form': form}
         return render(request, 'register.html', ctx)
 
