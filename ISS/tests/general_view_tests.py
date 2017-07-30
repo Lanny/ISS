@@ -431,6 +431,9 @@ class RegistrationByInviteTestCase(test_utils.ForumConfigTestCase):
 
         self.assertEqual(Poster.objects.count(), 2)
 
+        self.reg_code = test_utils.refresh_model(self.reg_code)
+        self.assertFalse(self.reg_code.used_by == None)
+
     def test_unhappy_path(self):
         response = self.anon_client.post(
             self.path,

@@ -69,6 +69,9 @@ def create_user(thread_count=0, post_count=0):
 
     return user
 
+def refresh_model(model):
+    return type(model).objects.get(pk=model.pk)
+
 class ForumConfigTestCase(TestCase):
     _stored_values = {}
     _setup_called = False
