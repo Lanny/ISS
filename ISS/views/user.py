@@ -2,6 +2,7 @@ import uuid
 from datetime import timedelta
 
 from django.core.mail import send_mail
+from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, get_object_or_404
@@ -167,4 +168,27 @@ class RegisterUserWithCode(utils.MethodSplitView):
             ctx = { 'form': form }
             return render(request, 'register.html', ctx)
 
+class GenerateInvite(utils.MethodSplitView):
+    login_required = True
+    unbanned_requried = True
+    
+    def pre_method_check(self, request, *args, **kwargs):
+        acl = AccessControlList.get_acl('CREATE_INVITE')
+
+        if not acl.is_poster_authorized(request.user):
+            raise PermissionDenied('Not allowed to invite users')
+
+    def GET(self, request):
+        return render(request, 'generate_invite.html', {})
+
+    def POST(self, request):
+        reg_code = RegistrationCode(generated_by=request.user)
+        reg_code.save()
+        url = reverse('view-generated-invite') + '?code=%s' % reg_code.code
+        return HttpResponseRedirect(url)
+
+def view_generated_invite(request):
+    reg_code = get_object_or_404(RegistrationCode, code=request.GET.get('code'))
+    ctx = { 'reg_code': reg_code }
+    return render(request, 'view_generated_invite.html', ctx)
 

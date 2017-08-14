@@ -70,6 +70,8 @@ class AuthPackage(models.Model):
 class AccessControlGroup(models.Model):
     base_groups = (
         ('INVITORS',),
+        ('SUPERUSERS',),
+        ('MODS',),
     )
 
     name = models.TextField(unique=True, blank=False, null=False)
@@ -94,9 +96,12 @@ class AccessControlGroup(models.Model):
 
         return acg
 
+    def __unicode__(self):
+        return self.name
+
 class AccessControlList(models.Model):
     base_acls = (
-        ('CREATE_INVITE', False, ('INVITORS',), ()),
+        ('CREATE_INVITE', False, ('INVITORS', 'SUPERUSERS'), ()),
     )
 
     name = models.TextField(unique=True, blank=False, null=False)
@@ -151,3 +156,5 @@ class AccessControlList(models.Model):
 
         return acl
 
+    def __unicode__(self):
+        return self.name

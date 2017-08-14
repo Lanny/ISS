@@ -448,3 +448,44 @@ class RegistrationByInviteTestCase(test_utils.ForumConfigTestCase):
         self.assertEqual(Poster.objects.count(), 1)
         self.assertTrue('registration_code' in response.context['form'].errors)
 
+class GenerateInviteCodeTestCase(test_utils.ForumConfigTestCase):
+    forum_config = {
+        'enable_registration': False,
+        'enable_invites': True
+    }
+
+    def setUp2(self):
+        self.don = test_utils.create_user()
+        self.scrub = test_utils.create_user()
+
+        self.don_client = Client()
+        self.don_client.force_login(self.don)
+
+        self.scrub_client = Client()
+        self.scrub_client.force_login(self.scrub)
+
+        AccessControlGroup.get_acg('INVITORS').members.add(self.don)
+
+        self.path = reverse('generate-invite')
+
+    def test_scrub_cant_invite(self):
+        res1 = self.scrub_client.get(self.path)
+        res2 = self.scrub_client.post(self.path, {})
+
+        self.assertEqual(res1.status_code, 403)
+        self.assertEqual(res2.status_code, 403)
+
+    def test_donny_can_invite_get(self):
+        res = self.don_client.get(self.path)
+        self.assertEqual(res.status_code, 200)
+
+    def test_donny_can_invite_post(self):
+        res = self.don_client.post(self.path, {})
+        self.assertEqual(res.status_code, 302)
+
+        reg_code = RegistrationCode.objects.order_by('-generated_on')[0]
+        self.assertEqual(self.don.pk, reg_code.generated_by.pk)
+        self.assertEqual(reg_code.used_by, None)
+        self.assertEqual(reg_code.used_on, None)
+
+ 

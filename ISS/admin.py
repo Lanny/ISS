@@ -52,3 +52,10 @@ class BanAdmin(admin.ModelAdmin):
 class IPBanAdmin(admin.ModelAdmin):
     list_display = ('on', 'memo')
 
+@admin.register(AccessControlList)
+class AccessControlListAdmin(admin.ModelAdmin):
+    list_display = ('name', 'allow_by_default')
+
+@admin.register(AccessControlGroup)
+class AccessControlListAdmin(admin.ModelAdmin):
+    list_display = ('name',)

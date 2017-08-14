@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load hooks %}
 {% load humanize %}
+{% load util_tags %}
 
 {% block page_name %}
   {{ poster.username }} -
@@ -124,11 +125,23 @@
             {% csrf_token %}
             <input type="hidden" name="form_name" value="SETTINGS" />
             {{ settings_form.as_p }}
+
             {% if poster.can_auto_anonymize %}
-              <a href="{% url 'auto-anonymize' %}">
-                Anonymize your account
-              </a>
+              <p>
+                <a href="{% url 'auto-anonymize' %}">
+                  Anonymize your account
+                </a>
+              </p>
             {% endif %}
+
+            {% if poster|check_acl:"CREATE_INVITE" %}
+              <p>
+                <a href="{% url 'generate-invite' %}">
+                  Generate Invite Code
+                </a>
+              </p>
+            {% endif %}
+
             <input type="submit" value="Submit" />
           </fieldset>
         </form>

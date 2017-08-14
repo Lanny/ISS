@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load bbc %}
+
+{% block page_name %}
+  Generate Invite Code -
+{% endblock %}
+
+{% block content %}
+  <div class="generic-section">
+    <h1>Generate Invite Code</h1>
+    <p>
+      By clicking the "Generate" button below you can create a unique invite
+      code that will allow new users to register accounts while public
+      registration is closed. The fact that you generate an invite code and
+      who uses it is recorded, while you are not responsible for the conduct of
+      those you invite using this feature for spamming or ban evasion (including
+      the evasion of bans on other posters) will cause your invite privilages
+      to be revoked and your account banned.
+    </p>
+    <p>
+      If you understand these conditions and agree to not abuse this feature,
+      click "Generate" to create an invite code.
+    </p>
+    <form method="POST" action="{% url 'generate-invite' %}">
+      {% csrf_token %}
+      <input type="submit" value="Generate" />
+    </form>
+  </div>
+{% endblock %}

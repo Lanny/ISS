@@ -10,7 +10,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from ISS import utils
-from auth_package import AuthPackage
+from auth_package import AuthPackage, AccessControlList
 
 min_time = timezone.make_aware(timezone.datetime.min,
                                timezone.get_default_timezone())

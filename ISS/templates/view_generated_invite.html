@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load bbc %}
+
+{% block page_name %}
+  Invite Generated -
+{% endblock %}
+
+{% block content %}
+  <div class="generic-section">
+    <h1>Invite Generated</h1>
+    <p>
+      You've successfully generated an invite code. It may only be used once
+      and will expire on {{ reg_code.expires|date:"Y-m-d" }}. Distribute the
+      following link to the person you'd like to invite.
+    </p>
+    {# TODO: Don't hardcode protocol #}
+    <a href="http://{{ request.META.HTTP_HOST }}{{ reg_code.get_reg_url }}">
+      http://{{ request.META.HTTP_HOST }}{{ reg_code.get_reg_url }}
+    </p>
+    <form method="POST" action="{% url 'generate-invite' %}">
+      {% csrf_token %}
+      <input type="submit" value="Generate" />
+    </form>
+  </div>
+{% endblock %}

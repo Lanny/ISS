@@ -1,6 +1,6 @@
 from django import template
 
-from ISS.models import FilterWord
+from ISS.models import FilterWord, AccessControlList
 
 register = template.Library()
 
@@ -22,3 +22,8 @@ def word_filter(value):
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
+
+@register.filter
+def check_acl(poster, acl_name):
+    acl = AccessControlList.get_acl(acl_name)
+    return acl.is_poster_authorized(poster)
