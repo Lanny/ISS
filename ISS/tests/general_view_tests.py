@@ -448,6 +448,55 @@ class RegistrationByInviteTestCase(test_utils.ForumConfigTestCase):
         self.assertEqual(Poster.objects.count(), 1)
         self.assertTrue('registration_code' in response.context['form'].errors)
 
+    def test_double_use(self):
+        response = self.anon_client.post(
+            self.path,
+            {
+                'username': 'Groucho Marx',
+                'password1': 'BD08081890',
+                'password2': 'BD08081890',
+                'email': 'gmarx@contrarian.club',
+                'registration_code': self.reg_code.code
+            })
+
+        self.assertEqual(Poster.objects.count(), 2)
+
+        self.reg_code = test_utils.refresh_model(self.reg_code)
+        self.assertFalse(self.reg_code.used_by == None)
+
+        # Now log out and try to re-register
+        self.anon_client.logout()
+
+        response = self.anon_client.post(
+            self.path,
+            {
+                'username': 'Groucho Marx II',
+                'password1': 'BD08081890',
+                'password2': 'BD08081890',
+                'email': 'gmarx2@contrarian.club',
+                'registration_code': self.reg_code.code
+            })
+
+        self.assertEqual(Poster.objects.count(), 2)
+        self.assertTrue('registration_code' in response.context['form'].errors)
+
+    def test_expiration(self):
+        self.reg_code.expires = timezone.now() - datetime.timedelta(seconds=30)
+        self.reg_code.save()
+
+        response = self.anon_client.post(
+            self.path,
+            {
+                'username': 'Groucho Marx',
+                'password1': 'BD08081890',
+                'password2': 'BD08081890',
+                'email': 'gmarx@contrarian.club',
+                'registration_code': self.reg_code.code
+            })
+
+        self.assertEqual(Poster.objects.count(), 1)
+        self.assertTrue('registration_code' in response.context['form'].errors)
+
 class GenerateInviteCodeTestCase(test_utils.ForumConfigTestCase):
     forum_config = {
         'enable_registration': False,

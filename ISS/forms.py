@@ -306,7 +306,13 @@ class InviteRegistrationFrom(RegistrationForm):
             raise ValidationError('Unrecognized registration code',
                                   code='INVALID_REG_CODE')
 
-        return candidate_codes[0]
+        reg_code = candidate_codes[0]
+
+        if timezone.now() > reg_code.expires:
+            raise ValidationError('This registration code has already expired.',
+                                  code='EXPIRED_REG_CODE')
+
+        return reg_code
 
     def save(self):
         poster = super(InviteRegistrationFrom, self).save()
