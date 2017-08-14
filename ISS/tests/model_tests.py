@@ -147,4 +147,53 @@ class SubscriptionTestCase(TestCase):
         second_post = self._mkpost()
 
         self.assertEqual(self.thread.get_jump_post(self.tu_1).pk, first_post.pk)
- 
+
+class ACLTestCase(TestCase):
+    def setUp(self):
+        self.tu_1 = test_utils.create_user()
+        self.tu_2 = test_utils.create_user()
+        self.tu_3 = test_utils.create_user()
+
+        self.pacl = AccessControlList(name="PERM_ACL", allow_by_default=True)
+        self.pacl.save()
+
+        self.uacl = AccessControlList(name="UPERM_ACL", allow_by_default=False)
+        self.uacl.save()
+
+        self.non_even_group = AccessControlGroup(name="ODD_USERS")
+        self.non_even_group.save()
+        self.non_even_group.members.add(self.tu_1)
+        self.non_even_group.members.add(self.tu_3)
+
+    def test_default_permissive_list(self):
+        self.assertTrue(self.pacl.is_poster_authorized(self.tu_1))
+
+    def test_default_unpermissive_list(self):
+        self.assertFalse(self.uacl.is_poster_authorized(self.tu_1))
+
+    def test_blacklisted_case(self):
+        self.pacl.black_posters.add(self.tu_1)
+        self.assertFalse(self.pacl.is_poster_authorized(self.tu_1))
+        self.assertTrue(self.pacl.is_poster_authorized(self.tu_2))
+
+    def test_whitelisted_case(self):
+        self.uacl.white_posters.add(self.tu_1)
+        self.assertTrue(self.uacl.is_poster_authorized(self.tu_1))
+        self.assertFalse(self.uacl.is_poster_authorized(self.tu_2))
+
+    def test_group_whitelist_case(self):
+        self.uacl.white_groups.add(self.non_even_group)
+        self.assertTrue(self.uacl.is_poster_authorized(self.tu_1))
+        self.assertTrue(self.uacl.is_poster_authorized(self.tu_3))
+        self.assertFalse(self.uacl.is_poster_authorized(self.tu_2))
+
+    def test_group_blacklist_case(self):
+        self.pacl.black_groups.add(self.non_even_group)
+        self.assertFalse(self.pacl.is_poster_authorized(self.tu_1))
+        self.assertFalse(self.pacl.is_poster_authorized(self.tu_3))
+        self.assertTrue(self.pacl.is_poster_authorized(self.tu_2))
+
+    def test_user_primacy_over_group(self):
+        self.uacl.white_posters.add(self.tu_3)
+        self.uacl.black_groups.add(self.non_even_group)
+        self.assertTrue(self.pacl.is_poster_authorized(self.tu_3))

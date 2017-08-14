@@ -67,6 +67,44 @@ class AuthPackage(models.Model):
     def __unicode__(self):
         return u'%s (%d)' % (self.logic_package, self.pk)
 
+class AccessControlGroup(models.Model):
+    base_groups = (
+        ('MAY_INVITE',),
+    )
 
+    name = models.TextField(unique=True, blank=False, null=False)
+    members = models.ManyToManyField('ISS.Poster')
 
+class AccessControlList(models.Model):
+    base_acls = (
+        ('CREATE_INVITE', False, ('MAY_INVITE',), ()),
+    )
 
+    name = models.TextField(unique=True, blank=False, null=False)
+    allow_by_default = models.BooleanField(default=False, null=False)
+
+    white_posters = models.ManyToManyField('ISS.Poster',
+                                           related_name='whitelisted_acls')
+    black_posters = models.ManyToManyField('ISS.Poster',
+                                           related_name='blacklisted_acls')
+    white_groups = models.ManyToManyField('ISS.AccessControlGroup',
+                                          related_name='whitelisted_acls')
+    black_groups = models.ManyToManyField('ISS.AccessControlGroup',
+                                          related_name='blacklisted_acls')
+
+    def is_poster_authorized(self, poster):
+        if self.white_posters.filter(pk=poster.pk).count():
+            return True
+        if self.black_posters.filter(pk=poster.pk).count():
+            return False
+
+        if self.white_groups.filter(members__pk=poster.pk).count():
+            return True
+        if self.black_groups.filter(members__pk=poster.pk).count():
+            return False
+
+        return self.allow_by_default
+
+    @classmethod
+    def get_acl(cls, name):
+        pass
