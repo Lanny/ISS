@@ -69,15 +69,34 @@ class AuthPackage(models.Model):
 
 class AccessControlGroup(models.Model):
     base_groups = (
-        ('MAY_INVITE',),
+        ('INVITORS',),
     )
 
     name = models.TextField(unique=True, blank=False, null=False)
     members = models.ManyToManyField('ISS.Poster')
 
+    @classmethod
+    def get_acg(cls, name):
+        zero_or_one_qs = list(cls.objects.filter(name=name))
+        acg = None
+
+        if not zero_or_one_qs:
+            acg_descs = filter(lambda desc: desc[0] == name, cls.base_groups)
+            if acg_descs:
+                (name,) = acg_descs[0]
+                acg = cls(name=name)
+                acg.save()
+            else:
+                raise Exception('No ACG with name "%s" exists.' % name)
+
+        else:
+            acg = zero_or_one_qs[0]
+
+        return acg
+
 class AccessControlList(models.Model):
     base_acls = (
-        ('CREATE_INVITE', False, ('MAY_INVITE',), ()),
+        ('CREATE_INVITE', False, ('INVITORS',), ()),
     )
 
     name = models.TextField(unique=True, blank=False, null=False)
@@ -93,18 +112,42 @@ class AccessControlList(models.Model):
                                           related_name='blacklisted_acls')
 
     def is_poster_authorized(self, poster):
-        if self.white_posters.filter(pk=poster.pk).count():
-            return True
         if self.black_posters.filter(pk=poster.pk).count():
             return False
-
-        if self.white_groups.filter(members__pk=poster.pk).count():
+        if self.white_posters.filter(pk=poster.pk).count():
             return True
+
         if self.black_groups.filter(members__pk=poster.pk).count():
             return False
+        if self.white_groups.filter(members__pk=poster.pk).count():
+            return True
 
         return self.allow_by_default
 
     @classmethod
     def get_acl(cls, name):
-        pass
+        zero_or_one_qs = list(cls.objects.filter(name=name))
+        acl = None
+
+        if not zero_or_one_qs:
+            acl_descs = filter(lambda desc: desc[0] == name, cls.base_acls)
+            if acl_descs:
+                # ACL doesn't exist in the DB but it is in the base_acls list,
+                # so we'll create it.
+                name, allow_by_default, white_groups, black_groups = acl_descs[0]
+                acl = cls(name=name, allow_by_default=allow_by_default)
+                acl.save()
+
+                for group in white_groups:
+                    acl.white_groups.add(AccessControlGroup.get_acg(group))
+
+                for group in black_groups:
+                    acl.white_groups.add(AccessControlGroup.get_acg(group))
+            else:
+                raise Exception('No ACL with name "%s" exists.' % name)
+
+        else:
+            acl = zero_or_one_qs[0]
+
+        return acl
+

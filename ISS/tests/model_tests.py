@@ -197,3 +197,11 @@ class ACLTestCase(TestCase):
         self.uacl.white_posters.add(self.tu_3)
         self.uacl.black_groups.add(self.non_even_group)
         self.assertTrue(self.pacl.is_poster_authorized(self.tu_3))
+
+    def test_get_acl(self):
+        invite_acl = AccessControlList.get_acl('CREATE_INVITE')
+        invite_group = AccessControlGroup.get_acg('INVITORS')
+        invite_group.members.add(self.tu_1)
+
+        self.assertTrue(invite_acl.is_poster_authorized(self.tu_1))
+        self.assertFalse(invite_acl.is_poster_authorized(self.tu_2))
