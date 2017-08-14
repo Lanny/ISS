@@ -157,7 +157,11 @@ urlpatterns = [
         name='compose-pm'),
     url(r'^pms/read/(?P<pm_id>\d+)$',
         views.private_messages.read_pm,
-        name='read-pm')
+        name='read-pm'),
+
+    url(r'^api/users/search$',
+        views.user.user_fuzzy_search,
+        name='api-user-serach')
 ]
 
 for page in utils.get_config('static_pages'):

@@ -5,6 +5,7 @@ from django.core.mail import send_mail
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.contrib.auth import login, authenticate
+from django.db.models import Count
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -192,3 +193,19 @@ def view_generated_invite(request):
     ctx = { 'reg_code': reg_code }
     return render(request, 'view_generated_invite.html', ctx)
 
+def user_fuzzy_search(request):
+    query = request.GET.get('q', '')
+    nquery = Poster.normalize_username(query)
+    matches = (Poster.objects
+        .filter(normalized_username__contains=nquery)
+        .annotate(post_count=Count('post'))
+        .order_by('-post_count'))[:7]
+    response_users = []
+
+    for match in matches:
+        response_users.append({
+            'username': match.username,
+            'pk': match.pk
+        })
+
+    return JsonResponse({'users': response_users})
