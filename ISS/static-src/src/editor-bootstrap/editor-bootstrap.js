@@ -8,11 +8,6 @@
       $('.editor').each(function(_, el) {
         new Editor(el);
       });
-
-      new AutoSuggest($('#id_to')[0], {
-        queryUrl: '/api/users/search',
-        delimiter: ','
-      });
     });
   }
 

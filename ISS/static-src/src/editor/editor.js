@@ -1,5 +1,5 @@
 ;(function() {
-  function wrap($) {
+  function wrap($, AutoSuggest) {
     var wrapOperations = [
       {
         name: 'bold',
@@ -85,6 +85,16 @@
         this._ta.before(this._edButtonContainer);
       }
 
+      this._el.find('[data-auto-suggest]')
+        .each(function(i, el) {
+          var $el = $(el);
+
+          new AutoSuggest($el, {
+            queryUrl: $el.attr('data-auto-suggest-endpoint'),
+            delimiter: $el.attr('data-auto-suggest-delimiter')
+          });
+        });
+
       this._bindHandlers();
     }
 
@@ -168,5 +178,9 @@
     return Editor;
   }
 
-  define(['jquery'], wrap);
+  define([
+    'jquery',
+    'auto-suggest'
+  ], wrap);
 })();
+

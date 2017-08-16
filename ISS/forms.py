@@ -7,6 +7,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import transaction
 from django.forms import ValidationError
+from django.urls import reverse
 from django.utils import timezone
 from PIL import Image
 
@@ -503,12 +504,18 @@ class NewPrivateMessageForm(forms.Form):
                               max_length=255,
                               min_length=title_min_len)
 
-    to = forms.CharField(label='To', max_length=512)
+    to = forms.CharField(
+        label='To',
+        max_length=512,
+        widget=forms.TextInput(attrs={
+            'data-auto-suggest': 'true',
+            'data-auto-suggest-delimiter': ',',
+        }))
 
     content = BBCodeField(label='Reply',
-                           min_length=post_min_len,
-                           max_length=post_max_len,
-                           widget=forms.Textarea())
+                          min_length=post_min_len,
+                          max_length=post_max_len,
+                          widget=forms.Textarea())
 
 
     _author = None
@@ -516,6 +523,11 @@ class NewPrivateMessageForm(forms.Form):
     def __init__(self, *args, **kwargs):
         if 'author' not in kwargs:
             raise ValueError('Must be inited with a author')
+
+        # Delay setting this attr because urlconf initilization must be
+        # complete for reverse to function
+        self.base_fields['to'].widget.attrs['data-auto-suggest-endpoint'] = (
+                reverse('api-user-serach'))
 
         self._author = kwargs['author']
         del kwargs['author']
