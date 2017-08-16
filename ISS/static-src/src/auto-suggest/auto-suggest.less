@@ -1,0 +1,29 @@
+@import "../base/config.less";
+
+.auto-suggest-wrapper {
+  position: relative;
+  overflow: visible;
+
+  .auto-suggestions {
+    position: absolute;
+    top: 100%;
+    width: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-style: solid;
+    border-color: lightgray;
+    border-width: 0 1px;
+
+    li {
+      background-color: white;
+      padding: 3px 10px;
+      border-bottom: 1px solid lightgray;
+
+      &.active {
+        background-color: #0095ff;
+        color: white;
+      }
+    }
+  }
+}

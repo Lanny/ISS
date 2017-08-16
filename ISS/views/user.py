@@ -204,8 +204,11 @@ def user_fuzzy_search(request):
 
     for match in matches:
         response_users.append({
-            'username': match.username,
+            'name': match.username,
             'pk': match.pk
         })
 
-    return JsonResponse({'users': response_users})
+    return JsonResponse({
+        'results': response_users,
+        'resultType': 'user'
+    })
