@@ -1,4 +1,5 @@
 from django import template
+from django.utils import formats
 
 from ISS.models import FilterWord, AccessControlList
 
@@ -27,3 +28,9 @@ def get_item(dictionary, key):
 def check_acl(poster, acl_name):
     acl = AccessControlList.get_acl(acl_name)
     return acl.is_poster_authorized(poster)
+
+@register.filter
+def present_dt(dt):
+    return '%s at %s' % (
+        formats.date_format(dt, 'Y-m-d'),
+        formats.time_format(dt, 'f A e'))
