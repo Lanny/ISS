@@ -102,6 +102,7 @@ class AccessControlGroup(models.Model):
 class AccessControlList(models.Model):
     base_acls = (
         ('CREATE_INVITE', False, ('INVITORS', 'SUPERUSERS'), ()),
+        ('VIEW_INVITE_TREE', False, ('INVITORS', 'SUPERUSERS'), ())
     )
 
     name = models.TextField(unique=True, blank=False, null=False)
