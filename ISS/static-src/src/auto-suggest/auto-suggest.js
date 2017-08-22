@@ -47,7 +47,7 @@
           self._queryMaybe();
         });
       },
-      _getCurrentTerm() {
+      _getCurrentTerm: function() {
         var rawVal = this._el.val();
         if (this._delimiter) {
           var terms = rawVal.split(this._delimiter),
@@ -58,7 +58,7 @@
           return rawVal;
         }
       },
-      _setCurrentTerm(term) {
+      _setCurrentTerm: function(term) {
         var rawVal = this._el.val();
         if (this._delimiter) {
           var terms = rawVal.split(this._delimiter);
@@ -68,7 +68,7 @@
           this._el.val(term);
         }
       },
-      _queryMaybe() {
+      _queryMaybe: function() {
         var self = this,
           currentVal = this._getCurrentTerm();
 
