@@ -1,5 +1,5 @@
 from django import template
-from django.utils import formats
+from django.template import defaultfilters
 
 from ISS.models import FilterWord, AccessControlList
 
@@ -29,8 +29,8 @@ def check_acl(poster, acl_name):
     acl = AccessControlList.get_acl(acl_name)
     return acl.is_poster_authorized(poster)
 
-@register.filter
+@register.filter(expects_localtime=True, is_safe=False)
 def present_dt(dt):
     return '%s at %s' % (
-        formats.date_format(dt, 'Y-m-d'),
-        formats.time_format(dt, 'f A e'))
+        defaultfilters.date(dt, 'Y-m-d'),
+        defaultfilters.time(dt, 'f A e'))
