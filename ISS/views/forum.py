@@ -437,6 +437,9 @@ class NewThread(utils.MethodSplitView):
 
             thread = form.save(request.user, ip_addr)
 
+            if request.user.auto_subscribe >= 1:
+                thread.subscribe(request.user)
+
             return HttpResponseRedirect(thread.get_url())
 
         else:

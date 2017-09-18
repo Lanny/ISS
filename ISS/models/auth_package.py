@@ -30,9 +30,21 @@ class PermissiveLogicPackage(BaseLogicPackage):
     def is_authorized(self, auth_package, request):
         return True
 
+class ACLLogicPackage(BaseLogicPackage):
+    @classmethod
+    def get_name(cls):
+        return 'ACL_CONTROLLED'
+
+    def is_authorized(self, auth_package, request):
+        config = self.get_logic_config()
+        ACL = AccessControlGroup.get_acl(config['ACL_NAME'])
+
+        return ACL.is_poster_authorized(request.user)
+
 LOGIC_PACKAGES = (
     AdminRequiredLogicPackage,
-    PermissiveLogicPackage
+    PermissiveLogicPackage,
+    ACLLogicPackage
 )
 
 PACKAGE_MAP = dict([(p.get_name(), p) for p in LOGIC_PACKAGES])

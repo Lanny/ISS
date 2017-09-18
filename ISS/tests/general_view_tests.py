@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core import mail
 from django.contrib.auth import authenticate
 from django.test import TestCase, Client
-from django.urls import reverse
+from django.urls import reverse, resolve
 from django.utils import timezone
 
 from ISS.models import *
@@ -19,6 +19,8 @@ class GeneralViewTestCase(test_utils.ForumConfigTestCase):
         test_utils.create_std_forums()
 
         self.scrub = test_utils.create_user(thread_count=5, post_count=10)
+        self.scrub.auto_subscribe = 1
+        self.scrub.save()
 
         self.scrub_client = Client()
         self.scrub_client.force_login(self.scrub)
@@ -82,6 +84,40 @@ class GeneralViewTestCase(test_utils.ForumConfigTestCase):
         })
         post = Post.objects.get(pk=post.pk)
         self.assertLess(len(post.content), len(long_content))
+
+    def test_new_thread(self):
+        forum = Forum.objects.all()[0]
+        path = reverse('new-thread', kwargs={'forum_id': forum.pk})
+
+        response = self.scrub_client.post(
+            path,
+            {
+                'title': 'SAT is a lie',
+                'content': 'NP erect lol',
+                'forum': forum.pk
+            })
+
+        self.assertEqual(response.status_code, 302)
+
+    def test_new_thread_generates_subscription(self):
+        forum = Forum.objects.all()[0]
+        path = reverse('new-thread', kwargs={'forum_id': forum.pk})
+
+        response = self.scrub_client.post(
+            path,
+            {
+                'title': 'SAT is a lie',
+                'content': 'NP erect lol',
+                'forum': forum.pk
+            })
+
+        match = resolve(response['Location'])
+        thread = Thread.objects.get(pk=match.kwargs['thread_id'])
+
+        subscription = ThreadFlag.objects.get(poster=self.scrub,
+                                              thread=thread)
+        self.assertTrue(subscription.subscribed)
+
 
 class ThanksViewTest(TestCase):
     def setUp(self):
