@@ -122,12 +122,16 @@ class AccessControlList(models.Model):
     allow_by_default = models.BooleanField(default=False, null=False)
 
     white_posters = models.ManyToManyField('ISS.Poster',
+                                           blank=True,
                                            related_name='whitelisted_acls')
     black_posters = models.ManyToManyField('ISS.Poster',
+                                           blank=True,
                                            related_name='blacklisted_acls')
     white_groups = models.ManyToManyField('ISS.AccessControlGroup',
+                                          blank=True,
                                           related_name='whitelisted_acls')
     black_groups = models.ManyToManyField('ISS.AccessControlGroup',
+                                          blank=True,
                                           related_name='blacklisted_acls')
 
     def is_poster_authorized(self, poster):
