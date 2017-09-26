@@ -179,7 +179,7 @@
       </div>
     {% endif %}
 
-    {% if user.is_staff %}
+    {% if user|check_acl:"VIEW_IPS" %}
     <div class="alts">
       <h3>Alternative Accounts</h3>
       <div>
@@ -207,6 +207,44 @@
               <td colspan="999">No alts found</td>
             </tr>
           {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="ip-distribution">
+      <h3>IP Address Distrbution</h3>
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>IP Address</th>
+              <th>Number of Posts</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for ip in ip_distr %}
+            <tr>
+              <td>
+                {{ ip.posted_from }}
+              </td>
+              <td>
+                {{ ip.num_posts }}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="999">Poster has no posts.</td>
+            </tr>
+          {% endfor %}
+
+          {% if ip_distr_remaning %}
+            <tr>
+              <td colspan="999">
+                {{ ip_distr_remaning }} addresses not shown...
+              </td>
+            </tr>
+          {% endif %}
           </tbody>
         </table>
       </div>

@@ -330,6 +330,16 @@ class UserProfile(utils.MethodSplitView):
             ctx['settings_form'] = self._base_settings_form(poster)
             ctx['avatar_form'] = self._base_avatar_form(poster)
 
+        ip_acl = AccessControlList.get_acl('VIEW_IPS')
+        if ip_acl.is_poster_authorized(request.user):
+            ip_distr = (poster.post_set
+                .values('posted_from')
+                .annotate(num_posts=Count('id'))
+                .order_by('-num_posts'))
+
+            ctx['ip_distr'] = ip_distr[:10]
+            ctx['ip_distr_remaining'] = max(ip_distr.count() - 10, 0)
+
         HookManager.add_ctx_for_hook(ctx, 'user_profile_stats', poster)
 
         return render(request, 'user_profile.html', ctx)
