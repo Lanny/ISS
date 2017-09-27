@@ -2,6 +2,7 @@ import json
 
 from django.db import models
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth.models import AnonymousUser
 
 class BaseLogicPackage(object):
     def __init__(self, config=None):
@@ -135,6 +136,9 @@ class AccessControlList(models.Model):
                                           related_name='blacklisted_acls')
 
     def is_poster_authorized(self, poster):
+        if isinstance(poster, AnonymousUser):
+            return self.allow_by_default
+
         if self.black_posters.filter(pk=poster.pk).count():
             return False
         if self.white_posters.filter(pk=poster.pk).count():
