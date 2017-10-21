@@ -17,7 +17,7 @@ class vB5_legacy(object):
         UserModel = get_user_model()
 
         unsalted_pass = hashlib.new('md5')
-        unsalted_pass.update(password)
+        unsalted_pass.update(password.encode('utf-8'))
         unsalted_digest = unsalted_pass.hexdigest()
 
         try:

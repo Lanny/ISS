@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import datetime
 import json
 
@@ -574,3 +576,46 @@ class GenerateInviteCodeTestCase(test_utils.ForumConfigTestCase):
         self.assertEqual(reg_code.used_on, None)
 
  
+class LoginTestCase(TestCase):
+    def setUp(self):
+        self.password = u'私わ大津展之です'
+        self.path = reverse('login')
+
+        self.otsu = test_utils.create_user()
+        self.otsu.set_password(self.password)
+        self.otsu.save()
+
+        self.otsu_client = Client()
+
+    def test_correct_unicode_password(self):
+        response = self.otsu_client.post(
+            self.path,
+            {
+                'username': self.otsu.username,
+                'password': self.password,
+            })
+
+        uid = (self.otsu_client
+                .session
+                .load()
+                .get('_auth_user_id'))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(int(uid), self.otsu.pk)
+        
+    def test_incorrect_unicode_password_success(self):
+        response = self.otsu_client.post(
+            self.path,
+            {
+                'username': self.otsu.username,
+                'password': self.password[:-1],
+            })
+
+        uid = (self.otsu_client
+                .session
+                .load()
+                .get('_auth_user_id'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(uid, None)
+        
