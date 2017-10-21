@@ -132,7 +132,12 @@
       bbcode.bindRegion($('.page-content'));
       shakeBaby($('.ex'), 10);
       window.setTimeout(peek, Math.random()*1000*60*60);
-    })
+
+      if ($('.g-recaptcha').length > 0) {
+        $(document.documentElement).append(
+          '<script src="https://www.google.com/recaptcha/api.js"></script>');
+      }
+    });
   }
 
   require([

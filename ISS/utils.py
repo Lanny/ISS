@@ -18,7 +18,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse, \
     HttpResponseForbidden
 from django.shortcuts import render
-from captcha.fields import ReCaptchaField
+from snowpenguin.django.recaptcha2.fields import ReCaptchaField
 
 from ISS.models import *
 from ISS import iss_bbcode
@@ -448,7 +448,7 @@ def normalize_homoglyphs(prenormalized):
 def captchatize_form(form):
     _config = get_config('recaptcha_settings')
 
-    if config:
+    if _config:
         class NewForm(form):
             captcha = ReCaptchaField(public_key=_config[0],
                                      private_key=_config[1])

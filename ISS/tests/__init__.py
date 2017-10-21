@@ -1,4 +1,5 @@
 import importlib
+import os
 
 from ISS import utils
 
@@ -11,3 +12,4 @@ from model_tests import *
 for ext in utils.get_config('extensions'):
     globals().update(importlib.import_module(ext + '.tests').__dict__)
 
+os.environ['RECAPTCHA_DISABLE'] = 'True'

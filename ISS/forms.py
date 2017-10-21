@@ -52,41 +52,6 @@ class BBCodeField(forms.CharField):
 
         return value
 
-class CaptchaForm(forms.Form):
-    def clean(self, *args, **kwargs):
-        if not utils.get_config('recaptcha_settings'):
-            return self.cleaned_data
-
-        captcha_response = self.data.get('g-recaptcha-response', None)
-
-        if not captcha_response:
-            raise ValidationError('Please solve the captcha first.')
-
-        req_data = urllib.urlencode({
-            'secret': utils.get_config('recaptcha_settings')[1],
-            'response': captcha_response
-        })
-
-        try:
-            resp = urllib2.urlopen(
-                'https://www.google.com/recaptcha/api/siteverify',
-                req_data,
-                1000)
-
-            resp_data = json.load(resp)
-
-            if not resp_data.get('success', False):
-                raise ValidationError('Invalid captcha submitted.')
-
-        except ValidationError, e:
-            raise
-        except e:
-            raise ValidationError(
-                'Unexpected error occured while validating captcha. Please '
-                'try again later.')
-
-        return self.cleaned_data
-
 class InitialPeriodLimitingForm(forms.Form):
     def __init__(self, *args, **kwargs):
         if 'author' not in kwargs:
@@ -257,7 +222,8 @@ class ISSAuthenticationForm(AuthenticationForm):
         else:
             return user.username
 
-class RegistrationForm(UserCreationForm, CaptchaForm):
+@utils.captchatize_form
+class RegistrationForm(UserCreationForm):
     error_css_class = 'in-error'
 
     class Meta:
@@ -286,12 +252,8 @@ class RegistrationForm(UserCreationForm, CaptchaForm):
 
         return username
 
-    def clean(self, *args, **kwargs):
-        CaptchaForm.clean(self, *args, **kwargs)
-
-    def save(self):   
-        poster = super(RegistrationForm, self).save(commit = False)
-        poster.save()
+    def save(self):
+        poster = UserCreationForm.save(self)
         return poster
 
 class InviteRegistrationFrom(RegistrationForm):
@@ -316,7 +278,7 @@ class InviteRegistrationFrom(RegistrationForm):
         return reg_code
 
     def save(self):
-        poster = super(InviteRegistrationFrom, self).save()
+        poster = RegistrationForm.save(self)
         reg_code = self.cleaned_data['registration_code']
 
         reg_code.used_by = poster
@@ -366,7 +328,8 @@ class ExecutePasswordRecoveryForm(forms.Form):
         return ret
     
 
-class ReportPostForm(CaptchaForm):
+@utils.captchatize_form
+class ReportPostForm(forms.Form):
     post_min_len = utils.get_config('min_post_chars')
     post_max_len = utils.get_config('max_post_chars')
 
