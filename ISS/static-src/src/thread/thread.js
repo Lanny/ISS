@@ -2,7 +2,7 @@
   function wrap($, thanks, Editor) {
     $(function() {
       $('.editor').each(function(_, el) {
-        new Editor(el);
+        new Editor(el, {saveContent: true});
       });
 
       $('body').on('click', '.quote', function(e) {
@@ -35,4 +35,5 @@
     'base'
   ], wrap);
 })();
+
 

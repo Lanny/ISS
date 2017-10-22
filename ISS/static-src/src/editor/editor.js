@@ -1,4 +1,6 @@
 ;(function() {
+  var sessionStorage = window.sessionStorage || {};
+
   function wrap($, AutoSuggest) {
     var wrapOperations = [
       {
@@ -64,11 +66,20 @@
       return deferred.promise();
     }
 
-    function Editor(element) {
+    var defaults = {
+      saveContent: false
+    };
+
+    function Editor(element, options) {
+      this.settings = $.extend({}, defaults, options);
       this._el = $(element);
       this._ta = this._el.find('textarea');
 
       this._el.data('editor', this);
+
+      if (this._getStoreKey() in sessionStorage) {
+        this._ta.val(sessionStorage[this._getStoreKey()]);
+      }
 
       if (window.config['editor-buttons']) {
         this._edButtonContainer = $('<div class="editor-buttons">');
@@ -104,7 +115,7 @@
       _bindHandlers: function() {
         var self = this;
 
-        self._ta.on('keydown', function(e) {
+        this._ta.on('keydown', function(e) {
           if (e.keyCode === 13 && (e.ctrlKey || e.metaKey)) {
             e.preventDefault();
             self._el.trigger('submit');
@@ -123,10 +134,27 @@
           }
         });
 
-        self._el.on('click', '.editor-buttons .wrap-operation', function(e) {
+        this._ta.on('keyup', function(e) {
+          if (self.settings.saveContent) { self._sessSave(); }
+        });
+
+        this._el.on('submit', function() { self._sessClear(); });
+
+        this._el.on('click', '.editor-buttons .wrap-operation', function(e) {
           self.executeWrapIntension($(e.target).data('wrapOp'));
           return false;
         });
+      },
+      _getStoreKey: function() {
+        return 'editor-content:' + document.location.pathname;
+      },
+      _sessClear: function() {
+        delete sessionStorage[this._getStoreKey()];
+      },
+      _sessSave: function() {
+        var content = this._ta.val();
+        sessionStorage[this._getStoreKey()] = content;
+
       },
       executeWrapIntension: function(wrapOp) {
         var self = this,
@@ -147,6 +175,8 @@
             self._ta.focus();
             self._ta[0].selectionStart = selStart;
             self._ta[0].selectionEnd = selStart + wrappedContent.length;
+
+            if (self.settings.saveContent) { self._sessSave(); }
           }, 0);
         }
 
@@ -172,6 +202,8 @@
 
         self._ta.val(newVal + '\n\n')
           .focus();
+
+        if (self.settings.saveContent) { self._sessSave(); }
       }
     }
 
@@ -183,4 +215,5 @@
     'auto-suggest'
   ], wrap);
 })();
+
 
