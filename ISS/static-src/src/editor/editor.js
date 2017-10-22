@@ -74,6 +74,7 @@
       this.settings = $.extend({}, defaults, options);
       this._el = $(element);
       this._ta = this._el.find('textarea');
+      this._deconstructing = false;
 
       this._el.data('editor', this);
 
@@ -135,10 +136,15 @@
         });
 
         this._ta.on('keyup', function(e) {
-          if (self.settings.saveContent) { self._sessSave(); }
+          if (self.settings.saveContent && !self._deconstructing) {
+            self._sessSave();
+          }
         });
 
-        this._el.on('submit', function() { self._sessClear(); });
+        this._el.on('submit', function() {
+          self._deconstructing = true;
+          self._sessClear();
+        });
 
         this._el.on('click', '.editor-buttons .wrap-operation', function(e) {
           self.executeWrapIntension($(e.target).data('wrapOp'));
