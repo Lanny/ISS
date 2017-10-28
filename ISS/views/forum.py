@@ -14,7 +14,7 @@ from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.views.decorators.cache import cache_control, cache_page
 
-from ISS import utils, forms
+from ISS import utils, forms, iss_bbcode
 from ISS.models import *
 from ISS.hooks import HookManager
 
@@ -729,7 +729,7 @@ def get_bc_embed_code(request):
 
     try:
         embed_code = utils.bandcamp_markup_for_url(url)
-    except utils.EmbeddingNotSupportedException:
+    except iss_bbcode.EmbeddingNotSupportedException:
         return JsonResponse({
             'status': 'FAILURE',
             'reason': 'Url is not embeddable'
