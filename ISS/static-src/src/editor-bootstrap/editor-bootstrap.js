@@ -15,6 +15,7 @@
     'jquery',
     'editor',
     'auto-suggest',
+    'base'
   ], wrap);
 })();
 
