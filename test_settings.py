@@ -37,7 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'captcha',
+    'snowpenguin.django.recaptcha2',
     'Houston',
     'ISS',
     'ISS.contrib.taboo'
