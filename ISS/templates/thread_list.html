@@ -81,9 +81,9 @@
         <span class="last-post-date">
           {{ last_post.created|present_dt }}
         </span>
-        <span "last-post-autor">
-          by
-          <a href="{{last_post.author.get_url}}">{{ last_post.author.username }}</a>
+        <span class="last-post-author">
+          <span>by</span>
+          <a href="{{last_post.author.get_url}}" class="author-username">{{ last_post.author.username }}</a>
           <a href="{{ last_post.get_url }}" class="last-post"></a>
       {% endwith %}
     </td>

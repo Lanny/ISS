@@ -104,6 +104,21 @@
           display: block;
         }
 
+        .last-post-author {
+          display: flex;
+
+          & > * {
+            margin-right: 5px;
+          }
+
+          .author-username {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            max-width: 12em;
+          }
+        }
+
         .last-post, .oldest-unread-post {
           .icn-btn();
           vertical-align: middle;
