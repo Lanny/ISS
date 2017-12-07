@@ -90,6 +90,7 @@
             .addClass('wrap-operation')
             .addClass(wrapOperations[i].buttonClass)
             .attr('title', wrapOperations[i].name)
+            .attr('tabindex', -1)
             .data('wrapOp', wrapOperations[i])
             .appendTo(this._edButtonContainer);
         }
