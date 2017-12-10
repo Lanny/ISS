@@ -40,6 +40,8 @@
             self._preventNextQuery = true;
             self._close();
             e.preventDefault();
+          } else if (e.keyCode === 27) {
+            self._close();
           }
         });
         this._el.on('focusin', function() { self._open(); })
