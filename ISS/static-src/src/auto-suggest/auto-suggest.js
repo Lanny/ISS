@@ -42,6 +42,8 @@
             e.preventDefault();
           }
         });
+        this._el.on('focusin', function() { self._open(); })
+          .on('focusout', function() { self._close(); });
 
         this._el.on('keyup', function(e) {
           self._queryMaybe();
