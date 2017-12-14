@@ -691,6 +691,10 @@ class SpamCanUser(utils.MethodSplitView):
             poster.is_staff = False
             poster.is_admin = False
 
+            Ban.objects.create(given_by=request.user,
+                               subject=poster,
+                               reason="spam ban")
+
             poster.save()
 
             threads.update(forum=form.cleaned_data['target_forum'])

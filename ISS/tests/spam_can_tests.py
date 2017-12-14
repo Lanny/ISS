@@ -104,3 +104,11 @@ class SpamCanTestCase(TestCase):
         self._spamcan_bot()
         self.legit_thread = Thread.objects.get(pk=self.legit_thread.pk)
         self.assertFalse(self.legit_thread.has_unread_posts(self.joe))
+
+    def test_it_creates_a_ban_record(self):
+        response = self._spamcan_bot()
+        self.assertEqual(response.status_code, 302)
+
+        self.assertEqual(self.bot.bans.count(), 1)
+        ban = self.bot.bans.all()[0]
+        self.assertEqual(ban.end_date, None)
