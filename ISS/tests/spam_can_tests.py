@@ -112,3 +112,4 @@ class SpamCanTestCase(TestCase):
         self.assertEqual(self.bot.bans.count(), 1)
         ban = self.bot.bans.all()[0]
         self.assertEqual(ban.end_date, None)
+        self.assertTrue(ban.is_active())

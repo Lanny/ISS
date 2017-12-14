@@ -627,7 +627,7 @@ class Ban(models.Model):
         if not now:
             now = timezone.now()
 
-        return self.end_date > now
+        return self.end_date == None or self.end_date > now
 
     def __unicode__(self):
         return u'Ban on %s for reason: %s' % (

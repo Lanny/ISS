@@ -284,7 +284,11 @@
                 {{ ban.start_date|date:"Y-m-d" }} at {{ ban.start_date|time:"f A e" }}
               </td>
               <td>
-                {{ ban.end_date|date:"Y-m-d" }} at {{ ban.end_date|time:"f A e" }}
+                {% if ban.end_date %}
+                  {{ ban.end_date|date:"Y-m-d" }} at {{ ban.end_date|time:"f A e" }}
+                {% else %}
+                  <strong>Never</strong>
+                {% endif %}
               </td>
             </tr>
           {% empty %}
