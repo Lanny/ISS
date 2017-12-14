@@ -197,7 +197,7 @@ def user_fuzzy_search(request):
     query = request.GET.get('q', '')
     nquery = Poster.normalize_username(query)
     matches = (Poster.objects
-        .filter(normalized_username__contains=nquery)
+        .filter(normalized_username__contains=nquery, is_active=True)
         .annotate(post_count=Count('post'))
         .order_by('-post_count'))[:7]
     response_users = []
