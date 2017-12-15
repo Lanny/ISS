@@ -60,7 +60,10 @@ a {
 .paginator {
   display: block;
   overflow: hidden;
-  margin-bottom: 20px;
+
+  @media (min-width: @breakpoint) {
+    margin-bottom: 20px;
+  }
 
   ol {
     list-style: none;
