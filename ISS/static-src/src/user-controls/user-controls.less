@@ -1,9 +1,8 @@
 @import "../base/config.less";
 
 .user-controls {
-  .rounded();
+  .region(0,0,0,@content_margin_bottom);
   background-color: @bg_dark;
-  margin-bottom: @content_margin_bottom;
 
   h3 {
     .title-box();
@@ -79,6 +78,7 @@
         display: flex;
 
         .welcome-line {
+  
           flex: 1;
           text-align: left;
         }

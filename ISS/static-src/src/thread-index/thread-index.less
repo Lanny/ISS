@@ -2,9 +2,9 @@
 
 .thread-index {
   .forum-intro {
-    .rounded();
+    .region(0,0,0,@content_margin_bottom);
+
     background-color: @bg_light;
-    margin-bottom: @content_margin_bottom;
 
     .forum-title {
       .title-box();
@@ -21,9 +21,14 @@
     .teal-inv();
 
     float: left;
-    margin-bottom: @content_margin_bottom;
+
+    @media(min-width: @breakpoint) {
+      margin-bottom: @content_margin_bottom;
+    }
 
     @media(max-width: @breakpoint) {
+      border-top: 1px solid @seperator_color;
+      border-bottom: 1px solid @seperator_color;
       display: block;
       float: none;
       text-align: center;
@@ -32,8 +37,7 @@
 
   .threads {
     .index-table;
-    .rounded();
-    margin-bottom: 20px;
+    .region(0,0,0,20px);
 
     tr {
       .mobile-thread-controls {

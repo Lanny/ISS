@@ -3,8 +3,10 @@
 
 .thread {
   .thread-content {
-    .rounded();
-    margin-bottom: 20px;
+    @media (min-width: @breakpoint) {
+      .rounded();
+      margin-bottom: 20px;
+    }
 
     h1 {
       .title-box();
@@ -13,7 +15,9 @@
 
   .quick-reply {
     .standard-form();
-    margin-top: 20px;
 
+    @media (min-width: @breakpoint) {
+      margin-top: 20px;
+    }
   }
 }

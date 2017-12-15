@@ -6,8 +6,9 @@
   margin: 0;
 
   .post {
-    &:not(:last-child) {
-      margin-bottom: 10px;
+    .region(0,0,0,10px);
+    &:last-child {
+      margin-bottom: 0;
     }
 
     .post-hat {

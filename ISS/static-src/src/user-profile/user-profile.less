@@ -2,8 +2,7 @@
 
 .user-profile {
   .public-info {
-    .rounded();
-    margin-bottom: 15px;
+    .region(0,0,0,15px);
 
     h3 {
       .title-box();
@@ -78,8 +77,7 @@
   }
 
   .profile-settings {
-    margin-bottom: 15px;
-
+    .region(0,0,0,15px);
     form {
       .standard-form();
       background-color: @bg_dark;
@@ -94,7 +92,7 @@
   }
 
   .avatar-controls {
-    margin-bottom: 15px;
+    .region(0,0,0,15px);
 
     form {
       .standard-form();
@@ -103,13 +101,15 @@
   }
 
   .ban-log {
-    .rounded();
+    .region(0,0,0,0);
 
     h3 {
       .title-box();
     }
 
     & > div {
+      overflow: auto;
+
       table {
         .index-table();
 

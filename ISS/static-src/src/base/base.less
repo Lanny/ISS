@@ -29,6 +29,10 @@ input {
   margin: 0 auto;
   padding: 0 5px;
 
+  @media (max-width: @breakpoint) {
+    padding: 0;
+  }
+
   .banner {
     min-height: 150px;
     margin: 10px 0;
@@ -151,9 +155,8 @@ a {
 }
 
 .breadcrumb {
-  .rounded();
+  .region(0,0,0,@content_margin_bottom);
   background-color: @bg_dark;
-  margin-bottom: @content_margin_bottom;
 
   h3 {
     .title-box();
@@ -219,12 +222,14 @@ blockquote {
 }
 
 footer {
-  .rounded();
+  @media (min-width: @breakpoint) {
+    .rounded();
+    margin: 15px 0;
+  }
 
   background-color: @bg_ultra_dark;
   color: @fg_ultra_dark;
   padding: 10px @std_lr_padding;
-  margin: 15px 0;
   border: 1px solid #565656;
 }
 
@@ -320,7 +325,6 @@ footer {
   .btn();
   .teal();
 
-  margin-top: 20px;
   display: flex;
   flex-direction: row;
 

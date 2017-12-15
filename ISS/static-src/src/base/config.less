@@ -37,6 +37,17 @@
   overflow: hidden;
 }
 
+.region(@top: 0, @right: 0, @left: 0, @bottom: 0) {
+  @media (min-width: @breakpoint) {
+    .rounded();
+    margin-top: @top;
+    margin-right: @right;
+    margin-left: @left;
+    margin-bottom: @bottom;
+  }
+}
+
+
 .btn() {
   border-radius: 0px;
   border: 0;
@@ -119,7 +130,10 @@
 }
 
 .standard-form() {
-  .rounded();
+  @media (min-width: @breakpoint) {
+    .rounded();
+  }
+
   background-color: @white;
   padding-bottom: 10px;
 
