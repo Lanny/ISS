@@ -406,6 +406,9 @@ class Thread(models.Model):
 
         flag.save()
 
+    def has_been_read(self, user):
+        return bool(self._get_flag(user, save=False).last_read_date)
+
     def is_subscribed(self, user):
         return self._get_flag(user, save=False).subscribed
 

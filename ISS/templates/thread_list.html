@@ -68,13 +68,15 @@
           {% endif %}
         {% endwith %}
 
-        {% with last_post=thread.get_last_post %}
-          <li>
-            <a href="{{ last_post.get_url }}" title="last post"
-               class="last-post">
-            </a>
-          </li>
-        {% endwith %}
+        {% if thread.has_been_read %}
+          {% with last_post=thread.get_last_post %}
+            <li>
+              <a href="{{ last_post.get_url }}" title="last post"
+                 class="last-post">
+              </a>
+            </li>
+          {% endwith %}
+        {% endif %}
 
         {% if user.is_staff %}
           <li>
