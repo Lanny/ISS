@@ -143,8 +143,7 @@
   require([
     'jquery',
     'config',
-    'bbcode',
-    'user-controls'
+    'bbcode'
   ], wrap);
 })();
 
