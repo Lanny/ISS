@@ -6,9 +6,16 @@
   margin: 0;
 
   .post {
-    .region(0,0,0,10px);
-    &:last-child {
-      margin-bottom: 0;
+    @media (min-width: @breakpoint) {
+      &:not(:first-child) {
+        margin-top: 10px;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+      }
     }
 
     .post-hat {
@@ -77,8 +84,11 @@
     }
 
     .thanker-block {
-      margin-top: 5px;
       background-color: @bg_dark;
+
+      @media (min-width: @breakpoint) {
+        margin-top: 5px;
+      }
 
       .thanker-caption {
         .teal();
