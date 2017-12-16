@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12.5 12.5">
+  <g transform="translate(0, 1.25)">
+    <path d="M 0 2.5 L 5 2.5 L 5 0 L 10 5 L 5 10 L 5 7.5 L 0 7.5 Z"
+      stroke="0"
+      fill="white"></path>
+    <rect x="10.5" y="0" height="10" width="2" fill="white"/>
+  </g>
+</svg>

@@ -29,7 +29,8 @@
         {% with oldest_undread_post=thread.get_jump_post %}
           {% if oldest_undread_post %}
             <a href="{{ oldest_undread_post.get_url }}"
-               class="oldest-unread-post"></a>
+               class="oldest-unread-post"
+               title="last unread post"></a>
           {% endif %}
         {% endwith %}
 
@@ -61,15 +62,25 @@
           {% if oldest_undread_post %}
             <li>
               <a href="{{ oldest_undread_post.get_url }}"
+                 title="last unread post"
                  class="oldest-unread-post"></a>
             </li>
           {% endif %}
         {% endwith %}
 
+        {% with last_post=thread.get_last_post %}
+          <li>
+            <a href="{{ last_post.get_url }}" title="last post"
+               class="last-post">
+            </a>
+          </li>
+        {% endwith %}
+
         {% if user.is_staff %}
           <li>
             <a href="{% url 'admin:ISS_thread_change' thread.pk %}"
-               class="edit-thread">
+               class="edit-thread"
+               title="edit thread">
             </a>
           </li>
         {% endif %}
@@ -84,7 +95,8 @@
         <span class="last-post-author">
           <span>by</span>
           <a href="{{last_post.author.get_url}}" class="author-username">{{ last_post.author.username }}</a>
-          <a href="{{ last_post.get_url }}" class="last-post"></a>
+          <a href="{{ last_post.get_url }}" class="last-post"
+             title="last post"></a>
       {% endwith %}
     </td>
     <td>

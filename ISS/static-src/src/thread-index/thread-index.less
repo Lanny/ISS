@@ -173,9 +173,16 @@
               border-right: 1px solid @white;
             }
 
-            .edit-thread {
+            .edit-thread, .last-post {
               border: none;
             }
+
+            .last-post {
+              &:before {
+                .icn-right-arrow-bar();
+              }
+            }
+                
 
             a {
               text-align: center;
