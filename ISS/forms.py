@@ -92,7 +92,8 @@ class NewThreadForm(InitialPeriodLimitingForm):
 
     title = forms.CharField(label='Title',
                             max_length=1000,
-                            min_length=thread_min_len)
+                            min_length=thread_min_len,
+                            widget=forms.TextInput(attrs={'autofocus': 'true'}))
 
     content = BBCodeField(label='Post Body',
                            min_length=post_min_len,
@@ -181,7 +182,7 @@ class EditPostForm(forms.Form):
     content = BBCodeField(label='Content',
                           min_length=post_min_len,
                           max_length=post_max_len,
-                          widget=forms.Textarea())
+                          widget=forms.Textarea(attrs={'autofocus': 'true'}))
 
     def save(self, editor=None):
         post = self.cleaned_data['post']
