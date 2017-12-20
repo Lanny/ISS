@@ -380,6 +380,9 @@ class UserSettingsForm(forms.Form):
     allow_image_embed = forms.BooleanField(
         label="Enable images embedded in posts",
         required=False)
+    allow_video_embed = forms.BooleanField(
+        label="Enable videos embedded in posts",
+        required=False)
     enable_tripphrase = forms.BooleanField(label="Enable tripphrase", required=False)
     auto_subscribe = forms.ChoiceField(
         label="Auto-subscribe",
@@ -405,6 +408,7 @@ class UserSettingsForm(forms.Form):
         poster.allow_js = self.cleaned_data['allow_js']
         poster.allow_avatars = self.cleaned_data['allow_avatars']
         poster.allow_image_embed = self.cleaned_data['allow_image_embed']
+        poster.allow_video_embed = self.cleaned_data['allow_video_embed']
         poster.enable_editor_buttons = self.cleaned_data['enable_editor_buttons']
         poster.auto_subscribe = self.cleaned_data['auto_subscribe']
         poster.timezone = self.cleaned_data['timezone']

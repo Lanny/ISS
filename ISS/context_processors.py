@@ -29,19 +29,22 @@ def user_config(request):
 
     if isinstance(request.user, AnonymousUser):
         ctx['embed_images'] = True
+        ctx['embed_video'] = True
         ctx['allow_avatars'] = True
         ctx['allow_js'] = True
         ctx['editor_buttons'] = False
         ctx['login_form'] = AuthenticationForm()
     else:
         ctx['embed_images'] = request.user.embed_images()
+        ctx['embed_video'] = request.user.embed_video()
         ctx['allow_js'] = request.user.allow_js
         ctx['editor_buttons'] = request.user.enable_editor_buttons
         ctx['allow_avatars'] = request.user.allow_avatars
 
     ctx['bbcode_settings'] = {
         'allow_js': ctx['allow_js'],
-        'embed_images': ctx['embed_images']
+        'embed_images': ctx['embed_images'],
+        'embed_video': ctx['embed_video'],
     }
 
     return ctx

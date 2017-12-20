@@ -257,10 +257,11 @@ def bandcamp_markup_for_url(urlstr):
     return markup
 
 
-def get_standard_bbc_parser(embed_images=True, allow_js=True, escape_html=True):
+def get_standard_bbc_parser(embed_images=True, embed_video=True,
+                            allow_js=True, escape_html=True):
     return iss_bbcode.build_parser((
             'IMG' if embed_images else 'NO_IMG',
-            'VIDEO' if embed_images else 'NO_IMG',
+            'VIDEO' if embed_video else 'NO_VIDEO',
             'BYUSINGTHISTAGIAFFIRMLANNYISSUPERCOOL',
             'QUOTE',
             'CODE',

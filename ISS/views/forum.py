@@ -400,6 +400,7 @@ class UserProfile(utils.MethodSplitView):
             'allow_js': poster.allow_js,
             'allow_avatars': poster.allow_avatars,
             'allow_image_embed': poster.allow_image_embed,
+            'allow_video_embed': poster.allow_video_embed,
             'enable_editor_buttons': poster.enable_editor_buttons,
             'enable_tripphrase': not (poster.tripphrase == None),
             'auto_subscribe': poster.auto_subscribe,

@@ -67,6 +67,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     allow_js = models.BooleanField(default=True)
     allow_image_embed = models.BooleanField(default=True)
+    allow_video_embed = models.BooleanField(default=True)
     enable_editor_buttons = models.BooleanField(default=False)
     allow_avatars = models.BooleanField(default=True)
     auto_subscribe = models.IntegerField(
@@ -248,6 +249,9 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     def embed_images(self):
         return self.allow_image_embed
+
+    def embed_video(self):
+        return self.allow_video_embed
 
 class Category(models.Model):
     name = models.CharField(max_length=256)

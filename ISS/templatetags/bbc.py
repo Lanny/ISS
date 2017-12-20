@@ -8,7 +8,8 @@ register = template.Library()
 
 default_settings = {
     'allow_js': True,
-    'embed_images': True
+    'embed_images': True,
+    'embed_video': True
 }
 
 @register.filter(name='bbc', needs_autoescape=True)

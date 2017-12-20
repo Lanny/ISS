@@ -95,11 +95,21 @@ def _add_img_tag(parser):
 def _add_img_stub_tag(parser):
     parser.add_simple_formatter(
         'img',
-        '<a class="img-link" href="%(value)s">embedded image</a>',
+        'embedded image: <a class="img-link" href="%(value)s">%(value)s</a>',
         replace_links=False,
         replace_cosmetic=False)
 
     return parser
+
+def _add_video_stub_tag(parser):
+    parser.add_simple_formatter(
+        'video',
+        'embedded video: <a class="img-link" href="%(value)s">%(value)s</a>',
+        replace_links=False,
+        replace_cosmetic=False)
+
+    return parser
+
 
 def _add_very_cool_tag(parser):
     parser.add_simple_formatter(
@@ -275,6 +285,7 @@ _supported_tags = {
     'BYUSINGTHISTAGIAFFIRMLANNYISSUPERCOOL': _add_very_cool_tag,
     'QUOTE': _add_quote_tag,
     'VIDEO': _add_video_tag,
+    'NO_VIDEO': _add_video_stub_tag,
     'CODE': _add_code_tag,
     'BC': _add_bc_tag,
     'LINK': _add_link_tag,
