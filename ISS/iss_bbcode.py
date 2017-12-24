@@ -198,10 +198,10 @@ def _add_link_tag(parser):
 def _add_spoiler_tag(parser):
     template = '''
         <div class="spoiler closed">
-            <div class="tab">
+            <button class="tab">
                 <span class="label">Show</span>
                 <span class="name">%s</span>
-            </div>
+            </button>
             <div class="content" data-content="%s"></div>
         </div>
     '''
