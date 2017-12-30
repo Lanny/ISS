@@ -76,17 +76,6 @@ class GeneralViewTestCase(test_utils.ForumConfigTestCase):
         })
         self.assertEqual(self.scrub.get_post_count(), post_count)
 
-    def test_edit_post_too_long(self):
-        post = self.scrub.post_set.all()[0]
-        path = reverse('edit-post', kwargs={'post_id': post.pk})
-        long_content = 'P = NP?' * 3000
-        response = self.scrub_client.post(path, {
-            'content': long_content,
-            'post': post.pk
-        })
-        post = Post.objects.get(pk=post.pk)
-        self.assertLess(len(post.content), len(long_content))
-
     def test_new_thread(self):
         forum = Forum.objects.all()[0]
         path = reverse('new-thread', kwargs={'forum_id': forum.pk})
@@ -120,8 +109,44 @@ class GeneralViewTestCase(test_utils.ForumConfigTestCase):
                                               thread=thread)
         self.assertTrue(subscription.subscribed)
 
+class EditPostTestCase(test_utils.ForumConfigTestCase):
+    forum_config = {
+        'captcha_period': 0,
+        'max_post_chars': 600
+    }
 
-class ThanksViewTest(TestCase):
+    def setUp2(self):
+        test_utils.create_std_forums()
+        self.scrub = test_utils.create_user(thread_count=1, post_count=0)
+        self.scrub_client = Client()
+        self.scrub_client.force_login(self.scrub)
+
+    def _attempt_edit(self, content):
+        post = self.scrub.post_set.all()[0]
+        path = reverse('edit-post', kwargs={'post_id': post.pk})
+        response = self.scrub_client.post(path, {
+            'content': content,
+            'post': post.pk
+        })
+
+        return response
+
+    def test_edit_post(self):
+        new_content = 'This post corntains a bad joke'
+        self._attempt_edit(new_content)
+
+        post = self.scrub.post_set.all()[0]
+        self.assertEqual(new_content, post.content)
+    
+
+    def test_edit_post_too_long(self):
+        long_content = '!' * 800
+        self._attempt_edit(long_content)
+
+        post = self.scrub.post_set.all()[0]
+        self.assertNotEqual(len(post.content), len(long_content))
+
+class ThanksViewTestCase(TestCase):
     def setUp(self):
         self.limit = utils.get_config()['initial_account_period_total'] = 3
 
