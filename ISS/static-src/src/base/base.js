@@ -112,6 +112,24 @@
     })();
   };
 
+  function bindKeyboardPaginatorControls() {
+    var paginator = $('.paginator').first();
+
+    console.log(paginator.length)
+    if (paginator.length !== 1) return;
+
+    $('body').on('keydown', function(e) {
+      var href;
+      if (e.keyCode === 37) {
+        var href = paginator.find('a.previous-page').attr('href');
+        document.location.assign(href);
+      } else if (e.keyCode == 39) {
+        var href = paginator.find('a.next-page').attr('href');
+        document.location.assign(href);
+      }
+    });
+  }
+
   function wrap($, config, bbcode) {
     function peek() {
       var peekaboo = $('.peekaboo').first()
@@ -130,6 +148,7 @@
 
     $(function() {
       bbcode.bindRegion($('.page-content'));
+      bindKeyboardPaginatorControls();
       shakeBaby($('.ex'), 10);
       window.setTimeout(peek, Math.random()*1000*60*60);
 
