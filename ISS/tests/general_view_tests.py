@@ -131,6 +131,11 @@ class EditPostTestCase(test_utils.ForumConfigTestCase):
 
         return response
 
+    def test_has_been_edited_default_to_false(self):
+        post = self.scrub.post_set.all()[0]
+        self.assertEqual(post.postsnapshot_set.all().count(), 0)
+        self.assertFalse(post.has_been_edited)
+
     def test_edit_post(self):
         new_content = 'This post corntains a bad joke'
         self._attempt_edit(new_content)
@@ -145,6 +150,21 @@ class EditPostTestCase(test_utils.ForumConfigTestCase):
 
         post = self.scrub.post_set.all()[0]
         self.assertNotEqual(len(post.content), len(long_content))
+
+    def test_edit_post_generates_snapshot(self):
+        post = self.scrub.post_set.all()[0]
+        old_content = post.content
+        new_content = 'This post corntains a bad joke'
+
+        self._attempt_edit(new_content)
+
+        post = self.scrub.post_set.all()[0]
+        self.assertEqual(post.has_been_edited, True)
+        self.assertEqual(post.postsnapshot_set.all().count(), 1)
+
+        snapshot = post.postsnapshot_set.all()[0]
+        self.assertEqual(snapshot.content, old_content)
+        self.assertEqual(snapshot.obsolesced_by, self.scrub)
 
 class ThanksViewTestCase(TestCase):
     def setUp(self):

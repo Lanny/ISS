@@ -438,6 +438,7 @@ class Post(models.Model):
     thread = models.ForeignKey(Thread)
     content = models.TextField()
     author = models.ForeignKey(Poster)
+    has_been_edited = models.BooleanField(default=False)
 
     posted_from = models.GenericIPAddressField(null=True)
 
@@ -500,6 +501,16 @@ class Post(models.Model):
     def delete(self, *args, **kwargs):
         self._rectify_subscriptions_on_removal_from_thread()
         super(Post, self).delete(*args, **kwargs)
+
+
+class PostSnapshot(models.Model):
+    time = models.DateTimeField(default=timezone.now)
+    post = models.ForeignKey(Post)
+    content = models.TextField()
+
+    # Who made the edit trigging the creation of this snapshot?
+    obsolesced_by = models.ForeignKey(Poster)
+    obsolescing_ip = models.GenericIPAddressField(null=True)
 
 class Thanks(models.Model):
     class Meta:

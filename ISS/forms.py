@@ -184,15 +184,24 @@ class EditPostForm(forms.Form):
                           max_length=post_max_len,
                           widget=forms.Textarea(attrs={'autofocus': 'true'}))
 
-    def save(self, editor=None):
+    def save(self, editor, editor_ip=None):
         post = self.cleaned_data['post']
-        post.content = self.cleaned_data['content']
 
-        edit_time = timezone.now() - post.created
-        if edit_time.total_seconds() > utils.get_config('ninja_edit_grace_time'):
-            editor_name = editor.username if editor else 'unknown'
-            post.content += '\n\n[i]Post last edited by %s at %s[/i]' % (
-                    editor_name, timezone.now().isoformat())
+        snapshot = PostSnapshot(
+            post=post,
+            content=post.content,
+            obsolesced_by=editor,
+            obsolescing_ip=editor_ip)
+        snapshot.save()
+
+        post.content = self.cleaned_data['content']
+        post.has_been_edited = True
+
+        # edit_time = timezone.now() - post.created
+        # if edit_time.total_seconds() > utils.get_config('ninja_edit_grace_time'):
+        #     editor_name = editor.username if editor else 'unknown'
+        #     post.content += '\n\n[i]Post last edited by %s at %s[/i]' % (
+        #             editor_name, timezone.now().isoformat())
 
         post.save()
 
