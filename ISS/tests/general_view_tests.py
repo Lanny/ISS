@@ -156,8 +156,13 @@ class ThanksViewTest(TestCase):
         resp = self.noob_thanker_client.post(self.url)
         self.assertEqual(self.thankee.thanks_received.count(), 0)
 
-class PostFloodControlTestCase(TestCase):
-    def setUp(self):
+class PostFloodControlTestCase(test_utils.ForumConfigTestCase):
+    forum_config = {
+        'initial_account_period_total': 10,
+        'initial_account_period_limit': 5
+    }
+
+    def setUp2(self):
         test_utils.create_std_forums()
         self.scrub = test_utils.create_user(thread_count=1, post_count=0)
         self.thread = Thread.objects.get(author=self.scrub)
