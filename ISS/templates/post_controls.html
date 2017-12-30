@@ -1,3 +1,5 @@
+{% load util_tags %}
+
 <div class="post-controls">
   <a class="quote"
      href="{% url 'new-reply' post.thread.pk %}?quote={{ post.pk }}"
@@ -34,4 +36,14 @@
     </a>
   {% endif %}
     
+  {% if post.show_edit_line %}
+  {% with snapshot=post.get_last_edit_snapshot %}
+    <div class="edit-line">
+      Post last edited by
+      <a href="{{ snapshot.obsolesced_by.get_url }}">{{ snapshot.obsolesced_by.username }}</a>
+      on
+      {{ snapshot.time|present_dt }}
+    </div>
+  {% endwith %}
+  {% endif %}
 </div>

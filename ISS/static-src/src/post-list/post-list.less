@@ -65,20 +65,23 @@
       background-color: @bg_dark;
 
       .post-controls {
-        display: block;
+        .-display-flex();
+        .-flex-direction(row-reverse);
         overflow: hidden;
         border-top: 1px solid @seperator_color;
         padding-top: 5px;
         margin-top: 5px;
 
-        > * {
-          float: right;
-          margin-left: 3px;
-        }
-
         .quote, .thank-action, .edit-post, .report  {
           .small-btn();
           .teal();
+          align-self: flex-start;
+          margin-left: 3px;
+        }
+
+        .edit-line {
+          font-style: oblique;
+          flex: 1;
         }
       }
     }

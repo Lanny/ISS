@@ -502,6 +502,19 @@ class Post(models.Model):
         self._rectify_subscriptions_on_removal_from_thread()
         super(Post, self).delete(*args, **kwargs)
 
+    def show_edit_line(self):
+        if not self.has_been_edited:
+            return False
+
+        snapshot = self.get_last_edit_snapshot()
+
+        edit_time = timezone.now() - snapshot.time
+        max_seconds = utils.get_config('ninja_edit_grace_time')
+
+        return edit_time.total_seconds() > max_seconds
+
+    def get_last_edit_snapshot(self):
+        return self.postsnapshot_set.all().order_by('-time')[0]
 
 class PostSnapshot(models.Model):
     time = models.DateTimeField(default=timezone.now)
@@ -511,6 +524,7 @@ class PostSnapshot(models.Model):
     # Who made the edit trigging the creation of this snapshot?
     obsolesced_by = models.ForeignKey(Poster)
     obsolescing_ip = models.GenericIPAddressField(null=True)
+
 
 class Thanks(models.Model):
     class Meta:

@@ -7,8 +7,7 @@
     <li class="post" id="post-{{ post.pk }}">
       <div class="post-hat">
         <span class="post-data">
-          {{ post.created|date:"Y-m-d" }} at
-          {{ post.created|time:"f A e" }}
+          {{ post.created|present_dt }}
 
           {% if show_thread_context %}
             in

@@ -550,7 +550,8 @@ class EditPost(utils.MethodSplitView):
 
             return render(request, 'edit_post.html', ctx)
 
-        form.save(editor=request.user)
+        ip_addr = request.META.get(utils.get_config('client_ip_field'), None)
+        form.save(editor=request.user, editor_ip=ip_addr)
         return HttpResponseRedirect(post.get_url())
 
 def assume_identity(request, user_id):
