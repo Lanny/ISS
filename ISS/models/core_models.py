@@ -508,7 +508,7 @@ class Post(models.Model):
 
         snapshot = self.get_last_edit_snapshot()
 
-        edit_time = timezone.now() - snapshot.time
+        edit_time = snapshot.time - self.created
         max_seconds = utils.get_config('ninja_edit_grace_time')
 
         return edit_time.total_seconds() > max_seconds

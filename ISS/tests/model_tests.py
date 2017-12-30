@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.test import TestCase
 from django.test import SimpleTestCase
 from ISS.models import *
@@ -62,6 +64,34 @@ class PosterTestCase(TestCase):
         self.assertEqual(dons_alts[0]['poster'].pk, self.lanny.pk)
         self.assertEqual(dons_alts[0]['addr'], '8.8.8.4')
 
+class PostTestCase(test_utils.ForumConfigTestCase):
+    forum_config = {
+        'ninja_edit_grace_time': 120
+    }
+
+    def setUp2(self):
+        test_utils.create_std_forums()
+        self.rikimaru = test_utils.create_user(thread_count=1, post_count=0)
+        self.post = self.rikimaru.post_set.all()[0]
+        self.post.created = self.post.created - timedelta(days=4)
+        self.post.has_been_edited = True
+        self.post.save()
+
+    def _edit_post(self, seconds_later):
+        PostSnapshot.objects.create(
+            post = self.post,
+            time = self.post.created + timedelta(seconds=seconds_later),
+            content = "something moody about heaven's wrath or whatever",
+            obsolesced_by = self.rikimaru)
+
+    def test_ninja_edit(self):
+        self._edit_post(10)
+        self.assertFalse(self.post.show_edit_line())
+    
+    def test_non_ninja_edit(self):
+        self._edit_post(200)
+        self.assertTrue(self.post.show_edit_line())
+    
 class PosterUsernameNormalizationTestCase(SimpleTestCase):
     def assertNormEqual(self, username_one, username_two):
         return self.assertEqual(
