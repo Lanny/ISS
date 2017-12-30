@@ -145,7 +145,7 @@ class EditPostTestCase(test_utils.ForumConfigTestCase):
     
 
     def test_edit_post_too_long(self):
-        long_content = '!' * 800
+        long_content = '!' * 80000
         self._attempt_edit(long_content)
 
         post = self.scrub.post_set.all()[0]
