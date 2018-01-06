@@ -12,13 +12,14 @@
             return;
           }
 
+          var href;
           if (e.keyCode === 37) {
-            var href = paginator.find('a.previous-page').attr('href');
-            document.location.assign(href);
+            href = paginator.find('a.previous-page').attr('href');
           } else if (e.keyCode == 39) {
             var href = paginator.find('a.next-page').attr('href');
-            document.location.assign(href);
           }
+
+          if (href) document.location.assign(href);
         });
       }
     };
