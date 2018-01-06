@@ -35,14 +35,17 @@ class InitiatePasswordRecovery(utils.MethodSplitView):
                 timezone.now() + timedelta(days=1))
             user.save()
 
+            forum_name = utils.get_config('forum_name')
             ctx = {
-                'url': (utils.get_config('forum_domain') +
+                'forum_name': forum_name,
+                'url': ('http://' +
+                        utils.get_config('forum_domain') +
                         reverse('recovery-reset') +
-                        '?code=' + user.recovery_code)
+                        '?code=' + user.recovery_code),
             }
 
             send_mail(
-                'Password Recovery for %s' % utils.get_config('forum_name'),
+                'Password Recovery for %s' % forum_name,
                 render_to_string('email/password_recovery.txt', ctx),
                 settings.EMAIL_HOST_USER,
                 [user.email])
