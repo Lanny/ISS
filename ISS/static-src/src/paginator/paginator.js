@@ -7,7 +7,11 @@
         if (paginator.length !== 1) return;
 
         $('body').on('keydown', function(e) {
-          var href;
+          if ($(e.target).is('input, textarea')) {
+            // Don't mess with useragent editor use of arrow keys
+            return;
+          }
+
           if (e.keyCode === 37) {
             var href = paginator.find('a.previous-page').attr('href');
             document.location.assign(href);
