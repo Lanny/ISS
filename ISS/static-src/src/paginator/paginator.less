@@ -1,0 +1,101 @@
+@import "../base/config.less";
+
+.paginator {
+  display: block;
+  overflow: hidden;
+
+  @media (min-width: @breakpoint) {
+    margin-bottom: 20px;
+  }
+
+  ol {
+    list-style: none;
+    float: right;
+    padding: 0;
+    margin: 0;
+
+    li {
+      display: inline-block;
+      background-color: @bg_light;
+      float: left;
+      min-width: 20px;
+      padding: 2px;
+      text-align: center;
+      border: 1px solid @white;
+      height: 21px;
+
+      &:not(:last-child) {
+        border-right: 0;
+      }
+      
+      &.arrow {
+        .teal();
+      }
+
+      &.current-page {
+        a {
+          font-weight: bold;
+        }
+      }
+
+      a {
+        text-decoration: none;
+        font-weight: normal;
+      }
+
+      .previous-page, .next-page, .first-page, .last-page {
+        i {
+          .icn(13px);
+          margin: 1px;
+        }
+      }
+
+      .previous-page i { .icn-left-chevron(); }
+      .next-page i { .icn-right-chevron(); }
+      .first-page i { .icn-double-left-chevron(); }
+      .last-page i { .icn-double-right-chevron(); }
+    }
+  }
+
+  @media(max-width: @breakpoint) {
+    ol {
+      .flex-stretch;
+      width: 100%;
+
+      li {
+        padding: 0;
+        display: none;
+
+        &.arrow, &.current-page {
+          display: inline-block;
+          height: 45px;
+        }
+
+        &.current-page {
+          .-flex(1);
+
+          a {
+            .vcenter(18);
+            font-size: 16px;
+          }
+        }
+
+        &.arrow {
+          width: 45px;
+        }
+
+        .previous-page, .next-page, .first-page, .last-page {
+          display: block;
+          width: 100%;
+          height: 100%;
+          padding: 8px;
+
+          i {
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+    }
+  }
+}
