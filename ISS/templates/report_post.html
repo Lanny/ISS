@@ -11,10 +11,6 @@ Report Post -
   &gt; Report Post
 {% endblock %}
 
-{% block head_extra %}                                                          
-  <script src='https://www.google.com/recaptcha/api.js'></script>               
-{% endblock %}                                                                  
-
 {% block content %}
   <div class="form-page">
     <form method="POST" action="{% url 'report-post' post.pk %}" class="editor">
@@ -32,10 +28,6 @@ Report Post -
         </p>
 
         {{ form.as_p }}
-
-        <div class="g-recaptcha"                                                
-             data-sitekey="{{ config.recaptcha_settings.0 }}">                  
-        </div>                                                                  
 
         <input type="submit" value="Submit Report" />
       </fieldset>
