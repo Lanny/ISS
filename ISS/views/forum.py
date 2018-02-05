@@ -74,6 +74,7 @@ def thread_index(request, forum_id):
     page = utils.page_by_request(paginator, request)
 
     ctx = {
+        'rel_page': page,
         'forum': forum,
         'threads': page,
         'can_start_thread': forum.create_thread_pack.check_request(request)
@@ -92,6 +93,7 @@ def thread(request, thread_id):
                                              initial={ 'thread': thread })
 
     ctx = {
+        'rel_page': page,
         'thread': thread,
         'posts': page,
         'reply_form': reply_form,
@@ -187,6 +189,7 @@ def threads_by_user(request, user_id):
     page = utils.page_by_request(paginator, request)
 
     ctx = {
+        'rel_page': page,
         'poster': poster,
         'threads': page
     }
@@ -204,6 +207,7 @@ def posts_by_user(request, user_id):
     page = utils.page_by_request(paginator, request)
 
     ctx = {
+        'rel_page': page,
         'poster': poster,
         'posts': page
     }
@@ -220,6 +224,7 @@ def thanked_posts(request, user_id):
     page = utils.get_posts_page(posts, request)
 
     ctx = {
+        'rel_page': page,
         'poster': poster,
         'posts': page
     }
@@ -234,6 +239,7 @@ def posts_thanked(request, user_id):
     page = utils.get_posts_page(posts, request)
 
     ctx = {
+        'rel_page': page,
         'poster': poster,
         'posts': page
     }
@@ -254,6 +260,7 @@ def latest_threads(request):
     page = utils.page_by_request(paginator, request)
 
     ctx = {
+        'rel_page': page,
         'threads': page
     }
 
@@ -277,6 +284,7 @@ def usercp(request):
     page = utils.page_by_request(paginator, request)
 
     ctx = {
+        'rel_page': page,
         'threads': page
     }
 
@@ -290,6 +298,7 @@ def user_list(request):
     page = utils.page_by_request(posters, posters_per_page)
 
     ctx = {
+        'rel_page': page,
         'posters': page
     }
 
@@ -311,6 +320,7 @@ def search(request):
     page = utils.page_by_request(paginator, request)
 
     ctx = {
+        'rel_page': page,
         'q': q,
         'posts': page
     }

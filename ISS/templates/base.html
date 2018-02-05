@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load pagination %}
 
 <!doctype html>
 <html class="no-js">
@@ -10,7 +11,17 @@
       {% endblock %}
     </title>
     
-    <link rel="author" href="{% url 'humans' %}" />
+    <link rel="author" href="{% url 'humans' %}">
+
+    {% if rel_page %}
+      {% if rel_page.has_next %}
+        <link rel="next" href="{{ request.get_full_path|mixin_page_param:rel_page.next_page_number  }}">
+      {% endif %}
+      {% if rel_page.has_previous %}
+        <link rel="prev" href="{{ request.get_full_path|mixin_page_param:rel_page.previous_page_number  }}">
+      {% endif %}
+    {% endif %}
+
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <link rel="stylesheet" href="{% static "css/combined.css" %}">
     {% block css %} {% endblock %}
