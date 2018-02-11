@@ -196,7 +196,7 @@
           wrapAndInsertContent(selContent);
         }
       },
-      addQuote: function(quoteCode) {
+      addQuote: function(quoteCode, setFocus) {
         var self = this,
           oldVal = self._ta.val(),
           newVal;
@@ -207,9 +207,9 @@
           newVal = oldVal + '\n\n' + quoteCode;
         }
 
-        self._ta.val(newVal + '\n\n')
-          .focus();
+        self._ta.val(newVal + '\n\n');
 
+        if (setFocus) { self._ta.focus(); }
         if (self.settings.saveContent) { self._sessSave(); }
       }
     }
