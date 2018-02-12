@@ -8,7 +8,7 @@
       $('body').on('click', '.quote', function(e) {
         e.preventDefault();
 
-        var setFocus = !event.shiftKey;
+        var setFocus = !e.shiftKey;
         var quoteFetchUrl = $(e.target).attr('data-bbc-url'),
           editor = $('.quick-reply').data('editor');
 
