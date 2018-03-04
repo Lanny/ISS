@@ -446,12 +446,13 @@ def normalize_homoglyphs(prenormalized):
 
     return _process_normalizer.normalize(prenormalized)
 
-def captchatize_form(form):
+def captchatize_form(form, label="Captcha"):
     _config = get_config('recaptcha_settings')
 
     if _config:
         class NewForm(form):
-            captcha = ReCaptchaField(public_key=_config[0],
+            captcha = ReCaptchaField(label=label,
+                                     public_key=_config[0],
                                      private_key=_config[1])
 
         return NewForm

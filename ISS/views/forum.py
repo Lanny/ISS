@@ -18,6 +18,11 @@ from ISS import utils, forms, iss_bbcode
 from ISS.models import *
 from ISS.hooks import HookManager
 
+GENERIC_CAPTCHA_LABEL = 'Captcha (required for your first %d posts)' % (
+    utils.get_config('captcha_period')
+)
+
+
 def _get_new_post_form(request):
     if not request.user.is_authenticated():
         return forms.NewPostForm
@@ -25,7 +30,8 @@ def _get_new_post_form(request):
     post_count = request.user.post_set.count()
 
     if post_count < utils.get_config('captcha_period'):
-        return utils.captchatize_form(forms.NewPostForm)
+        return utils.captchatize_form(forms.NewPostForm,
+                                      label=GENERIC_CAPTCHA_LABEL)
     else:
         return forms.NewPostForm
 
@@ -429,7 +435,8 @@ class NewThread(utils.MethodSplitView):
         post_count = request.user.post_set.count()
 
         if post_count < utils.get_config('captcha_period'):
-            return utils.captchatize_form(forms.NewThreadForm)
+            return utils.captchatize_form(forms.NewThreadForm,
+                                          label=GENERIC_CAPTCHA_LABEL)
         else:
             return forms.NewThreadForm
 
