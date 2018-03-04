@@ -2,6 +2,51 @@
 @import "../post-list/post-list.less";
 
 .thread {
+  .actions-and-pages {
+    .-display-flex();
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    @media (max-width: @breakpoint) {
+      margin-bottom: 0;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .paginator {
+      margin-bottom: 0;
+
+      @media (max-width: @breakpoint) {
+        flex: 1;
+      }
+    }
+
+    #post-actions {
+      .-display-flex();
+      align-items: stretch;
+
+      @media (min-width: @breakpoint) {
+        select {
+          margin-right: 5px;
+        }
+      }
+
+      input[type="submit"] {
+        .small-btn();
+        .teal();
+        height: 30px;
+      }
+
+      select {
+        flex: 1;
+        height: 30px;
+      }
+    }
+    
+  }
+
   .thread-content {
     @media (min-width: @breakpoint) {
       .rounded();

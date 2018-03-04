@@ -201,13 +201,24 @@ class EditPostForm(forms.Form):
 
 
 class ThreadActionForm(forms.Form):
-    action = forms.ChoiceField(
-        label="Action",
-        required=True,
-        choices=(('edit-thread', 'Edit Thread'),
-                 ('delete-posts', 'Delete Posts'),
-                 ('trash-thread', 'Trash Thread')))
+    @classmethod
+    def _get_action_field(cls):
+        choices = [('edit-thread', 'Edit Thread'),
+                   ('delete-posts', 'Delete Posts'),
+                   ('trash-thread', 'Trash Thread')]
 
+        for forum in Forum.objects.all():
+            choices.append(('move-to-%d' % forum.pk,
+                            '-> Move to %s' % forum.name))
+
+        return forms.ChoiceField(
+            label="",
+            required=True,
+            choices=choices)
+
+    def __init__(self, *args, **kwargs):
+        super(ThreadActionForm, self).__init__(*args, **kwargs)
+        self.fields['action'] = self._get_action_field()
 
 class ISSAuthenticationForm(AuthenticationForm):
     def clean_username(self):
@@ -232,7 +243,7 @@ class RegistrationForm(UserCreationForm):
 
     class Meta:
         model = Poster
-        fields = ('username', 'email')        
+        fields = ('username', 'email')
 
     def clean_username(self):
         username = self.cleaned_data['username']

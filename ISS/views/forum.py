@@ -1,3 +1,4 @@
+import re
 from collections import defaultdict
 
 from django.contrib.auth import login, logout, authenticate, _get_backends
@@ -133,6 +134,8 @@ class ThreadActions(utils.MethodSplitView):
                 return self._handle_delete_posts(request, thread)
             elif action == 'trash-thread':
                 return self._handle_trash_thread(request, thread)
+            elif re.match('move-to-(\d+)', action):
+                return self._handle_move_thread(request, thread, action)
             else:
                 raise Exception('Unexpected action.')
         else:
@@ -152,6 +155,14 @@ class ThreadActions(utils.MethodSplitView):
 
         target = request.POST.get('next', None)
         target = target or reverse('thread', kwargs={'thread_id': thread.pk})
+        return HttpResponseRedirect(target)
+
+    def _handle_move_thread(self, request, thread, action):
+        fid = int(re.match('move-to-(\d+)', action).group(1))
+        thread.forum = Forum.objects.get(pk=fid)
+        thread.save()
+
+        target = reverse('thread', kwargs={'thread_id': thread.pk})
         return HttpResponseRedirect(target)
 
     @transaction.atomic
