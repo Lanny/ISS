@@ -16,6 +16,8 @@
   <div class="thread">
 
     <div class="actions-and-pages">
+      {% include "page_list.html" with page=posts %}
+
       {% if user.is_authenticated and user.is_staff %}
         <form method="POST" action="{% url 'thread-action' thread.pk %}"
               id="post-actions">
@@ -26,8 +28,6 @@
           <input type="submit" value="Go" />
         </form>
       {% endif %}
-
-      {% include "page_list.html" with page=posts %}
     </div>
 
 
