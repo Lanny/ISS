@@ -5,6 +5,13 @@ from django import template
 
 register = template.Library()
 
+def _encode_maybe(thing):
+    """
+    If thing is a unicode string, return it utf-8 encoded in a str, otherwise
+    return it unchanged
+    """
+    return thing.encode('utf-8') if isinstance(thing, unicode) else thing
+
 RANGE_WIDTH = 3
 @register.assignment_tag
 def nice_page_set(page):
@@ -36,7 +43,7 @@ def mixin_page_param(base_url, page_number):
     one_pairs = []
     for key, values in query.items():
         for value in values:
-            one_pairs.append((key, value))
+            one_pairs.append((_encode_maybe(key), _encode_maybe(value)))
 
     qs = urllib.urlencode(one_pairs)
     url_dict = parsed_url._asdict()
