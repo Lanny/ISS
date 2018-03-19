@@ -38,7 +38,7 @@ def mixin_page_param(base_url, page_number):
         for value in values:
             one_pairs.append((key, value))
 
-    qs = urllib.urlencode(one_pairs)
+    qs = urllib.urlencode(one_pairs.encode('utf-8'))
     url_dict = parsed_url._asdict()
     url_dict['query'] = qs
 
