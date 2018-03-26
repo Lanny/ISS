@@ -1,4 +1,3 @@
-import re
 from collections import defaultdict
 
 from django.contrib.auth import login, logout, authenticate, _get_backends
@@ -19,22 +18,11 @@ from ISS import utils, forms, iss_bbcode
 from ISS.models import *
 from ISS.hooks import HookManager
 
-GENERIC_CAPTCHA_LABEL = 'Captcha (required for your first %d posts)' % (
-    utils.get_config('captcha_period')
-)
+
 
 
 def _get_new_post_form(request):
-    if not request.user.is_authenticated():
-        return forms.NewPostForm
-
-    post_count = request.user.post_set.count()
-
-    if post_count < utils.get_config('captcha_period'):
-        return utils.captchatize_form(forms.NewPostForm,
-                                      label=GENERIC_CAPTCHA_LABEL)
-    else:
-        return forms.NewPostForm
+    return utils.conditionally_captchatize(request, forms.NewPostForm)
 
 @cache_control(max_age=60)
 def forum_index(request):
@@ -545,18 +533,56 @@ class NewReply(utils.MethodSplitView):
             return render(request, 'new_post.html', ctx)
 
 class PreviewPost(utils.MethodSplitView):
-    def POST(self, request, thread_id):
-        thread = get_object_or_404(Thread, pk=thread_id)
-        form = forms.PreviewPostForm(request.POST)
+    login_required = True
 
-        ctx = {
-            'thread': thread,
-            'form': form,
-            'content': request.POST['content']
-        }
+    def POST(self, request, action):
+        struct_form = forms.StructuralPreviewPostForm(request.POST)
 
-        return render(request, 'preview_post.html', ctx)
+        if struct_form.is_valid():
+            content = request.POST.get('content', '')
+            form_action, secondary_form = self.get_secondary_form(
+                struct_form, request, content)
 
+            preview_action = reverse('preview-post', kwargs={'action': action})
+            ctx = {
+                'form_action': form_action,
+                'form': secondary_form,
+                'preview_action': preview_action,
+                'action': action,
+                'content': content
+            }
+
+            return render(request, 'preview_post.html', ctx)
+
+        else:
+            print struct_form.errors
+            return HttpResponseBadRequest('Invalid form.')
+
+
+    def get_secondary_form(self, preview_form, request, content):
+        action = preview_form.cleaned_data['preview_action']
+
+        form = None
+        form_action = None
+
+        if action == 'new-reply':
+            Form = utils.conditionally_captchatize(request, forms.NewPostForm)
+            thread = preview_form.cleaned_data['thread']
+            form_action = reverse('new-reply', kwargs={'thread_id': thread.pk})
+            form = Form(request.POST, author=request.user)
+
+        elif action == 'edit-post':
+            post = preview_form.cleaned_data['post'] 
+            form_action = reverse('edit-post', kwargs={'post_id': post.pk})
+            form = forms.EditPostForm(request.POST)
+
+        elif action == 'new-thread':
+            forum = preview_form.cleaned_data['forum'] 
+            form_action = reverse('new-thread', kwargs={'forum_id': forum.pk})
+            Form = utils.conditionally_captchatize(request, forms.NewThreadForm)
+            form = Form(request.POST, author=request.user)
+
+        return (form_action, form)
 
 class RenderBBCode(utils.MethodSplitView):
     def POST(self, request):

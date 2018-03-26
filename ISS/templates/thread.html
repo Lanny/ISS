@@ -57,7 +57,7 @@
                  value="Submit" />
           <input class="preview-post-action"
                  type="submit"
-                 formaction="{% url 'preview-post' thread.pk %}"
+                 formaction="{% url 'preview-post' 'post' %}"
                  data-preview-url="{% url 'api-render-bbcode' %}"
                  value="Preview" />
         </fieldset>

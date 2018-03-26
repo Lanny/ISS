@@ -468,3 +468,20 @@ def captchatize_form(form, label="Captcha"):
 
     else:
         return form
+
+GENERIC_CAPTCHA_LABEL = 'Captcha (required for your first %d posts)' % (
+    get_config('captcha_period')
+)
+
+def conditionally_captchatize(request, Form):
+    if not request.user.is_authenticated():
+        return Form
+
+    post_count = request.user.post_set.count()
+
+    if post_count < get_config('captcha_period'):
+        return utils.captchatize_form(Form, label=GENERIC_CAPTCHA_LABEL)
+    else:
+        return Form
+    
+

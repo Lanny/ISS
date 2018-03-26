@@ -26,6 +26,11 @@ Reply to {{ thread.title }} -
         </a>
 
         <input type="submit" value="Submit" />
+        <input class="preview-post-action"
+               type="submit"
+               formaction="{% url 'preview-post' 'edit' %}"
+               data-preview-url="{% url 'api-render-bbcode' %}"
+               value="Preview" />
       </fieldset>
      </form>
    </div>

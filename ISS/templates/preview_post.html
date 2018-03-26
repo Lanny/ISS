@@ -7,14 +7,12 @@
 {% endblock %}
 
 {% block breadcrumb %}
-  &gt; <a href="{{ thread.forum.get_url }}">{{ thread.forum.name }}</a>
-  &gt; <a href="{{ thread.get_url }}">{{ thread.title }}</a>
   &gt; <a href="">Preview Post</a>
 {% endblock %}
 
 {% block content %}
   <div class="preview-post">
-    <form method="POST" action="{% url 'new-reply' thread.pk %}" class="editor">
+    <form method="POST" action="{{ form_action }}" class="editor">
       <h1>Preview Post</h1>
 
       {% include 'post_preview_block.html' with content=content %}
@@ -28,11 +26,11 @@
         </a>
 
         <input type="submit"
-               formaction="{% url 'new-reply' thread.pk %}"
-               value="Reply" />
+               formaction="{{ form_action }}"
+               value="Submit" />
         <input class="preview-post-action"
                type="submit"
-               formaction="{% url 'preview-post' thread.pk %}"
+               formaction="{{ preview_action }}"
                data-preview-url="{% url 'api-render-bbcode' %}"
                value="Preview" />
       </fieldset>

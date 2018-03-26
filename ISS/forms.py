@@ -90,16 +90,16 @@ class NewThreadForm(InitialPeriodLimitingForm):
     post_min_len = utils.get_config('min_post_chars')
     post_max_len = utils.get_config('max_post_chars')
 
+    preview_action = forms.CharField(initial='new-thread',
+                                     widget=forms.HiddenInput())
     title = forms.CharField(label='Title',
                             max_length=1000,
                             min_length=thread_min_len,
                             widget=forms.TextInput(attrs={'autofocus': 'true'}))
-
     content = BBCodeField(label='Post Body',
                            min_length=post_min_len,
                            max_length=post_max_len,
                            widget=forms.Textarea())
-
     forum = forms.ModelChoiceField(queryset=Forum.objects.all(),
                                    widget=forms.HiddenInput())
 
@@ -133,6 +133,8 @@ class NewPostForm(InitialPeriodLimitingForm):
     post_min_len = utils.get_config('min_post_chars')
     post_max_len = utils.get_config('max_post_chars')
 
+    preview_action = forms.CharField(initial='new-reply',
+                                     widget=forms.HiddenInput())
     content = BBCodeField(label='Reply',
                            min_length=post_min_len,
                            max_length=post_max_len,
@@ -176,6 +178,8 @@ class EditPostForm(forms.Form):
     post_min_len = utils.get_config('min_post_chars')
     post_max_len = utils.get_config('max_post_chars')
 
+    preview_action = forms.CharField(initial='edit-post',
+                                     widget=forms.HiddenInput())
     post = forms.ModelChoiceField(queryset=Post.objects.all(),
                                   widget=forms.HiddenInput())
     
@@ -199,18 +203,46 @@ class EditPostForm(forms.Form):
 
         post.save()
 
-class PreviewPostForm(forms.Form):
+class StructuralPreviewPostForm(forms.Form):
     error_css_class = 'in-error'
     post_min_len = utils.get_config('min_post_chars')
     post_max_len = utils.get_config('max_post_chars')
 
-    content = BBCodeField(label='Reply',
-                           min_length=post_min_len,
-                           max_length=post_max_len,
-                           widget=forms.Textarea())
+    preview_action = forms.ChoiceField(choices=[('new-reply', 'new-reply'),
+                                                ('new-thread', 'new-thread'),
+                                                ('edit-post', 'edit-post')],
+                                       required=True)
 
+    post = forms.ModelChoiceField(queryset=Post.objects.all(),
+                                  widget=forms.HiddenInput(),
+                                  required=False)
     thread = forms.ModelChoiceField(queryset=Thread.objects.all(),
-                                    widget=forms.HiddenInput())
+                                    widget=forms.HiddenInput(),
+                                    required=False)
+    forum = forms.ModelChoiceField(queryset=Forum.objects.all(),
+                                   widget=forms.HiddenInput(),
+                                   required=False)
+
+    def clean(self, *args, **kwargs):
+        ret = super(StructuralPreviewPostForm, self).clean(*args, **kwargs)
+        return ret
+        action = self.cleaned_data['action']
+
+        if action == 'new-reply' and not self.cleaned_data['thread']:
+            raise ValidationError('No thread to reply to specified.',
+                                  code='REPLY_W_NO_THREAD')
+        elif action == 'new-thread' and not self.cleaned_data['forum']:
+            raise ValidationError('No forum to make thread in specified.',
+                                  code='NEW_THREAD_W_NO_FORUM')
+        elif action == 'edit-post' and not self.cleaned_data['post']:
+            raise ValidationError('No forum to make thread in specified.',
+                                  code='NEW_THREAD_W_NO_FORUM')
+        else:
+            # Should never happen
+            raise ValidationError('Unexpected action', code='UNEXPECTED_ACTION')
+
+        return ret
+
 
 class RenderBBCodeForm(forms.Form):
     error_css_class = 'in-error'
