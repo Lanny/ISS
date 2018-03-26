@@ -480,7 +480,7 @@ def conditionally_captchatize(request, Form):
     post_count = request.user.post_set.count()
 
     if post_count < get_config('captcha_period'):
-        return utils.captchatize_form(Form, label=GENERIC_CAPTCHA_LABEL)
+        return captchatize_form(Form, label=GENERIC_CAPTCHA_LABEL)
     else:
         return Form
     
