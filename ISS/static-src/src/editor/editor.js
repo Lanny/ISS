@@ -151,6 +151,49 @@
           self.executeWrapIntension($(e.target).data('wrapOp'));
           return false;
         });
+
+        this._el.on('click', 'input.preview-post-action', function(e) {
+          var input = $(e.target),
+            url = input.attr('data-preview-url'),
+            csrfToken = self._el
+              .find('[name=csrfmiddlewaretoken]')
+              .attr('value');
+
+          e.preventDefault();
+
+          if (input.is('[disabled]')) return;
+
+          input.prop('disabled', true);
+
+          $.ajax(url, {
+            method: 'POST',
+            data: {
+              'csrfmiddlewaretoken': csrfToken,
+              'content': self._ta.val()
+            },
+            dataType: 'json'
+          })
+          .done(function(data) {
+            if (data.status !== 'SUCCESS') {
+              alert('Failed to submit request');
+              return;
+            }
+
+            var priorPreview = self._el.find('.post-preview-block');
+            if (priorPreview.length) {
+              priorPreview.replaceWith($(data.postPreview));
+            } else {
+              $(data.postPreview).insertBefore(self._el.find('fieldset:first'));
+            }
+          })
+          .fail(function(data) {
+            console.error(data);
+            alert('Failed to submit request');
+          })
+          .always(function() {
+            input.prop('disabled', false);
+          });
+        });
       },
       _getStoreKey: function() {
         return 'editor-content:' + document.location.pathname;

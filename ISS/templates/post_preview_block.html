@@ -1,0 +1,8 @@
+{% load bbc %}
+
+<div class="post-preview-block">
+  <span>Preview:</span>
+  <div class="content">
+    {{ content|bbc:bbcode_settings }}
+  </div>
+</div>

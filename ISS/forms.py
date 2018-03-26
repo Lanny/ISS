@@ -212,6 +212,13 @@ class PreviewPostForm(forms.Form):
     thread = forms.ModelChoiceField(queryset=Thread.objects.all(),
                                     widget=forms.HiddenInput())
 
+class RenderBBCodeForm(forms.Form):
+    error_css_class = 'in-error'
+    post_min_len = utils.get_config('min_post_chars')
+    post_max_len = utils.get_config('max_post_chars')
+
+    content = BBCodeField(min_length=post_min_len, max_length=post_max_len)
+
 class ThreadActionForm(forms.Form):
     @classmethod
     def _get_action_field(cls):

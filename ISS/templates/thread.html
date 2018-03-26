@@ -52,9 +52,13 @@
             BBCode Reference
           </a>
 
-          <input type="submit" formaction="{% url 'new-reply' thread.pk %}"
+          <input type="submit"
+                 formaction="{% url 'new-reply' thread.pk %}"
                  value="Submit" />
-          <input type="submit" formaction="{% url 'preview-post' thread.pk %}"
+          <input class="preview-post-action"
+                 type="submit"
+                 formaction="{% url 'preview-post' thread.pk %}"
+                 data-preview-url="{% url 'api-render-bbcode' %}"
                  value="Preview" />
         </fieldset>
       </form>

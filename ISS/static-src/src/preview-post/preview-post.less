@@ -1,15 +1,25 @@
 @import "../base/config.less";
 
 .preview-post {
-  .post-preview {
-    background-color: @bg_dark;
-    padding: 20px;
-    border-bottom: 1px solid lightgrey;
-  }
-
   form {
     .standard-form();
     background-color: @bg_light;
+  }
+}
+
+.post-preview-block {
+  padding: 20px;
+
+  > span {
+    padding-bottom: 3px;
+    display: block;
+  }
+
+  .content {
+    background-color: @bg_dark;
+    padding: 15px;
+    border: 1px solid lightgrey;
+    border-radius: 5px;
   }
 }
 

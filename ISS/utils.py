@@ -140,6 +140,14 @@ class MethodSplitView(object):
     delegating to the corresponding method.
     """
 
+    _MAGIC = 'haderach kwisatz'
+
+    def __init__(self, magic='melange', *args, **kwargs):
+        if magic != self._MAGIC:
+            raise RuntimeError(
+                'MethodSplitViews should be instantiated through the '
+                '.as_view() method, not directly. Check your urls file.')
+
     def __call__(self, request, *args, **kwargs):
         if getattr(self, 'active_required', False):
             if not request.user.is_active:
@@ -175,10 +183,11 @@ class MethodSplitView(object):
 
     @classmethod
     def as_view(cls):
+        view = cls(magic=cls._MAGIC)
         if getattr(cls, 'require_login', False):
-            return login_required(cls())
+            return login_required(view)
         else:
-            return cls()
+            return view
 
 def get_config(key=None):
     if not key:

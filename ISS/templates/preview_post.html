@@ -16,9 +16,8 @@
   <div class="preview-post">
     <form method="POST" action="{% url 'new-reply' thread.pk %}" class="editor">
       <h1>Preview Post</h1>
-      <div class="post-preview">
-        {{ content|bbc:bbcode_settings }}
-      </div>
+
+      {% include 'post_preview_block.html' with content=content %}
 
       <fieldset>
         {% csrf_token %}
@@ -28,10 +27,19 @@
           BBCode Reference
         </a>
 
-        <input type="submit" formaction="{% url 'new-reply' thread.pk %}" value="Reply" />
-        <input type="submit" formaction="{% url 'preview-post' thread.pk %}" value="Preview" />
+        <input type="submit"
+               formaction="{% url 'new-reply' thread.pk %}"
+               value="Reply" />
+        <input class="preview-post-action"
+               type="submit"
+               formaction="{% url 'preview-post' thread.pk %}"
+               data-preview-url="{% url 'api-render-bbcode' %}"
+               value="Preview" />
       </fieldset>
      </form>
    </div>
 {% endblock %}
 
+{% block js %}                                                                  
+  {% include "require.html" with bootstrap="editor-bootstrap" %}                
+{% endblock %}     

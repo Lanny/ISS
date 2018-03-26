@@ -164,7 +164,10 @@ urlpatterns = [
 
     url(r'^api/users/search$',
         views.user.user_fuzzy_search,
-        name='api-user-serach')
+        name='api-user-serach'),
+    url(r'^api/bbcode/render$',
+        views.forum.RenderBBCode.as_view(),
+        name='api-render-bbcode')
 ]
 
 for page in utils.get_config('static_pages'):

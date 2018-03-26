@@ -1,8 +1,10 @@
+from django.db.models import Count
 from django.urls import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.utils import timezone
 from django.shortcuts import render, get_object_or_404
 
+from ISS import models as iss_models
 from ISS.utils import MethodSplitView
 from models import *
 from apps import TabooConfig
@@ -75,3 +77,17 @@ class Unregister(MethodSplitView):
             prof.save()
 
         return HttpResponseRedirect(reverse('taboo-status'))
+
+def leader_board(request):
+    players = (iss_models.Poster
+        .objects
+        .all()
+        .annotate(victories=Count('taboo_successes'))
+        .annotate(losses=Count('taboo_failures'))
+        .filter(victories__gt=0)
+        .order_by('victories'))
+
+
+    return render(request, 'taboo/leader_board.html', {
+        'players': players
+    })

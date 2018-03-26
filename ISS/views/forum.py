@@ -557,6 +557,24 @@ class PreviewPost(utils.MethodSplitView):
 
         return render(request, 'preview_post.html', ctx)
 
+
+class RenderBBCode(utils.MethodSplitView):
+    def POST(self, request):
+        form = forms.RenderBBCodeForm(request.POST)
+
+        if form.is_valid():
+            ctx = { 'content': request.POST['content'] }
+
+            return utils.render_mixed_mode(
+                request,
+                (('postPreview', 'post_preview_block.html', ctx),),
+                additional={'status': 'SUCCESS'})
+        else:
+            return JsonResponse({
+                'status': 'INVALID_FORM',
+                'errors': form.errors
+            })
+
 class EditPost(utils.MethodSplitView):
     unbanned_required = True
     
