@@ -431,13 +431,7 @@ class NewThread(utils.MethodSplitView):
     unbanned_required = True
 
     def _get_form(self, request):
-        post_count = request.user.post_set.count()
-
-        if post_count < utils.get_config('captcha_period'):
-            return utils.captchatize_form(forms.NewThreadForm,
-                                          label=GENERIC_CAPTCHA_LABEL)
-        else:
-            return forms.NewThreadForm
+        return utils.conditionally_captchatize(request, forms.NewThreadForm)
 
     def GET(self, request, forum_id):
         forum = get_object_or_404(Forum, pk=forum_id)
