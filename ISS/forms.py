@@ -91,6 +91,7 @@ class NewThreadForm(InitialPeriodLimitingForm):
     post_max_len = utils.get_config('max_post_chars')
 
     preview_action = forms.CharField(initial='new-thread',
+                                     required=False,
                                      widget=forms.HiddenInput())
     title = forms.CharField(label='Title',
                             max_length=1000,
@@ -134,6 +135,7 @@ class NewPostForm(InitialPeriodLimitingForm):
     post_max_len = utils.get_config('max_post_chars')
 
     preview_action = forms.CharField(initial='new-reply',
+                                     required=False,
                                      widget=forms.HiddenInput())
     content = BBCodeField(label='Reply',
                            min_length=post_min_len,
@@ -179,6 +181,7 @@ class EditPostForm(forms.Form):
     post_max_len = utils.get_config('max_post_chars')
 
     preview_action = forms.CharField(initial='edit-post',
+                                     required=False,
                                      widget=forms.HiddenInput())
     post = forms.ModelChoiceField(queryset=Post.objects.all(),
                                   widget=forms.HiddenInput())
