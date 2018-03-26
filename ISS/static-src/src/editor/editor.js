@@ -174,10 +174,15 @@
             dataType: 'json'
           })
           .done(function(data) {
-            if (data.status !== 'SUCCESS') {
+            if (data.status !== 'FORM_INVALID' && data.errors) {
+              self.applyErrors(data.errors)
+              return;
+            } else  if (data.status !== 'SUCCESS') {
               alert('Failed to submit request');
               return;
             }
+
+            self.clearErrors();
 
             var priorPreview = self._el.find('.post-preview-block');
             if (priorPreview.length) {
@@ -254,6 +259,30 @@
 
         if (setFocus) { self._ta.focus(); }
         if (self.settings.saveContent) { self._sessSave(); }
+      },
+      applyErrors: function(errors) {
+        for (var field in errors) {
+          var fieldErrors = errors[field],
+            errorList = $('<ul class="errorlist">');
+
+          for (var i=0; i<fieldErrors.length; i++) {
+            $('<li>')
+              .text(fieldErrors[i])
+              .appendTo(errorList);
+          }
+
+          var fieldEl = this._el.find('[name="' + field + '"]'),
+            priorErrorList = fieldEl.prev('.errorlist');
+
+          if (priorErrorList.length) {
+            priorErrorList.replaceWith(errorList);
+          } else {
+            errorList.insertBefore(fieldEl);
+          }
+        }
+      },
+      clearErrors: function() {
+        this._el.find('.errorlist').remove();
       }
     }
 
