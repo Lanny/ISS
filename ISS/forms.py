@@ -199,6 +199,18 @@ class EditPostForm(forms.Form):
 
         post.save()
 
+class PreviewPostForm(forms.Form):
+    error_css_class = 'in-error'
+    post_min_len = utils.get_config('min_post_chars')
+    post_max_len = utils.get_config('max_post_chars')
+
+    content = BBCodeField(label='Reply',
+                           min_length=post_min_len,
+                           max_length=post_max_len,
+                           widget=forms.Textarea())
+
+    thread = forms.ModelChoiceField(queryset=Thread.objects.all(),
+                                    widget=forms.HiddenInput())
 
 class ThreadActionForm(forms.Form):
     @classmethod

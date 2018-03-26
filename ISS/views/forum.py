@@ -544,6 +544,19 @@ class NewReply(utils.MethodSplitView):
 
             return render(request, 'new_post.html', ctx)
 
+class PreviewPost(utils.MethodSplitView):
+    def POST(self, request, thread_id):
+        thread = get_object_or_404(Thread, pk=thread_id)
+        form = forms.PreviewPostForm(request.POST)
+
+        ctx = {
+            'thread': thread,
+            'form': form,
+            'content': request.POST['content']
+        }
+
+        return render(request, 'preview_post.html', ctx)
+
 class EditPost(utils.MethodSplitView):
     unbanned_required = True
     

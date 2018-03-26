@@ -52,7 +52,10 @@
             BBCode Reference
           </a>
 
-          <input type="submit" value="Submit" />
+          <input type="submit" formaction="{% url 'new-reply' thread.pk %}"
+                 value="Submit" />
+          <input type="submit" formaction="{% url 'preview-post' thread.pk %}"
+                 value="Preview" />
         </fieldset>
       </form>
     {% endif %}

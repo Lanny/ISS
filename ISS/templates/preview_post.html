@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% load bbc %}
+
+{% block page_name %}
+  Preview Post -
+{% endblock %}
+
+{% block breadcrumb %}
+  &gt; <a href="{{ thread.forum.get_url }}">{{ thread.forum.name }}</a>
+  &gt; <a href="{{ thread.get_url }}">{{ thread.title }}</a>
+  &gt; <a href="">Preview Post</a>
+{% endblock %}
+
+{% block content %}
+  <div class="preview-post">
+    <form method="POST" action="{% url 'new-reply' thread.pk %}" class="editor">
+      <h1>Preview Post</h1>
+      <div class="post-preview">
+        {{ content|bbc:bbcode_settings }}
+      </div>
+
+      <fieldset>
+        {% csrf_token %}
+        {{ form }}
+
+        <a href="{% url 'bbcode-help' %}" class="bbcode-ref-link" target="_blank">
+          BBCode Reference
+        </a>
+
+        <input type="submit" formaction="{% url 'new-reply' thread.pk %}" value="Reply" />
+        <input type="submit" formaction="{% url 'preview-post' thread.pk %}" value="Preview" />
+      </fieldset>
+     </form>
+   </div>
+{% endblock %}
+
