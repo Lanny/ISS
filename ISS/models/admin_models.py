@@ -6,6 +6,7 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.dispatch import receiver
+from django.utils import timezone
 
 class StaticPage(models.Model):
     page_id = models.CharField(max_length=1024, unique=True)

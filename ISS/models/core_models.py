@@ -11,6 +11,7 @@ from django.utils import timezone
 
 from ISS import utils
 from auth_package import AuthPackage, AccessControlList
+from admin_models import Ban
 
 min_time = timezone.make_aware(timezone.datetime.min,
                                timezone.get_default_timezone())
