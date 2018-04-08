@@ -18,9 +18,6 @@ from ISS import utils, forms, iss_bbcode
 from ISS.models import *
 from ISS.hooks import HookManager
 
-
-
-
 def _get_new_post_form(request):
     return utils.conditionally_captchatize(request, forms.NewPostForm)
 
@@ -940,12 +937,13 @@ class BanPoster(utils.MethodSplitView):
 
             return render(request, 'ban_poster.html', ctx)
 
-class StaticPage(utils.MethodSplitView):
-    def __init__(self, page_config):
-        self.page_config = page_config
-    
-    def __call__(self, request):
-        return render(request, 'static_page.html', self.page_config)
+def view_static_page(request, page_id):
+    page = get_object_or_404(StaticPage, page_id=page_id)
+    ctx = {
+        'page_title': page.page_title,
+        'content': page.content
+    }
+    return render(request, 'static_page.html', ctx)
 
 def humans(request):
     humans = utils.get_config('humans')

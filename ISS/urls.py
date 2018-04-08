@@ -138,6 +138,10 @@ urlpatterns = [
         views.forum.AutoAnonymize.as_view(),
         name='auto-anonymize'),
 
+    url('^page/(?P<page_id>.*)',
+        views.forum.view_static_page,
+        name="static-page"),
+
     url('^embed/bandcamp',
         views.forum.get_bc_embed_code,
         name='embed-bandcamp'),
@@ -169,12 +173,6 @@ urlpatterns = [
         views.forum.RenderBBCode.as_view(),
         name='api-render-bbcode')
 ]
-
-for page in utils.get_config('static_pages'):
-    urlpatterns.append(
-        url(page['url_pat'],
-            views.forum.StaticPage(page),
-            name=page['url_name']))
 
 # Install urls for extensions.
 for ext in utils.get_config('extensions'):

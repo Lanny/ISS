@@ -1,5 +1,6 @@
 from django import template
 from django.template import defaultfilters
+from django.urls import reverse
 
 from ISS.models import FilterWord, AccessControlList
 
@@ -15,6 +16,11 @@ def test_link(test, user):
         return not user.is_authenticated()
     elif test == 'is_admin':
         return user.is_authenticated() and user.is_admin
+
+@register.simple_tag(name='url_apply')
+def url_apply(pat, args_and_kwargs=None):
+    args, kwargs = args_and_kwargs if args_and_kwargs else ((), {})
+    return reverse(pat, args=args, kwargs=kwargs)
 
 @register.filter(name='word_filter')
 def word_filter(value):

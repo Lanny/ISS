@@ -7,7 +7,7 @@
     {% if test_passed %}
       <li>
         {% if link_type == 'RLINK' %}
-          <a href="{% url pat %}">
+          <a href="{% url_apply pat extra %}">
             {{ name }}
           </a>
         {% elif link_type == 'PMS' %}
