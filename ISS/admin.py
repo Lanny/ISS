@@ -15,6 +15,7 @@ admin.site.register(Thread)
 admin.site.register(Thanks)
 admin.site.register(AuthPackage)
 admin.site.register(RegistrationCode)
+admin.site.register(PostSnapshot)
 
 class BanInline(admin.TabularInline):
     model = Ban
@@ -59,3 +60,10 @@ class AccessControlListAdmin(admin.ModelAdmin):
 @admin.register(AccessControlGroup)
 class AccessControlListAdmin(admin.ModelAdmin):
     list_display = ('name',)
+
+@admin.register(StaticPage)
+class StaticPageAdmin(admin.ModelAdmin):
+    list_display = ('page_id', 'page_title', 'short_content')
+
+    def short_content(self, obj):
+        return obj.content[:200]

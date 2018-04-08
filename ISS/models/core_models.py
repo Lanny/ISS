@@ -616,60 +616,6 @@ class PrivateMessage(models.Model):
 
         return (sent_copies, kept_copies)
 
-class FilterWord(models.Model):
-    pattern = models.CharField(max_length=1024)
-    replacement = models.CharField(max_length=1024)
-    active = models.BooleanField(default=True)
-    case_sensitive = models.BooleanField(default=False)
-    _pattern_cache = None
-
-    def _get_pat(self):
-        if not self._pattern_cache:
-            if self.case_sensitive:
-                self._pattern_cache = re.compile(self.pattern)
-            else:
-                self._pattern_cache = re.compile(self.pattern, re.IGNORECASE)
-
-        return self._pattern_cache
-
-    def replace(self, text):
-        return self._get_pat().sub(self.replacement, text)
-
-    @classmethod
-    def do_all_replacements(cls, text):
-        filters = cache.get('active_filters')
-        if not filters:
-            filters = cls.objects.filter(active=True)
-            cache.set('active_filters', filters)
-
-        for f in filters:
-            text = f.replace(text)
-
-
-        return text
-
-class Ban(models.Model):
-    subject = models.ForeignKey(Poster, related_name="bans")
-    given_by = models.ForeignKey(Poster, null=True, related_name="bans_given")
-    start_date = models.DateTimeField(auto_now_add=True)
-    end_date = models.DateTimeField(null=True)
-    reason = models.CharField(max_length=1024)
-
-    def is_active(self, now=None):
-        if not now:
-            now = timezone.now()
-
-        return self.end_date == None or self.end_date > now
-
-    def __unicode__(self):
-        return u'Ban on %s for reason: %s' % (
-            self.subject.username, self.reason)
-
-class IPBan(models.Model):
-    on = models.GenericIPAddressField(null=True)
-    given = models.DateTimeField(auto_now_add=True)
-    memo = models.TextField(blank=True, default='')
-
 @receiver(models.signals.post_save, sender=Post)
 def update_thread_last_update_on_insert(sender, instance, created, **kwargs):
     if not created:
@@ -710,11 +656,3 @@ def set_normalized_username(sender, instance, **kwargs):
 def reject_auto_erotic_athanksication(sender, instance, **kwargs):
     if instance.thanker.pk == instance.thankee.pk:
         raise IntegrityError('A user may not thank themselves')
-
-@receiver(models.signals.pre_save, sender=FilterWord)
-def invalidate_filter_cache(sender, instance, **kwargs):
-    cache.delete('active_filters')
-
-@receiver(models.signals.post_save, sender=Ban)
-def invalidate_user_title_cache(sender, instance, *args, **kwargs):
-    instance.subject.invalidate_user_title_cache()
