@@ -139,6 +139,9 @@ class GeneralViewTestCase(test_utils.ForumConfigTestCase):
         found_trash_rule = False
         
         for row in response.content.split('\n'):
+            if row[0] == '#':
+                continue
+
             parts = row.split(': ')
             self.assertEqual(len(parts), 2)
 

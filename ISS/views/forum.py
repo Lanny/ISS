@@ -968,6 +968,17 @@ def humans(request):
 
 def robots(request):
     robots = [
+        '# ISS robots.txt, please crawl responsibly. We ask that you keep ',
+        '# crawling to a few (as in less than 4) requests per second. Fully ',
+        '# recursive crawling is acceptable under the condition that the ',
+        '# disallowed urls are ignored for ranking operations as we maintain ',
+        '# content the owners explicitly disavow (spam) for legal reasons ',
+        '# under some of these urls.',
+        '#',
+        '# Please note that paginated post lists like those matching ',
+        '# /forum/\d+/ are sorted in reverse cronological order and their ',
+        '# content is highly dynamic while most other paginated lists are ',
+        '# append-only and will remain fairly stable.',
         'User-agent: *',
         'Disallow: /pms/',
         'Disallow: /api/',
