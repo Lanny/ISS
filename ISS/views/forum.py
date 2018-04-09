@@ -966,6 +966,22 @@ def humans(request):
 
     return HttpResponse(s, content_type='text/plain')
 
+def robots(request):
+    robots = [
+        'User-agent: *',
+        'Disallow: /pms/',
+        'Disallow: /api/',
+        'Disallow: /embed/',
+        'Disallow: /search',
+        'Disallow: /search/',
+    ]
+
+    for forum in Forum.objects.filter(is_trash=True):
+        url = reverse('thread-index', args=(forum.pk,))
+        robots.append('Disallow: %s' % url)
+
+    return HttpResponse('\n'.join(robots), content_type='text/plain')
+
 @cache_page(60 * 24 * 7)
 @cache_control(max_age=60*24)
 def smilies_css(request):

@@ -109,6 +109,45 @@ class GeneralViewTestCase(test_utils.ForumConfigTestCase):
                                               thread=thread)
         self.assertTrue(subscription.subscribed)
 
+    def test_static_page_valid(self):
+        StaticPage.objects.create(
+                page_id='cryptonomicon',
+                page_title='Cryptonomicon',
+                content='''
+                    “FILIPINOS ARE A WARM, GENTLE, CARING, GIVING people,” Avi
+                    says, “which is a good thing since so many of them carry
+                    concealed weapons.”
+                ''')
+        path = reverse('static-page', kwargs={'page_id': 'cryptonomicon'})
+        response = self.scrub_client.get(path)
+        self.assertEqual(response.status_code, 200)
+
+    def test_static_page_invalid(self):
+        path = reverse('static-page', kwargs={'page_id': 'dune'})
+        response = self.scrub_client.get(path)
+        self.assertEqual(response.status_code, 404)
+
+    def test_robots_txt(self):
+        forum = Forum(
+            name='Garbage Compactor',
+            description='Han, Like, Chewbacca, and Leia not included',
+            is_trash=True)
+        forum.save()
+        forum_url = reverse('thread-index', args=(forum.pk,))
+        path = reverse('robots')
+        response = self.scrub_client.get(path)
+        found_trash_rule = False
+        
+        for row in response.content.split('\n'):
+            parts = row.split(': ')
+            self.assertEqual(len(parts), 2)
+
+            lh, rh = parts
+            self.assertIn(lh, ('User-agent', 'Disallow', 'Allow'))
+            found_trash_rule = found_trash_rule or rh == forum_url
+
+        self.assertTrue(found_trash_rule)
+
 class EditPostTestCase(test_utils.ForumConfigTestCase):
     forum_config = {
         'captcha_period': 0,

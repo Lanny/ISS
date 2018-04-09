@@ -45,7 +45,6 @@ class FilterWord(models.Model):
         for f in filters:
             text = f.replace(text)
 
-
         return text
 
 class Ban(models.Model):

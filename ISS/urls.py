@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^houston/', include('Houston.urls')),
 
     url(r'^humans.txt$', views.forum.humans, name='humans'),
+    url(r'^robots.txt$', views.forum.robots, name='robots'),
 
     url(r'^smilies.css', views.forum.smilies_css, name='smilies-css'),
     url(r'^smiley-refrence',
