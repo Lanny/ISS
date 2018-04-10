@@ -11,7 +11,9 @@ class ForumsSitemap(Sitemap):
     priority = 1.0
 
     def items(self):
-        return Forum.objects.filter(is_trash=False)
+        return (Forum.objects
+            .filter(is_trash=False)
+            .order_by('-last_update'))
 
     def lastmod(self, forum):
         return forum.last_update
@@ -29,8 +31,10 @@ class ThreadSitemap(Sitemap):
             return 'hourly'
         elif  inactive_time < timedelta(days=28):
             return 'daily'
-        else:
+        elif  inactive_time < timedelta(days=28*3):
             return 'monthly'
+        else:
+            return 'yearly'
 
     def lastmod(self, thread):
         return thread.last_update
