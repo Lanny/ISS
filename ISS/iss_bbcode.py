@@ -87,6 +87,7 @@ def _add_img_tag(parser):
         ('<a class="img-embed" href="%(value)s">'
             '<img src="%(value)s">'
         '</a>'),
+        render_embedded=False,
         replace_links=False,
         replace_cosmetic=False)
 
@@ -96,6 +97,7 @@ def _add_img_stub_tag(parser):
     parser.add_simple_formatter(
         'img',
         'embedded image: <a class="img-link" href="%(value)s">%(value)s</a>',
+        render_embedded=False,
         replace_links=False,
         replace_cosmetic=False)
 
@@ -105,6 +107,7 @@ def _add_video_stub_tag(parser):
     parser.add_simple_formatter(
         'video',
         'embedded video: <a class="img-link" href="%(value)s">%(value)s</a>',
+        render_embedded=False,
         replace_links=False,
         replace_cosmetic=False)
 
@@ -177,7 +180,7 @@ def _add_code_tag(parser):
         """ % value)
 
     parser.add_formatter('code', render_code, replace_cosmetic=False,
-                         render_embedded=False)
+                         render_embedded=False, replace_links=False)
     return parser
 
 def _add_bc_tag(parser):
@@ -186,7 +189,7 @@ def _add_bc_tag(parser):
                 % value)
 
     parser.add_formatter('bc', render_bc, replace_cosmetic=False,
-                         replace_links=False)
+                         replace_links=False, render_embeded=False)
     return parser
 
 def _add_link_tag(parser):
