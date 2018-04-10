@@ -352,8 +352,12 @@ class Thread(models.Model):
     def get_posts_in_thread_order(self, reverse=False):
         return self.post_set.order_by('-created' if reverse else 'created')
 
-    def get_url(self):
-        return reverse('thread', kwargs={'thread_id': self.pk})
+    def get_url(self, page=None):
+        url = reverse('thread', kwargs={'thread_id': self.pk})
+        if page and page > 1:
+            url = '%s?p=%d' % (url, page)
+
+        return url
 
     def get_jump_post(self, user):
         """
