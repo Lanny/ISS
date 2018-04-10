@@ -17,9 +17,11 @@ from django.conf import settings
 from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.sitemaps.views import sitemap
 from django.views.generic import TemplateView
 
 from ISS import views, utils
+from ISS.sitemaps import iss_sitemaps
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -27,6 +29,7 @@ urlpatterns = [
 
     url(r'^humans.txt$', views.forum.humans, name='humans'),
     url(r'^robots.txt$', views.forum.robots, name='robots'),
+    url(r'^sitemap.xml$', sitemap, {'sitemaps': iss_sitemaps}, name='sitemap'),
 
     url(r'^smilies.css', views.forum.smilies_css, name='smilies-css'),
     url(r'^smiley-refrence',
