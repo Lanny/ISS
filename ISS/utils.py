@@ -25,14 +25,15 @@ from ISS import iss_bbcode
 
 DO_NOT_LINK_TAGS = { 'video', 'pre' }
 TIME_DELTA_FORMAT = re.compile(r'^\s*((?P<years>\d+)y)?\s*((?P<weeks>\d+)w)?\s*((?P<days>\d+)d)?\s*((?P<hours>\d+?)h)?\s*((?P<minutes>\d+?)m)?\s*((?P<seconds>\d+?)s)?\s*$')
-SECONDS_IN = {
-    'years': 356 * 24 * 60 * 60,
-    'weeks': 7 * 24 * 60 * 60,
-    'days': 24 * 60 * 60,
-    'hours': 60 * 60,
-    'minutes': 60,
-    'seconds': 1
-}
+TIME_HIERARCHY = (
+    ('years', 356 * 24 * 60 * 60),
+    ('weeks', 7 * 24 * 60 * 60),
+    ('days', 24 * 60 * 60),
+    ('hours', 60 * 60),
+    ('minutes', 60),
+    ('seconds', 1)
+)
+SECONDS_IN = dict(TIME_HIERARCHY)
 
 class GlobShortcodeRegistrar(object):
     _directory = None
@@ -391,6 +392,19 @@ def parse_duration(time_str):
             seconds += int(comp) * SECONDS_IN[name]
 
     return datetime.timedelta(seconds=seconds)
+
+def format_duration(duration):
+    seconds = duration.total_seconds()
+    parts = []
+
+    for (unit_name, nsecs) in TIME_HIERARCHY:
+        if seconds > nsecs:
+            (q, r) = divmod(seconds, nsecs)
+            parts.append('%d%s' % (q, unit_name[0]))
+            seconds = r 
+
+    return ' '.join(parts)
+
 
 class TolerantJSONEncoder(json.JSONEncoder):
     def default(self, o):
