@@ -61,6 +61,9 @@ class Ban(models.Model):
         return self.end_date == None or self.end_date > now
 
     def get_duration(self):
+        if not self.end_date:
+            return None
+
         return self.end_date - self.start_date
 
     def __unicode__(self):

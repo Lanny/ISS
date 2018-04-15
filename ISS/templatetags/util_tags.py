@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django import template
 from django.template import defaultfilters
 from django.urls import reverse
@@ -44,4 +46,7 @@ def present_dt(dt):
 
 @register.filter(expects_localtime=True, is_safe=False)
 def present_td(td):
+    if not isinstance(td, timedelta):
+        return 'Forever'
+
     return utils.format_duration(td)
