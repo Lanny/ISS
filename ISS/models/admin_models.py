@@ -60,6 +60,9 @@ class Ban(models.Model):
 
         return self.end_date == None or self.end_date > now
 
+    def get_duration(self):
+        return self.end_date - self.start_date
+
     def __unicode__(self):
         return u'Ban on %s for reason: %s' % (
             self.subject.username, self.reason)

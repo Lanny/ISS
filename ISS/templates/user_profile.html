@@ -261,6 +261,7 @@
               <th>Reason</th>
               <th>Given By</th>
               <th>Given At</th>
+              <th>Duration</th>
               <th>Ends</th>
             </tr>
           </thead>
@@ -282,6 +283,9 @@
               </td>
               <td>
                 {{ ban.start_date|date:"Y-m-d" }} at {{ ban.start_date|time:"f A e" }}
+              </td>
+              <td>
+                {{ ban.get_duration|present_td }}
               </td>
               <td>
                 {% if ban.end_date %}

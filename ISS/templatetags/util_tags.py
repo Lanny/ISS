@@ -2,6 +2,7 @@ from django import template
 from django.template import defaultfilters
 from django.urls import reverse
 
+from ISS import utils
 from ISS.models import FilterWord, AccessControlList
 
 register = template.Library()
@@ -40,3 +41,7 @@ def present_dt(dt):
     return '%s at %s' % (
         defaultfilters.date(dt, 'Y-m-d'),
         defaultfilters.time(dt, 'f A e'))
+
+@register.filter(expects_localtime=True, is_safe=False)
+def present_td(td):
+    return utils.format_duration(td)
