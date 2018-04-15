@@ -39,10 +39,20 @@ class UtilsTestCase(test_utils.ForumConfigTestCase):
 
             self.assertEqual(exp, act, msg)
 
-
     def test_format_duration(self):
         for (rep, val) in self.cannonical_form_tests:
             act = utils.format_duration(val)
             msg = 'Expected %r to format to %r, got %r' %  (val, rep, act)
             self.assertEqual(rep, act, msg)
+
+    def test_parse_format_parse(self):
+        for (rep, val) in self.cannonical_form_tests:
+            exp = val.total_seconds()
+            act = utils.parse_duration(
+                utils.format_duration(
+                    utils.parse_duration(rep))
+                ).total_seconds()
+
+
+            self.assertEqual(exp, act)
 
