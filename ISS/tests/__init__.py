@@ -8,6 +8,7 @@ from spam_can_tests import *
 from general_view_tests import *
 from model_tests import *
 from management_commands_tests import *
+from utils_tests import *
 
 # Import extension tests.
 for ext in utils.get_config('extensions'):

@@ -24,7 +24,15 @@ from ISS.models import *
 from ISS import iss_bbcode
 
 DO_NOT_LINK_TAGS = { 'video', 'pre' }
-TIME_DELTA_FORMAT = re.compile(r'^\s*((?P<days>\d+)d)?\s*((?P<hours>\d+?)h)?\s*((?P<minutes>\d+?)m)?\s*((?P<seconds>\d+?)s)?\s*$')
+TIME_DELTA_FORMAT = re.compile(r'^\s*((?P<years>\d+)y)?\s*((?P<weeks>\d+)w)?\s*((?P<days>\d+)d)?\s*((?P<hours>\d+?)h)?\s*((?P<minutes>\d+?)m)?\s*((?P<seconds>\d+?)s)?\s*$')
+SECONDS_IN = {
+    'years': 356 * 24 * 60 * 60,
+    'weeks': 7 * 24 * 60 * 60,
+    'days': 24 * 60 * 60,
+    'hours': 60 * 60,
+    'minutes': 60,
+    'seconds': 1
+}
 
 class GlobShortcodeRegistrar(object):
     _directory = None
@@ -377,13 +385,12 @@ def parse_duration(time_str):
     if not parts:
         return
 
-    parts = parts.groupdict()
-    time_params = {}
-    for (name, param) in parts.iteritems():
-        if param:
-            time_params[name] = int(param)
+    seconds = 0
+    for (name, comp) in parts.groupdict().items():
+        if comp:
+            seconds += int(comp) * SECONDS_IN[name]
 
-    return datetime.timedelta(**time_params)
+    return datetime.timedelta(seconds=seconds)
 
 class TolerantJSONEncoder(json.JSONEncoder):
     def default(self, o):
