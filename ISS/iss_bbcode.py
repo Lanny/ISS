@@ -303,5 +303,8 @@ def build_parser(tags, escape_html=True):
     for tag in tags:
         _supported_tags[tag](parser)
 
+    del parser.recognized_tags['link']
+    del parser.recognized_tags['*']
+
     return parser
 
