@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node_modules/gulp-cli/bin/gulp.js clean && node_modules/gulp-cli/bin/gulp.js generate --optimize"
+    "build": "node_modules/gulp-cli/bin/gulp.js clean && node_modules/gulp-cli/bin/gulp.js generate"
   },
   "repository": {
     "type": "git",
@@ -24,6 +24,10 @@
     "gulp-flatten": "^0.3.1",
     "gulp-minify-css": "^1.2.4",
     "gulp-sources-less": "^1.0.1",
-    "less": "^2.7.1"
+    "less": "^2.7.1",
+    "graceful-fs": "^4.1.11"
+  },
+  "resolutions": {
+    "natives": "1.1.3"
   }
 }
