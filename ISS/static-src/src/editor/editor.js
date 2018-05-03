@@ -1,7 +1,7 @@
 ;(function() {
   var sessionStorage = window.sessionStorage || {};
 
-  function wrap($, AutoSuggest) {
+  function wrap($, AutoSuggest, bbcode) {
     var wrapOperations = [
       {
         name: 'bold',
@@ -185,11 +185,16 @@
             self.clearErrors();
 
             var priorPreview = self._el.find('.post-preview-block');
+            var newPreview = $(data.postPreview);
+
             if (priorPreview.length) {
-              priorPreview.replaceWith($(data.postPreview));
+              priorPreview.replaceWith(newPreview);
             } else {
-              $(data.postPreview).insertBefore(self._el.find('fieldset:first'));
+              newPreview.insertBefore(self._el.find('fieldset:first'));
             }
+
+            // Bind all those sexy bbcode frills
+            bbcode.bindRegion(newPreview);
           })
           .fail(function(data) {
             console.error(data);
@@ -291,7 +296,8 @@
 
   define([
     'jquery',
-    'auto-suggest'
+    'auto-suggest',
+    'bbcode'
   ], wrap);
 })();
 
