@@ -460,6 +460,17 @@ class Post(models.Model):
     def get_thanker_pks(self):
         return {t.thanker_id for t in self.thanks_set.all()}
 
+    def can_be_edited_by(self, poster):
+        if poster.is_banned():
+            return False
+
+        if poster == self.author:
+            return True
+
+        acl = AccessControlList.get_acl('EDIT_ALL_POSTS')
+        return acl.is_poster_authorized(poster)
+        
+
     def _rectify_subscriptions_on_removal_from_thread(self):
         """
         Somewhat complex. When a post is removed from a thread some ThreadFlags

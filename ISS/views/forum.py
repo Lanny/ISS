@@ -599,7 +599,7 @@ class EditPost(utils.MethodSplitView):
         post = get_object_or_404(Post, pk=post_id)
         form_initials = { 'content': post.content, 'post': post }
 
-        if (not request.user == post.author) and (not request.user.is_staff):
+        if not post.can_be_edited_by(request.user):
             raise PermissionDenied()
 
         form = forms.EditPostForm(initial=form_initials)
@@ -613,7 +613,7 @@ class EditPost(utils.MethodSplitView):
     def POST(self, request, post_id):
         post = get_object_or_404(Post, pk=post_id)
 
-        if (not request.user == post.author) and (not request.user.is_staff):
+        if not post.can_be_edited_by(request.user):
             raise PermissionDenied()
 
         form = forms.EditPostForm(request.POST)

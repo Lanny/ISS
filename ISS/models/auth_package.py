@@ -4,6 +4,8 @@ from django.db import models
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import AnonymousUser
 
+from ISS import utils
+
 class BaseLogicPackage(object):
     def __init__(self, config=None):
         pass
@@ -85,6 +87,7 @@ class AccessControlGroup(models.Model):
         ('INVITORS',),
         ('SUPERUSERS',),
         ('MODS',),
+        ('ADMINS',)
     )
 
     name = models.TextField(unique=True, blank=False, null=False)
@@ -109,14 +112,22 @@ class AccessControlGroup(models.Model):
 
         return acg
 
+    @classmethod
+    def is_superuser(cls, poster):
+        return bool(cls.get_acg('SUPERUSERS')
+            .members
+            .filter(pk=poster.pk)
+            .count())
+
     def __unicode__(self):
         return self.name
 
 class AccessControlList(models.Model):
     base_acls = (
-        ('CREATE_INVITE', False, ('INVITORS', 'SUPERUSERS'), ()),
-        ('VIEW_INVITE_TREE', False, ('INVITORS', 'SUPERUSERS'), ()),
-        ('VIEW_IPS', False, ('SUPERUSERS',), ())
+        ('CREATE_INVITE', False, ('INVITORS', 'ADMINS'), ()),
+        ('VIEW_INVITE_TREE', False, ('INVITORS', 'ADMINS'), ()),
+        ('VIEW_IPS', False, ('SUPERUSERS', 'MODS'), ()),
+        ('EDIT_ALL_POSTS', False, ('ADMINS',), ())
     )
 
     name = models.TextField(unique=True, blank=False, null=False)
@@ -147,6 +158,10 @@ class AccessControlList(models.Model):
         if self.black_groups.filter(members__pk=poster.pk).count():
             return False
         if self.white_groups.filter(members__pk=poster.pk).count():
+            return True
+
+        # Superusers have every permission not explicitly denied to them
+        if AccessControlGroup.is_superuser(poster):
             return True
 
         return self.allow_by_default
@@ -180,3 +195,4 @@ class AccessControlList(models.Model):
 
     def __unicode__(self):
         return self.name
+

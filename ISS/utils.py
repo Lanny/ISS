@@ -198,6 +198,16 @@ class MethodSplitView(object):
         else:
             return view
 
+def memoize(f):
+    memo = {}
+    def memoized(*args):
+        if args not in memo:            
+            memo[args] = f(*args)
+
+        return memo[args]
+
+    return memoized
+
 def get_config(key=None):
     if not key:
         return config

@@ -38,6 +38,21 @@ def check_acl(poster, acl_name):
     acl = AccessControlList.get_acl(acl_name)
     return acl.is_poster_authorized(poster)
 
+@register.filter
+def apply(args, fn):
+    """
+    Apply function to arguments. NB: the first arg (the value on the left of
+    `|apply`) is a tuple containing arguments or a single non-tuple argument
+    while the second arg is the function to be applied.
+
+    The logic here is that the function is a parameter of this "filter" which
+    acts on some data (an arg tuple in this case).
+    """
+    if not isinstance(args, tuple):
+        args = (args,)
+
+    return fn(*args)
+
 @register.filter(expects_localtime=True, is_safe=False)
 def present_dt(dt):
     return '%s at %s' % (
