@@ -186,7 +186,6 @@ class EditPostTestCase(test_utils.ForumConfigTestCase):
 
         post = self.scrub.post_set.all()[0]
         self.assertEqual(new_content, post.content)
-    
 
     def test_edit_post_too_long(self):
         long_content = '!' * 80000
@@ -216,10 +215,15 @@ class EditPostTestCase(test_utils.ForumConfigTestCase):
         spec_client = Client()
         spec_client.force_login(spectral)
 
+        old_content = self.scrub.post_set.all()[0].content
+
         resp = self._attempt_edit(
             'use shellcode to reticulate splines',
             spec_client)
 
+        new_content = self.scrub.post_set.all()[0].content
+
+        self.assertEqual(old_content, new_content)
 
 class ThanksViewTestCase(TestCase):
     def setUp(self):

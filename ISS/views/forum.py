@@ -594,14 +594,15 @@ class RenderBBCode(utils.MethodSplitView):
 
 class EditPost(utils.MethodSplitView):
     unbanned_required = True
+
+    def pre_method_check(self, request, post_id):
+        post = get_object_or_404(Post, pk=post_id)
+        if not post.can_be_edited_by(request.user):
+            raise PermissionDenied()
     
     def GET(self, request, post_id):
         post = get_object_or_404(Post, pk=post_id)
         form_initials = { 'content': post.content, 'post': post }
-
-        if not post.can_be_edited_by(request.user):
-            raise PermissionDenied()
-
         form = forms.EditPostForm(initial=form_initials)
         ctx = {
             'form': form,
@@ -612,10 +613,6 @@ class EditPost(utils.MethodSplitView):
 
     def POST(self, request, post_id):
         post = get_object_or_404(Post, pk=post_id)
-
-        if not post.can_be_edited_by(request.user):
-            raise PermissionDenied()
-
         form = forms.EditPostForm(request.POST)
 
         if not form.is_valid():

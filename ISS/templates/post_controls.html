@@ -24,7 +24,7 @@
   {% endif %}
 
 
-  {% if user|apply:post.can_be_edited_by %}
+  {% if post|poster_can_edit:user %}
     <a class="edit-post" href="{% url 'edit-post' post.pk %}">
       Edit
     </a>
