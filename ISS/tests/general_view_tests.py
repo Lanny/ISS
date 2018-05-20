@@ -163,10 +163,12 @@ class EditPostTestCase(test_utils.ForumConfigTestCase):
         self.scrub_client = Client()
         self.scrub_client.force_login(self.scrub)
 
-    def _attempt_edit(self, content):
+    def _attempt_edit(self, content, client=None):
+        client = client or self.scrub_client
+
         post = self.scrub.post_set.all()[0]
         path = reverse('edit-post', kwargs={'post_id': post.pk})
-        response = self.scrub_client.post(path, {
+        response = client.post(path, {
             'content': content,
             'post': post.pk
         })
@@ -207,6 +209,17 @@ class EditPostTestCase(test_utils.ForumConfigTestCase):
         snapshot = post.postsnapshot_set.all()[0]
         self.assertEqual(snapshot.content, old_content)
         self.assertEqual(snapshot.obsolesced_by, self.scrub)
+
+    def test_non_author_cant_edit(self):
+        # URL manipulation is about the extent of his abilities, it's true
+        spectral = test_utils.create_user(thread_count=0, post_count=0)
+        spec_client = Client()
+        spec_client.force_login(spectral)
+
+        resp = self._attempt_edit(
+            'use shellcode to reticulate splines',
+            spec_client)
+
 
 class ThanksViewTestCase(TestCase):
     def setUp(self):

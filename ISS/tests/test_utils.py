@@ -40,13 +40,16 @@ def create_posts(user, count, bulk=False):
         for post in posts:
             post.save()
 
-def create_user(thread_count=0, post_count=0): 
+def create_user(thread_count=0, post_count=0, acgs=()): 
     global USERS_CREATED
     global THREADS_CREATED
 
     USERS_CREATED += 1
     user = Poster(username=u'TEST_USER-%d' % USERS_CREATED)
     user.save()
+
+    for acg in acgs:
+        AccessControlGroup.get_acg(acg).members.add(user)
 
     for _ in range(thread_count):
         THREADS_CREATED += 1

@@ -91,7 +91,18 @@ class PostTestCase(test_utils.ForumConfigTestCase):
     def test_non_ninja_edit(self):
         self._edit_post(200)
         self.assertTrue(self.post.show_edit_line())
-    
+
+    def test_suepruser_can_edit(self):
+        superuser = test_utils.create_user(acgs=('SUPERUSERS',))
+        self.assertTrue(self.post.can_be_edited_by(superuser))
+
+    def test_author_can_edit(self):
+        self.assertTrue(self.post.can_be_edited_by(self.rikimaru))
+
+    def test_non_author_cant_edit(self):
+        non_author = test_utils.create_user()
+        self.assertFalse(self.post.can_be_edited_by(non_author))
+
 class PosterUsernameNormalizationTestCase(SimpleTestCase):
     def assertNormEqual(self, username_one, username_two):
         return self.assertEqual(
