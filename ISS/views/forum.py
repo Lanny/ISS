@@ -546,7 +546,6 @@ class PreviewPost(utils.MethodSplitView):
             return render(request, 'preview_post.html', ctx)
 
         else:
-            print struct_form.errors
             return HttpResponseBadRequest('Invalid form.')
 
 
@@ -572,6 +571,10 @@ class PreviewPost(utils.MethodSplitView):
             form_action = reverse('new-thread', kwargs={'forum_id': forum.pk})
             Form = utils.conditionally_captchatize(request, forms.NewThreadForm)
             form = Form(request.POST, author=request.user)
+
+        elif action == 'compose-pm':
+            form_action = reverse('compose-pm')
+            form = forms.NewPrivateMessageForm(request.POST, author=request.user)
 
         return (form_action, form)
 

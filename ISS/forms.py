@@ -213,6 +213,7 @@ class StructuralPreviewPostForm(forms.Form):
 
     preview_action = forms.ChoiceField(choices=[('new-reply', 'new-reply'),
                                                 ('new-thread', 'new-thread'),
+                                                ('compose-pm', 'compose-pm'),
                                                 ('edit-post', 'edit-post')],
                                        required=True)
 
@@ -225,27 +226,6 @@ class StructuralPreviewPostForm(forms.Form):
     forum = forms.ModelChoiceField(queryset=Forum.objects.all(),
                                    widget=forms.HiddenInput(),
                                    required=False)
-
-    def clean(self, *args, **kwargs):
-        ret = super(StructuralPreviewPostForm, self).clean(*args, **kwargs)
-        return ret
-        action = self.cleaned_data['action']
-
-        if action == 'new-reply' and not self.cleaned_data['thread']:
-            raise ValidationError('No thread to reply to specified.',
-                                  code='REPLY_W_NO_THREAD')
-        elif action == 'new-thread' and not self.cleaned_data['forum']:
-            raise ValidationError('No forum to make thread in specified.',
-                                  code='NEW_THREAD_W_NO_FORUM')
-        elif action == 'edit-post' and not self.cleaned_data['post']:
-            raise ValidationError('No forum to make thread in specified.',
-                                  code='NEW_THREAD_W_NO_FORUM')
-        else:
-            # Should never happen
-            raise ValidationError('Unexpected action', code='UNEXPECTED_ACTION')
-
-        return ret
-
 
 class RenderBBCodeForm(forms.Form):
     error_css_class = 'in-error'
@@ -535,6 +515,10 @@ class NewPrivateMessageForm(forms.Form):
     post_min_len = utils.get_config('min_post_chars')
     post_max_len = utils.get_config('max_post_chars')
     title_min_len = utils.get_config('min_thread_title_chars')
+
+    preview_action = forms.CharField(initial='compose-pm',
+                                     required=False,
+                                     widget=forms.HiddenInput())
 
     subject = forms.CharField(label='Title',
                               max_length=255,

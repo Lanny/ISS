@@ -51,7 +51,7 @@ urlpatterns = [
     url('^thread/(?P<thread_id>\d+)/unsubscribe$',
         views.forum.UnsubscribeFromThread.as_view(),
         name='unsubscribe'),
-    url('^preview-(?P<action>edit|thread|post)$',
+    url('^preview-(?P<action>edit|thread|post|compose-pm)$',
         views.forum.PreviewPost.as_view(),
         name='preview-post'),
 
