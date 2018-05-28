@@ -238,3 +238,28 @@ a.bbcode-ref-link {
     margin-bottom: 20px;
   }
 }
+
+.page-message {
+  .-display-flex();
+  background-color: @bg_light;
+  margin-bottom: @content_margin_bottom;
+  
+  .icon-container {
+    .-display-flex();
+    background-color: @bg_teal;
+    padding: 5px 10px;
+    justify-content: center;
+    align-items: center;
+
+    .alert-icon {
+      .icn(32px);
+      .icn-alert();
+    }
+  }
+  .message-content {
+    flex: 1;
+    .-display-flex();
+    align-items: center;
+    padding: 5px 10px;
+  }
+}
