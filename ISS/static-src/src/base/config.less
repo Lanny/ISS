@@ -65,13 +65,17 @@
   }
 }
 
-.small-btn() {
+.-small-btn-base() {
   .btn();
   border-radius: 3px;
   padding: 5px 10px;
   font-weight: normal;
   font-size: 10px;
 
+}
+
+.small-btn() {
+  .-small-btn-base();
   @media (max-width: @breakpoint) {
     padding: 10px 15px;
     font-size: 12px;
@@ -79,7 +83,7 @@
 }
 
 .v-small-btn {
-  .small-btn();
+  .-small-btn-base();
   padding: 1px 5px;
   font-size: 9px;
   border: 1px solid @white;

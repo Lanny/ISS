@@ -20,23 +20,28 @@
 
     .post-hat {
       .teal();
+      .-display-flex();
       padding: 5px;
       font-size: 10px;
 
-      .select-post {
-        float: right;
-        margin: 0;
-        margin-left: 6px;
+      .post-date, .right-content {
+        flex: 1;
       }
 
-      .admin-edit-post {
-        .v-small-btn();
-        .teal();
-        float: right;
-        margin-right: 5px;
-      }
-      .post-number {
-        float: right;
+      .right-content {
+        .-display-flex();
+        .-flex-direction(row-reverse);
+
+        .select-post {
+          margin: 0;
+          margin-left: 6px;
+        }
+
+        .admin-edit-post {
+          .v-small-btn();
+          .teal();
+          margin-right: 5px;
+        }
       }
     }
 
