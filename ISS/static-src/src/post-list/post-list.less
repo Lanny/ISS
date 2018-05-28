@@ -69,35 +69,39 @@
       }
 
       .post-controls {
-        .-display-flex();
-        .-flex-direction(row);
         overflow: hidden;
         border-top: 1px solid @seperator_color;
         padding-top: 5px;
         margin-top: 5px;
 
-        .left-controls, .right-controls {
+        .control-buttons {
           .-display-flex();
-          flex: 1;
-        }
+          .-flex-direction(row);
 
-        .left-controls {
-        }
+          .left-controls, .right-controls {
+            .-display-flex();
+            flex: 1;
+          }
 
-        .right-controls {
-          .-flex-direction(row-reverse);
-        }
+          .left-controls {
+          }
 
-        .quote, .thank-action, .edit-post, .report  {
-          .small-btn();
-          .teal();
-          align-self: flex-start;
-          margin-left: 3px;
+          .right-controls {
+            .-flex-direction(row-reverse);
+          }
+
+          .quote, .thank-action, .edit-post, .report  {
+            .small-btn();
+            .teal();
+            align-self: flex-start;
+            margin-left: 3px;
+          }
         }
 
         .edit-line {
+          text-align: right;
           font-style: oblique;
-          flex: 1;
+          padding-top: 5px;
         }
       }
     }
