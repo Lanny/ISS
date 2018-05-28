@@ -3,9 +3,9 @@ import os.path
 import re
 import random
 
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import AnonymousUser
 
+from ISS.forms import ISSAuthenticationForm
 from ISS import utils
 
 banners = os.listdir(os.path.join('ISS/static', utils.get_config('banner_dir')))
@@ -33,7 +33,7 @@ def user_config(request):
         ctx['allow_avatars'] = True
         ctx['allow_js'] = True
         ctx['editor_buttons'] = False
-        ctx['login_form'] = AuthenticationForm()
+        ctx['login_form'] = ISSAuthenticationForm()
     else:
         ctx['embed_images'] = request.user.embed_images()
         ctx['embed_video'] = request.user.embed_video()

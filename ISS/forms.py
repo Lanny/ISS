@@ -255,6 +255,11 @@ class ThreadActionForm(forms.Form):
         self.fields['action'] = self._get_action_field()
 
 class ISSAuthenticationForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        autofocus = kwargs.pop('autofocus', False)
+        super(ISSAuthenticationForm, self).__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs['autofocus'] = autofocus
+
     def clean_username(self):
         """
         Normalize the submitted username and replace the value in cleaned data

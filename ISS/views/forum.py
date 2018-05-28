@@ -657,7 +657,7 @@ class GetQuote(utils.MethodSplitView):
 
 class LoginUser(utils.MethodSplitView):
     def GET(self, request):
-        form = forms.ISSAuthenticationForm()
+        form = forms.ISSAuthenticationForm(autofocus=True)
         ctx = {'form': form}
         return render(request, 'login.html', ctx)
 
