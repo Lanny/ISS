@@ -1,10 +1,11 @@
 ;(function() {
-  function wrap($, config) {
+  function wrap($, config, utils) {
     var Module = {
       bindRegion: function(region) {
         region = $(region);
         Module.bindSpoilerHandlers(region);
         Module.embedBandcampLinks(region);
+        Module.shakeSuperCoolElements(region);
       },
       bindSpoilerHandlers: function(region) {
         region.find('.spoiler')
@@ -49,6 +50,9 @@
                 }
               })
           });
+      },
+      shakeSuperCoolElements: function(region) {
+         utils.shake($('.ex'), 10);
       }
     };
 
@@ -57,6 +61,7 @@
 
   define([
     'jquery',
-    'config'
+    'config',
+    'utils'
   ], wrap);
 })();
