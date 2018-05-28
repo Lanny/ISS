@@ -70,11 +70,23 @@
 
       .post-controls {
         .-display-flex();
-        .-flex-direction(row-reverse);
+        .-flex-direction(row);
         overflow: hidden;
         border-top: 1px solid @seperator_color;
         padding-top: 5px;
         margin-top: 5px;
+
+        .left-controls, .right-controls {
+          .-display-flex();
+          flex: 1;
+        }
+
+        .left-controls {
+        }
+
+        .right-controls {
+          .-flex-direction(row-reverse);
+        }
 
         .quote, .thank-action, .edit-post, .report  {
           .small-btn();

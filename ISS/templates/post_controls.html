@@ -1,41 +1,44 @@
 {% load util_tags %}
 
 <div class="post-controls">
-  <a class="quote"
-     href="{% url 'new-reply' post.thread.pk %}?quote={{ post.pk }}"
-     data-bbc-url="{% url 'get-quote' post.pk %}">
-    Quote
-  </a>
-
-  {% if user.pk != post.author.pk and user.post_set.count >= config.initial_account_period_total %}
-    {% if user.pk in post.get_thanker_pks %}
-      <form action="{% url 'unthank-post' post.pk %}" method="POST"
-            class="thank-action-form">
-        {% csrf_token %}
-        <input type="submit" value="Unthank" class="thank-action" />
-      </form>
-    {% else %}
-      <form action="{% url 'thank-post' post.pk %}" method="POST"
-            class="thank-action-form">
-        {% csrf_token %}
-        <input type="submit" value="Thank" class="thank-action" />
-      </form>
+  <div class="left-controls">
+    {% if user.can_report and user.pk != post.author.pk %}
+      <a href="{% url 'report-post' post.pk %}" class="report">
+        Report
+      </a>
     {% endif %}
-  {% endif %}
-
-
-  {% if post|poster_can_edit:user %}
-    <a class="edit-post" href="{% url 'edit-post' post.pk %}">
-      Edit
+  </div>
+  <div class="right-controls">
+    <a class="quote"
+       href="{% url 'new-reply' post.thread.pk %}?quote={{ post.pk }}"
+       data-bbc-url="{% url 'get-quote' post.pk %}">
+      Quote
     </a>
-  {% endif %}
 
-  {% if user.can_report and user.pk != post.author.pk %}
-    <a href="{% url 'report-post' post.pk %}" class="report">
-      Report
-    </a>
-  {% endif %}
-    
+    {% if user.pk != post.author.pk and user.post_set.count >= config.initial_account_period_total %}
+      {% if user.pk in post.get_thanker_pks %}
+        <form action="{% url 'unthank-post' post.pk %}" method="POST"
+              class="thank-action-form">
+          {% csrf_token %}
+          <input type="submit" value="Unthank" class="thank-action" />
+        </form>
+      {% else %}
+        <form action="{% url 'thank-post' post.pk %}" method="POST"
+              class="thank-action-form">
+          {% csrf_token %}
+          <input type="submit" value="Thank" class="thank-action" />
+        </form>
+      {% endif %}
+    {% endif %}
+
+
+    {% if post|poster_can_edit:user %}
+      <a class="edit-post" href="{% url 'edit-post' post.pk %}">
+        Edit
+      </a>
+    {% endif %}
+  </div>
+
   {% if post.show_edit_line %}
   {% with snapshot=post.get_last_edit_snapshot %}
     <div class="edit-line">
