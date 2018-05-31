@@ -664,7 +664,9 @@ class LoginUser(utils.MethodSplitView):
     def POST(self, request):
         logout(request)
         if request.POST:
-            form = forms.ISSAuthenticationForm(data=request.POST, request=request)
+            form = forms.ISSAuthenticationForm(autofocus=True,
+                                               data=request.POST,
+                                               request=request)
 
             if form.is_valid():
                 login(request, form.user_cache)
