@@ -37,7 +37,7 @@
           margin-left: 6px;
         }
 
-        .admin-edit-post {
+        .admin-edit-post, .report {
           .v-small-btn();
           .teal();
           margin-right: 5px;
@@ -81,19 +81,7 @@
 
         .control-buttons {
           .-display-flex();
-          .-flex-direction(row);
-
-          .left-controls, .right-controls {
-            .-display-flex();
-            flex: 1;
-          }
-
-          .left-controls {
-          }
-
-          .right-controls {
-            .-flex-direction(row-reverse);
-          }
+          .-flex-direction(row-reverse);
 
           .quote, .thank-action, .edit-post, .report  {
             .small-btn();

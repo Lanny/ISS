@@ -24,15 +24,21 @@
                      name="post" value="{{ post.pk }}" />
             {% endif %}
 
+
             <a href="{{ post.get_url }}" class="post-number">
               #{{ forloop.counter0|add:posts.start_index }}
             </a>
           {% endif %}
 
+
           {% if user.is_authenticated and user.is_admin %}
             <a href="{% url 'admin:ISS_post_change' post.pk %}"
                class="admin-edit-post">
               admin
+            </a>
+          {% elif user.can_report and user.pk != post.author.pk %}
+            <a href="{% url 'report-post' post.pk %}" class="report">
+              Report
             </a>
           {% endif %}
         </div>
