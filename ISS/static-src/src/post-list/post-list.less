@@ -24,23 +24,26 @@
       padding: 5px;
       font-size: 10px;
 
-      .post-date, .right-content {
+      .post-date {
         flex: 1;
       }
 
       .right-content {
-        .-display-flex();
-        .-flex-direction(row-reverse);
-
-        .select-post {
-          margin: 0;
-          margin-left: 6px;
-        }
+        display: inline;
+        flex-shrink: 1;
 
         .admin-edit-post, .report {
           .v-small-btn();
           .teal();
-          margin-right: 5px;
+        }
+
+        .post-number {
+          margin-left: 5px;
+        }
+
+        .select-post {
+          margin: 0;
+          margin-left: 6px;
         }
       }
     }
