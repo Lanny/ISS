@@ -18,15 +18,17 @@
         </span>
 
         <div class="right-content">
-          {% if user.is_authenticated and user.is_admin %}
-            <a href="{% url 'admin:ISS_post_change' post.pk %}"
-               class="admin-edit-post">
-              admin
-            </a>
-          {% elif user.can_report and user.pk != post.author.pk %}
-            <a href="{% url 'report-post' post.pk %}" class="report">
-              Report
-            </a>
+          {% if user.is_authenticated %}
+            {% if user.is_admin %}
+              <a href="{% url 'admin:ISS_post_change' post.pk %}"
+                 class="admin-edit-post">
+                admin
+              </a>
+            {% elif user.can_report and user.pk != post.author.pk %}
+              <a href="{% url 'report-post' post.pk %}" class="report">
+                Report
+              </a>
+            {% endif %}
           {% endif %}
 
           {% if not show_thread_context %}
