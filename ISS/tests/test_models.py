@@ -4,9 +4,9 @@ from django.test import TestCase
 from django.test import SimpleTestCase
 from ISS.models import *
 
-import test_utils
+import tutils
 
-class PosterTestCase(test_utils.ForumConfigTestCase):
+class PosterTestCase(tutils.ForumConfigTestCase):
     forum_config = {
         'title_ladder': (
             (5, 'Regular'),
@@ -75,37 +75,37 @@ class PosterTestCase(test_utils.ForumConfigTestCase):
         self.assertEqual(dons_alts[0]['addr'], '8.8.8.4')
 
     def test_is_banned_positive(self):
-        test_utils.ban_user(self.lanny)
+        tutils.ban_user(self.lanny)
         self.assertTrue(self.lanny.is_banned())
 
     def test_is_banned_infinite(self):
-        test_utils.ban_user(self.lanny, duration=None)
+        tutils.ban_user(self.lanny, duration=None)
         self.assertTrue(self.lanny.is_banned())
 
     def test_is_banned_negative(self):
         self.assertFalse(self.lanny.is_banned())
 
     def test_is_banned_expired(self):
-        test_utils.ban_user(self.lanny, start_expired=True)
+        tutils.ban_user(self.lanny, start_expired=True)
         self.assertFalse(self.lanny.is_banned())
 
     def test_get_ban_reason(self):
-        test_utils.ban_user(self.lanny, reason='bad reason', duration='1m')
-        test_utils.ban_user(self.lanny, reason='good reason', duration='2m')
-        test_utils.ban_user(self.lanny, reason='shit reason', duration='1m 5s')
+        tutils.ban_user(self.lanny, reason='bad reason', duration='1m')
+        tutils.ban_user(self.lanny, reason='good reason', duration='2m')
+        tutils.ban_user(self.lanny, reason='shit reason', duration='1m 5s')
 
         self.assertEqual(self.lanny.get_ban_reason(), 'good reason')
 
     def test_get_longest_ban_multi_bans(self):
-        short_ban = test_utils.ban_user(self.lanny, duration='1m')
-        long_ban = test_utils.ban_user(self.lanny, duration='2m')
-        mid_ban = test_utils.ban_user(self.lanny, duration='1m 5s')
+        short_ban = tutils.ban_user(self.lanny, duration='1m')
+        long_ban = tutils.ban_user(self.lanny, duration='2m')
+        mid_ban = tutils.ban_user(self.lanny, duration='1m 5s')
 
         self.assertEqual(self.lanny.get_longest_ban(), long_ban)
 
     def test_get_longest_ban_infinite(self):
-        short_ban = test_utils.ban_user(self.lanny, duration='1m')
-        inf_ban = test_utils.ban_user(self.lanny, duration=None)
+        short_ban = tutils.ban_user(self.lanny, duration='1m')
+        inf_ban = tutils.ban_user(self.lanny, duration=None)
 
         self.assertEqual(self.lanny.get_longest_ban(), inf_ban)
 
@@ -116,19 +116,19 @@ class PosterTestCase(test_utils.ForumConfigTestCase):
         self.assertEqual(self.lanny.get_user_title(), 'Novice')
 
     def test_get_user_title_some_posts(self):
-        test_utils.create_posts(self.lanny, 3)
+        tutils.create_posts(self.lanny, 3)
         self.assertEqual(self.lanny.get_user_title(), 'Acolyte')
 
     def test_get_user_title_many_posts(self):
-        test_utils.create_posts(self.lanny, 5)
+        tutils.create_posts(self.lanny, 5)
         self.assertEqual(self.lanny.get_user_title(), 'Regular')
 
     def test_get_user_title_banned(self):
-        test_utils.ban_user(self.lanny, duration=None)
+        tutils.ban_user(self.lanny, duration=None)
         self.assertEqual(self.lanny.get_user_title(), 'Novice (banned)')
 
     def test_get_user_title_inf_ban(self):
-        test_utils.ban_user(self.lanny, duration='1m')
+        tutils.ban_user(self.lanny, duration='1m')
         self.assertEqual(self.lanny.get_user_title(), 'Novice (banned)')
 
     def test_get_user_title_inactive(self):
@@ -136,14 +136,14 @@ class PosterTestCase(test_utils.ForumConfigTestCase):
         self.lanny.invalidate_user_title_cache()
         self.assertEqual(self.lanny.get_user_title(), 'Novice (banned)')
 
-class PostTestCase(test_utils.ForumConfigTestCase):
+class PostTestCase(tutils.ForumConfigTestCase):
     forum_config = {
         'ninja_edit_grace_time': 120
     }
 
     def setUp2(self):
-        test_utils.create_std_forums()
-        self.rikimaru = test_utils.create_user(thread_count=1, post_count=0)
+        tutils.create_std_forums()
+        self.rikimaru = tutils.create_user(thread_count=1, post_count=0)
         self.post = self.rikimaru.post_set.all()[0]
         self.post.created = self.post.created - timedelta(days=4)
         self.post.has_been_edited = True
@@ -165,14 +165,14 @@ class PostTestCase(test_utils.ForumConfigTestCase):
         self.assertTrue(self.post.show_edit_line())
 
     def test_suepruser_can_edit(self):
-        superuser = test_utils.create_user(acgs=('SUPERUSERS',))
+        superuser = tutils.create_user(acgs=('SUPERUSERS',))
         self.assertTrue(self.post.can_be_edited_by(superuser))
 
     def test_author_can_edit(self):
         self.assertTrue(self.post.can_be_edited_by(self.rikimaru))
 
     def test_non_author_cant_edit(self):
-        non_author = test_utils.create_user()
+        non_author = tutils.create_user()
         self.assertFalse(self.post.can_be_edited_by(non_author))
 
 class PosterUsernameNormalizationTestCase(SimpleTestCase):
@@ -201,10 +201,10 @@ class PosterUsernameNormalizationTestCase(SimpleTestCase):
 
 class SubscriptionTestCase(TestCase):
     def setUp(self):
-        test_utils.create_std_forums()
+        tutils.create_std_forums()
 
-        self.tu_1 = test_utils.create_user(thread_count=1)
-        self.tu_2 = test_utils.create_user()
+        self.tu_1 = tutils.create_user(thread_count=1)
+        self.tu_2 = tutils.create_user()
 
         self.thread = Thread.objects.filter(author=self.tu_1)[0]
         self.thread.subscribe(self.tu_1)
@@ -263,9 +263,9 @@ class SubscriptionTestCase(TestCase):
 
 class ACLTestCase(TestCase):
     def setUp(self):
-        self.tu_1 = test_utils.create_user()
-        self.tu_2 = test_utils.create_user()
-        self.tu_3 = test_utils.create_user()
+        self.tu_1 = tutils.create_user()
+        self.tu_2 = tutils.create_user()
+        self.tu_3 = tutils.create_user()
 
         self.pacl = AccessControlList(name="PERM_ACL", allow_by_default=True)
         self.pacl.save()

@@ -12,15 +12,15 @@ from django.utils import timezone
 
 from ISS.models import *
 from ISS import utils
-import test_utils
+import tutils
 
-class GeneralViewTestCase(test_utils.ForumConfigTestCase):
+class GeneralViewTestCase(tutils.ForumConfigTestCase):
     forum_config = {'captcha_period': 0}
 
     def setUp2(self):
-        test_utils.create_std_forums()
+        tutils.create_std_forums()
 
-        self.scrub = test_utils.create_user(thread_count=5, post_count=10)
+        self.scrub = tutils.create_user(thread_count=5, post_count=10)
         self.scrub.auto_subscribe = 1
         self.scrub.save()
 
@@ -151,15 +151,15 @@ class GeneralViewTestCase(test_utils.ForumConfigTestCase):
 
         self.assertTrue(found_trash_rule)
 
-class EditPostTestCase(test_utils.ForumConfigTestCase):
+class EditPostTestCase(tutils.ForumConfigTestCase):
     forum_config = {
         'captcha_period': 0,
         'max_post_chars': 600
     }
 
     def setUp2(self):
-        test_utils.create_std_forums()
-        self.scrub = test_utils.create_user(thread_count=1, post_count=0)
+        tutils.create_std_forums()
+        self.scrub = tutils.create_user(thread_count=1, post_count=0)
         self.scrub_client = Client()
         self.scrub_client.force_login(self.scrub)
 
@@ -211,7 +211,7 @@ class EditPostTestCase(test_utils.ForumConfigTestCase):
 
     def test_non_author_cant_edit(self):
         # URL manipulation is about the extent of his abilities, it's true
-        spectral = test_utils.create_user(thread_count=0, post_count=0)
+        spectral = tutils.create_user(thread_count=0, post_count=0)
         spec_client = Client()
         spec_client.force_login(spectral)
 
@@ -229,11 +229,11 @@ class ThanksViewTestCase(TestCase):
     def setUp(self):
         self.limit = utils.get_config()['initial_account_period_total'] = 3
 
-        test_utils.create_std_forums()
+        tutils.create_std_forums()
 
-        self.thankee = test_utils.create_user(thread_count=1, post_count=4)
-        self.thanker = test_utils.create_user(post_count=4)
-        self.noob_thanker = test_utils.create_user(post_count=1)
+        self.thankee = tutils.create_user(thread_count=1, post_count=4)
+        self.thanker = tutils.create_user(post_count=4)
+        self.noob_thanker = tutils.create_user(post_count=1)
 
         self.thanker_client = Client()
         self.thanker_client.force_login(self.thanker)
@@ -260,15 +260,15 @@ class ThanksViewTestCase(TestCase):
         resp = self.noob_thanker_client.post(self.url)
         self.assertEqual(self.thankee.thanks_received.count(), 0)
 
-class PostFloodControlTestCase(test_utils.ForumConfigTestCase):
+class PostFloodControlTestCase(tutils.ForumConfigTestCase):
     forum_config = {
         'initial_account_period_total': 10,
         'initial_account_period_limit': 5
     }
 
     def setUp2(self):
-        test_utils.create_std_forums()
-        self.scrub = test_utils.create_user(thread_count=1, post_count=0)
+        tutils.create_std_forums()
+        self.scrub = tutils.create_user(thread_count=1, post_count=0)
         self.thread = Thread.objects.get(author=self.scrub)
         self.scrub_client = Client()
         self.scrub_client.force_login(self.scrub)
@@ -290,12 +290,12 @@ class PostFloodControlTestCase(test_utils.ForumConfigTestCase):
         self.assertEqual(self._attempt_new_post(), 1)
 
     def test_initial_account_period_violation(self):
-        test_utils.create_posts(self.scrub, self.limit, bulk=True)
+        tutils.create_posts(self.scrub, self.limit, bulk=True)
         # Post should be rejected
         self.assertEqual(self._attempt_new_post(), 0)
 
     def test_initial_account_period_violation_cooldown(self):
-        test_utils.create_posts(self.scrub, self.limit, bulk=True)
+        tutils.create_posts(self.scrub, self.limit, bulk=True)
         new_created = timezone.now() - utils.get_config(
                 'initial_account_period_width')
         self.scrub.post_set.update(created=new_created)
@@ -306,16 +306,16 @@ class PostFloodControlTestCase(test_utils.ForumConfigTestCase):
     def test_initial_account_period_done(self):
         # Create enough posts to get us out of the initial period
         count = utils.get_config('initial_account_period_total')
-        test_utils.create_posts(self.scrub, count + 1, bulk=True)
+        tutils.create_posts(self.scrub, count + 1, bulk=True)
 
         self.assertEqual(self._attempt_new_post(), 1)
 
 class ThreadActionTestCase(TestCase):
     def setUp(self):
-        test_utils.create_std_forums()
+        tutils.create_std_forums()
 
-        self.admin = test_utils.create_user()
-        self.scrub = test_utils.create_user(thread_count=1, post_count=10)
+        self.admin = tutils.create_user()
+        self.scrub = tutils.create_user(thread_count=1, post_count=10)
 
         self.admin.is_admin = True
         self.admin.is_staff = True
@@ -347,10 +347,10 @@ class ThreadActionTestCase(TestCase):
 
 class AdminThreadCreationForum(TestCase):
     def setUp(self):
-        test_utils.create_std_forums()
+        tutils.create_std_forums()
 
-        self.admin = test_utils.create_user()
-        self.scrub = test_utils.create_user()
+        self.admin = tutils.create_user()
+        self.scrub = tutils.create_user()
 
         self.admin.is_admin = True
         self.admin.is_staff = True
@@ -393,7 +393,7 @@ class AdminThreadCreationForum(TestCase):
 
 class PasswordResetTestCase(TestCase):
     def setUp(self):
-        self.franz = test_utils.create_user()
+        self.franz = tutils.create_user()
         self.franz.email = 'J.K@bank.gov'
         self.franz.save()
         
@@ -495,14 +495,14 @@ class PasswordResetTestCase(TestCase):
             })
         self.assertEqual(response.status_code, 404)
 
-class RegistrationTestCase(test_utils.ForumConfigTestCase):
+class RegistrationTestCase(tutils.ForumConfigTestCase):
     forum_config = {
         'recaptcha_settings': None,
         'enable_registration': True
     }
 
     def setUp2(self):
-        test_utils.create_std_forums()
+        tutils.create_std_forums()
         self.anon_client = Client()
         self.path = reverse('register')
 
@@ -520,14 +520,14 @@ class RegistrationTestCase(test_utils.ForumConfigTestCase):
 
         self.assertEqual(Poster.objects.count(), initial_user_count + 1)
 
-class RegistrationDisabledTestCase(test_utils.ForumConfigTestCase):
+class RegistrationDisabledTestCase(tutils.ForumConfigTestCase):
     forum_config = {
         'recaptcha_settings': None,
         'enable_registration': False
     }
 
     def setUp2(self):
-        test_utils.create_std_forums()
+        tutils.create_std_forums()
         self.anon_client = Client()
         self.path = reverse('register')
 
@@ -545,7 +545,7 @@ class RegistrationDisabledTestCase(test_utils.ForumConfigTestCase):
 
         self.assertEqual(Poster.objects.count(), initial_user_count)
 
-class RegistrationByInviteTestCase(test_utils.ForumConfigTestCase):
+class RegistrationByInviteTestCase(tutils.ForumConfigTestCase):
     forum_config = {
         'recaptcha_settings': None,
         'captcha_period': 0,
@@ -554,9 +554,9 @@ class RegistrationByInviteTestCase(test_utils.ForumConfigTestCase):
     }
 
     def setUp2(self):
-        test_utils.create_std_forums()
+        tutils.create_std_forums()
 
-        self.admin = test_utils.create_user()
+        self.admin = tutils.create_user()
         self.anon_client = Client()
 
         self.reg_code = RegistrationCode()
@@ -578,7 +578,7 @@ class RegistrationByInviteTestCase(test_utils.ForumConfigTestCase):
 
         self.assertEqual(Poster.objects.count(), 2)
 
-        self.reg_code = test_utils.refresh_model(self.reg_code)
+        self.reg_code = tutils.refresh_model(self.reg_code)
         self.assertFalse(self.reg_code.used_by == None)
 
     def test_unhappy_path(self):
@@ -608,7 +608,7 @@ class RegistrationByInviteTestCase(test_utils.ForumConfigTestCase):
 
         self.assertEqual(Poster.objects.count(), 2)
 
-        self.reg_code = test_utils.refresh_model(self.reg_code)
+        self.reg_code = tutils.refresh_model(self.reg_code)
         self.assertFalse(self.reg_code.used_by == None)
 
         # Now log out and try to re-register
@@ -644,15 +644,15 @@ class RegistrationByInviteTestCase(test_utils.ForumConfigTestCase):
         self.assertEqual(Poster.objects.count(), 1)
         self.assertTrue('registration_code' in response.context['form'].errors)
 
-class GenerateInviteCodeTestCase(test_utils.ForumConfigTestCase):
+class GenerateInviteCodeTestCase(tutils.ForumConfigTestCase):
     forum_config = {
         'enable_registration': False,
         'enable_invites': True
     }
 
     def setUp2(self):
-        self.don = test_utils.create_user()
-        self.scrub = test_utils.create_user()
+        self.don = tutils.create_user()
+        self.scrub = tutils.create_user()
 
         self.don_client = Client()
         self.don_client.force_login(self.don)
@@ -690,7 +690,7 @@ class LoginTestCase(TestCase):
         self.password = u'私わ大津展之です'
         self.path = reverse('login')
 
-        self.otsu = test_utils.create_user()
+        self.otsu = tutils.create_user()
         self.otsu.set_password(self.password)
         self.otsu.save()
 

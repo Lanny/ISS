@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from ISS.models import *
-from ISS.tests import test_utils
+from ISS.tests import tutils
 
 class AutoAnonymizeTestCase(TestCase):
     def setUp(self):
@@ -60,10 +60,10 @@ class AutoAnonymizeTestCase(TestCase):
 
 class AutoAnonymizeViewTestCase(TestCase):
     def setUp(self):
-        test_utils.create_std_forums()
+        tutils.create_std_forums()
 
     def test_younguns_cant_autoanonymize(self):
-        tu = test_utils.create_user(1, 151)
+        tu = tutils.create_user(1, 151)
         client = Client()
         client.force_login(tu)
         url = reverse('auto-anonymize')
@@ -72,7 +72,7 @@ class AutoAnonymizeViewTestCase(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_newbs_cant_autoanonymize(self):
-        tu = test_utils.create_user(1, 5)
+        tu = tutils.create_user(1, 5)
         tu.date_joined = timezone.now() - datetime.timedelta(days=365)
         tu.save()
 
@@ -84,7 +84,7 @@ class AutoAnonymizeViewTestCase(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_well_aged_users_can_autoanonymize(self):
-        tu = test_utils.create_user(1, 151)
+        tu = tutils.create_user(1, 151)
         tu.date_joined = timezone.now() - datetime.timedelta(days=365)
         tu.save()
 

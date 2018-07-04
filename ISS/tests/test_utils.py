@@ -1,139 +1,58 @@
-import random
+# -*- coding: utf-8 -*-
+
 from datetime import timedelta
 
-from django.test import TestCase
-from django.utils import timezone
+from ISS import utils
+import tutils
 
-from ISS.models import *
+class UtilsTestCase(tutils.ForumConfigTestCase):
+    cannonical_form_tests = (
+        ('42s', timedelta(seconds=42)),
+        ('1y 2d', timedelta(days=358)),
+        ('2w 42s', timedelta(days=14, seconds=42)),
+        ('2y 2d 2h 2m 2s', timedelta(
+            seconds=(((356*2 + 2)*24 + 2) * 60 + 2) * 60 + 2))
+    )
 
-def create_std_forums():
-    general_cat = Category(name='general')
-    general_cat.save()
+    strange_tests = (
+        ('120s', timedelta(seconds=120)),
+        ('48h', timedelta(days=2))
+    )
 
-    trash_cat = Category(name='trash cat')
-    trash_cat.save()
+    def test_cannonical_parse_duration(self):
+        for (rep, val) in self.cannonical_form_tests:
+            exp = val.total_seconds()
+            act = utils.parse_duration(rep).total_seconds()
 
-    forum = Forum(name='test forum', category=general_cat)
-    forum.save()
+            msg = 'Expected "%s" to evaluate to %d seconds, got %d.' %  (
+                rep, exp, act)
 
-    trash_forum = Forum(name='trash forum',
-                             is_trash=True,
-                             category=trash_cat)
-    trash_forum.save()
+            self.assertEqual(exp, act, msg)
 
-USERS_CREATED = 0
-THREADS_CREATED = 0
+    def test_strange_parse_duration(self):
+        for (rep, val) in self.strange_tests:
+            exp = val.total_seconds()
+            act = utils.parse_duration(rep).total_seconds()
 
-def create_posts(user, count, bulk=False):
-    """
-    Create `count` posts belonging to `user`. Skips signal triggering if `bulk`
-    is True which speeds things up but may cause unexpected behavior.
-    """
-    posts = [Post(
-                author=user,
-                thread=random.choice(Thread.objects.all()),
-                content='postum ipsum',
-                posted_from='8.8.8.8')
-            for _ in xrange(count)]
+            msg = 'Expected "%s" to evaluate to %d seconds, got %d.' %  (
+                rep, exp, act)
 
-    if bulk:
-        Post.objects.bulk_create(posts)
-    else:
-        for post in posts:
-            post.save()
+            self.assertEqual(exp, act, msg)
 
-def create_user(thread_count=0, post_count=0, acgs=()): 
-    global USERS_CREATED
-    global THREADS_CREATED
+    def test_format_duration(self):
+        for (rep, val) in self.cannonical_form_tests:
+            act = utils.format_duration(val)
+            msg = 'Expected %r to format to %r, got %r' %  (val, rep, act)
+            self.assertEqual(rep, act, msg)
 
-    USERS_CREATED += 1
-    user = Poster(username=u'TEST_USER-%d' % USERS_CREATED)
-    user.save()
-
-    for acg in acgs:
-        AccessControlGroup.get_acg(acg).members.add(user)
-
-    for _ in range(thread_count):
-        THREADS_CREATED += 1
-        destination_forum = random.choice(Forum.objects.all())
-
-        thread = Thread(
-            title='TEST_THREAD-%d' % THREADS_CREATED,
-            forum=destination_forum,
-            author=user)
-        thread.save()
-
-        op = Post(
-            author=user,
-            thread=thread,
-            content='opsum ipsum',
-            posted_from='8.8.8.4')
-        op.save()
-
-    create_posts(user, post_count)
-
-    return user
-
-def ban_user(user, duration='1m', reason='test ban', start_expired=False):
-    start_date = timezone.now()
-
-    if duration != None:
-        duration = utils.parse_duration(duration)
-        if start_expired:
-            start_date -= duration + timedelta(seconds=1)
-        end_date = start_date + duration
-    elif start_expired:
-        raise RuntimeError(
-            'It makes no sense to have an infinte duration ban but also '
-            'start expired.')
-    else:
-        end_date=None
+    def test_parse_format_parse(self):
+        for (rep, val) in self.cannonical_form_tests:
+            exp = val.total_seconds()
+            act = utils.parse_duration(
+                utils.format_duration(
+                    utils.parse_duration(rep))
+                ).total_seconds()
 
 
-    ban = Ban(
-        subject=user,
-        given_by=Poster.get_or_create_system_user(),
-        start_date=start_date,
-        end_date=end_date,
-        reason=reason)
+            self.assertEqual(exp, act)
 
-    ban.save()
-    return ban
-
-def refresh_model(model):
-    return type(model).objects.get(pk=model.pk)
-
-class ForumConfigTestCase(TestCase):
-    _stored_values = {}
-    _setup_called = False
-    forum_config = {}
-
-    def setUp(self):
-        if self._setup_called:
-            raise Exception('tearDown wasn\'t called. tearDown most likely '
-                            'errantly overridden')
-        self._setup_called = True
-
-        for key in self.forum_config:
-            self._stored_values[key] = utils.get_config()[key]
-            utils.get_config()[key] = self.forum_config[key]
-
-
-        self.setUp2()
-
-    def setUp2(self):
-        pass
-
-    def tearDown(self):
-        if not self._setup_called:
-            raise Exception('setUp wasn\'t called. setUp most likely '
-                            'errantly overridden')
-        self.setup_called = False
-
-        for key in self._stored_values:
-            utils.get_config()[key] = self._stored_values[key] 
-
-        self.tearDown2()
-
-    def tearDown2(self):
-        pass

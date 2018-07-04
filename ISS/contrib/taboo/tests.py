@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from ISS import utils as iss_utils
 from ISS import models as iss_models
-from ISS.tests import test_utils
+from ISS.tests import tutils
 from ISS.contrib.taboo.models import *
 from apps import TabooConfig
 
@@ -16,10 +16,10 @@ iss_utils.get_ext_config(EXT)['min_age_to_reg'] = datetime.timedelta(days=0)
 
 class TabooModelsTest(TestCase):
     def setUp(self):
-        test_utils.create_std_forums()
+        tutils.create_std_forums()
 
-        self.mark = test_utils.create_user(thread_count=1)
-        self.assassin = test_utils.create_user()
+        self.mark = tutils.create_user(thread_count=1)
+        self.assassin = tutils.create_user()
 
         self.profile = TabooProfile.objects.create(
             poster=self.assassin,
@@ -101,13 +101,13 @@ class TabooModelsTest(TestCase):
 
 class TabooViewTest(TestCase):
     def setUp(self):
-        test_utils.create_std_forums()
+        tutils.create_std_forums()
 
-        self.tu_1 = test_utils.create_user(thread_count=1)
+        self.tu_1 = tutils.create_user(thread_count=1)
         self.tu_1_client = Client()
         self.tu_1_client.force_login(self.tu_1)
         
-        self.tu_2 = test_utils.create_user()
+        self.tu_2 = tutils.create_user()
         self.tu_2_client = Client()
         self.tu_2_client.force_login(self.tu_2)
 
@@ -146,7 +146,7 @@ class TabooViewTest(TestCase):
         self.assertEqual(self.tu_2.taboo_profile.mark.pk, self.tu_1.pk)
 
     def test_unregister(self):
-        self.tu_3 = test_utils.create_user()
+        self.tu_3 = tutils.create_user()
 
         tu_3_profile = TabooProfile.objects.create(
             poster=self.tu_3,
