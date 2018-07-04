@@ -18,7 +18,7 @@ before_script:
 
 script:
   - python manage.py migrate
-  - python manage.py test ISS.tests
+  - python manage.py test
 
 notifications:
   email:
