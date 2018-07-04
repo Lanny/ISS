@@ -6,8 +6,16 @@ from ISS.models import *
 
 import test_utils
 
-class PosterTestCase(TestCase):
-    def setUp(self):
+class PosterTestCase(test_utils.ForumConfigTestCase):
+    forum_config = {
+        'title_ladder': (
+            (5, 'Regular'),
+            (3, 'Acolyte'),
+            (0, 'Novice')
+        )
+    }
+
+    def setUp2(self):
         self.lanny = Poster(username='Lanny')
         self.feallen = Poster(username='F.E. Allen')
         self.don_knuth = Poster(username='Donald Knuth')
@@ -30,6 +38,8 @@ class PosterTestCase(TestCase):
             content ='foo bar',
             thread = self.thread)
         self.post.save()
+
+        self.lanny.invalidate_user_title_cache()
 
     def test_poster_get_alts(self):
         Post.objects.create(
@@ -101,6 +111,30 @@ class PosterTestCase(TestCase):
 
     def test_get_longest_ban_no_bans(self):
         self.assertEqual(self.lanny.get_longest_ban(), None)
+
+    def test_get_user_title_no_posts(self):
+        self.assertEqual(self.lanny.get_user_title(), 'Novice')
+
+    def test_get_user_title_some_posts(self):
+        test_utils.create_posts(self.lanny, 3)
+        self.assertEqual(self.lanny.get_user_title(), 'Acolyte')
+
+    def test_get_user_title_many_posts(self):
+        test_utils.create_posts(self.lanny, 5)
+        self.assertEqual(self.lanny.get_user_title(), 'Regular')
+
+    def test_get_user_title_banned(self):
+        test_utils.ban_user(self.lanny, duration=None)
+        self.assertEqual(self.lanny.get_user_title(), 'Novice (banned)')
+
+    def test_get_user_title_inf_ban(self):
+        test_utils.ban_user(self.lanny, duration='1m')
+        self.assertEqual(self.lanny.get_user_title(), 'Novice (banned)')
+
+    def test_get_user_title_inactive(self):
+        self.lanny.is_active = False
+        self.lanny.invalidate_user_title_cache()
+        self.assertEqual(self.lanny.get_user_title(), 'Novice (banned)')
 
 class PostTestCase(test_utils.ForumConfigTestCase):
     forum_config = {
