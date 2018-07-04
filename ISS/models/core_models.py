@@ -6,6 +6,7 @@ from django.contrib import auth
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db import models, IntegrityError, transaction
+from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import timezone
 
@@ -144,7 +145,17 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
             .count())
 
     def get_pending_bans(self):
-       return Ban.objects.filter(subject=self, end_date__gt=timezone.now())
+        subject_query = Q(subject=self)
+        active_query = Q(end_date__gt=timezone.now()) | Q(end_date__isnull=True)
+        return Ban.objects.filter(subject_query & active_query)
+
+    def get_longest_ban(self):
+       sorted_bans = self.get_pending_bans().order_by('-end_date')
+
+       if len(sorted_bans):
+           return sorted_bans[0]
+       else:
+           return None
 
     def is_banned(self):
         if not self.is_active:
@@ -157,9 +168,8 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         return False
 
     def get_ban_reason(self):
-        pending_bans = self.get_pending_bans().order_by('-end_date')
-
-        return pending_bans[0].reason
+        ban = self.get_longest_ban()
+        return ban.reason if ban else 'Not Banned (you should never see this)'
 
     def can_report(self):
         return self.has_report_privilege

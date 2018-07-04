@@ -66,6 +66,12 @@ class Ban(models.Model):
 
         return self.end_date - self.start_date
 
+    def get_remaining_duration(self):
+        if not self.end_date:
+            return None
+
+        return max(self.end_date - timezone.now(), 0)
+
     def __unicode__(self):
         return u'Ban on %s for reason: %s' % (
             self.subject.username, self.reason)

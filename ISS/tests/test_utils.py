@@ -1,6 +1,8 @@
 import random
+from datetime import timedelta
 
 from django.test import TestCase
+from django.utils import timezone
 
 from ISS.models import *
 
@@ -71,6 +73,32 @@ def create_user(thread_count=0, post_count=0, acgs=()):
     create_posts(user, post_count)
 
     return user
+
+def ban_user(user, duration='1m', reason='test ban', start_expired=False):
+    start_date = timezone.now()
+
+    if duration != None:
+        duration = utils.parse_duration(duration)
+        if start_expired:
+            start_date -= duration + timedelta(seconds=1)
+        end_date = start_date + duration
+    elif start_expired:
+        raise RuntimeError(
+            'It makes no sense to have an infinte duration ban but also '
+            'start expired.')
+    else:
+        end_date=None
+
+
+    ban = Ban(
+        subject=user,
+        given_by=Poster.get_or_create_system_user(),
+        start_date=start_date,
+        end_date=end_date,
+        reason=reason)
+
+    ban.save()
+    return ban
 
 def refresh_model(model):
     return type(model).objects.get(pk=model.pk)

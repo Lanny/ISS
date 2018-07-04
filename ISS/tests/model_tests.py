@@ -64,6 +64,44 @@ class PosterTestCase(TestCase):
         self.assertEqual(dons_alts[0]['poster'].pk, self.lanny.pk)
         self.assertEqual(dons_alts[0]['addr'], '8.8.8.4')
 
+    def test_is_banned_positive(self):
+        test_utils.ban_user(self.lanny)
+        self.assertTrue(self.lanny.is_banned())
+
+    def test_is_banned_infinite(self):
+        test_utils.ban_user(self.lanny, duration=None)
+        self.assertTrue(self.lanny.is_banned())
+
+    def test_is_banned_negative(self):
+        self.assertFalse(self.lanny.is_banned())
+
+    def test_is_banned_expired(self):
+        test_utils.ban_user(self.lanny, start_expired=True)
+        self.assertFalse(self.lanny.is_banned())
+
+    def test_get_ban_reason(self):
+        test_utils.ban_user(self.lanny, reason='bad reason', duration='1m')
+        test_utils.ban_user(self.lanny, reason='good reason', duration='2m')
+        test_utils.ban_user(self.lanny, reason='shit reason', duration='1m 5s')
+
+        self.assertEqual(self.lanny.get_ban_reason(), 'good reason')
+
+    def test_get_longest_ban_multi_bans(self):
+        short_ban = test_utils.ban_user(self.lanny, duration='1m')
+        long_ban = test_utils.ban_user(self.lanny, duration='2m')
+        mid_ban = test_utils.ban_user(self.lanny, duration='1m 5s')
+
+        self.assertEqual(self.lanny.get_longest_ban(), long_ban)
+
+    def test_get_longest_ban_infinite(self):
+        short_ban = test_utils.ban_user(self.lanny, duration='1m')
+        inf_ban = test_utils.ban_user(self.lanny, duration=None)
+
+        self.assertEqual(self.lanny.get_longest_ban(), inf_ban)
+
+    def test_get_longest_ban_no_bans(self):
+        self.assertEqual(self.lanny.get_longest_ban(), None)
+
 class PostTestCase(test_utils.ForumConfigTestCase):
     forum_config = {
         'ninja_edit_grace_time': 120
