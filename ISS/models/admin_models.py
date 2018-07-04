@@ -1,6 +1,7 @@
 import re
 import uuid
 import pytz
+from datetime import timedelta
 
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
@@ -70,7 +71,7 @@ class Ban(models.Model):
         if not self.end_date:
             return None
 
-        return max(self.end_date - timezone.now(), 0)
+        return max(self.end_date - timezone.now(), timedelta(seconds=0))
 
     def __unicode__(self):
         return u'Ban on %s for reason: %s' % (

@@ -118,6 +118,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         if cached_value:
             return cached_value
 
+        cache_duration = 60*30
         if self.custom_user_title:
             title = self.custom_user_title
         else:
@@ -132,7 +133,19 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         if self.is_banned():
             title += ' (banned)'
 
-        cache.set(cache_key, title, 60*30)
+            ban = self.get_longest_ban()
+            if ban:
+                remaining = ban.get_remaining_duration()
+
+                if remaining:
+                    cache_duration = int(remaining.total_seconds())
+                else:
+                    # User is perma-banned, cache long-term
+                    cache_duration = 60*60*24*7
+            else:
+                cache_duration = 60*60*24*7
+
+        cache.set(cache_key, title, cache_duration)
         return title
 
     def get_nojs(self):
