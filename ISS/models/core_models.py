@@ -294,6 +294,7 @@ class Forum(models.Model):
     priority = models.IntegerField(default=0, null=False)
     last_update = models.DateTimeField(default=timezone.now)
     is_trash = models.BooleanField(default=False)
+    include_in_lastest_threads = models.BooleanField(default=True, null=False)
 
     create_thread_pack = models.ForeignKey(
         AuthPackage,

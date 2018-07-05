@@ -67,3 +67,11 @@ class StaticPageAdmin(admin.ModelAdmin):
 
     def short_content(self, obj):
         return obj.content[:200]
+
+@admin.register(LatestThreadsForumPreference)
+class LatestThreadsForumPreferenceAdmin(admin.ModelAdmin):
+    list_display = ('name', 'poster', 'forum', 'include')
+
+    def name(self, obj):
+        return unicode(obj)
+

@@ -7,7 +7,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
-from django.db.models import Count, Max, F
+from django.db.models import Count, Max, F, Q
 from django.http import (HttpResponseRedirect, HttpResponseBadRequest,
     JsonResponse, HttpResponseForbidden, HttpResponse)
 from django.shortcuts import render, get_object_or_404
@@ -251,9 +251,31 @@ def posts_thanked(request, user_id):
 
 @cache_control(no_cache=True, max_age=0, must_revalidate=True, no_store=True)
 def latest_threads(request):
+    effective_prefs = {}
+    trash_forums = []
+
+    for forum in Forum.objects.all():
+        effective_prefs[forum.pk] = forum.include_in_lastest_threads 
+        if forum.is_trash: trash_forums.append(forum.pk)
+
+    if request.user.is_authenticated():
+        prefs = LatestThreadsForumPreference.objects.filter(poster=request.user)
+        for pref in prefs:
+            effective_prefs[pref.forum_id] = pref.include
+
+    for fpk in trash_forums:
+        effective_prefs[fpk] = False
+
+
+    print effective_prefs
+    excluded_forums = [
+        fpk for fpk, include in effective_prefs.items() if not include]
+    print excluded_forums
+
     threads = (Thread.objects.all()
-        .filter(forum__is_trash=False)
+        .filter(~Q(forum_id__in=excluded_forums))
         .order_by('-last_update'))
+
     threads_per_page = utils.get_config('threads_per_forum_page')
     paginator = utils.MappingPaginator(threads, threads_per_page)
 
