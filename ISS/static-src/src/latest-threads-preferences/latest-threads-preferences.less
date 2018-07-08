@@ -1,0 +1,36 @@
+@import "../base/config.less";
+
+.update-latest-threads-preferences {
+  form {
+    .standard-form();
+
+    .errorlist {
+      width: 100%;
+    }
+
+    .forum-choices {
+      .-display-flex();
+      flex-wrap: wrap;
+
+      p {
+        .-display-flex();
+        .-flex-direction(row-reverse);
+        align-items: center;
+        min-width: 250px;
+        padding-right: 10px;
+
+        input {
+          flex-shrink: 1;
+          width: auto;
+          margin: 0 5px 0 0;
+        }
+
+        label {
+          .-flex(1);
+          margin: 0;
+        }
+      }
+    }
+  }
+}
+

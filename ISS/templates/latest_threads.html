@@ -14,7 +14,11 @@
     <div class="forum-intro">
       <h1 class="forum-title">Latest Threads</h1>
       <span class="forum-description">
-        Threads from every forum, sorted by last reply.
+        Threads from every forum, sorted by last reply. You can control which
+        forums contribute threads to this list from your 
+        <a href="{% url 'latest-threads-preferences' %}">
+          latest threads settings
+        </a>.
       </span>
     </div>
 
@@ -23,5 +27,6 @@
     {% include 'thread_list.html' with threads=threads %}
 
     {% include "page_list.html" with page=threads %}
+
   </div>
 {% endblock %}

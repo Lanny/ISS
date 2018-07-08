@@ -1,3 +1,4 @@
+import re
 import json
 import pytz
 import urllib
@@ -253,6 +254,51 @@ class ThreadActionForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(ThreadActionForm, self).__init__(*args, **kwargs)
         self.fields['action'] = self._get_action_field()
+
+class LatestThreadsPreferencesForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        poster = kwargs.pop('poster', None)
+        kwargs['label_suffix'] = ''
+        super(LatestThreadsPreferencesForm, self).__init__(*args, **kwargs)
+
+        initial = (LatestThreadsForumPreference
+            .get_effective_preferences(poster))
+
+        for forum in Forum.objects.filter(is_trash=False):
+            self.fields['forum-%d' % forum.pk] = forms.BooleanField(
+                label=forum.name,
+                required=False,
+                initial=initial[forum.pk])
+
+    @classmethod
+    def _get_fpk(cls, field_name):
+        match = re.match(r'^forum-(\d+)$', field_name)
+        return int(match.group(1)) if match else None
+
+    def get_effective_preferences(self):
+        effective_prefs = {}
+
+        for field_name in self.fields:
+            fpk = self._get_fpk(field_name)
+            if not fpk: continue
+            effective_prefs[fpk] = self.cleaned_data[field_name]
+
+        return effective_prefs
+
+    def clean(self, *args, **kwargs):
+        super(LatestThreadsPreferencesForm, self).clean(*args, **kwargs)
+
+        for field_name in self.cleaned_data:
+            fpk = self._get_fpk(field_name)
+            try:
+                forum = Forum.objects.get(pk=fpk, is_trash=False)
+            except Forum.DoesNotExist, e:
+                raise ValidationError(
+                    'Invalid fourm ID: %r' % fpk,
+                    code='DUPE')
+
+        return self.cleaned_data
+
 
 class ISSAuthenticationForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):

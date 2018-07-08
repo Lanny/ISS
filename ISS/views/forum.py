@@ -251,26 +251,12 @@ def posts_thanked(request, user_id):
 
 @cache_control(no_cache=True, max_age=0, must_revalidate=True, no_store=True)
 def latest_threads(request):
-    effective_prefs = {}
-    trash_forums = []
+    effective_prefs = (LatestThreadsForumPreference
+            .get_effective_preferences(
+                request.user if request.user.is_authenticated() else None))
 
-    for forum in Forum.objects.all():
-        effective_prefs[forum.pk] = forum.include_in_lastest_threads 
-        if forum.is_trash: trash_forums.append(forum.pk)
-
-    if request.user.is_authenticated():
-        prefs = LatestThreadsForumPreference.objects.filter(poster=request.user)
-        for pref in prefs:
-            effective_prefs[pref.forum_id] = pref.include
-
-    for fpk in trash_forums:
-        effective_prefs[fpk] = False
-
-
-    print effective_prefs
     excluded_forums = [
         fpk for fpk, include in effective_prefs.items() if not include]
-    print excluded_forums
 
     threads = (Thread.objects.all()
         .filter(~Q(forum_id__in=excluded_forums))
@@ -289,6 +275,49 @@ def latest_threads(request):
     }
 
     return render(request, 'latest_threads.html', ctx)
+
+
+class UpdateLatestThreadsPreferences(utils.MethodSplitView):
+    login_required = True
+
+    def GET(self, request):
+        form = forms.LatestThreadsPreferencesForm(poster=request.user)
+        ctx = { 'form': form }
+        return render(request, 'update_latest_threads_preferences.html', ctx)
+
+    def POST(self, request):
+        form = forms.LatestThreadsPreferencesForm(request.POST)
+
+        if form.is_valid():
+            old_prefs = (LatestThreadsForumPreference
+                .get_effective_preferences(poster=request.user))
+            new_prefs = form.get_effective_preferences()
+            diff_keys = []
+
+            for fpk, new_pref in new_prefs.items():
+                if new_pref != old_prefs[fpk]:
+                    diff_keys.append(fpk)
+
+            for fpk in diff_keys:
+                pref, created = (LatestThreadsForumPreference
+                    .objects
+                    .get_or_create(
+                        poster=request.user,
+                        forum_id=fpk,
+                        defaults={'include': new_prefs[fpk]}))
+
+                if not created:
+                    pref.include = new_prefs[fpk]
+                    pref.save()
+
+            return HttpResponseRedirect(reverse('latest-threads'))
+
+        else:
+            ctx = { 'form': form }
+            return render(
+                request,
+                'update_latest_threads_preferences.html',
+                ctx)
 
 @login_required
 @cache_control(no_cache=True, max_age=0, must_revalidate=True, no_store=True)

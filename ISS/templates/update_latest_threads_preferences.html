@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block page_name %}
+Update Latest Thread Preferences
+{% endblock %}
+
+{% block breadcrumb %}
+  &gt; <a href="{% url 'latest-threads' %}">Latest Threads</a>
+  &gt; <a href="">Update Latest Thread Preferences</a>
+{% endblock %}
+
+{% block content %}
+  <div class="update-latest-threads-preferences">
+
+    <form method="POST" action="{% url 'latest-threads-preferences' %}">
+      <h1>
+        Update Latest Threads Peeferences
+      </h1>
+      <fieldset>
+        {% csrf_token %}
+        <p>
+          Check a forum to see the most recently active threads in that forum in your Latest Threads list. Uncheck to exclude that forum's threads from your Latest Threads. Choices here have no effect on your Subscriptions or ability to post in a forum.
+        </p>
+
+        <div class="forum-choices">
+          {{ form.as_p }}
+        </div>
+
+        <input type="submit" value="Submit" />
+      </fieldset>
+     </form>
+   </div>
+{% endblock %}
+

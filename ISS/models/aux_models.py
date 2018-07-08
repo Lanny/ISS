@@ -16,5 +16,34 @@ class LatestThreadsForumPreference(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    @classmethod
+    def get_poster_preferences(cls, poster):
+        poster_prefs = {}
+
+        prefs = LatestThreadsForumPreference.objects.filter(poster=poster)
+        for pref in prefs:
+            poster_prefs[pref.forum_id] = pref.include
+
+        return poster_prefs
+
+    @classmethod
+    def get_effective_preferences(cls, poster=None):
+        effective_prefs = {}
+        trash_forums = []
+
+        for forum in Forum.objects.all():
+            effective_prefs[forum.pk] = forum.include_in_lastest_threads 
+            if forum.is_trash: trash_forums.append(forum.pk)
+
+        if poster:
+            poster_prefs = cls.get_poster_preferences(poster)
+            for fpk, include in poster_prefs.items():
+                effective_prefs[fpk] = include
+
+        for fpk in trash_forums:
+            effective_prefs[fpk] = False
+
+        return effective_prefs
+
     def __unicode__(self):
         return u'%s to %s' % (self.poster, self.forum)
