@@ -163,7 +163,7 @@ class ThreadActions(utils.MethodSplitView):
         return HttpResponseRedirect(target)
 
 class UnsubscribeFromThread(utils.MethodSplitView):
-    login_required = True
+    require_login = True
 
     def POST(self, request, thread_id):
         thread = get_object_or_404(Thread, pk=thread_id)
@@ -278,7 +278,7 @@ def latest_threads(request):
 
 
 class UpdateLatestThreadsPreferences(utils.MethodSplitView):
-    login_required = True
+    require_login = True
 
     def GET(self, request):
         form = forms.LatestThreadsPreferencesForm(poster=request.user)
@@ -475,7 +475,7 @@ class UserProfile(utils.MethodSplitView):
         
 
 class NewThread(utils.MethodSplitView):
-    login_required = True
+    require_login = True
     unbanned_required = True
 
     def _get_form(self, request):
@@ -520,7 +520,7 @@ class NewThread(utils.MethodSplitView):
             return render(request, 'new_thread.html', ctx)
 
 class NewReply(utils.MethodSplitView):
-    login_required = True
+    require_login = True
     unbanned_required = True
 
     def _get_form(self, request):
@@ -575,7 +575,7 @@ class NewReply(utils.MethodSplitView):
             return render(request, 'new_post.html', ctx)
 
 class PreviewPost(utils.MethodSplitView):
-    login_required = True
+    require_login = True
 
     def POST(self, request, action):
         struct_form = forms.StructuralPreviewPostForm(request.POST)
