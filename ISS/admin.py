@@ -37,6 +37,10 @@ class PostAdmin(admin.ModelAdmin):
     def short_content(self, obj):
         return obj.content[:200]
 
+    def get_readonly_fields(self, request, obj=None):
+        return self.readonly_fields + ('thread', 'author')
+    
+
 @admin.register(PrivateMessage)
 class PrivateMessageAdmin(admin.ModelAdmin):
     list_display = ('subject', 'sender', 'receiver', 'created')
