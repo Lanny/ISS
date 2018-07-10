@@ -1,67 +1,56 @@
 import SocketServer
+import threading
+import time
 
 from django.core.management.base import BaseCommand, CommandError
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
-class TIException(Exception):
-    handled = False
+from ISS.contrib.telnet_interface import server
 
-    def __init__(self, *args, **kwargs):
-        self.handled = kwargs.pop('handled', False)
-        super(TIException, self).__init__(self, *args, **kwargs)
+class FileModifiedHandler(FileSystemEventHandler):
+    def __init__(self, server_runner):
+        super(FileModifiedHandler, self).__init__()
+        self._server_runner = server_runner
 
-class TIResponse(object):
-    message = ""
+    def on_modified(self, event):
+        if not event.src_path.endswith('.py'):
+            return
 
-    def __init__(self, message):
-        self.message = message + '\n'
+        print '%s modified, reloading server' % event.src_path
+        self._server_runner.reload()
 
-    def respond(self, request):
-        request.sendall(self.message)
+class ServerRunner(threading.Thread):
+    _server = None
+    _continue = True
 
-class TIView(object):
-    def _respond_to_line(self, req, line):
-        try:
-            response = self.respond_to_line(req, line)
-            if not isinstance(response, TIResponse):
-                raise ValueError('Responses must subclass TIResponse.')
+    def _create_server(self):
+        host, port = '0.0.0.0', 1337
 
-            response.respond(req)
+        from ISS.contrib.telnet_interface import server
+        server = reload(server)
+        from ISS.contrib.telnet_interface import server
+        self._server = SocketServer.TCPServer((host, port), server.TIRequestHandler)
 
-        except TIException as e:
-            req.sendall(e.message + '\n')
+        print 'Starting telnet server on %s:%d' % (host, port)
+        self._server.serve_forever()
 
-    def respond_to_line(self, req, line):
-        raise NotImplemented()
+    def reload(self):
+        self.shutdown()
 
-class TICommandView(TIView):
-    def _parse_line(self, line):
-        parts = line.split(' ')
-        return parts
+    def stop(self):
+        self._continue = False
+        self.shutdown()
 
-    def respond_to_line(self, req, line):
-        parts = self._parse_line(line)
-        cmd = parts[0]
-        params = parts[1:]
-        handler = getattr(self, 'handle_' + cmd.lower(), None)
+    def shutdown(self):
+        print 'Shutting down server...'
+        self._server.shutdown()
 
-        if not handler:
-            raise TIException('Command not recognized: %s' % cmd)
-
-        return handler(req, params)
-
-class TILatestThreadsView(TICommandView):
-    def handle_echo(self, req, params):
-        return TIResponse('You said: %s\n' % ' '.join(params))
-
-class TIRequestHandler(SocketServer.StreamRequestHandler):
-    def setup(self):
-        SocketServer.StreamRequestHandler.setup(self)
-        self._view = TILatestThreadsView()
-
-    def handle(self):
-        while 1:
-            line = self.rfile.readline().strip()
-            self._view._respond_to_line(self.request, line)
+    def run(self):
+        while self._continue:
+            self._create_server()
+            self._server.server_close()
+            print 'Server closed.'
 
 class Command(BaseCommand):
     help = 'Runs the Telnet interface with automatic reloading.'
@@ -70,7 +59,27 @@ class Command(BaseCommand):
         pass
 
     def handle(self, **kwargs):
-        host, port = '0.0.0.0', 1337
-        server = SocketServer.TCPServer((host, port), TIRequestHandler)
-        print 'Starting telnet server on %s:%d' % (host, port)
-        server.serve_forever()
+        server_runner = ServerRunner()
+        fs_event_handler = FileModifiedHandler(server_runner)
+
+        path = 'ISS/contrib/telnet_interface'
+        observer = Observer()
+        observer.schedule(fs_event_handler, path, recursive=True)
+        observer.start()
+
+        server_runner.start()
+
+        try:
+            while True:
+                time.sleep(1)
+        except (KeyboardInterrupt, Exception):
+            observer.stop()
+            server_runner.stop()
+
+        print 'Waiting for Watchdog thread to conclude...'
+        observer.join()
+        print 'done.'
+
+        print 'Waiting for server runner thread to conclude...'
+        server_runner.join()
+        print 'done. Script complete.'
