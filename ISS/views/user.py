@@ -120,7 +120,7 @@ class RegisterUser(utils.MethodSplitView):
 
             if utils.get_config('enable_invites'):
                 url = reverse('register-with-code')
-                message += (' If you have a regsitration code, you may use it '
+                message += (' If you have a registration code, you may use it '
                             'by clicking [url="%s"]here[/url].') % url
 
             return render(request, 'generic_message.html', {
