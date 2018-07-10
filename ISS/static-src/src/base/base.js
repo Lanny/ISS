@@ -2,6 +2,7 @@
 
   function wrap($, config, bbcode, paginator, hyperDrive) {
     function peek() {
+      return;
       var peekaboo = $('.peekaboo').first()
         .css('display', 'block');
 
@@ -20,7 +21,7 @@
       bbcode.bindRegion($('.page-content'));
       paginator.bindKeyboardControls();
 
-      window.setTimeout(peek, Math.random()*1000*60*60);
+      //window.setTimeout(peek, Math.random()*1000*60*60);
 
       if ($('.g-recaptcha').length > 0) {
         $(document.documentElement).append(
