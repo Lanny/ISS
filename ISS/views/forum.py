@@ -343,6 +343,14 @@ def usercp(request):
 
     return render(request, 'user_cp.html', ctx)
 
+@login_required
+class MarkSubsriptionsRead(utils.MethodSplitView):
+    require_login = True
+
+    def POST(self, request):
+        request.user.threadflag_set.update(last_read_date=timezone.now())
+        return HttpResponseRedirect(reverse('usercp'))
+
 def user_list(request):
     posters = Poster.objects.all().order_by('username')
     posters_per_page = 20
