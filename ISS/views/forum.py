@@ -347,7 +347,11 @@ class MarkSubsriptionsRead(utils.MethodSplitView):
     require_login = True
 
     def POST(self, request):
-        request.user.threadflag_set.update(last_read_date=timezone.now())
+        (request
+            .user
+            .threadflag_set
+            .filter(subscribed=True)
+            .update(last_read_date=timezone.now()))
         return HttpResponseRedirect(reverse('usercp'))
 
 @login_required
