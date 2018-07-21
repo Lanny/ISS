@@ -33,8 +33,35 @@
       }
 
       &.current-page {
+        position: relative;
+        border: 1px solid @bg_teal;
+
         a {
           font-weight: bold;
+        }
+
+        @media(min-width: @breakpoint) {
+          &:before {
+            border-style: solid;
+            border-color: transparent transparent @bg_teal transparent;
+            border-width: 0 0 6px 6px;
+            display: block;
+            content: ' ';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+          }
+
+          &:after {
+            border-style: solid;
+            border-color: @bg_teal transparent transparent transparent;
+            border-width: 6px 6px 0 0;
+            display: block;
+            content: ' ';
+            position: absolute;
+            top: 0;
+            left: 0;
+          }
         }
       }
 
