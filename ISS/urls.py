@@ -142,7 +142,7 @@ urlpatterns = [
         views.forum.usercp,
         name='usercp'),
     url('^usercp/mark-read$',
-        views.forum.MarkSubsriptionsRead,
+        views.forum.MarkSubsriptionsRead.as_view(),
         name='read-subscriptions'),
     url('^auto-anonymize$',
         views.forum.AutoAnonymize.as_view(),

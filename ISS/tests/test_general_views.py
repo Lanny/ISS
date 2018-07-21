@@ -766,7 +766,7 @@ class UserCPTestCase(tutils.ForumConfigTestCase):
         self.assertEqual(len(response.context['threads']), 1)
 
         # Mark all threads as read
-        response = self.don_client.get(mar_path)
+        response = self.don_client.post(mar_path)
         self.assertEqual(response.status_code, 302)
 
         # Verify Don has no more new sub'd threads
