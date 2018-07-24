@@ -30,7 +30,11 @@
           {% if oldest_undread_post %}
             <a href="{{ oldest_undread_post.get_url }}"
                class="oldest-unread-post"
-               title="last unread post"></a>
+               title="last unread post">
+              <span class="visually-hidden">
+                (oldest unread post)
+              </span>
+            </a>
           {% endif %}
         {% endwith %}
 
