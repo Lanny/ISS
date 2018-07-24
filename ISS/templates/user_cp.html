@@ -11,8 +11,16 @@
 {% endblock %}
 
 {% block content %}
-  <div class="thread-index">
-    {% include "page_list.html" with page=threads %}
+  <div class="user-cp thread-index">
+    <div>
+      <form action="{% url 'read-subscriptions' %}"
+            method="POST"
+            class="mark-all-read">
+        {% csrf_token %}
+        <input type="submit" value="Mark All as Read" />
+      </form>
+      {% include "page_list.html" with page=threads %}
+    </div>
 
     {% include 'thread_list.html' with threads=threads empty_message="No new subscribed threads." %}
 

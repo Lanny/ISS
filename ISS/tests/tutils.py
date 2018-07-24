@@ -24,6 +24,18 @@ def create_std_forums():
 USERS_CREATED = 0
 THREADS_CREATED = 0
 
+def create_post(user, thread, save=True):
+    post = Post(
+            author=user,
+            thread=thread,
+            content='postum ipsum',
+            posted_from='8.8.8.8')
+
+    if save:
+        post.save()
+
+    return post
+
 def create_posts(user, count, bulk=False):
     """
     Create `count` posts belonging to `user`. Skips signal triggering if `bulk`

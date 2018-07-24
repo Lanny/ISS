@@ -728,3 +728,56 @@ class LoginTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(uid, None)
         
+
+
+class UserCPTestCase(tutils.ForumConfigTestCase):
+    forum_config = {'captcha_period': 0}
+
+    def setUp2(self):
+        tutils.create_std_forums()
+
+        self.don = tutils.create_user(thread_count=1, post_count=1)
+        self.fran = tutils.create_user(thread_count=0, post_count=0)
+
+        self.thread = Thread.objects.all()[0]
+        self.thread.subscribe(self.don)
+
+        self.thread.mark_read(self.don, self.thread.get_last_post())
+
+        self.don_client = Client()
+        self.don_client.force_login(self.don)
+
+
+    def test_mark_all_read(self):
+        ucp_path = reverse('usercp')
+        mar_path = reverse('read-subscriptions')
+
+        # Don starts with no new items in his new subs list
+        response = self.don_client.get(ucp_path)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['threads']), 0)
+
+        # Bump his subscribed thread
+        tutils.create_post(self.fran, self.thread)
+
+        # Make sure he now has a new sub thread
+        response = self.don_client.get(ucp_path)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['threads']), 1)
+
+        # Mark all threads as read
+        response = self.don_client.post(mar_path)
+        self.assertEqual(response.status_code, 302)
+
+        # Verify Don has no more new sub'd threads
+        response = self.don_client.get(ucp_path)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['threads']), 0)
+
+        # Bump again
+        tutils.create_post(self.fran, self.thread)
+
+        # Make sure Don sees the thread as bumped
+        response = self.don_client.get(ucp_path)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['threads']), 1)
