@@ -69,7 +69,13 @@ def _video_markup_for_url(urlstr):
     a page. If the link it malformed or to an unknown video hosting service
     throws EmbeddingNotSupportedException.
     """
-    url = urlparse.urlparse(urlstr)
+    try :
+        url = urlparse.urlparse(urlstr)
+    except ValueError:
+        # Apparently urlparse can throw exceptions. That probably shouldn't
+        # have been surprising.
+        raise EmbeddingNotSupportedException('Invalid url.')
+
     ext = url.path.split('.')[-1]
 
     if url.netloc in ('www.youtube.com', 'youtube.com', 'm.youtube.com'):
