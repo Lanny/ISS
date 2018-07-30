@@ -1,0 +1,5 @@
+Some notes:
+
+- Themes are "registered" by creating a file in the `src/themes` with the name `<theme_name>.less`. They should import the `combined.less` file and specify any variable/mixing overrides **after** the import.
+- Every theme is also expected define a `@THEME` variable which other less files can use to apply theme specific styling.
+- New themes also need to be added to the `themes` list in the default config, found in `ISS/utils.py` (from the project root).

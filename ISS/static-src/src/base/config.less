@@ -1,17 +1,17 @@
 @import "icons.less";
 
-@bg_dark: #D5DEE5;
-@bg_ultra_dark: #052733;
-@fg_ultra_dark: #D2D2D2;
-@bg_light: #E8EFF4;
-@bg_teal: #008080;
-@fg: #000000;
-@fg_alt: #FFFFFF;
-@link_color: #008080;
-@fg_low_contrast: #333333;
-@alert_red: #EC0000;
-@seperator_color: #BBBBBB;
-@white: #FFFFFF;
+@bg_dark: #FF00FF;
+@bg_ultra_dark: #FF00FF;
+@fg_ultra_dark: #FF00FF;
+@bg_light: #FF00FF;
+@bg_primary: #FF00FF;
+@fg: #FF00FF;
+@fg_alt: #FF00FF;
+@link_color: #FF00FF;
+@fg_low_contrast: #FF00FF;
+@alert_red: #FF00FF;
+@seperator_color: #FF00FF;
+@white: #FF00FF;
 
 @std_lr_padding: 20px;
 @content_margin_bottom: 15px;
@@ -19,7 +19,7 @@
 @breakpoint: 600px;
 
 .teal() {
-  background-color: @bg_teal;
+  background-color: @bg_primary;
   color: @fg_alt;
 
   a {
@@ -29,7 +29,7 @@
 
 .teal-inv() {
   background-color: @fg_alt;
-  color: @bg_teal;
+  color: @bg_primary;
 }
 
 .rounded() {
@@ -244,7 +244,7 @@
 
 .icn-btn-scaleable(@size, @padding: 3px) {
   display: inline-block;
-  background-color: @bg_teal;
+  background-color: @bg_primary;
   border: 1px solid @white;
   border-radius: 3px;
   padding: unit(@padding, px);
@@ -262,7 +262,7 @@
   display: inline-block;
   width: 16px;
   height: 16px;
-  background-color: @bg_teal;
+  background-color: @bg_primary;
   border: 1px solid @white;
   border-radius: 3px;
 
@@ -292,23 +292,22 @@
 }
 
 .-flex-direction(@direction) {
+  // LEGACY: DELETE AT USE SITE 
   flex-direction: @direction;
-  -webkit-flex-direction: @direction;
 }
 
 .-flex(@value) {
-  -webkit-flex: @value;
+  // LEGACY: DELETE AT USE SITE 
   flex: @value;
 }
 
 .-display-flex() {
-  display: box;
-  display: -webkit-flex;
-  display: flexbox;
+  // LEGACY: DELETE AT USE SITE 
   display: flex;
 }
 
 .flex-stretch() {
+  // LEGACY: DELETE AT USE SITE 
   .-display-flex();
   align-items: stretch;
 }
