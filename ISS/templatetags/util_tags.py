@@ -3,6 +3,7 @@ from datetime import timedelta
 from django import template
 from django.template import defaultfilters
 from django.urls import reverse
+from django.contrib.staticfiles.templatetags import staticfiles
 
 from ISS import utils
 from ISS.models import FilterWord, AccessControlList
@@ -19,6 +20,20 @@ def test_link(test, user):
         return not user.is_authenticated()
     elif test == 'is_admin':
         return user.is_authenticated() and user.is_admin
+
+@register.simple_tag(name='url_apply')
+def url_apply(pat, args_and_kwargs=None):
+    args, kwargs = args_and_kwargs if args_and_kwargs else ((), {})
+    return reverse(pat, args=args, kwargs=kwargs)
+
+@register.simple_tag(name='get_theme')
+def get_theme(user):
+    if user.is_authenticated and False:
+        theme_name = user.theme
+    else:
+        theme_name = utils.get_config('default_theme')
+
+    return staticfiles.static("css/%s.css" % theme_name)
 
 @register.simple_tag(name='url_apply')
 def url_apply(pat, args_and_kwargs=None):
