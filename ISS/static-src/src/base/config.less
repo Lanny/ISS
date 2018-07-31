@@ -11,14 +11,18 @@
 @fg_low_contrast: #FF00FF;
 @alert_red: #FF00FF;
 @seperator_color: #FF00FF;
+@seperator_color_major: #FF00FF;
 @white: #FF00FF;
 
 @std_lr_padding: 20px;
 @content_margin_bottom: 15px;
+@body_font_family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+@body_font_size: 12px;
+@rounding_factor: 5px;
 
 @breakpoint: 600px;
 
-.teal() {
+.primary() {
   background-color: @bg_primary;
   color: @fg_alt;
 
@@ -27,13 +31,13 @@
   }
 }
 
-.teal-inv() {
+.primary-inv() {
   background-color: @fg_alt;
   color: @bg_primary;
 }
 
 .rounded() {
-  border-radius: 5px;
+  border-radius: @rounding_factor;
   overflow: hidden;
 }
 
@@ -89,18 +93,22 @@
   border: 1px solid @white;
 }
 
-.link-style() {
-  color: @link_color;
-  font-weight: bold;
-}
+.link-style() {}
 
 .title-box() {
-  .teal;
-
-  border-bottom: 1px solid @white;
+  border-bottom: 1px solid @seperator_color_major;
   padding: 5px @std_lr_padding;
   font-size: 12px;
   font-weight: bold;
+
+  & when (@THEME = '&T') {
+    .primary;
+  }
+
+  & when (@THEME = 'bibliotek') {
+    font-size: 14px;
+    font-weight: normal;
+  }
 }
 
 .index-table() {
@@ -199,7 +207,7 @@
 
     [type="submit"] {
       .btn();
-      .teal();
+      .primary();
 
       float: right;
       margin-top: 20px;
