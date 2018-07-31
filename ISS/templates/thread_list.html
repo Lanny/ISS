@@ -37,12 +37,6 @@
             </a>
           {% endif %}
         {% endwith %}
-
-        {% if user.is_staff %}
-          <a href="{% url 'admin:ISS_thread_change' thread.pk %}"
-             class="edit-thread">
-          </a>
-        {% endif %}
       </div>
 
       <a class="thread-author" href="{{ thread.get_author.get_url }}">
@@ -80,15 +74,6 @@
               </a>
             </li>
           {% endwith %}
-        {% endif %}
-
-        {% if user.is_staff %}
-          <li>
-            <a href="{% url 'admin:ISS_thread_change' thread.pk %}"
-               class="edit-thread"
-               title="edit thread">
-            </a>
-          </li>
         {% endif %}
       </ul>
       {% endspaceless %}

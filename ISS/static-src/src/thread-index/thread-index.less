@@ -74,23 +74,19 @@
           text-align: center;
         }
 
-        .edit-thread {
-          .icn-btn-scaleable(32);
-          float: right;
-
-          &:before {
-            .icn-pencil();
-          }
-        }
-
         .title-line {
           padding-bottom: 2px;
-          display: block;
+          display: flex;
 
           .thread-name {
             display: block;
             text-overflow: ellipsis;
             overflow: hidden;
+            padding-right: 5px;
+          }
+
+          .oldest-unread-post {
+            flex-shrink: 0;
           }
         }
 
@@ -163,7 +159,7 @@
         }
 
         td {
-          .oldest-unread-post, .edit-thread {
+          .oldest-unread-post {
             display: none;
           }
         }
@@ -187,7 +183,7 @@
               border-right: 1px solid @white;
             }
 
-            .edit-thread, .last-post {
+            .last-post {
               border: none;
             }
 
@@ -220,10 +216,6 @@
           .oldest-unread-post {
             display: block;
             border: none;
-          }
-
-          .edit-thread {
-            display: block;
           }
         }
       }
