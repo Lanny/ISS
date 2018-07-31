@@ -18,9 +18,10 @@
 
   .new-thread {
     .btn();
-    .primary-inv();
 
     float: left;
+
+    & when (@THEME = "&T") {.primary-inv(); }
 
     @media(min-width: @breakpoint) {
       margin-bottom: @content_margin_bottom;
@@ -44,10 +45,6 @@
         display: none;
       }
       
-      th {
-        .primary;
-      }
-
       td {
         &:nth-child(1) {
           width: 50px;

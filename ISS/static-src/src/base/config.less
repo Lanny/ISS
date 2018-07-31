@@ -52,13 +52,7 @@
 }
 
 
-.btn() {
-  border-radius: 0px;
-  border: 0;
-  padding: 10px 20px;
-  cursor: pointer;
-  text-decoration: none;
-}
+.btn() {}
 
 .resp-btn() {
   .btn();
@@ -135,14 +129,23 @@
     }
   }
 
-  th {
-    &:not(:last-child) {
-      border-right: 1px solid @white;
+  td, th {
+    padding: 5px 15px;
+  }
+
+  & when (@THEME = "&T") {
+    th {
+      .primary;
+      &:not(:last-child) {
+        border-right: 1px solid @white;
+      }
     }
   }
 
-  td, th {
-    padding: 5px 15px;
+  & when (@THEME = "bibliotek") {
+    th {
+      border-bottom: 1px solid @seperator_color_major;
+    }
   }
 }
 
@@ -207,7 +210,6 @@
 
     [type="submit"] {
       .btn();
-      .primary();
 
       float: right;
       margin-top: 20px;
