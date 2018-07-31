@@ -38,19 +38,18 @@
   .threads {
     .index-table;
     .region(0,0,0,20px);
+    width: 100%;
+    table-layout: fixed;
+
 
     tr {
       .mobile-thread-controls {
         display: none;
       }
-      
-      th {
-        .teal;
-      }
 
-      td {
+      td, th {
         &:nth-child(1) {
-          width: 50px;
+          width: 60px;
         }
 
         &:nth-child(3) {
@@ -58,8 +57,17 @@
         }
         
         &:nth-child(4) {
+          width: 60px;
+        }
+      }
+      
+      th {
+        .teal;
+      }
+
+      td {
+        &:nth-child(4) {
           text-align: center;
-          width: 30px;
         }
 
         &.empty-message {
@@ -78,6 +86,12 @@
         .title-line {
           padding-bottom: 2px;
           display: block;
+
+          .thread-name {
+            display: block;
+            text-overflow: ellipsis;
+            overflow: hidden;
+          }
         }
 
         .thread-author {
