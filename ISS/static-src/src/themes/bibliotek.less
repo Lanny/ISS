@@ -9,9 +9,14 @@
 @bg_primary: #000;
 @fg: #000;
 @fg_alt: #FFF;
-@link_color: #008080;
+@link_color: #000;
 @fg_low_contrast: #333333;
 @alert_red: #EC0000;
 @seperator_color: #BBBBBB;
 @white: #FFFFFF;
 
+.index-table() {
+  td:not(:last-child) {
+    border-right: none;
+  }
+}
