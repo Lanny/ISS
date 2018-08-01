@@ -3,7 +3,7 @@
 
 .thread {
   .actions-and-pages {
-    .-display-flex();
+    display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
@@ -24,7 +24,7 @@
     }
 
     #post-actions {
-      .-display-flex();
+      display: flex;
       align-items: stretch;
 
       @media (min-width: @breakpoint) {
@@ -35,7 +35,7 @@
 
       input[type="submit"] {
         .small-btn();
-        .teal();
+        .primary();
         height: 30px;
       }
 
@@ -54,7 +54,7 @@
     }
 
     h1 {
-      .title-box();
+      .title-box(true);
     }
   }
 

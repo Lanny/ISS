@@ -77,6 +77,11 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         default=1,
         blank=False,
         null=False)
+    theme = models.CharField(
+        max_length=256,
+        null=False,
+        default=utils.get_config('default_theme'),
+        choices=utils.get_config('themes'))
 
     # For support of vB backends
     backend = models.TextField(

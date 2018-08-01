@@ -19,10 +19,18 @@
     }
 
     .post-hat {
-      .teal();
-      .-display-flex();
+      display: flex;
       padding: 5px;
       font-size: 10px;
+
+      & when (@THEME = "&T") {
+        .primary();
+      }
+
+      & when (@THEME = "bibliotek") {
+        padding: 5px 20px;
+        border-top: 1px solid @seperator_color_major;
+      }
 
       .post-date {
         flex: 1;
@@ -33,8 +41,10 @@
         flex-shrink: 1;
 
         .admin-edit-post, .report {
-          .v-small-btn();
-          .teal();
+          & when (@THEME = "&T") {
+            .primary();
+            .v-small-btn();
+          }
         }
 
         .post-number {
@@ -50,6 +60,10 @@
 
     .user-block, .post-block {
       padding: 10px;
+
+      & when (@THEME = "bibliotek") {
+        padding: 10px 20px;
+      }
     }
 
     .user-block {
@@ -57,7 +71,7 @@
       overflow: hidden;
 
       .author-name {
-        font-size: 16px;
+        font-size: 18px;
         font-weight: normal;
         display: block;
         margin-bottom: 5px;
@@ -74,6 +88,12 @@
 
       .post-body {
         word-wrap: break-word;
+
+        & when (@THEME = "bibliotek") {
+          border-top: 1px solid @seperator_color;
+          padding-top: 20px;
+          padding-bottom: 10px;
+        }
       }
 
       .post-controls {
@@ -88,7 +108,6 @@
 
           .quote, .thank-action, .edit-post, .report  {
             .small-btn();
-            .teal();
             align-self: flex-start;
             margin: 0 3px;
           }
@@ -110,7 +129,7 @@
       }
 
       .thanker-caption {
-        .teal();
+        .primary();
         padding: 3px 5px;
         font-size: 12px;
       }

@@ -7,7 +7,7 @@
     background-color: @bg_light;
 
     .forum-title {
-      .title-box();
+      .title-box(true);
     }
 
     .forum-description {
@@ -18,9 +18,10 @@
 
   .new-thread {
     .btn();
-    .teal-inv();
 
     float: left;
+
+    & when (@THEME = "&T") {.primary-inv(); }
 
     @media(min-width: @breakpoint) {
       margin-bottom: @content_margin_bottom;
@@ -107,7 +108,7 @@
             text-decoration: underline;
             border: none;
             background-color: transparent;
-            color: @bg_teal;
+            color: @bg_primary;
             font-weight: bold;
             cursor: pointer;
             padding: 2px;
@@ -175,7 +176,7 @@
           overflow: hidden;
 
           li {
-            .teal();
+            .primary();
             display: block;
             .-flex(1);
 

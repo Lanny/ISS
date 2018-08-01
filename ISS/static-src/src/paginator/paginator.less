@@ -29,12 +29,12 @@
       }
       
       &.arrow {
-        .teal();
+        .primary();
       }
 
       &.current-page {
         position: relative;
-        border: 1px solid @bg_teal;
+        border: 1px solid @bg_primary;
 
         a {
           font-weight: bold;
@@ -43,7 +43,7 @@
         @media(min-width: @breakpoint) {
           &:before {
             border-style: solid;
-            border-color: transparent transparent @bg_teal transparent;
+            border-color: transparent transparent @bg_primary transparent;
             border-width: 0 0 6px 6px;
             display: block;
             content: ' ';
@@ -54,7 +54,7 @@
 
           &:after {
             border-style: solid;
-            border-color: @bg_teal transparent transparent transparent;
+            border-color: @bg_primary transparent transparent transparent;
             border-width: 6px 6px 0 0;
             display: block;
             content: ' ';

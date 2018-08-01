@@ -9,6 +9,7 @@ var requirejsOptimize = require('gulp-requirejs-optimize');
 var concat = require('gulp-concat');
 var svg = require('gulp-svg-inline-css');
 var clean = require('gulp-clean');
+var autoprefixer = require('gulp-autoprefixer');
 var execSync = require('child_process').execSync;
 
 var staticDir = '../static',
@@ -19,6 +20,10 @@ var staticDir = '../static',
     'thread.js',
     'editor-bootstrap.js',
     'base.js'
+  ],
+  themes = [
+    '&T',
+    'Bibliotek'
   ];
 
 var ISSConfig = JSON.parse(
@@ -48,7 +53,6 @@ gulp.task('smilies', function() {
 });
 
 gulp.task('less', ['icons'], function() {
-
   var lessStream = less({
       paths: [ path.join(__dirname, 'less') ]
     }).on('error', function(err) {
@@ -56,12 +60,13 @@ gulp.task('less', ['icons'], function() {
       this.emit('end');
     });
 
-  var stream = gulp.src('./src/combined/combined.less');
+  var stream = gulp.src('./src/themes/*.less');
 
   stream = argv.optimize ? stream : stream.pipe(sourcemaps.init());
   stream = stream.pipe(lessStream);
   stream = argv.optimize ? stream : stream.pipe(sourcemaps.write());
   stream = stream.pipe(flatten());
+  stream = stream.pipe(autoprefixer());
   stream = argv.optimize ? stream.pipe(minifyCSS()) : stream;
   stream = stream.pipe(gulp.dest(cssDir));
 

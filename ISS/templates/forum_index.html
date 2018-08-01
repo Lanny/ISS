@@ -11,42 +11,46 @@
 {% block content %}
   <section class="forum-index">
     <table >
-      <tr>
-        <th>New</th>
-        <th>Forum</th>
-        <th>Threads</th>
-        <th>Posts</th>
-      </tr>
+      <tbody>
+        <tr>
+          <th>New</th>
+          <th>Forum</th>
+          <th>Threads</th>
+          <th>Posts</th>
+        </tr>
+      </tbody>
       {% for category in categories %}
-      <tr>
-        <td colspan="4" class="category-divider">
-          {{ category.name }}
-        </td>
-      </tr>
+      <tbody>
+        <tr>
+          <td colspan="4" class="category-divider">
+            {{ category.name }}
+          </td>
+        </tr>
 
 
-      {% for forum in forums_by_category|get_item:category.pk %}
-      <tr>
-        <td>
-          <div class="read-status">
-          {% if forum.is_unread %}
-            <img src="{% static 'img/forum_new.gif' %}" alt="Unread posts" />
-          {% else %}
-            <img src="{% static 'img/forum_old.gif' %}" alt="No new posts" />
-          {% endif %}
-          </div>
-        </td>
-        <td>
-          <a class="forum-name"
-             href="{% url 'thread-index' forum.pk %}">
-            {{ forum.name }}
-          </a>
-          <span class="forum-description">{{ forum.description }}</a>
-        </td>
-        <td>{{ forum.get_thread_count|intcomma }}</td>
-        <td>{{ forum.get_post_count|intcomma }}</td>
-      </tr>
-      {% endfor %}
+        {% for forum in forums_by_category|get_item:category.pk %}
+        <tr>
+          <td>
+            <div class="read-status">
+            {% if forum.is_unread %}
+              <img src="{% static 'img/forum_new.gif' %}" alt="Unread posts" />
+            {% else %}
+              <img src="{% static 'img/forum_old.gif' %}" alt="No new posts" />
+            {% endif %}
+            </div>
+          </td>
+          <td>
+            <a class="forum-name"
+               href="{% url 'thread-index' forum.pk %}">
+              {{ forum.name }}
+            </a>
+            <span class="forum-description">{{ forum.description }}</span>
+          </td>
+          <td>{{ forum.get_thread_count|intcomma }}</td>
+          <td>{{ forum.get_post_count|intcomma }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
       {% endfor %}
     </table>
   </section>

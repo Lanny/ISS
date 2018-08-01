@@ -1,0 +1,35 @@
+@import "../combined/combined.less";
+
+@THEME: "&T";
+
+@bg_dark: #D5DEE5;
+@bg_ultra_dark: #052733;
+@fg_ultra_dark: #D2D2D2;
+@bg_light: #E8EFF4;
+@bg_primary: #008080;
+@fg: #000000;
+@fg_alt: #FFFFFF;
+@link_color: #008080;
+@fg_low_contrast: #333333;
+@alert_red: #EC0000;
+@seperator_color: #BBBBBB;
+@seperator_color_major: #FFF;
+@white: #FFFFFF;
+
+@rounding_factor: 5px;
+@rounding_factor: 3px;
+
+.link-style() {
+  color: @link_color;
+  font-weight: bold;
+}
+
+.btn() {
+  border-radius: 0px;
+  border: 0;
+  padding: 10px 20px;
+  cursor: pointer;
+  text-decoration: none;
+
+  .primary();
+}

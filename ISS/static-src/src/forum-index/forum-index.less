@@ -15,10 +15,6 @@
         }
       }
 
-      th {
-        .teal;
-      }
-
       td {
         &:nth-child(1) {
           width: 50px;
@@ -35,16 +31,16 @@
         }
 
         &.category-divider {
-          .teal();
-          border-top: 1px solid @white;
-          border-bottom: 1px solid @white;
+          border-top: 1px solid @seperator_color_major;
+          border-bottom: 1px solid @seperator_color_major;
           font-weight: bold;
+
+          & when (@THEME = "&T") { .primary; }
         }
 
         .forum-name {
           display: block;
-          font-weight: bold;
-          color: @link_color
+          color: @link_color;
         }
       }
     }

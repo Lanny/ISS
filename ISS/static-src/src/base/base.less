@@ -9,19 +9,27 @@ input[type="submit"] {
 }
 
 body {
-  background: @bg_teal url(/static/img/bg.jpg) repeat 0 0;
-  font: 12px Verdana, Lucida, Arial, Helvetica, sans-serif;
+  font-family: @body_font_family;
+  font-size: @body_font_size;
   border: 0;
   padding: 0;
   margin: 0;
+
+  & when (@THEME = '&T') {
+    background: @bg_primary url(/static/img/bg.jpg) repeat 0 0;
+  }
+  & when (@THEME = 'bibliotek') {
+    background-color: @white;
+  }
 }
+
 
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
 }
 
 input {
-  font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+  font-family: @body_font_family;
 }
 
 .page-content {
@@ -33,23 +41,37 @@ input {
     padding: 0;
   }
 
-  .banner {
-    min-height: 150px;
-    margin: 10px 0;
-    max-width: 100%;
-    position: relative;
-    z-index: 1;
-  }
-
-  .peekaboo-container {
-    margin: 10px 0;
-    z-index: 0;
-    position: absolute;
-
-    .peekaboo {
+  #top-banner {
+    .banner {
+      min-height: 150px;
+      margin: 10px 0;
+      max-width: 100%;
       position: relative;
-      display: none;
+      z-index: 1;
     }
+
+    .peekaboo-container {
+      margin: 10px 0;
+      z-index: 0;
+      position: absolute;
+
+      .peekaboo {
+        position: relative;
+        display: none;
+      }
+    }
+
+    & when (@THEME = 'bibliotek') {
+      .banner, .peekaboo-container {
+        display: none;
+      }
+    }
+  }
+}
+
+.form-wrapper {
+  > p {
+    margin: 0;
   }
 }
 
@@ -115,7 +137,14 @@ footer {
   background-color: @bg_ultra_dark;
   color: @fg_ultra_dark;
   padding: 10px @std_lr_padding;
-  border: 1px solid #565656;
+
+  & when (@THEME = "&T") {
+    border: 1px solid #565656;
+  }
+
+  & when (@THEME = "bibliotek") {
+    border-top: 1px solid @seperator_color_major;
+  }
 }
 
 .img-embed {
@@ -164,7 +193,7 @@ footer {
   }
 
   [type="submit"] {
-    .teal();
+    .primary();
     padding: 10px 15px;
     border: none;
   }
@@ -191,7 +220,7 @@ footer {
 
   input[type="submit"] {
     .btn();
-    .teal();
+    .primary();
 
     float: right;
   }
@@ -208,7 +237,7 @@ footer {
 
 .jump-to-top {
   .btn();
-  .teal();
+  .primary();
 
   display: flex;
   flex-direction: row;
@@ -246,7 +275,7 @@ a.bbcode-ref-link {
   
   .icon-container {
     .-display-flex();
-    background-color: @bg_teal;
+    background-color: @bg_primary;
     padding: 5px 10px;
     justify-content: center;
     align-items: center;

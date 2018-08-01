@@ -480,6 +480,7 @@ class UserProfile(utils.MethodSplitView):
             'enable_tripphrase': not (poster.tripphrase == None),
             'auto_subscribe': poster.auto_subscribe,
             'timezone': poster.timezone,
+            'theme': poster.theme,
             'posts_per_page': poster.posts_per_page })
 
     def _base_avatar_form(self, poster):

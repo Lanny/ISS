@@ -114,7 +114,12 @@ config_defaults = {
     'captcha_period': 0,
     'enable_registration': True,
     'enable_invites': False,
-    'invite_expiration_time': datetime.timedelta(days=14)
+    'invite_expiration_time': datetime.timedelta(days=14),
+    'themes': (
+        ('&T', '&T'),
+        ('bibliotek', 'Bibliotek')
+    ),
+    'default_theme': '&T'
 }
 
 config = config_defaults.copy()

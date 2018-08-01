@@ -20,9 +20,9 @@
         <form method="POST" action="{% url 'thread-action' thread.pk %}"
               id="post-actions">
           {% csrf_token %}
-          {{ thread_action_form }}
+          <div class="form-wrapper">{{ thread_action_form.as_p }}</div>
 
-          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <input type="hidden" name="next" value="{{ request.get_full_path }}" />
           <input type="submit" value="Go" />
         </form>
       {% endif %}
@@ -46,7 +46,9 @@
         <h2>Quick Reply</h2>
         <fieldset>
           {% csrf_token %}
-          {{ reply_form }}
+          <div class="form-wrapper">
+            {{ reply_form.as_p }}
+          </div>
 
           <a href="{% url 'bbcode-help' %}" class="bbcode-ref-link" target="_blank">
             BBCode Reference
