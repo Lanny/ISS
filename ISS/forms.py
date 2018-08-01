@@ -472,6 +472,10 @@ class UserSettingsForm(forms.Form):
     new_password_repeat = forms.CharField(label='New Password (repeat)',
                                           required=False,
                                           widget=forms.PasswordInput)
+    theme = forms.ChoiceField(
+        label="Theme",
+        required=True,
+        choices=utils.get_config('themes'))
     allow_js = forms.BooleanField(label="Enable javascript", required=False)
     allow_avatars = forms.BooleanField(label="Show user avatars", required=False)
     enable_editor_buttons = forms.BooleanField(
@@ -489,6 +493,7 @@ class UserSettingsForm(forms.Form):
         required=True,
         choices=Poster.SUBSCRIBE_CHOICES,
         widget=forms.RadioSelect)
+
 
     def clean(self, *args, **kwargs):
         ret = super(UserSettingsForm, self).clean(*args, **kwargs)
@@ -513,6 +518,7 @@ class UserSettingsForm(forms.Form):
         poster.auto_subscribe = self.cleaned_data['auto_subscribe']
         poster.timezone = self.cleaned_data['timezone']
         poster.posts_per_page = self.cleaned_data['posts_per_page']
+        poster.theme = self.cleaned_data['theme']
 
         if self.cleaned_data['enable_tripphrase']:
             poster.tripphrase = tripphrase(poster.username)

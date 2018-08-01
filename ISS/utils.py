@@ -115,11 +115,11 @@ config_defaults = {
     'enable_registration': True,
     'enable_invites': False,
     'invite_expiration_time': datetime.timedelta(days=14),
-    'themes': [
-        '&T',
-        'bibliotek'
-    ],
-    'default_theme': 'bibliotek'
+    'themes': (
+        ('&T', '&T'),
+        ('bibliotek', 'Bibliotek')
+    ),
+    'default_theme': '&T'
 }
 
 config = config_defaults.copy()

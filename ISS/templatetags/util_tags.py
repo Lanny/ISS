@@ -28,7 +28,7 @@ def url_apply(pat, args_and_kwargs=None):
 
 @register.simple_tag(name='get_theme')
 def get_theme(user):
-    if user.is_authenticated and False:
+    if user.is_authenticated:
         theme_name = user.theme
     else:
         theme_name = utils.get_config('default_theme')

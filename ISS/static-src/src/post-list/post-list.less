@@ -22,7 +22,6 @@
       display: flex;
       padding: 5px;
       font-size: 10px;
-      border-top: 1px solid @seperator_color_major;
 
       & when (@THEME = "&T") {
         .primary();
@@ -30,6 +29,7 @@
 
       & when (@THEME = "bibliotek") {
         padding: 5px 20px;
+        border-top: 1px solid @seperator_color_major;
       }
 
       .post-date {
