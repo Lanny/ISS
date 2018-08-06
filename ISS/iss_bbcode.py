@@ -304,7 +304,7 @@ _supported_tags = {
 }
 
 def build_parser(tags, escape_html=True):
-    parser = PreprocessingParser(escape_html=escape_html)
+    parser = PreprocessingParser(escape_html=escape_html, replace_cosmetic=False)
 
     for tag in tags:
         _supported_tags[tag](parser)
