@@ -1,0 +1,64 @@
+@import "../base/config.less";
+
+.spoiler {
+  display: block;
+
+  &.open {
+    > .tab {
+      border-bottom-left-radius: 0px;
+      border-bottom-right-radius: 0px;
+    }
+
+    > .content {
+      display: block;
+    }
+  }
+
+  > .content  {
+      background-color: @bg_light;
+      border: 1px solid @seperator_color;
+      padding: 10px 20px;
+      border-radius: 5px;
+      border-top-left-radius: 0;
+  }
+
+  > .tab {
+    font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+    display: inline-block;
+    background-color: @bg_primary;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 15px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 1em;
+  }
+
+  > .content {
+    display: none;
+  }
+}
+
+.nojs-spoiler {
+  .label:after {
+    content: 'Show ';
+  }
+
+  .spoiler-hack-checkbox {
+    display: none;
+  }
+
+  .spoiler-hack-checkbox:checked ~ .content {
+    display: block;
+  }
+
+  .spoiler-hack-checkbox:checked ~ .tab {
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+
+    .label:after {
+      content: 'Hide ';
+    }
+  }
+}

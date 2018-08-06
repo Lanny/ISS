@@ -123,6 +123,12 @@
           <a href="{% url 'compose-pm' %}?to={{ poster.pk }}">
             Send Private Message to {{ poster.username }}
           </a>
+
+          {% if poster.pgp_key %}
+            <div class="pgp-key-container">
+              {% pgp_block poster.pgp_key  js_enabled=allow_js %}
+            </div>
+          {% endif %}
         {% endif %}
       </div>
     </div>

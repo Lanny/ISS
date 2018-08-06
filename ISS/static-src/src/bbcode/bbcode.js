@@ -1,5 +1,5 @@
 ;(function() {
-  function wrap($, config, utils) {
+  function wrap($, config, utils, spoilers) {
     var Module = {
       bindRegion: function(region) {
         region = $(region);
@@ -10,31 +10,11 @@
       bindSpoilerHandlers: function(region) {
         region.find('.spoiler')
           .each(function(_, e) {
-            e = $(e);
-
-            if (e.data('spoilerInited') !== undefined) {
-              return;
-            }
-            e.data('spoilerInited', true);
-
-            var tab = e.children('.tab'),
-              content = e.children('.content');
-
-            tab.on('click', function() {
-              if (content.attr('data-content')) {
-                content.html(content.attr('data-content'));
-                content.removeAttr('data-content');
-                Module.bindRegion(content);
-              }
-
-              if (e.hasClass('closed')) {
-                e.removeClass('closed').addClass('open')
-                tab.find('.label').text('Hide');
-              } else {
-                e.removeClass('open').addClass('closed')
-                tab.find('.label').text('Show');
-              }
-            })
+            spoilers.bindSpoilerHandler(e, function(content) {
+              // Bind BBCode handlers once the spoiler is shown for the first
+              // time.
+              Module.bindRegion(content);
+            });
           });
       },
       embedBandcampLinks: function(region) {
@@ -62,6 +42,7 @@
   define([
     'jquery',
     'config',
-    'utils'
+    'utils',
+    'spoilers'
   ], wrap);
 })();

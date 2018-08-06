@@ -3,6 +3,8 @@ from datetime import timedelta
 from django import template
 from django.template import defaultfilters
 from django.urls import reverse
+from django.utils import html
+from django.utils import safestring
 from django.contrib.staticfiles.templatetags import staticfiles
 
 from ISS import utils
@@ -35,10 +37,14 @@ def get_theme(user):
 
     return staticfiles.static("css/%s.css" % theme_name)
 
-@register.simple_tag(name='url_apply')
-def url_apply(pat, args_and_kwargs=None):
-    args, kwargs = args_and_kwargs if args_and_kwargs else ((), {})
-    return reverse(pat, args=args, kwargs=kwargs)
+@register.simple_tag(name='pgp_block')
+def pgp_block(pgp_key, js_enabled=True):
+    markup = utils.render_spoiler(
+        '<pre>' + html.escape(pgp_key) + '</pre>',
+        name="PGP Public Key",
+        js_enabled=js_enabled)
+
+    return safestring.mark_safe(markup)
 
 @register.filter(name='word_filter')
 def word_filter(value):

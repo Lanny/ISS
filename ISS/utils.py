@@ -7,6 +7,7 @@ import bbcode
 import collections
 import importlib
 import json
+import random
 
 from lxml import etree
 
@@ -17,6 +18,7 @@ from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse, \
     HttpResponseForbidden
+from django.utils import html
 from django.shortcuts import render
 from snowpenguin.django.recaptcha2.fields import ReCaptchaField
 
@@ -420,6 +422,43 @@ def format_duration(duration):
 
     return ' '.join(parts)
 
+_js_spoiler_template = '''
+    <div class="spoiler closed">
+        <button class="tab" type="button">
+            <span class="label">Show</span>
+            <span class="name">%s</span>
+        </button>
+        <div class="content" data-content="%s"></div>
+    </div>
+'''
+
+_nojs_spoiler_template = '''
+    <div class="nojs-spoiler spoiler">
+        <input id="sp-%(id)s" type="checkbox" class="spoiler-hack-checkbox" />
+        <label class="tab" for="sp-%(id)s">
+            <span class="label"></span>
+            <span class="name">%(name)s</span>
+        </label>
+        <div class="content">
+            %(content)s
+        </div>
+    </div>
+'''
+
+def render_spoiler(content, name='spoiler', js_enabled=True):
+    # NOTE: it may look odd to you that we're escaping HTML content in the JS
+    # enabled case but not in the nojs case. This is correct so don't change
+    # it. The reason for this is that the content is already HTML escaped, but
+    # in the JS case it's 
+    # 
+    if js_enabled:
+        return _js_spoiler_template % (name, html.escape(content))
+    else:
+        return _nojs_spoiler_template % {
+            'content': content,
+            'id': random.randint(0,2**32),
+            'name': name
+        }
 
 class TolerantJSONEncoder(json.JSONEncoder):
     def default(self, o):

@@ -205,43 +205,19 @@ def _add_link_tag(parser):
     return parser
 
 def _add_spoiler_tag(parser):
-    template = '''
-        <div class="spoiler closed">
-            <button class="tab" type="button">
-                <span class="label">Show</span>
-                <span class="name">%s</span>
-            </button>
-            <div class="content" data-content="%s"></div>
-        </div>
-    '''
 
     def render_spoiler(tag_name, value, options, parent, context):
-       return template % (options.get(tag_name, 'spoiler'), html.escape(value))
+        name = options.get(tag_name, 'spoiler')
+        return utils.render_spoiler(value, name=name, js_enabled=True)
 
     parser.add_formatter('spoiler', render_spoiler)
     return parser
 
 def _add_nojs_spoiler_tag(parser):
-    template = '''
-        <div class="nojs-spoiler spoiler">
-            <input id="sp-%(id)s" type="checkbox" class="spoiler-hack-checkbox" />
-            <label class="tab" for="sp-%(id)s">
-                <span class="label"></span>
-                <span class="name">%(name)s</span>
-            </label>
-            <div class="content">
-                %(content)s
-            </div>
-        </div>
-    '''
-
 
     def render_nojs_spoiler(tag_name, value, options, parent, context):
-        return template % {
-            'content': value,
-            'id': random.randint(0,2**32),
-            'name': options.get(tag_name, 'spoiler')
-        }
+        name = options.get(tag_name, 'spoiler')
+        return utils.render_spoiler(value, name=name, js_enabled=False)
 
     parser.add_formatter('spoiler', render_nojs_spoiler)
     return parser

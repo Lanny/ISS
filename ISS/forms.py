@@ -65,7 +65,7 @@ class PGPPublicKeyField(forms.CharField):
     def clean(self, value):
         value = super(PGPPublicKeyField, self).clean(value)
 
-        if not isinstance(value, basestring): return value # Probably none 
+        if not value: return value
 
         if 'PRIVATE KEY BLOCK' in value:
             raise ValidationError(
@@ -526,6 +526,7 @@ class UserSettingsForm(forms.Form):
     pgp_key = PGPPublicKeyField(label='PGP Public Key',
                                 min_length=0,
                                 max_length=10000,
+                                required=False,
                                 widget=forms.Textarea())
 
     def clean(self, *args, **kwargs):
