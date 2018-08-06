@@ -82,6 +82,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         null=False,
         default=utils.get_config('default_theme'),
         choices=utils.get_config('themes'))
+    pgp_key = models.TextField(default='')
 
     # For support of vB backends
     backend = models.TextField(

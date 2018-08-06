@@ -97,7 +97,7 @@ urlpatterns = [
         name='logout'),
 
     url(r'^user/(?P<user_id>\d+)/?$',
-        views.forum.UserProfile.as_view(),
+        views.user.UserProfile.as_view(),
         name='user-profile'),
     url(r'^user/(?P<user_id>\d+)/posts/?$',
         views.forum.posts_by_user,

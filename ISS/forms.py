@@ -53,6 +53,36 @@ class BBCodeField(forms.CharField):
 
         return value
 
+
+class PGPPublicKeyField(forms.CharField):
+    KEY_REGEX = re.compile(
+            '^\s*'                                      # Leading whitespace
+            '-----BEGIN PGP PUBLIC KEY BLOCK-----\s*'   # header
+            '([a-zA-Z\d+/=]+\s+)+'                      # B64 key content
+            '-----END PGP PUBLIC KEY BLOCK-----'        # Footer
+            '\s*$')                                     # Trailing whitespace
+
+    def clean(self, value):
+        value = super(PGPPublicKeyField, self).clean(value)
+
+        if not isinstance(value, basestring): return value # Probably none 
+
+        if 'PRIVATE KEY BLOCK' in value:
+            raise ValidationError(
+                ('It looks like you may have entered a private key. This is '
+                 'invalid and if you have shared this key elsewhere you key '
+                 'is no longer secure. We suggest re-generating a new '
+                 'key-pair and avoid sharing your private key in the future.'),
+                code='PRIVATE_KEY_POSSIBLY')
+
+        if not re.match(self.KEY_REGEX, value):
+            raise ValidationError(
+                ('Invalid public key format. Expected a PGP "armored" key '
+                 '(like you would get out of a .asc file).'),
+                code='INVALID_KEY_FORMAT')
+
+        return value.strip()
+
 class InitialPeriodLimitingForm(forms.Form):
     def __init__(self, *args, **kwargs):
         if 'author' not in kwargs:
@@ -493,7 +523,10 @@ class UserSettingsForm(forms.Form):
         required=True,
         choices=Poster.SUBSCRIBE_CHOICES,
         widget=forms.RadioSelect)
-
+    pgp_key = PGPPublicKeyField(label='PGP Public Key',
+                                min_length=0,
+                                max_length=10000,
+                                widget=forms.Textarea())
 
     def clean(self, *args, **kwargs):
         ret = super(UserSettingsForm, self).clean(*args, **kwargs)
@@ -519,6 +552,7 @@ class UserSettingsForm(forms.Form):
         poster.timezone = self.cleaned_data['timezone']
         poster.posts_per_page = self.cleaned_data['posts_per_page']
         poster.theme = self.cleaned_data['theme']
+        poster.pgp_key = self.cleaned_data['pgp_key']
 
         if self.cleaned_data['enable_tripphrase']:
             poster.tripphrase = tripphrase(poster.username)
