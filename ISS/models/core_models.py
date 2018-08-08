@@ -3,6 +3,8 @@ import uuid
 import pytz
 
 from django.contrib import auth
+from django.contrib.auth.models import UserManager
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db import models, IntegrityError, transaction
@@ -29,6 +31,24 @@ class TSVectorLookup(models.Lookup):
             lhs, rhs)
 
         return sql, params
+
+class PosterManager(UserManager):
+    def _create_user(self, username, email, password, **extra_fields):
+        """
+        Almost the same as the base implementation, the difference is that
+        `normalize_username` of the User class is called instead of the
+        Poster `normalize_username`, as the latter is not appropriate for the
+        `username` field.
+        """
+        if not username:
+            raise ValueError('The given username must be set')
+        email = self.normalize_email(email)
+        username = AbstractBaseUser.normalize_username(username)
+        user = self.model(username=username, email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
     
 
 class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
@@ -82,7 +102,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     backend = models.TextField(
         default='django.contrib.auth.backends.ModelBackend')
 
-    objects = auth.models.UserManager()
+    objects = PosterManager()
 
     def get_long_name(self):
         return self.username
