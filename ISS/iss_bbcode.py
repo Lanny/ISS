@@ -14,7 +14,9 @@ class EmbeddingNotSupportedException(Exception):
     pass
 
 class PreprocessingParser(bbcode.Parser):
-    _preprocessors = []
+    def __init__(self, *args, **kwargs):
+        self._preprocessors = []
+        super(PreprocessingParser, self).__init__(*args, **kwargs)
 
     def add_preprocessor(self, preprocessor):
         self._preprocessors.append(preprocessor)
@@ -250,6 +252,42 @@ def _add_shortcode_preprocessor(parser):
     parser.add_preprocessor(_preprocess_shortcode)
     return parser
 
+def _add_pgp_tag(parser):
+    pgp_sig_msg_pat = re.compile(
+        '(?P<message>'
+        '-----BEGIN PGP SIGNED MESSAGE-----\s+'
+        '(Hash: [^\n]+\s+)?'
+        '(?P<plaintext>.*)'
+        '-----BEGIN PGP SIGNATURE-----'
+        '.*'
+        '-----END PGP SIGNATURE-----'
+        ')', re.DOTALL)
+
+    def _replace_sig(match):
+        return '[pgp]%s[/pgp]%s' % (
+            match.group('message'),
+            match.group('plaintext'))
+
+    def _preprocess_pgp_signatures(text):
+        return pgp_sig_msg_pat.sub(_replace_sig, text)
+
+    def render_pgp(tag_name, value, options, parent, context):
+        rows = value.count('\n') + 1
+        return ("""
+            <div class="pgp-block">
+                <button title="Post is PGP signed. Show signature.">
+                    <i class="show-pgp-sig"></i>
+                </button>
+                <textarea rows="%d" readonly="true">%s</textarea>
+            </div>
+        """ % (rows, value))
+
+    parser.add_preprocessor(_preprocess_pgp_signatures)
+    parser.add_formatter('pgp', render_pgp, replace_cosmetic=False,
+                         render_embedded=False, replace_links=False,
+                         transform_newlines=False)
+    return parser
+
 def _add_shortcode_tag(parser):
     global shortcode_map
 
@@ -276,7 +314,9 @@ _supported_tags = {
     'LINK': _add_link_tag,
     'SPOILER': _add_spoiler_tag,
     'NOJS_SPOILER': _add_nojs_spoiler_tag,
-    'SHORTCODE': _add_shortcode_tag
+    'SHORTCODE': _add_shortcode_tag,
+    'PGP': _add_pgp_tag,
+    'NOP': lambda parser: parser
 }
 
 def build_parser(tags, escape_html=True):

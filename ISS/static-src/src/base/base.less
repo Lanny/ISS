@@ -159,16 +159,20 @@ footer {
   max-height: 500px;
 }
 
+.pretty-pre() {
+  background-color: @bg_light;
+  border: 1px solid @seperator_color;
+  padding: 1em 1.5em;
+  border-radius: 3px;
+  overflow: auto;
+}
+
 .code-block {
   margin-top: 2em;
   position: relative;
 
   pre {
-    background-color: @bg_light;
-    border: 1px solid @seperator_color;
-    padding: 1em 1.5em;
-    border-radius: 3px;
-    overflow: auto;
+    .pretty-pre();
   }
 
   &:before {
@@ -177,6 +181,31 @@ footer {
     top: -16px;
     left: 0px;
     font-size: 10px;
+  }
+}
+
+.pgp-block {
+  button {
+    .icn-btn-scaleable(35);
+    display: block; 
+    float: right;
+    background: transparent;
+    border: none;
+
+    &:hover {
+      background: rgba(255,255,255,0.4);
+    }
+
+    &:before { .icn-lock(); }
+  }
+  textarea {
+    .pretty-pre();
+    display: none;
+    width: 100%;
+
+    &.show {
+      display: block;
+    }
   }
 }
 
