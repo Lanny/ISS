@@ -58,6 +58,7 @@ class PGPPublicKeyField(forms.CharField):
     KEY_REGEX = re.compile(
             '^\s*'                                      # Leading whitespace
             '-----BEGIN PGP PUBLIC KEY BLOCK-----\s*'   # header
+            '.*\s*'                                     # Something like ver.
             '([a-zA-Z\d+/=]+\s+)+'                      # B64 key content
             '-----END PGP PUBLIC KEY BLOCK-----'        # Footer
             '\s*$')                                     # Trailing whitespace
