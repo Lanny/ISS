@@ -125,6 +125,10 @@
     .thanker-block {
       background-color: @bg_dark;
 
+      & when (@THEME = "bibliotek") {
+        margin: 0 20px;
+      }
+
       @media (min-width: @breakpoint) {
         margin-top: 5px;
       }
