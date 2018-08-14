@@ -416,10 +416,13 @@ def format_duration(duration):
     parts = []
 
     for (unit_name, nsecs) in TIME_HIERARCHY:
-        if seconds > nsecs:
+        if seconds >= nsecs:
             (q, r) = divmod(seconds, nsecs)
             parts.append('%d%s' % (q, unit_name[0]))
             seconds = r 
+
+        if seconds < 1:
+            break
 
     return ' '.join(parts)
 

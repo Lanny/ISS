@@ -8,6 +8,7 @@ import tutils
 class UtilsTestCase(tutils.ForumConfigTestCase):
     cannonical_form_tests = (
         ('42s', timedelta(seconds=42)),
+        ('1w', timedelta(days=7)),
         ('1y 2d', timedelta(days=358)),
         ('2w 42s', timedelta(days=14, seconds=42)),
         ('2y 2d 2h 2m 2s', timedelta(
