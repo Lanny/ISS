@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node_modules/gulp-cli/bin/gulp.js clean && node_modules/gulp-cli/bin/gulp.js generate"
+    "build": "node node_modules/gulp-cli/bin/gulp.js clean && node node_modules/gulp-cli/bin/gulp.js generate"
   },
   "repository": {
     "type": "git",

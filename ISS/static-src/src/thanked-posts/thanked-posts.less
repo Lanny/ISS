@@ -2,8 +2,10 @@
 @import "../post-list/post-list.less";
 
 .thanked-posts {
-  .rounded();
-  margin-bottom: 20px;
+  @media (min-width: @breakpoint) {
+    .rounded();
+    margin-bottom: 20px;
+  }
 
   h1 {
     .title-box();
@@ -11,7 +13,9 @@
 
   .post-list {
     .post {
-      .rounded();
+      @media (min-width: @breakpoint) {
+        .rounded();
+      }
     }
   }
 }
