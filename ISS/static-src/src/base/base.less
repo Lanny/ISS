@@ -11,16 +11,11 @@ input[type="submit"] {
 body {
   font-family: @body_font_family;
   font-size: @body_font_size;
+  color: @body_font_color;
   border: 0;
   padding: 0;
   margin: 0;
-
-  & when (@THEME = '&T') {
-    background: @bg_primary url(/static/img/bg.jpg) repeat 0 0;
-  }
-  & when (@THEME = 'bibliotek') {
-    background-color: @white;
-  }
+  background: @body_bg;
 }
 
 

@@ -21,10 +21,6 @@ var staticDir = '../static',
     'editor-bootstrap.js',
     'auto-suggest-bootstrap.js',
     'base.js'
-  ],
-  themes = [
-    '&T',
-    'Bibliotek'
   ];
 
 var ISSConfig = JSON.parse(

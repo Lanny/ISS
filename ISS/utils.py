@@ -119,7 +119,8 @@ config_defaults = {
     'invite_expiration_time': datetime.timedelta(days=14),
     'themes': (
         ('&T', '&T'),
-        ('bibliotek', 'Bibliotek')
+        ('bibliotek', 'Bibliotek'),
+        ('NSTS', 'Never Seen The Sun')
     ),
     'default_theme': '&T'
 }
