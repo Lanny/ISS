@@ -213,9 +213,7 @@ footer {
 }
 
 .inline-submit-container {
-  .rounded();
-  .-display-flex();
-
+  display: flex;
   width: 100%;
 
   [type="text"] {
@@ -226,13 +224,14 @@ footer {
 
   [type="submit"] {
     .primary();
+    margin: 0;
     padding: 10px 15px;
-    border: none;
+    border: 0;
   }
 
   input {
     font-size: 14px;
-    border-radius: none;
+    border-radius: 0;
   }
 }
 

@@ -406,7 +406,6 @@ def search(request):
             items_per_page = utils.get_config('general_items_per_page')
             paginator = Paginator(qs, items_per_page)
             page = utils.page_by_request(paginator, request)
-            print page[0]
 
             ctx = {
                 'rel_page': page,

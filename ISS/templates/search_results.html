@@ -25,9 +25,33 @@
 
     <form method="GET" action="" class="search-form">
       <fieldset>
-        {{ form.as_p }}
+        {{ form.non_field_errors }}
+        <div id="q-container">
+          {{ form.q.errors }}
+          {{ form.q.label_tag }}
+          <div class="input-container">
+            {{ form.q }}
+            <input type="submit" value="Search">
+          </div>
+        </div>
 
-        <input type="submit" value="Search">
+        <div>
+          {{ form.search_type.errors }}
+          {{ form.search_type.label_tag }}
+          {{ form.search_type }}
+        </div>
+
+        <div>
+          {{ form.author.errors }}
+          {{ form.author.label_tag }}
+          {{ form.author }}
+        </div>
+
+        <div>
+          {{ form.forum.errors }}
+          {{ form.forum.label_tag }}
+          {{ form.forum }}
+        </div>
       </fieldset>
     </form>
 
