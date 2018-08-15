@@ -3,7 +3,7 @@
 {% load util_tags %}
 
 <!doctype html>
-<html class="no-js">
+<html lang="en" class="no-js">
   <head>
     <title>
       {% block title %}
@@ -45,9 +45,9 @@
     <div class="page-content">
       <a href="/" id='top-banner'>
         <div class="peekaboo-container">
-          <img src="{% static "img/peekaboo.png" %}" class="peekaboo" >
+          <img src="{% static "img/peekaboo.png" %}" class="peekaboo" alt="a really stupid image that you should ignore" >
         </div>
-        <img src="{% static banner %}" class="banner" >
+        <img src="{% static banner %}" class="banner" alt="site banner" >
       </a>
 
       <div class="user-controls">

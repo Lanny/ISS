@@ -23,7 +23,7 @@
 
   <div class="search-results">
 
-    <form method="GET" action="" class="search-form">
+    <form method="GET" action="{% url 'search' %}" class="search-form">
       <fieldset>
         {{ form.non_field_errors }}
         <div id="q-container">
