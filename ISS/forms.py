@@ -62,7 +62,7 @@ class PosterSelectField(forms.CharField):
 
         for username in value.split(','):
             if not username: continue
-            
+
             norm = Poster.normalize_username(username)
 
             try:
@@ -740,3 +740,11 @@ class SearchForm(forms.Form):
     forum = forms.ModelMultipleChoiceField(
         queryset=Forum.objects.all(),
         required=False)
+
+    def __init__(self, *args, **kwargs):
+        # Delay setting this attr because urlconf initilization must be
+        # complete for reverse to function
+        self.base_fields['author'].widget.attrs['data-auto-suggest-endpoint'] = (
+                reverse('api-user-serach'))
+
+        super(SearchForm, self).__init__(*args, **kwargs)

@@ -19,6 +19,7 @@ var staticDir = '../static',
   optimizeModules = [
     'thread.js',
     'editor-bootstrap.js',
+    'auto-suggest-bootstrap.js',
     'base.js'
   ],
   themes = [

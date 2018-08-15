@@ -72,3 +72,7 @@
     {% include "page_list.html" with page=page %}
   {% endif %}
 {% endblock %}
+
+{% block js %}
+  {% include "require.html" with bootstrap="auto-suggest-bootstrap" %}
+{% endblock %}
