@@ -372,25 +372,54 @@ def user_list(request):
 def search(request):
     q = request.GET.get('q', None)
 
+    # Special case for no query param, user is probably landing here
+    # without having filled out a query yet.
     if not q:
-        return render(request, 'search_results.html', {})
+        return render(request, 'search_results.html', {
+            'form': forms.SearchForm()
+        })
 
-    terms = ' & '.join(q.split(' '))
-    qs = Post.objects.filter(content__tsmatch=terms).order_by('-created')
+    else:
+        form = forms.SearchForm(request.GET)
+        if form.is_valid():
+            d = form.cleaned_data
+            terms = ' & '.join(d['q'].split(' '))
 
-    posts_per_page = utils.get_config('general_items_per_page')
+            model = None
+            filter_q = {}
 
-    paginator = Paginator(qs, posts_per_page)
+            if d['search_type'] == 'threads':
+                model = Thread
+                filter_q['title__tsmatch'] =  terms
+                if d['forum']: filter_q['forum__in'] = d['forum']
+            else:
+                model = Post
+                filter_q['content__tsmatch'] = terms
+                if d['forum']: filter_q['thread__forum__in'] = d['forum']
 
-    page = utils.page_by_request(paginator, request)
+            if d['author']:
+                filter_q['author__in'] = d['author']
 
-    ctx = {
-        'rel_page': page,
-        'q': q,
-        'posts': page
-    }
+            qs = model.objects.filter(**filter_q).order_by('-created')
 
-    return render(request, 'search_results.html', ctx)
+
+            items_per_page = utils.get_config('general_items_per_page')
+            paginator = Paginator(qs, items_per_page)
+            page = utils.page_by_request(paginator, request)
+            print page[0]
+
+            ctx = {
+                'rel_page': page,
+                'page': page,
+                'form': form,
+                'q': d['q']
+            }
+        else:
+            ctx = {
+                'form': form
+            }
+
+        return render(request, 'search_results.html', ctx)
 
 
 class NewThread(utils.MethodSplitView):

@@ -53,6 +53,43 @@ class BBCodeField(forms.CharField):
 
         return value
 
+class PosterSelectField(forms.CharField):
+    def clean(self, value):
+        value = super(PosterSelectField, self).clean(value)
+
+        posters = []
+        unfound = []
+
+        for username in value.split(','):
+            if not username: continue
+            
+            norm = Poster.normalize_username(username)
+
+            try:
+                user = Poster.objects.get(normalized_username=norm)
+            except Poster.DoesNotExist:
+                error = ValidationError(
+                    'User with username %(username)s does not exist.',
+                    params={'username': username},
+                    code='UNKNOWN_USER')
+
+                unfound.append(error)
+            else:
+                posters.append(user)
+
+        if unfound:
+            raise ValidationError(unfound)
+        else:
+            return posters
+
+    def widget_attrs(self, widget):
+        attrs = super(PosterSelectField, self).widget_attrs(widget)
+
+        attrs['data-auto-suggest'] = 'true'
+        attrs['data-auto-suggest-delimiter'] = ','
+
+        return attrs
+
 
 class PGPPublicKeyField(forms.CharField):
     KEY_REGEX = re.compile(
@@ -617,13 +654,7 @@ class NewPrivateMessageForm(forms.Form):
                               max_length=255,
                               min_length=title_min_len)
 
-    to = forms.CharField(
-        label='To',
-        max_length=512,
-        widget=forms.TextInput(attrs={
-            'data-auto-suggest': 'true',
-            'data-auto-suggest-delimiter': ',',
-        }))
+    to = PosterSelectField(label='To', max_length=512)
 
     content = BBCodeField(label='Reply',
                           min_length=post_min_len,
@@ -646,32 +677,6 @@ class NewPrivateMessageForm(forms.Form):
         del kwargs['author']
 
         super(NewPrivateMessageForm, self).__init__(*args, **kwargs)
-
-    def clean_to(self):
-        to_line = self.cleaned_data['to']
-
-        receivers = []
-        unfound = []
-
-        for username in to_line.split(','):
-            norm = Poster.normalize_username(username)
-
-            try:
-                user = Poster.objects.get(normalized_username=norm)
-            except Poster.DoesNotExist:
-                error = ValidationError(
-                    'User with username %(username)s does not exist.',
-                    params={'username': username},
-                    code='UNKNOWN_USER')
-
-                unfound.append(error)
-            else:
-                receivers.append(user)
-
-        if unfound:
-            raise ValidationError(unfound)
-        else:
-            return receivers
 
     def clean(self, *args, **kwargs):
         super(NewPrivateMessageForm, self).clean(*args, **kwargs)
@@ -722,3 +727,16 @@ class IssueBanForm(forms.Form):
                                     widget=forms.HiddenInput())
     duration = DurationField(required=True)
     reason = forms.CharField(max_length=1024)
+
+class SearchForm(forms.Form):
+    q = forms.CharField(required=True, max_length=2048, label='Query')
+    search_type = forms.ChoiceField(
+        label='Search Type',
+        choices=(('posts', 'Posts'), ('threads', 'Threads')),
+        widget=forms.RadioSelect(),
+        required=True,
+        initial='posts')
+    author = PosterSelectField(label='Author', max_length=512, required=False)
+    forum = forms.ModelMultipleChoiceField(
+        queryset=Forum.objects.all(),
+        required=False)

@@ -2,7 +2,11 @@
 {% load bbc %}
 
 {% block page_name %}
-  Posts by {{ poster.username }} - 
+  {% if page %}
+    Search Results for: {{ q }}
+  {% else %}
+    Search
+  {% endif %}
 {% endblock %}
 
 {% block breadcrumb %}
@@ -14,28 +18,33 @@
 
 {% block content %}
   {% if posts %}
-    {% include "page_list.html" with page=posts %}
+    {% include "page_list.html" with page=page %}
   {% endif %}
 
   <div class="search-results">
 
     <form method="GET" action="" class="search-form">
-      <div class="inline-submit-container">
-        <input type="text" name="q" {% if q %}value="{{ q }}"{% endif %}>
+      <fieldset>
+        {{ form.as_p }}
+
         <input type="submit" value="Search">
-      </div>
+      </fieldset>
     </form>
 
-    {% if posts %}
+    {% if page %}
       <div class="results">
         <h1>Search Results for "{{ q }}"</h1>
 
-        {% include "post_list.html" with posts=posts show_thread_context=True show_post_controls=False show_thanks_block=False %}
+        {% if form.cleaned_data.search_type == 'threads' %}
+          {% include 'thread_list.html' with threads=page %}
+        {% else %}
+          {% include "post_list.html" with posts=page show_thread_context=True show_post_controls=False show_thanks_block=False %}
+        {% endif %}
       </div>
     {% endif %}
   </div>
 
-  {% if posts %}
-    {% include "page_list.html" with page=posts %}
+  {% if page %}
+    {% include "page_list.html" with page=page %}
   {% endif %}
 {% endblock %}

@@ -1,13 +1,37 @@
 @import "../base/config.less";
 @import "../post-list/post-list.less";
+@import "../thread-index/thread-index.less";
 
 .search-results {
   .search-form {
+    .standard-form();
     margin-bottom: 20px;
+
+    #id_search_type {
+      list-style: none;
+      display: flex;
+      padding: 0;
+
+      li {
+        margin-right: 15px;
+
+        label {
+          margin: 0;
+
+          input {
+            display: inline;
+            width: auto;
+            margin: 0;
+            vertical-align: middle;
+          }
+        }
+      }
+    }
   }
 
   .results {
     .rounded();
+    .thread-index();
     margin-bottom: 20px;
 
     h1 {
