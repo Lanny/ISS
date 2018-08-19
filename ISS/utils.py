@@ -303,7 +303,7 @@ def get_standard_bbc_parser(embed_images=True, embed_video=True,
             'BC',
             'LINK',
             'SPOILER' if allow_js else 'NOJS_SPOILER',
-            'PGP' if allow_js else 'NOP',
+            'PGP' if allow_js else 'NOJS_PGP',
             'SHORTCODE'
         ), escape_html=escape_html)
 

@@ -27,11 +27,11 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^houston/', include('Houston.urls')),
 
-    url(r'^humans.txt$', views.forum.humans, name='humans'),
-    url(r'^robots.txt$', views.forum.robots, name='robots'),
+    url(r'^humans.txt$', views.misc.humans, name='humans'),
+    url(r'^robots.txt$', views.misc.robots, name='robots'),
     url(r'^sitemap.xml$', sitemap, {'sitemaps': iss_sitemaps}, name='sitemap'),
 
-    url(r'^smilies.css', views.forum.smilies_css, name='smilies-css'),
+    url(r'^smilies.css', views.misc.smilies_css, name='smilies-css'),
     url(r'^smiley-refrence',
         TemplateView.as_view(template_name="smilies_refrence.html"),
         name='smilies-refrence'),
@@ -135,6 +135,9 @@ urlpatterns = [
         TemplateView.as_view(template_name="bbcode_help.html"),
         name='bbcode-help'),
 
+    url(r'^misc/echo',
+        views.misc.EchoForm.as_view(),
+        name='echo'),
     url('^search$',
         views.forum.search,
         name='search'),
@@ -149,7 +152,7 @@ urlpatterns = [
         name='auto-anonymize'),
 
     url('^page/(?P<page_id>.*)',
-        views.forum.view_static_page,
+        views.misc.view_static_page,
         name="static-page"),
 
     url('^embed/bandcamp',

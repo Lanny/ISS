@@ -252,7 +252,7 @@ def _add_shortcode_preprocessor(parser):
     parser.add_preprocessor(_preprocess_shortcode)
     return parser
 
-def _add_pgp_tag(parser):
+def _add_pgp_preprocessor(parser):
     pgp_sig_msg_pat = re.compile(
         '(?P<message>'
         '-----BEGIN PGP SIGNED MESSAGE-----\s+'
@@ -271,6 +271,11 @@ def _add_pgp_tag(parser):
     def _preprocess_pgp_signatures(text):
         return pgp_sig_msg_pat.sub(_replace_sig, text)
 
+    parser.add_preprocessor(_preprocess_pgp_signatures)
+
+    return parser
+
+def _add_pgp_tag(parser):
     def render_pgp(tag_name, value, options, parent, context):
         rows = value.count('\n') + 1
         return ("""
@@ -282,7 +287,26 @@ def _add_pgp_tag(parser):
             </div>
         """ % (rows, value))
 
-    parser.add_preprocessor(_preprocess_pgp_signatures)
+    parser = _add_pgp_preprocessor(parser)
+    parser.add_formatter('pgp', render_pgp, replace_cosmetic=False,
+                         render_embedded=False, replace_links=False,
+                         transform_newlines=False)
+    return parser
+
+def _add_nojs_pgp_tag(parser):
+    def render_pgp(tag_name, value, options, parent, context):
+        echo_url = reverse('echo')
+
+        return ("""
+            <form method="POST" action="%s">
+                <input type="hidden" name="content" value="%s" />
+                [[ This post contains PGP signed content. To see the raw
+                version for verification,
+                <input type="submit" value="click here" > ]]
+            </form>
+        """ % (echo_url, value))
+
+    parser = _add_pgp_preprocessor(parser)
     parser.add_formatter('pgp', render_pgp, replace_cosmetic=False,
                          render_embedded=False, replace_links=False,
                          transform_newlines=False)
@@ -316,6 +340,7 @@ _supported_tags = {
     'NOJS_SPOILER': _add_nojs_spoiler_tag,
     'SHORTCODE': _add_shortcode_tag,
     'PGP': _add_pgp_tag,
+    'NOJS_PGP': _add_nojs_pgp_tag,
     'NOP': lambda parser: parser
 }
 
