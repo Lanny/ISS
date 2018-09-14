@@ -1,5 +1,5 @@
 ;(function() {
-  function wrap($, thanks, Editor) {
+  function wrap($, thanks, Editor, CheckboxRangeSelector) {
     $(function() {
       $('.editor').each(function(_, el) {
         new Editor(el, {saveContent: true});
@@ -26,6 +26,10 @@
         var button = $(e.currentTarget).find('.thank-action');
         thanks.handleThankIntention(button);
       });
+
+      new CheckboxRangeSelector('.post-list', {
+        checkboxSelector: 'input[form="post-actions"]'
+      });
     });
   }
 
@@ -33,6 +37,7 @@
     'jquery',
     'thanks',
     'editor',
+    'checkbox-range-select',
     'base'
   ], wrap);
 })();
