@@ -7,7 +7,7 @@ tripphrase==0.4
 django-recaptcha==1.3.1
 django-houston==0.1.0
 git+https://github.com/RyanJenkins/django-recaptcha2.git
-git+https://github.com/RyanJenkins/bbcode.git
+git+https://github.com/RyanJenkins/bbcode.git@017533485082de9b717e6b0d31ca49706710b801
 
 # Dev dependencies
 django-debug-toolbar==1.6
