@@ -25,6 +25,9 @@ from snowpenguin.django.recaptcha2.fields import ReCaptchaField
 from ISS.models import *
 from ISS import iss_bbcode
 
+from .HomoglyphNormalizer import HomoglyphNormalizer
+HomoglyphNormalizer = HomoglyphNormalizer
+
 DO_NOT_LINK_TAGS = { 'video', 'pre' }
 TIME_DELTA_FORMAT = re.compile(r'^\s*((?P<years>\d+)y)?\s*((?P<weeks>\d+)w)?\s*((?P<days>\d+)d)?\s*((?P<hours>\d+?)h)?\s*((?P<minutes>\d+?)m)?\s*((?P<seconds>\d+?)s)?\s*$')
 TIME_HIERARCHY = (
@@ -121,7 +124,10 @@ config_defaults = {
         ('&T', '&T'),
         ('bibliotek', 'Bibliotek')
     ),
-    'default_theme': '&T'
+    'default_theme': '&T',
+    'hot_topics_count': 5,
+    'hot_topics_recent_span': datetime.timedelta(days=3),
+    'hot_topics_cache_time': datetime.timedelta(minutes=30)
 }
 
 config = config_defaults.copy()
@@ -470,69 +476,6 @@ class TolerantJSONEncoder(json.JSONEncoder):
             return super(self, json.JSONEncoder).default(o)
         except TypeError:
             return None
-
-class HomoglyphNormalizer(object):
-    @classmethod
-    def _decode_hex_repr(cls, s):
-        return ('\\U%08x' % int(s, 16)).decode('unicode-escape')
-
-    @classmethod
-    def _decode_seq(cls, s):
-        return u''.join(
-            [cls._decode_hex_repr(point) for point in s.strip().split(' ')]
-        )
-
-    def __init__(self, confusables_file=None):
-        if not confusables_file:
-            base = os.path.dirname(os.path.abspath(__file__))
-            path = os.path.join(base, 'support/confusables.txt')
-            confusables_file = open(path, 'r')
-
-        self._norm_graph = {}
-
-        with confusables_file:
-            for line in confusables_file:
-                # Strip off comments
-                effective_line = line.split('#', 1)[0].strip()
-
-                if effective_line.count(';') < 2:
-                    continue
-
-                confusable_seq, target_seq, _ = effective_line.split(';', 2)
-                confusable = self._decode_seq(confusable_seq)
-                target = self._decode_seq(target_seq)
-
-                if self._norm_graph.has_key(confusable):
-                    f.close()
-                    raise ValueError('One confusable codepoint has multiple '
-                                     'normalization targets.')
-
-                self._norm_graph[confusable] = target
-
-    def _norm_codepoint(self, code_point):
-        if self._norm_graph.has_key(code_point):
-            return self._norm_graph[code_point]
-        else:
-            return code_point
-
-    def normalize(self, unicode_str):
-        if not isinstance(unicode_str, unicode):
-            unicode_str = unicode(unicode_str)
-
-        normalized = []
-        for code_point in unicode_str:
-            normalized.append(self._norm_codepoint(code_point.lower()))
-            normalized.append(self._norm_codepoint(code_point.upper()))
-
-        return u''.join(normalized)
-
-_process_normalizer = None
-def normalize_homoglyphs(prenormalized):
-    global _process_normalizer
-    if not _process_normalizer:
-        _process_normalizer = HomoglyphNormalizer()
-
-    return _process_normalizer.normalize(prenormalized)
 
 def captchatize_form(form, label="Captcha"):
     _config = get_config('recaptcha_settings')

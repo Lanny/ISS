@@ -11,6 +11,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from ISS import utils
+from ISS.utils import HomoglyphNormalizer
 from auth_package import AuthPackage, AccessControlList
 from admin_models import Ban
 
@@ -272,7 +273,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     @classmethod
     def normalize_username(cls, username):
-        norm = utils.normalize_homoglyphs(username)
+        norm = HomoglyphNormalizer.normalize_homoglyphs(username)
         norm = re.sub('\s', '', norm)
 
         return norm
