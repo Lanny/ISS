@@ -206,23 +206,18 @@ def get_standard_bbc_parser(embed_images=True, embed_video=True,
         ), escape_html=escape_html)
 
 def get_closure_bbc_parser():
-    c_parser = bbcode.Parser(
-        newline='\n', install_defaults=False, escape_html=False,
-        replace_links=False, replace_cosmetic=False)
+    """
+    BBCode parser that renders BBCode to BBCode, stripping quotes and easter
+    eggs tags and removing PGP signatures, and . Typically used when quoting a
+    post.
+    """
 
-    def depyramiding_quote_render(tag_name, value, options, parent, context):
-        if tag_name == 'quote':
-            return ''
-
-        return value
-
-    c_parser.add_formatter('quote', depyramiding_quote_render)
-
-    c_parser.add_simple_formatter(
-        'byusingthistagIaffirmlannyissupercool',
-        '%(value)s')
-
-    return c_parser
+    return iss_bbcode.build_parser(
+        ('STRIP_PGP', 'STRIP_QUOTE', 'STRIP_COOL_TAG'),
+        escape_html=False, newline='\n',
+        install_defaults=False,
+        replace_links=False,
+        replace_cosmetic=False)
 
 def get_tag_distribution(data):
     """

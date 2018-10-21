@@ -10,6 +10,16 @@ from django.urls import reverse, NoReverseMatch
 shortcode_pat = None
 shortcode_map = None
 
+PGP_SIG_PAT = re.compile(
+    '(?P<message>'
+    '-----BEGIN PGP SIGNED MESSAGE-----\s+'
+    '(Hash: [^\n]+\s+)?'
+    '(?P<plaintext>.*)'
+    '-----BEGIN PGP SIGNATURE-----'
+    '.*'
+    '-----END PGP SIGNATURE-----'
+    ')', re.DOTALL)
+
 class EmbeddingNotSupportedException(Exception):
     pass
 
@@ -253,23 +263,13 @@ def _add_shortcode_preprocessor(parser):
     return parser
 
 def _add_pgp_preprocessor(parser):
-    pgp_sig_msg_pat = re.compile(
-        '(?P<message>'
-        '-----BEGIN PGP SIGNED MESSAGE-----\s+'
-        '(Hash: [^\n]+\s+)?'
-        '(?P<plaintext>.*)'
-        '-----BEGIN PGP SIGNATURE-----'
-        '.*'
-        '-----END PGP SIGNATURE-----'
-        ')', re.DOTALL)
-
     def _replace_sig(match):
         return '[pgp]%s[/pgp]%s' % (
             match.group('message'),
             match.group('plaintext'))
 
     def _preprocess_pgp_signatures(text):
-        return pgp_sig_msg_pat.sub(_replace_sig, text)
+        return PGP_SIG_PAT.sub(_replace_sig, text)
 
     parser.add_preprocessor(_preprocess_pgp_signatures)
 
@@ -326,6 +326,27 @@ def _add_shortcode_tag(parser):
 
     return parser
 
+def _add_quote_stripper(parser):
+    def depyramiding_quote_render(tag_name, value, options, parent, context):
+        if tag_name == 'quote':
+            return ''
+
+        return value
+
+    parser.add_formatter('quote', depyramiding_quote_render)
+    return parser
+
+def _add_cooltag_stripper(parser):
+    return parser.add_simple_formatter(
+        'byusingthistagIaffirmlannyissupercool',
+        '%(value)s')
+
+def _add_pgp_stripper(parser):
+    parser.add_preprocessor(
+        lambda text: PGP_SIG_PAT.sub(lambda m: m.group('plaintext'), text))
+
+    return parser
+
 _supported_tags = {
     'IMG': _add_img_tag,
     'NO_IMG': _add_img_stub_tag,
@@ -341,16 +362,21 @@ _supported_tags = {
     'SHORTCODE': _add_shortcode_tag,
     'PGP': _add_pgp_tag,
     'NOJS_PGP': _add_nojs_pgp_tag,
+    'STRIP_QUOTE': _add_quote_stripper,
+    'STRIP_PGP': _add_pgp_stripper,
+    'STRIP_COOL_TAG': _add_cooltag_stripper,
     'NOP': lambda parser: parser
 }
 
-def build_parser(tags, escape_html=True):
-    parser = PreprocessingParser(escape_html=escape_html, replace_cosmetic=False)
+def build_parser(tags, escape_html=True, **kwargs):
+    opts = {'replace_cosmetic': False}
+    opts.update(kwargs)
+    parser = PreprocessingParser(escape_html=escape_html, **opts)
 
     for tag in tags:
         _supported_tags[tag](parser)
 
-    del parser.recognized_tags['link']
+    if 'link' in parser.recognized_tags:
+        del parser.recognized_tags['link']
 
     return parser
-

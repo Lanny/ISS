@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
-from core_models import Forum, Poster
+from ISS import utils
+from core_models import Forum, Poster, Thread
 
 
 class LatestThreadsForumPreference(models.Model):
