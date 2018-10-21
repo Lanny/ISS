@@ -1,6 +1,8 @@
 import os
 
-class HomoglyphNormalizer(object):
+from .Singleton import Singleton
+
+class HomoglyphNormalizer(Singleton):
     """
     Loads a structured list of homoglyphs and produces "normalized" unicode
     sequences where differing input sequences that are visually ambigious (per
@@ -10,7 +12,6 @@ class HomoglyphNormalizer(object):
     conditions, normalized strings should be considered a "hash" of their input
     rather than a presentable string.
     """
-    _INSTANCE = None
 
     @classmethod
     def _decode_hex_repr(cls, s):
@@ -28,10 +29,7 @@ class HomoglyphNormalizer(object):
         Normalize a homoglyph string using the default configuration and
         confusables list.
         """
-        if not cls._INSTANCE:
-            cls._INSTANCE = cls()
-
-        return cls._INSTANCE.normalize(prenormalized)
+        return cls.get_instance().normalize(prenormalized)
 
     def __init__(self, confusables_file=None):
         if not confusables_file:
