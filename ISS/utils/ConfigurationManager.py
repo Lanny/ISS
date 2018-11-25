@@ -80,6 +80,7 @@ class ConfigurationManager(Singleton):
             overrides = settings.FORUM_CONFIG
 
         self._config.update(overrides)
+        self._config['DEBUG'] = settings.DEBUG
 
         for extension in self._config['extensions']:
             module = importlib.import_module(extension)

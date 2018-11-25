@@ -4,8 +4,22 @@
   <script>
     window.config = {
       'bandcamp-embed-url': "{% url 'embed-bandcamp' %}",
-      'editor-buttons': {% if editor_buttons %}true{% else %}false{% endif %}
-    };
+      'editor-buttons': {% if editor_buttons %}true{% else %}false{% endif %},
+      'development': {% if config.DEBUG %}true{% else %}false{% endif %},
+      {% if config.DEBUG %}
+      'themes': [
+        {% for code, name in config.themes %}
+        {% autoescape off %}
+        {
+          code: '{{ code }}',
+          name: '{{ name }}',
+          stylesheet: '{% static "css/"|add:code|add:".css" %}'
+        },
+        {% endautoescape %}
+        {% endfor %}
+      ],
+      {% endif %}
+    }
   </script>
 
   <script type="text/javascript" src="{% static 'js/require.js' %}"></script>
@@ -22,6 +36,9 @@
     // intermingled with us so just wait for it to finish.
     document.addEventListener('DOMContentLoaded', function() {
       requirejs(['{{ bootstrap }}'], function() {});
+      {% if config.DEBUG %}
+        requirejs(['development'], function() {});
+      {% endif %}
     });
   </script>
 {% endif %}

@@ -7,6 +7,9 @@
   <head>
     <title>
       {% block title %}
+        {% if config.DEBUG %}
+          [DEBUG] - 
+        {% endif %}
         {% block page_name %}{% endblock %}
         {{ config.forum_name }}
       {% endblock %}
@@ -24,7 +27,7 @@
     {% endif %}
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <link rel="stylesheet" href="{% get_theme request.user %}">
+    <link rel="stylesheet" id="theme-sheet" href="{% get_theme request.user %}">
     {% block css %} {% endblock %}
 
     <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon.png">
