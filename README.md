@@ -72,6 +72,9 @@ $ ./manage.py runserver
 
 If you want rotating banners drop them in `ISS/static/banners` and restart the server. You can make up some test data using thing admin interface (url `/admin/`)
 
+# Development Tips
+- When `DEBUG` is true, you can use ctrl+P on any page to cycle through the available themes.
+
 # Configuration
 Every ISS instance must define a `FORUM_CONFIG` setting. Default values exist
 for every key so it may be empty. Here is a list of the recognized properties
