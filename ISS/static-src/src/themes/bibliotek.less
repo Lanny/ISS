@@ -9,6 +9,8 @@
 @bg_primary: #000;
 @fg: #000;
 @fg_alt: #FFF;
+@bg_primary_disabled: @bg_light;
+@fg_disabled: #B9B9B9;
 @link_color: #000;
 @fg_low_contrast: #333333;
 @alert_red: #EC0000;
@@ -33,11 +35,14 @@
   text-decoration: underline;
 }
 
-.btn() {
+._theme_button() {
   border-radius: 0px;
   background-color: @bg_light;
   border: 1px solid @seperator_color_major;
   padding: 10px 20px;
-  cursor: pointer;
   text-decoration: none;
+
+  &[aria-disabled], &[disabled] {
+    border-style: dashed;
+  }
 }

@@ -5,7 +5,9 @@
 @fg_ultra_dark: #FF00FF;
 @bg_light: #FF00FF;
 @bg_primary: #FF00FF;
+@bg_primary_disabled: #FF00FF;
 @fg: #FF00FF;
+@fg_disabled: #FF00FF;
 @fg_alt: #FF00FF;
 @link_color: #FF00FF;
 @fg_low_contrast: #FF00FF;
@@ -53,8 +55,20 @@
   }
 }
 
+._btn_common() {
+  cursor: pointer;
 
-.btn() {}
+  &[aria-disabled], &[disabled] {
+    pointer-events: none;
+    color: @fg_disabled;
+    background-color: @bg_primary_disabled;
+  }
+}
+
+.btn() {
+  ._btn_common();
+  ._theme_button();
+}
 
 .resp-btn() {
   .btn();
