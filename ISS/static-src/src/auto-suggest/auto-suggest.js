@@ -15,6 +15,7 @@
       this._preventNextQuery = false;
       this._pendingQuery = null;
       this._selectedOption = 0;
+      this._hasFocus = false;
 
       this._bindHandlers();
     }
@@ -44,8 +45,14 @@
             self._close();
           }
         });
-        this._el.on('focusin', function() { self._open(); })
-          .on('focusout', function() { self._close(); });
+        this._el.on('focusin', function() {
+            self._hasFocus = true;
+            self._open();
+          })
+          .on('focusout', function() {
+            self._hasFocus = false;
+            self._close();
+          });
 
         this._el.on('keyup', function(e) {
           self._queryMaybe();
@@ -106,6 +113,9 @@
           .addClass('active');
       },
       _open: function() {
+        if (!this._hasFocus)
+          return; 
+
         this._suggestionsBox.css('display', 'block');
       },
       _close: function() {
