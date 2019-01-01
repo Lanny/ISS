@@ -18,8 +18,8 @@ class TabooModelsTest(TestCase):
     def setUp(self):
         tutils.create_std_forums()
 
-        self.mark = tutils.create_user(thread_count=1)
-        self.assassin = tutils.create_user()
+        self.mark = tutils.create_user(thread_count=1, post_count=1)
+        self.assassin = tutils.create_user(thread_count=1, post_count=1)
 
         self.profile = TabooProfile.objects.create(
             poster=self.assassin,
@@ -99,6 +99,52 @@ class TabooModelsTest(TestCase):
                          iss_utils.get_ext_config(EXT, 'usertitle_reward'))
 
 
+class TabooMarkAssignmentTest(TestCase):
+    def setUp(self):
+        tutils.create_std_forums()
+
+        self.mark = tutils.create_user(thread_count=1, post_count=1)
+        self.assassin = tutils.create_user(post_count=1)
+
+
+        TabooProfile.objects.create(
+            poster=self.assassin,
+            mark=None,
+            phrase='foobar')
+
+        TabooProfile.objects.create(
+            poster=self.mark,
+            mark=None,
+            phrase='foobar')
+
+    def test_unregistered_users_not_elligilbe(self):
+        unregistered_poster = tutils.create_user(post_count=1)
+
+        self.assertFalse(
+            TabooProfile.objects.filter(poster=unregistered_poster))
+
+        candidates = self.assassin.taboo_profile._get_candidate_marks()
+
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(candidates[0], self.mark.taboo_profile)
+
+    def test_inactive_users_not_elligilbe(self):
+        inactive_poster = tutils.create_user(post_count=1)
+        post = inactive_poster.post_set.all()[0]
+        post.created -= datetime.timedelta(days=356)
+        post.save()
+
+        TabooProfile.objects.create(
+            poster=inactive_poster,
+            active=True,
+            mark=None,
+            phrase='foobar')
+
+        candidates = self.assassin.taboo_profile._get_candidate_marks()
+
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(candidates[0], self.mark.taboo_profile)
+
 class TabooViewTest(TestCase):
     def setUp(self):
         tutils.create_std_forums()
@@ -107,7 +153,7 @@ class TabooViewTest(TestCase):
         self.tu_1_client = Client()
         self.tu_1_client.force_login(self.tu_1)
         
-        self.tu_2 = tutils.create_user()
+        self.tu_2 = tutils.create_user(post_count=1)
         self.tu_2_client = Client()
         self.tu_2_client.force_login(self.tu_2)
 
