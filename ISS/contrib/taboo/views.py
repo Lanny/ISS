@@ -49,6 +49,9 @@ class Register(MethodSplitView):
         if not is_eligible(request.user):
             return HttpResponseBadRequest('Not eligible.')
 
+        # Rectify violations here because cron jobs are nasty
+        TabooViolationRecord.rectify_all_usertitles()
+
         profile = None
         try:
             profile = TabooProfile.objects.get(poster=request.user)
@@ -75,6 +78,9 @@ class Unregister(MethodSplitView):
         for prof in those_marking:
             prof.mark = None
             prof.save()
+
+        # Rectify violations here because cron jobs are nasty
+        TabooViolationRecord.rectify_all_usertitles()
 
         return HttpResponseRedirect(reverse('taboo-status'))
 

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import random
+from datetime import timedelta
 
 from django.db import models, transaction
 from django.utils import timezone
@@ -88,6 +89,13 @@ class TabooProfile(models.Model):
             end_date=timezone.now() + duration,
             reason=ban_reason)
 
+        TabooViolationRecord.objects.create( phrase=self.phrase,
+            poster=self.poster,
+            mark=self.mark,
+            violating_post=post,
+            victor_former_title=self.poster.custom_user_title,
+            loser_former_title=self.mark.custom_user_title)
+
         self.mark.custom_user_title = iss_utils.get_ext_config(
             EXT,
             'usertitle_punishment')
@@ -97,12 +105,6 @@ class TabooProfile(models.Model):
             EXT,
             'usertitle_reward')
         self.poster.save()
-
-        TabooViolationRecord.objects.create(
-            phrase=self.phrase,
-            poster=self.poster,
-            mark=self.mark,
-            violating_post=post)
 
         self.mark = None
         self.save()
@@ -125,6 +127,37 @@ class TabooViolationRecord(models.Model):
     violating_post = models.ForeignKey(iss_models.Post, null=True,
                                        on_delete=models.SET_NULL)
 
+    titles_rectified = models.BooleanField(default=False)
+    victor_former_title = models.CharField(
+            max_length=256,
+            default=None,
+            null=True)
+    loser_former_title = models.CharField(
+            max_length=256,
+            default=None,
+            null=True)
+
+    @transaction.atomic
+    def rectify_usertitles(self):
+        title_period = iss_utils.get_ext_config(EXT, 'usertitle_duration')
+        is_due = self.created < (timezone.now() - title_period)
+
+        if is_due and not self.titles_rectified:
+            self.poster.custom_user_title = self.victor_former_title
+            self.poster.save()
+
+            self.mark.custom_user_title = self.loser_former_title
+            self.mark.save()
+
+            self.titles_rectified = True
+            self.save()
+
+    #@transaction.atomic
+    @classmethod
+    def rectify_all_usertitles(cls):
+        violations = cls.objects.filter(titles_rectified=False)
+        for violation in violations:
+            violation.rectify_usertitles()
 
 @receiver(models.signals.post_save, sender=iss_models.Post)
 def check_taboo_violation(sender, instance, created, **kwargs):
@@ -169,5 +202,3 @@ def taboo_profiles_changed(sender, instance, created, **kwargs):
                 [prof.poster],
                 'Taboo: You\'ve received a new mark.',
                 content)
-            
-    PROFILE_PROCESSING_IN_PROGRESS = False
