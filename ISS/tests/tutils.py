@@ -1,9 +1,11 @@
 import random
 from datetime import timedelta
 
+from django.conf import settings
 from django.test import TestCase
 from django.utils import timezone
 
+from ISS import utils
 from ISS.models import *
 
 def create_std_forums():
@@ -120,32 +122,31 @@ class ForumConfigTestCase(TestCase):
     _setup_called = False
     forum_config = {}
 
+    @classmethod
+    def setUpClass(cls):
+        super(ForumConfigTestCase, cls).setUpClass()
+        cm = utils.ConfigurationManager.get_instance()
+        config = utils.rmerge(settings.FORUM_CONFIG, cls.forum_config)
+        cm.reinit(config)
+
+        #for key in cls.forum_config:
+        #    cls._stored_values[key] = utils.get_config()[key]
+        #    utils.get_config()[key] = cls.forum_config[key]
+
     def setUp(self):
-        if self._setup_called:
-            raise Exception('tearDown wasn\'t called. tearDown most likely '
-                            'errantly overridden')
-        self._setup_called = True
-
-        for key in self.forum_config:
-            self._stored_values[key] = utils.get_config()[key]
-            utils.get_config()[key] = self.forum_config[key]
-
-
         self.setUp2()
 
-    def setUp2(self):
-        pass
-
     def tearDown(self):
-        if not self._setup_called:
-            raise Exception('setUp wasn\'t called. setUp most likely '
-                            'errantly overridden')
-        self.setup_called = False
-
-        for key in self._stored_values:
-            utils.get_config()[key] = self._stored_values[key] 
-
         self.tearDown2()
 
+    def setUp2(self):
+        """
+        Legacy method, use setUp in subclasses instead.
+        """
+        pass
+
     def tearDown2(self):
+        """
+        Legacy method, use tearDown in subclasses instead.
+        """
         pass
