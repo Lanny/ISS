@@ -12,6 +12,24 @@ from apps import TabooConfig
 
 EXT = TabooConfig.name
 
+MARKABLE_PROFILES_QUERY = """
+SELECT
+    profile.id,
+    profile.poster_id,
+    MAX(post.created)
+FROM "taboo_tabooprofile" AS profile
+JOIN "ISS_poster" AS poster
+    ON profile.poster_id=poster.id
+JOIN "ISS_post" as post
+    ON post.author_id=poster.id
+WHERE
+    profile.active IS TRUE AND
+    profile.poster_id != %s
+GROUP BY profile.id
+HAVING MAX(post.created) > (NOW() - INTERVAL '14 days');
+"""
+
+
 class TabooProfile(models.Model):
     poster = models.OneToOneField(iss_models.Poster, related_name='taboo_profile')
     mark = models.ForeignKey(iss_models.Poster, null=True,
@@ -32,13 +50,22 @@ class TabooProfile(models.Model):
         content = iss_utils.get_closure_bbc_parser().format(post.content)
         return self.phrase.lower() in content.lower()
 
+    def _get_candidate_marks(self):
+        candidates = TabooProfile.objects.raw(
+            MARKABLE_PROFILES_QUERY,
+            [self.poster.pk])
+
+        # De-serialize the profiles as the DB has already done most the heavy
+        # lifting and we need to call `len()` on them.
+        candidates = [c for c in candidates]
+
+        return candidates
+
     def choose_mark_and_phrase(self):
         self.phrase = random.choice(
                 iss_utils.get_ext_config(EXT, 'phrases'))
-        candidates = (TabooProfile.objects.all()
-            .filter(active=True)
-            .exclude(pk=self.pk))
-        ccount = candidates.count()
+        candidates = self._get_candidate_marks()
+        ccount = len(candidates)
 
         if ccount < 1:
             self.mark = None
@@ -83,6 +110,9 @@ class TabooProfile(models.Model):
 
     def get_successes(self):
         return TabooViolationRecord.objects.filter(poster=self.poster)
+
+    def __unicode__(self):
+        return self.poster.username
 
 class TabooViolationRecord(models.Model):
     created = models.DateTimeField(default=timezone.now)
