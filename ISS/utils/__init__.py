@@ -24,8 +24,21 @@ from snowpenguin.django.recaptcha2.fields import ReCaptchaField
 
 from ISS.models import *
 from ISS import iss_bbcode
+from ISS.utils import misc
 
 
+# Functions and classes defined in the misc submodule should be available as
+# properties of the `utils` module, however some other utils submodules which
+# can't import this module due to circularity require them as well. Utils
+# submodules refer to `utils.misc.foo()` but consumers of the utils lib refer 
+# to `utils.foo()` so here we're dumping the misc module's "exports" into our
+# own.
+for def_name in misc.__all__:
+    locals()[def_name] = getattr(misc, def_name)
+
+# We keep these classes in seperate files but would like to export them as part
+# of this module directly rather than a submodule. This isn't super pretty but
+# it makes working with them elsewhere a bit nicer.
 CLASSES = (
     'HomoglyphNormalizer',
     'ConfigurationManager'

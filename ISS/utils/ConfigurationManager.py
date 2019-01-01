@@ -5,6 +5,7 @@ from django.conf import settings
 
 from .GlobShortcodeRegistrar import GlobShortcodeRegistrar
 from .Singleton import Singleton
+from . import misc
 
 
 class ConfigurationManager(Singleton):
@@ -73,13 +74,11 @@ class ConfigurationManager(Singleton):
         'hot_topics_cache_time': datetime.timedelta(minutes=30)
     }
 
-    def __init__(self, overrides=None):
-        self._config = self.CONFIG_DEFAULTS.copy()
-
-        if overrides is None:
-            overrides = settings.FORUM_CONFIG
-
-        self._config.update(overrides)
+    def reinit(self, overrides):
+        """
+        Exists only for purposes of testing. Never use this in actual code.
+        """
+        self._config = misc.rmerge(self.CONFIG_DEFAULTS.copy(), overrides)
         self._config['DEBUG'] = settings.DEBUG
 
         for extension in self._config['extensions']:
@@ -99,6 +98,12 @@ class ConfigurationManager(Singleton):
         registrar = self._config['shortcode_registrar']
         self._config['shortcode_map'] = registrar.get_shortcode_map()
 
+    def __init__(self, overrides=None):
+        if overrides is None:
+            overrides = settings.FORUM_CONFIG
+
+        self.reinit(overrides=overrides)
+
     def get(self, *keys):
         if len(keys) == 0:
             return self._config
@@ -116,4 +121,21 @@ class ConfigurationManager(Singleton):
             return ext_config.get(keys[0])
         else:
             return tuple(ext_config.get(key) for key in keys)
+
+    def set(self, key_path, value):
+        """
+        Exists only for purposes of testing. Never use this in actual code.
+        """
+        if isinstance(keys, basestring):
+            key_path = (key_path,)
+
+        target = self._config
+        
+        for key in key_path[:-1]:
+            target = target[key_path]
+
+        target[key_path[-1]] = value
+
+
+
 
