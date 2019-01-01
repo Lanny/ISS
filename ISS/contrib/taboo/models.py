@@ -26,9 +26,8 @@ WHERE
     profile.active IS TRUE AND
     profile.poster_id != %s
 GROUP BY profile.id
-HAVING MAX(post.created) > (NOW() - INTERVAL '14 days');
+HAVING MAX(post.created) > (NOW() - INTERVAL %s);
 """
-
 
 class TabooProfile(models.Model):
     poster = models.OneToOneField(iss_models.Poster, related_name='taboo_profile')
@@ -53,7 +52,10 @@ class TabooProfile(models.Model):
     def _get_candidate_marks(self):
         candidates = TabooProfile.objects.raw(
             MARKABLE_PROFILES_QUERY,
-            [self.poster.pk])
+            [
+                self.poster.pk,
+                iss_utils.get_ext_config(EXT, 'time_to_inactivity')
+            ])
 
         # De-serialize the profiles as the DB has already done most the heavy
         # lifting and we need to call `len()` on them.

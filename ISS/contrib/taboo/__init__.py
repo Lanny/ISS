@@ -6,9 +6,10 @@ default_app_config = 'ISS.contrib.taboo.apps.TabooConfig'
 ISS_config = {
     'violation_duration': timedelta(days=1),
     'ban_reason_tmpl': 'You said the taboo phrase "%(phrase)s"!',
-    'reregister_cooldown': timedelta(days=7),
+    'reregister_cooldown': timedelta(days=1),
     'min_posts_to_reg': 100,
     'min_age_to_reg': timedelta(days=28),
+    'time_to_inactivity': timedelta(days=7),
     'post_msg_tmpl': '\n\n[b]User was banned for saying the taboo phrase "%(phrase)s"![/b]',
     'base_path': '^taboo/',
     'gulp_dir': os.path.dirname(os.path.realpath(__file__)) + '/static-src',

@@ -99,7 +99,17 @@ class TabooModelsTest(TestCase):
                          iss_utils.get_ext_config(EXT, 'usertitle_reward'))
 
 
-class TabooMarkAssignmentTest(TestCase):
+class TabooMarkAssignmentTest(tutils.ForumConfigTestCase):
+    forum_config = {
+        'extensions': ['ISS.contrib.taboo'],
+        'initial_account_period_total': 199,
+        'extension_config': {
+            'ISS.contrib.taboo': {
+                'time_to_inactivity': datetime.timedelta(days=355)
+            }
+        }
+    }
+
     def setUp(self):
         tutils.create_std_forums()
 
@@ -144,6 +154,23 @@ class TabooMarkAssignmentTest(TestCase):
 
         self.assertEqual(len(candidates), 1)
         self.assertEqual(candidates[0], self.mark.taboo_profile)
+
+
+    def test_barely_active_users_not_elligilbe(self):
+        active_poster = tutils.create_user(post_count=1)
+        post = active_poster.post_set.all()[0]
+        post.created -= datetime.timedelta(days=354)
+        post.save()
+
+        TabooProfile.objects.create(
+            poster=active_poster,
+            active=True,
+            mark=None,
+            phrase='foobar')
+
+        candidates = self.assassin.taboo_profile._get_candidate_marks()
+
+        self.assertEqual(len(candidates), 2)
 
 class TabooViewTest(TestCase):
     def setUp(self):
