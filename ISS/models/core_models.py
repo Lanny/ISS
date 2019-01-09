@@ -419,7 +419,7 @@ class Thread(models.Model):
         return not self.locked
 
     def _get_flag(self, user, save=True):
-        if not (user.pk in self._flag_cache[user.pk]):
+        if not (user.pk in self._flag_cache):
             flag, created = ThreadFlag.objects.get_or_create(
                 poster=user,
                 thread=self)
