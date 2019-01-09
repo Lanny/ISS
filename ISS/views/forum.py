@@ -297,7 +297,8 @@ def latest_threads(request):
             """, (ppk, [tf._thread.pk for tf in page]))
             fd = dict([(flag.thread_id, flag) for flag in flags])
             for tf in page:
-                tf._thread._flag_cache[ppk] = fd[tf._thread.pk]
+                if tf._thread.pk in fd:
+                    tf._thread._flag_cache[ppk] = fd[tf._thread.pk]
 
     ctx = {
         'rel_page': page,
