@@ -43,7 +43,7 @@ class ConfigurationManager(Singleton):
             ('PMS', 'Inbox', 'inbox', 'is_authenticated', None),
             ('RLINK', 'Search', 'search', 'always', None),
             ('RLINK', 'Admin', 'admin:index', 'is_admin', None),
-            ('FORM', 'Logout', 'logout', 'is_authenticated', None),
+            ('FORM', 'Logout', 'logout', 'is_authenticated', 'logout-form'),
             ('RLINK', 'Register', 'register', 'is_not_authenticated', None),
         ),
         'static_pages': (),

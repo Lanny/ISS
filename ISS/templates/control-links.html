@@ -21,7 +21,9 @@
             {% endif %}
           </a>
         {% elif link_type == 'FORM' %}
-          <form method="POST" action="{% url pat %}">
+          <form method="POST"
+                action="{% url pat %}"
+                data-form-name="{{ extra }}">
             {% csrf_token %}
             <input type="submit" value="{{ name }}">
             <input type="hidden" name="next"
