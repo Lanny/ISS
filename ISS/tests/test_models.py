@@ -236,6 +236,8 @@ class SubscriptionTestCase(TestCase):
 
         post.delete()
 
+        self.thread = Thread.objects.get(pk=self.thread.pk)
+
         self.assertTrue(self.thread.is_subscribed(self.tu_1))
         self.assertFalse(self.thread.has_unread_posts(self.tu_1))
         self.assertEqual(self.thread._get_flag(self.tu_1).last_read_post.pk,
