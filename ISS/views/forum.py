@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, transaction, connection
 from django.db.models import Count, Max, F, Q
 from django.http import (HttpResponseRedirect, HttpResponseBadRequest,
     JsonResponse, HttpResponseForbidden, HttpResponse)
@@ -260,14 +260,44 @@ def latest_threads(request):
 
     threads = (Thread.objects.all()
         .filter(~Q(forum_id__in=excluded_forums))
-        .order_by('-last_update'))
+        .order_by('-last_update')
+        .select_related('author'))
 
     threads_per_page = utils.get_config('threads_per_forum_page')
     paginator = utils.MappingPaginator(threads, threads_per_page)
 
     paginator.install_map_func(lambda t: utils.ThreadFascet(t, request))
-
     page = utils.page_by_request(paginator, request)
+
+    # We can apparently do aggregate queries faster than the ORM, so do that.
+    # This is ugly but this is one of the highest traffic pages in the project
+    # and we can make a _big_ perf difference (as in an order of magnitude) by
+    # doing these queries together like this.
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT post.thread_id, COUNT(*) FROM "ISS_post" AS post
+                WHERE post.thread_id = ANY(%s)
+                GROUP BY post.thread_id
+        """, ([tf._thread.pk for tf in page],))
+        counts = dict(cursor.fetchall())
+
+        for tf in page:
+            tf._thread.post_count = counts[tf._thread.pk]
+
+
+        if request.user.is_authenticated():
+            ppk = request.user.pk
+            flags = ThreadFlag.objects.raw("""
+                SELECT tf.*
+                    FROM "ISS_thread" AS thread
+                    JOIN "ISS_threadflag" AS tf ON
+                        tf.thread_id = thread.id
+                        AND tf.poster_id = %s
+                WHERE thread.id = ANY(%s)
+            """, (ppk, [tf._thread.pk for tf in page]))
+            fd = dict([(flag.thread_id, flag) for flag in flags])
+            for tf in page:
+                tf._thread._flag_cache[ppk] = fd[tf._thread.pk]
 
     ctx = {
         'rel_page': page,

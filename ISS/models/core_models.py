@@ -30,7 +30,6 @@ class TSVectorLookup(models.Lookup):
             lhs, rhs)
 
         return sql, params
-    
 
 class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     USERNAME_FIELD = 'username'
@@ -356,13 +355,17 @@ class Forum(models.Model):
 
 class Thread(models.Model):
     created = models.DateTimeField(default=timezone.now)
-    last_update = models.DateTimeField(default=timezone.now)
+    last_update = models.DateTimeField(default=timezone.now, db_index=True)
     locked = models.BooleanField(default=False)
 
     forum = models.ForeignKey(Forum)
     author = models.ForeignKey(Poster)
     title = models.TextField()
     log = models.TextField(blank=True)
+
+    def __init__(self, *args, **kwargs):
+        super(Thread, self).__init__(*args, **kwargs)
+        self._flag_cache = {}
 
     def get_last_post(self):
         return (self.post_set
@@ -378,7 +381,10 @@ class Thread(models.Model):
         return self.author
 
     def get_post_count(self):
-        return self.post_set.count()
+        if not hasattr(self, 'post_count'):
+            self.post_count = self.post_set.count()
+
+        return self.post_count
 
     def get_posts_in_thread_order(self, reverse=False):
         return self.post_set.order_by('-created' if reverse else 'created')
@@ -413,14 +419,17 @@ class Thread(models.Model):
         return not self.locked
 
     def _get_flag(self, user, save=True):
-        flag, created = ThreadFlag.objects.get_or_create(
-            poster=user,
-            thread=self)
+        if not (user.pk in self._flag_cache[user.pk]):
+            flag, created = ThreadFlag.objects.get_or_create(
+                poster=user,
+                thread=self)
 
-        if created and save:
-            flag.save()
+            if created and save:
+                flag.save()
 
-        return flag
+            self._flag_cache[user.pk] = flag
+
+        return self._flag_cache[user.pk]
 
     def has_unread_posts(self, user):
         if not user.is_authenticated():
