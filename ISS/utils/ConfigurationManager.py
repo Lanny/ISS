@@ -12,6 +12,7 @@ class ConfigurationManager(Singleton):
     CONFIG_DEFAULTS = {
         'forum_name': 'INTERNATIONAL SPACE STATION',
         'forum_domain': 'yourdomain.space',
+        'default_protocol': 'http',
         'banner_dir': 'banners',
         'min_post_chars': 1,
         'max_post_chars': 19475, # No. characters in the first chapter of Dune

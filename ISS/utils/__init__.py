@@ -41,7 +41,8 @@ for def_name in misc.__all__:
 # it makes working with them elsewhere a bit nicer.
 CLASSES = (
     'HomoglyphNormalizer',
-    'ConfigurationManager'
+    'ConfigurationManager',
+    'MethodSplitView',
 )
 
 for klass_name in CLASSES:
@@ -59,68 +60,6 @@ TIME_HIERARCHY = (
     ('seconds', 1)
 )
 SECONDS_IN = dict(TIME_HIERARCHY)
-
-class MethodSplitView(object):
-    """
-    A flexible class for splitting handling of different HTTP methods being
-    dispatched to the same view into separate class methods. Subclasses may
-    define a separate class method for each HTTP method the view handles (e.g.
-    GET(self, request, ...), POST(self, request, ...) which will be called with
-    the usual view signature when that sort of request is made.
-    
-    Subclasses may also define a `pre_method_check` method which, if it returns
-    a HttpResponse, will be used to response to the request instead of
-    delegating to the corresponding method.
-    """
-
-    _MAGIC = 'haderach kwisatz'
-
-    def __init__(self, magic='melange', *args, **kwargs):
-        if magic != self._MAGIC:
-            raise RuntimeError(
-                'MethodSplitViews should be instantiated through the '
-                '.as_view() method, not directly. Check your urls file.')
-
-    def __call__(self, request, *args, **kwargs):
-        if getattr(self, 'active_required', False):
-            if not request.user.is_active:
-                return HttpResponseForbidden('You must be an active user '
-                                             'to do this')
-        if getattr(self, 'staff_required', False):
-            if not request.user.is_staff:
-                return HttpResponseForbidden('You must be staff to do this.')
-
-        if getattr(self, 'unbanned_required', False):
-            if not request.user.is_authenticated() :
-                return HttpResponseForbidden(
-                    'You must be authenticated to take this action.')
-
-            if request.user.is_banned():
-                return get_ban_403_response(request)
-
-        meth = getattr(self, request.method, None)
-
-        if not meth:
-            return HttpResponseBadRequest('Request method %s not supported'
-                                          % request.method)
-        
-        response_maybe = self.pre_method_check(request, *args, **kwargs)
-
-        if isinstance(response_maybe, HttpResponse):
-            return response_maybe
-
-        return meth(request, *args, **kwargs)
-
-    def pre_method_check(request, *args, **kwargs):
-        return None
-
-    @classmethod
-    def as_view(cls):
-        view = cls(magic=cls._MAGIC)
-        if getattr(cls, 'require_login', False):
-            return login_required(view)
-        else:
-            return view
 
 def memoize(f):
     memo = {}
@@ -149,6 +88,18 @@ def get_ban_403_response(request):
 
     return render(request, 'ban_notification.html', ctx, status=403)
 
+def reverse_absolute(*args, **kwargs):
+    return '%s://%s%s' % (
+            get_config('default_protocol'),
+            get_config('forum_domain'),
+            reverse(*args, **kwargs))
+
+def get_posts_per_page(poster):
+    if poster.is_authenticated():
+        return poster.posts_per_page
+    else:
+        return get_config('posts_per_thread_page')
+
 def page_by_request(paginator, request):
     page_num = request.GET.get('p')
 
@@ -161,29 +112,12 @@ def page_by_request(paginator, request):
 
     return page
 
-def get_posts_per_page(poster):
-    if poster.is_authenticated():
-        return poster.posts_per_page
-    else:
-        return get_config('posts_per_thread_page')
-
 def get_posts_page(qs, request):
     posts_per_page = get_posts_per_page(request.user)
     paginator = Paginator(qs, posts_per_page)
     page = page_by_request(paginator, request)
 
     return page
-
-def render_mixed_mode(request, templates, additional={}):
-    data = {}
-
-    for key_name, template, ctx in templates:
-        markup = render(request, template, ctx).content
-        data[key_name] = markup
-
-    data.update(additional)
-
-    return JsonResponse(data)
 
 def bandcamp_markup_for_url(urlstr):
     url = urlparse.urlparse(urlstr)

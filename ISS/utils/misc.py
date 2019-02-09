@@ -1,5 +1,8 @@
 import itertools
 
+from django.core.paginator import EmptyPage, PageNotAnInteger
+from django.http import JsonResponse
+
 def rmerge(*args, **kwargs):
     seq_mode = kwargs.get('seq_mode', 'replace')
 
@@ -48,4 +51,19 @@ def rmerge(*args, **kwargs):
 
         return merged
 
-__all__ = ['rmerge']
+def render_mixed_mode(request, templates, additional={}):
+    data = {}
+
+    for key_name, template, ctx in templates:
+        markup = render(request, template, ctx).content
+        data[key_name] = markup
+
+    data.update(additional)
+
+    return JsonResponse(data)
+
+
+__all__ = [
+    'rmerge',
+    'render_mixed_mode',
+]
