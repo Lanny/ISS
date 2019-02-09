@@ -45,6 +45,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     username = models.CharField(max_length=256, unique=True)
     normalized_username = models.CharField(max_length=2048)
     email = models.EmailField()
+    #normalized_email = models.EmailField(unique=True)
     date_joined = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
@@ -55,7 +56,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     recovery_code = models.CharField(max_length=256, null=True, blank=True,
                                      default=None)
     recovery_expiration = models.DateTimeField(default=timezone.now)
-
+    email_verification_code = models.UUIDField(default=uuid.uuid4)
     avatar = models.ImageField(upload_to='avatars', null=True)
 
     posts_per_page = models.PositiveSmallIntegerField(default=20)
@@ -273,6 +274,10 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         norm = re.sub('\s', '', norm)
 
         return norm
+
+    @classmethod
+    def normalize_email(cls, email):
+        return email
 
     def embed_images(self):
         return self.allow_image_embed
@@ -704,6 +709,11 @@ def update_forum_last_update(sender, instance, created, **kwargs):
 def set_normalized_username(sender, instance, **kwargs):
     if not instance.normalized_username:
         instance.normalized_username = Poster.normalize_username(instance.username)
+
+#@receiver(models.signals.pre_save, sender=Poster)
+#def set_normalized_email(sender, instance, **kwargs):
+#    if not instance.normalized_email:
+#        instance.normalized_email = Poster.normalize_email(instance.email)
 
 @receiver(models.signals.pre_save, sender=Thanks)
 def reject_auto_erotic_athanksication(sender, instance, **kwargs):

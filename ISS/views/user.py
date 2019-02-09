@@ -5,6 +5,7 @@ from django.core.mail import send_mail
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.contrib.auth import login, authenticate
+from django.db import transaction
 from django.db.models import Count
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
@@ -231,16 +232,37 @@ class RegisterUser(utils.MethodSplitView):
         ctx = {'form': form}
         return render(request, 'register.html', ctx)
 
+    @transaction.atomic
     def POST(self, request):
         form = forms.RegistrationForm(request.POST)
 
         if form.is_valid():
             poster = form.save()
+            poster.is_active = False
+            poster.save()
 
-            poster = authenticate(username = form.cleaned_data['username'],
-                                  password = form.cleaned_data['password1'])
-            login(request, poster)
-            return HttpResponseRedirect('/')
+            #send_mail(
+            #    'Password Recovery for %s' % forum_name,
+            #    render_to_string('email/password_recovery.txt', ctx),
+            #    settings.EMAIL_HOST_USER,
+            #    [user.email])
+
+            forum_name = utils.get_config('forum_name')
+            email_address = form.cleaned_data['email']
+            message = (
+                'Thank you for registering with %s. You\'ll need to verify '
+                'your email address before logging in. We\'ve send an email '
+                'to %s. Please check that address and follow the instructions '
+                'in the email. Note that it may take a few minutes for the '
+                'email to arrive. If you don\'t receive an email check your '
+                'spam folder.'
+            ) % (forum_name, email_address)
+
+            return render(request, 'generic_message.html', {
+                'page_title': 'Regristration Successful',
+                'heading': 'Regristration Successful',
+                'message': message
+            })
 
         else:
             ctx = { 'form': form }
