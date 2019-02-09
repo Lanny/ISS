@@ -177,9 +177,6 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
            return None
 
     def is_banned(self):
-        if not self.is_active:
-            return True
-
         pending_bans = self.get_pending_bans()
         if pending_bans.count() > 0:
             return True
