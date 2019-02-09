@@ -5,7 +5,7 @@ import json
 
 from django.conf import settings
 from django.core import mail
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user
 from django.test import TestCase, Client
 from django.urls import reverse, resolve
 from django.utils import timezone
@@ -520,6 +520,40 @@ class RegistrationTestCase(tutils.ForumConfigTestCase):
 
         self.assertEqual(Poster.objects.count(), initial_user_count + 1)
 
+    def test_poster_starts_inavtive(self):
+        username =  'Leslie Lamport'
+        response = self.anon_client.post(
+            self.path,
+            {
+                'username': username,
+                'password1': 'BD08081890',
+                'password2': 'BD08081890',
+                'email': 'lamport@softmicro.com'
+            })
+
+        leslie = Poster.objects.get(username=username)
+        self.assertFalse(leslie.is_active)
+
+    def test_poster_cant_login(self):
+        username = 'Leslie Lamport'
+        password = 'BD08081890'
+        response = self.anon_client.post(
+            self.path,
+            {
+                'username': username,
+                'password1': password,
+                'password2': password,
+                'email': 'lamport@softmicro.com'
+            })
+
+        login_path  = reverse('login')
+        client = Client()
+        response = client.post(
+            login_path, { 'username': username, 'password': password })
+
+        user = auth.get_user(client)
+        self.assertFalse(user.is_authenticated())
+
 class RegistrationDisabledTestCase(tutils.ForumConfigTestCase):
     forum_config = {
         'recaptcha_settings': None,
@@ -704,13 +738,9 @@ class LoginTestCase(TestCase):
                 'password': self.password,
             })
 
-        uid = (self.otsu_client
-                .session
-                .load()
-                .get('_auth_user_id'))
-
+        user = auth.get_user(self.otsu_client)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(int(uid), self.otsu.pk)
+        self.assertEqual(user.pk, self.otsu.pk)
         
     def test_incorrect_unicode_password_success(self):
         response = self.otsu_client.post(
@@ -720,15 +750,9 @@ class LoginTestCase(TestCase):
                 'password': self.password[:-1],
             })
 
-        uid = (self.otsu_client
-                .session
-                .load()
-                .get('_auth_user_id'))
-
+        user = auth.get_user(self.otsu_client)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(uid, None)
-        
-
+        self.assertFalse(user.is_authenticated())
 
 class UserCPTestCase(tutils.ForumConfigTestCase):
     forum_config = {'captcha_period': 0}
