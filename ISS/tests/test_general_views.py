@@ -501,58 +501,84 @@ class RegistrationTestCase(tutils.ForumConfigTestCase):
         'enable_registration': True
     }
 
-    def setUp2(self):
+    def setUp(self):
         tutils.create_std_forums()
         self.anon_client = Client()
         self.path = reverse('register')
 
-    def test_happy_path(self):
-        initial_user_count = Poster.objects.count()
-
-        response = self.anon_client.post(
-            self.path,
-            {
-                'username': 'Groucho Marx',
-                'password1': 'BD08081890',
-                'password2': 'BD08081890',
-                'email': 'gmarx@contrarian.club'
-            })
-
-        self.assertEqual(Poster.objects.count(), initial_user_count + 1)
-
-    def test_poster_starts_inavtive(self):
-        username =  'Leslie Lamport'
-        response = self.anon_client.post(
-            self.path,
-            {
-                'username': username,
-                'password1': 'BD08081890',
-                'password2': 'BD08081890',
-                'email': 'lamport@softmicro.com'
-            })
-
-        leslie = Poster.objects.get(username=username)
-        self.assertFalse(leslie.is_active)
-
-    def test_poster_cant_login(self):
-        username = 'Leslie Lamport'
-        password = 'BD08081890'
+    def _register(self, username="Leslie Lamport", email="lamport@softmicro.com", password='TLA Rules'):
         response = self.anon_client.post(
             self.path,
             {
                 'username': username,
                 'password1': password,
                 'password2': password,
-                'email': 'lamport@softmicro.com'
+                'email': email
             })
+
+        return response
+
+    def test_happy_path(self):
+        initial_user_count = Poster.objects.count()
+        response = self._register() 
+        self.assertEqual(Poster.objects.count(), initial_user_count + 1)
+
+    def test_poster_starts_inavtive(self):
+        username =  'Leslie Lamport'
+        response = self._register() 
+        leslie = Poster.objects.get(username=username)
+        self.assertFalse(leslie.is_active)
+
+    def test_poster_cant_login(self):
+        username = 'Leslie Lamport'
+        password = 'BD08081890'
+        response = self._register(username=username, password=password) 
+        leslie = Poster.objects.get(username=username)
 
         login_path  = reverse('login')
         client = Client()
         response = client.post(
             login_path, { 'username': username, 'password': password })
-
         user = auth.get_user(client)
+
         self.assertFalse(user.is_authenticated())
+
+    def test_email_verification_invalid_code(self):
+        path = reverse('verify-email')
+        client = Client()
+        response = client.get(path, data={'code': 'invalid_code'})
+        self.assertEqual(response.status_code, 404)
+
+    def test_email_verification_missing_code(self):
+        path = reverse('verify-email')
+        client = Client()
+        response = client.get(path, data={'kode': 'zork'})
+        self.assertEqual(response.status_code, 404)
+
+    def test_email_verification_not_in_db_code(self):
+        path = reverse('verify-email')
+        client = Client()
+        response = client.get(path, data={'code': 'a15d9e9d-caf0-4196-b389-6f4ad5dbcf8d'})
+        self.assertEqual(response.status_code, 404)
+
+    def test_email_verification_happy_path(self):
+        username =  'Leslie Lamport'
+        password = 'Now is when I got my last message'
+        response = self._register(username=username, password=password)
+        leslie = Poster.objects.get(username=username)
+
+        path = reverse('verify-email')
+        client = Client()
+        response = client.get(path, data={'code': str(leslie.email_verification_code)})
+        self.assertEqual(response.status_code, 200)
+
+        login_path  = reverse('login')
+        client = Client()
+        response = client.post(login_path,
+                               { 'username': username, 'password': password })
+        print response
+        user = auth.get_user(client)
+        self.assertEqual(user, leslie)
 
 class RegistrationDisabledTestCase(tutils.ForumConfigTestCase):
     forum_config = {
