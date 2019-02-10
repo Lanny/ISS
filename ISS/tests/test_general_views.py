@@ -576,7 +576,6 @@ class RegistrationTestCase(tutils.ForumConfigTestCase):
         client = Client()
         response = client.post(login_path,
                                { 'username': username, 'password': password })
-        print response
         user = auth.get_user(client)
         self.assertEqual(user, leslie)
 
