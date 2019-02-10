@@ -136,10 +136,8 @@ class InitiatePasswordRecovery(utils.MethodSplitView):
             forum_name = utils.get_config('forum_name')
             ctx = {
                 'forum_name': forum_name,
-                'url': ('http://' +
-                        utils.get_config('forum_domain') +
-                        reverse('recovery-reset') +
-                        '?code=' + user.recovery_code),
+                'url': (utils.reverse_absolute('recovery-reset') +
+                    '?code=' + user.recovery_code)
             }
 
             send_mail(
@@ -241,14 +239,26 @@ class RegisterUser(utils.MethodSplitView):
             poster.is_active = False
             poster.save()
 
-            #send_mail(
-            #    'Password Recovery for %s' % forum_name,
-            #    render_to_string('email/password_recovery.txt', ctx),
-            #    settings.EMAIL_HOST_USER,
-            #    [user.email])
-
             forum_name = utils.get_config('forum_name')
             email_address = form.cleaned_data['email']
+
+            verification_url = '%s?code=%s' % (
+                utils.reverse_absolute('verify-email'),
+                poster.email_verification_code)
+            
+
+            ctx = {
+                'forum_name': forum_name,
+                'username': poster.username,
+                'email_address': email_address,
+                'verification_url': verification_url,
+            }
+            send_mail(
+                'Account Verification for %s' % forum_name,
+                render_to_string('email/account_verification.txt', ctx),
+                settings.EMAIL_HOST_USER,
+                [email_address])
+
             message = (
                 'Thank you for registering with %s. You\'ll need to verify '
                 'your email address before logging in. We\'ve send an email '
@@ -267,6 +277,48 @@ class RegisterUser(utils.MethodSplitView):
         else:
             ctx = { 'form': form }
             return render(request, 'register.html', ctx)
+
+class VerifyEmail(utils.MethodSplitView):
+    def _error_out(self, request):
+        message = ('The verification code is either invalid or already '
+            'used. Please check the code sent in the verification email.')
+
+        return render(
+            request,
+            'generic_message.html',
+            {
+                'page_title': 'Error',
+                'heading': 'Verification Code Invalid',
+                'message': message
+            },
+            status=404)
+
+    def GET(self, request):
+        try:
+            code = uuid.UUID(request.GET.get('code', ''))
+        except ValueError:
+            return self._error_out(request)
+
+        try :
+            poster = Poster.objects.get(email_verification_code=code)
+        except Poster.DoesNotExist:
+            return self._error_out(request)
+
+        if poster.is_active:
+            return self._error_out(request)
+
+        poster.is_active = True
+        poster.save()
+
+        message = ('You\'ve successfully verified your account, welcome to '
+            '%s. You can now [url="%s"]log in[/url] to your account.')
+        message = message % (utils.get_config('forum_name'), reverse('login'))
+
+        return render(request, 'generic_message.html', {
+            'page_title': 'Verification Successful',
+            'heading': 'Verification Successful',
+            'message': message
+        })
 
 class RegisterUserWithCode(utils.MethodSplitView):
     def GET(self, request):
