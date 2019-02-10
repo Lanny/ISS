@@ -390,7 +390,6 @@ class AdminThreadCreationForum(TestCase):
         })
         self.assertEqual(response.status_code, 403)
 
-
 class PasswordResetTestCase(TestCase):
     def setUp(self):
         self.franz = tutils.create_user()
@@ -495,18 +494,11 @@ class PasswordResetTestCase(TestCase):
             })
         self.assertEqual(response.status_code, 404)
 
-class RegistrationTestCase(tutils.ForumConfigTestCase):
-    forum_config = {
-        'recaptcha_settings': None,
-        'enable_registration': True
-    }
-
-    def setUp(self):
-        tutils.create_std_forums()
-        self.anon_client = Client()
-        self.path = reverse('register')
-
-    def _register(self, username="Leslie Lamport", email="lamport@softmicro.com", password='TLA Rules'):
+class AbstractRegistrationTestCase(tutils.ForumConfigTestCase):
+    def _register(self,
+                  username="Leslie Lamport",
+                  email="lamport@softmicro.com",
+                  password='TLA Rules'):
         response = self.anon_client.post(
             self.path,
             {
@@ -517,6 +509,17 @@ class RegistrationTestCase(tutils.ForumConfigTestCase):
             })
 
         return response
+
+class RegistrationTestCase(AbstractRegistrationTestCase):
+    forum_config = {
+        'recaptcha_settings': None,
+        'enable_registration': True
+    }
+
+    def setUp(self):
+        tutils.create_std_forums()
+        self.anon_client = Client()
+        self.path = reverse('register')
 
     def test_happy_path(self):
         initial_user_count = Poster.objects.count()
@@ -578,6 +581,48 @@ class RegistrationTestCase(tutils.ForumConfigTestCase):
                                { 'username': username, 'password': password })
         user = auth.get_user(client)
         self.assertEqual(user, leslie)
+
+
+class EmailNormalizationTestCase(AbstractRegistrationTestCase):
+    forum_config = {
+        'recaptcha_settings': None,
+        'enable_registration': True,
+        'email_host_blacklist': ['damnthespam.com']
+    }
+
+    def setUp(self):
+        tutils.create_std_forums()
+        self.anon_client = Client()
+        self.client = Client()
+        self.path = reverse('register')
+
+    def test_identical_address(self):
+        email = "Colin.Maclaurin@gov.scot"
+        self._register(username="CM1", email=email)
+
+        user_count = Poster.objects.count()
+        self._register(username="CM2", email=email)
+
+        self.assertEqual(Poster.objects.count(), user_count)
+
+    def test_similar_address(self):
+        self._register(username="CM1", email= "colinMaclaurin+z@gmail.com")
+        user_count = Poster.objects.count()
+
+        self._register(username="CM2", email="Colin.Maclaurin@gmail.com")
+
+        self.assertEqual(Poster.objects.count(), user_count)
+
+    def test_blacklisted_address(self):
+        user_count = Poster.objects.count()
+        self._register(username="I.N.", email= "isaac.newton@damnthespam.com")
+        self.assertEqual(Poster.objects.count(), user_count)
+
+    def test_diff_addres(self):
+        self._register(username="CM1", email= "Colin.Maclaurin@gov.scot")
+        user_count = Poster.objects.count()
+        self._register(username="CM2", email= "Maclaurin.Colin@gov.scot")
+        self.assertEqual(Poster.objects.count(), user_count + 1)
 
 class RegistrationDisabledTestCase(tutils.ForumConfigTestCase):
     forum_config = {
