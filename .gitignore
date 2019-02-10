@@ -89,6 +89,7 @@ ENV/
 
 *settings.py
 *.swp
+*.swo
 .DS_Store
 
 db.sqlite3
