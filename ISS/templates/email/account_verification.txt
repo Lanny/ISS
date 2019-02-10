@@ -1,0 +1,10 @@
+Thank you for registering on {{ forum_name }}, {{ username }}. To verify your account and get started posting please visit the following url:
+
+{{ verification_url }}
+
+For reference your account details are:
+
+Username: {{ username }}
+Email Address: {{ email_address }}
+
+If you did not register for an account please disregard this email.
