@@ -13,6 +13,7 @@ class ConfigurationManager(Singleton):
         'forum_name': 'INTERNATIONAL SPACE STATION',
         'forum_domain': 'yourdomain.space',
         'default_protocol': 'http',
+        'email_host_blacklist': [],
         'banner_dir': 'banners',
         'min_post_chars': 1,
         'max_post_chars': 19475, # No. characters in the first chapter of Dune
@@ -81,6 +82,11 @@ class ConfigurationManager(Singleton):
         """
         self._config = misc.rmerge(self.CONFIG_DEFAULTS.copy(), overrides)
         self._config['DEBUG'] = settings.DEBUG
+
+        # Turn the blacklist into a set for faster lookups
+        self._config['email_host_blacklist'] = set(
+            self._config['email_host_blacklist'])
+        
 
         for extension in self._config['extensions']:
             module = importlib.import_module(extension)

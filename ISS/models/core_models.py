@@ -10,6 +10,8 @@ from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import timezone
 
+import email_normalize
+
 from ISS import utils
 from ISS.utils import HomoglyphNormalizer
 from auth_package import AuthPackage, AccessControlList
@@ -45,7 +47,10 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     username = models.CharField(max_length=256, unique=True)
     normalized_username = models.CharField(max_length=2048)
     email = models.EmailField()
-    #normalized_email = models.EmailField(unique=True)
+
+    # TODO: Make this non-nullable somehow
+    normalized_email = models.EmailField(null=True)
+
     date_joined = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
@@ -274,10 +279,6 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         norm = re.sub('\s', '', norm)
 
         return norm
-
-    @classmethod
-    def normalize_email(cls, email):
-        return email
 
     def embed_images(self):
         return self.allow_image_embed
@@ -710,10 +711,10 @@ def set_normalized_username(sender, instance, **kwargs):
     if not instance.normalized_username:
         instance.normalized_username = Poster.normalize_username(instance.username)
 
-#@receiver(models.signals.pre_save, sender=Poster)
-#def set_normalized_email(sender, instance, **kwargs):
-#    if not instance.normalized_email:
-#        instance.normalized_email = Poster.normalize_email(instance.email)
+@receiver(models.signals.pre_save, sender=Poster)
+def set_normalized_email(sender, instance, **kwargs):
+    if instance.email:
+        instance.normalized_email = email_normalize.normalize(instance.email)
 
 @receiver(models.signals.pre_save, sender=Thanks)
 def reject_auto_erotic_athanksication(sender, instance, **kwargs):

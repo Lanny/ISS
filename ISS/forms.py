@@ -3,6 +3,7 @@ import json
 import pytz
 import urllib
 import urllib2
+import email_normalize
 
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -419,6 +420,24 @@ class RegistrationForm(UserCreationForm):
                 code='TOO_SIMILAR')
 
         return username
+
+    def clean_email(self, *args, **kwargs):
+        address = self.cleaned_data['email'] #super(RegistrationForm, self).clean_email(*args, **kwargs)
+        norm_addr = email_normalize.normalize(address)
+        _, domain = norm_addr.rsplit('@', 1)
+
+        if domain in utils.get_config('email_host_blacklist'):
+            raise ValidationError(
+                ('Accounts can not be resistered with email addresses '
+                 'provided by this host.'),
+                code='BAD_HOST')
+
+        if Poster.objects.filter(normalized_email=norm_addr).count():
+            raise ValidationError(
+                'Email address is already associated with an account',
+                code='TOO_SIMILAR')
+
+        return address
 
     def save(self):
         poster = UserCreationForm.save(self)
