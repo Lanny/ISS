@@ -422,7 +422,7 @@ class RegistrationForm(UserCreationForm):
         return username
 
     def clean_email(self, *args, **kwargs):
-        address = self.cleaned_data['email'] #super(RegistrationForm, self).clean_email(*args, **kwargs)
+        address = self.cleaned_data['email']
         norm_addr = email_normalize.normalize(address)
         _, domain = norm_addr.rsplit('@', 1)
 

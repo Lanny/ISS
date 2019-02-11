@@ -1,6 +1,7 @@
 import itertools
 
 from django.core.paginator import EmptyPage, PageNotAnInteger
+from django.shortcuts import render
 from django.http import JsonResponse
 
 def rmerge(*args, **kwargs):
