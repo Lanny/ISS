@@ -276,7 +276,7 @@ class RegisterUser(utils.MethodSplitView):
             except SMTPRecipientsRefused:
                 error = ValidationError(
                     'Unable to send verification email to: %(email)s.',
-                    params={ 'email': email_address },
+                    params={ 'email': form.cleaned_data['email'] },
                     code="SMTP_ERROR")
                 form.add_error('email', error)
                 return self._form_error(request, form)
