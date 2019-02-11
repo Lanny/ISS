@@ -1,4 +1,5 @@
 import uuid
+from smtplib import SMTPRecipientsRefused
 from datetime import timedelta
 
 from django.core.mail import send_mail
@@ -7,6 +8,7 @@ from django.conf import settings
 from django.contrib.auth import login, authenticate
 from django.db import transaction
 from django.db.models import Count
+from django.forms import ValidationError
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -225,40 +227,62 @@ class RegisterUser(utils.MethodSplitView):
                 'message': message
             })
 
+    def _form_error(self, request, form):
+        ctx = { 'form': form }
+        return render(request, 'register.html', ctx)
+
+    def _create_poster(self, form):
+        poster = form.save()
+        poster.is_active = False
+        poster.save()
+
+        return poster
+
+    def _send_verificaiton_email(self, poster):
+        forum_name = utils.get_config('forum_name')
+        email_address = poster.email
+
+        verification_url = '%s?code=%s' % (
+            utils.reverse_absolute('verify-email'),
+            poster.email_verification_code)
+        
+        ctx = {
+            'forum_name': forum_name,
+            'username': poster.username,
+            'email_address': email_address,
+            'verification_url': verification_url,
+        }
+
+        send_mail(
+            'Account Verification for %s' % forum_name,
+            render_to_string('email/account_verification.txt', ctx),
+            settings.EMAIL_HOST_USER,
+            [email_address])
+
     def GET(self, request):
         form = forms.RegistrationForm()
         ctx = {'form': form}
         return render(request, 'register.html', ctx)
 
-    @transaction.atomic
     def POST(self, request):
         form = forms.RegistrationForm(request.POST)
 
         if form.is_valid():
-            poster = form.save()
-            poster.is_active = False
-            poster.save()
+            try:
+                with transaction.atomic():
+                    poster = self._create_poster(form)
+                    self._send_verificaiton_email(poster)
+
+            except SMTPRecipientsRefused:
+                error = ValidationError(
+                    _('Unable to send verification email to: %(email)s.'),
+                    params={ 'email': email_address },
+                    code="SMTP_ERROR")
+                form.add_error('email', error)
+                return self._form_error(request, form)
 
             forum_name = utils.get_config('forum_name')
-            email_address = form.cleaned_data['email']
-
-            verification_url = '%s?code=%s' % (
-                utils.reverse_absolute('verify-email'),
-                poster.email_verification_code)
-            
-
-            ctx = {
-                'forum_name': forum_name,
-                'username': poster.username,
-                'email_address': email_address,
-                'verification_url': verification_url,
-            }
-            send_mail(
-                'Account Verification for %s' % forum_name,
-                render_to_string('email/account_verification.txt', ctx),
-                settings.EMAIL_HOST_USER,
-                [email_address])
-
+            email_address = poster.email
             message = (
                 'Thank you for registering with %s. You\'ll need to verify '
                 'your email address before logging in. We\'ve send an email '
@@ -275,8 +299,7 @@ class RegisterUser(utils.MethodSplitView):
             })
 
         else:
-            ctx = { 'form': form }
-            return render(request, 'register.html', ctx)
+            return self._form_error(request, form)
 
 class VerifyEmail(utils.MethodSplitView):
     def _error_out(self, request):
