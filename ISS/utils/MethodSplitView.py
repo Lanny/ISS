@@ -3,6 +3,8 @@ from django.http import HttpResponse, HttpResponseBadRequest, \
 
 from django.contrib.auth.decorators import login_required
 
+from ISS.utils.misc import get_ban_403_response
+
 class MethodSplitView(object):
     """
     A flexible class for splitting handling of different HTTP methods being

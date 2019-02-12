@@ -77,17 +77,6 @@ def get_config(*keys):
 def get_ext_config(ext, *keys):
     return ConfigurationManager.get_instance().get_ext(ext, *keys)
 
-def get_ban_403_response(request):
-    bans = request.user.get_pending_bans().order_by('-end_date')
-
-    ctx = {
-        'end_date': bans[0].end_date,
-        'reasons': [ban.reason for ban in bans],
-        'staff': auth.get_user_model().objects.filter(is_staff=True)
-    }
-
-    return render(request, 'ban_notification.html', ctx, status=403)
-
 def reverse_absolute(*args, **kwargs):
     return '%s://%s%s' % (
             get_config('default_protocol'),

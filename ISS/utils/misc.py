@@ -1,6 +1,7 @@
 import itertools
 
 from django.core.paginator import EmptyPage, PageNotAnInteger
+from django.contrib import auth
 from django.shortcuts import render
 from django.http import JsonResponse
 
@@ -63,8 +64,21 @@ def render_mixed_mode(request, templates, additional={}):
 
     return JsonResponse(data)
 
+def get_ban_403_response(request):
+    bans = request.user.get_pending_bans().order_by('-end_date')
+
+    ctx = {
+        'end_date': bans[0].end_date,
+        'reasons': [ban.reason for ban in bans],
+        'staff': auth.get_user_model().objects.filter(is_staff=True)
+    }
+
+    return render(request, 'ban_notification.html', ctx, status=403)
+
+
 
 __all__ = [
     'rmerge',
     'render_mixed_mode',
+    'get_ban_403_response',
 ]
