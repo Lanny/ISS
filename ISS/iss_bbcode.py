@@ -141,7 +141,7 @@ def _add_very_cool_tag(parser):
 
 def _add_quote_tag(parser):
     def render_quote(tag_name, value, options, parent, context):
-        author = options.get('author', None)
+        author = html.escape(options.get('author', None))
         pk = options.get('pk', None)
 
         if author:
@@ -219,7 +219,7 @@ def _add_link_tag(parser):
 def _add_spoiler_tag(parser):
 
     def render_spoiler(tag_name, value, options, parent, context):
-        name = options.get(tag_name, 'spoiler')
+        name = html.escape(options.get(tag_name, 'spoiler'))
         return utils.render_spoiler(value, name=name, js_enabled=True)
 
     parser.add_formatter('spoiler', render_spoiler)
@@ -228,7 +228,7 @@ def _add_spoiler_tag(parser):
 def _add_nojs_spoiler_tag(parser):
 
     def render_nojs_spoiler(tag_name, value, options, parent, context):
-        name = options.get(tag_name, 'spoiler')
+        name = html.escape(options.get(tag_name, 'spoiler'))
         return utils.render_spoiler(value, name=name, js_enabled=False)
 
     parser.add_formatter('spoiler', render_nojs_spoiler)
