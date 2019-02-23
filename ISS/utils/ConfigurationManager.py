@@ -68,7 +68,8 @@ class ConfigurationManager(Singleton):
         'invite_expiration_time': datetime.timedelta(days=14),
         'themes': (
             ('&T', '&T'),
-            ('bibliotek', 'Bibliotek')
+            ('bibliotek', 'Bibliotek'),
+            ('amoled', 'AMOLED')
         ),
         'default_theme': '&T',
         'hot_topics_count': 5,

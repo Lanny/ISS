@@ -11,6 +11,7 @@ input[type="submit"] {
 body {
   font-family: @body_font_family;
   font-size: @body_font_size;
+  color: @body_font_color;
   border: 0;
   padding: 0;
   margin: 0;
@@ -18,8 +19,8 @@ body {
   & when (@THEME = '&T') {
     background: @bg_primary url(/static/img/bg.jpg) repeat 0 0;
   }
-  & when (@THEME = 'bibliotek') {
-    background-color: @white;
+  & when (@ARCH = 'library') {
+    background-color: @body_bg_color;
   }
 }
 
@@ -30,6 +31,10 @@ h1, h2, h3, h4, h5, h6 {
 
 input {
   font-family: @body_font_family;
+}
+
+input, textarea, select {
+  .input-style();
 }
 
 .page-content {
@@ -144,7 +149,7 @@ footer {
     border: 1px solid #565656;
   }
 
-  & when (@THEME = "bibliotek") {
+  & when (@ARCH = "library") {
     border-top: 1px solid @seperator_color_major;
   }
 }
