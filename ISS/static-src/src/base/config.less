@@ -178,7 +178,14 @@
     .rounded();
   }
 
-  background-color: @white;
+  & when (@THEME = "&T") {
+    background-color: @white;
+  }
+
+  & when (@ARCH = "library") {
+    background-color: @body_bg_color;
+  }
+
   padding-bottom: 10px;
 
   h1, h2, h3, h4, h5, h6 {
