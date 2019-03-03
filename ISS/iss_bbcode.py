@@ -203,6 +203,9 @@ def _add_code_tag(parser):
 
 def _add_bc_tag(parser):
     def render_bc(tag_name, value, options, parent, context):
+        if re.sub(r'[^a-z0-9+]', '', value.lower().split(':', 1)[0]) not in ('http', 'https'):
+            return ''
+
         return ('<a class="unproc-embed" href="%s">embedded bandcamp link</a>'
                 % value)
 
