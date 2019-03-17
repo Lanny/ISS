@@ -111,7 +111,7 @@ def _add_img_tag(parser):
             '<a class="img-embed" href="%(value)s">'
                 '<img src="%(value)s">'
             '</a>'
-        ) % value
+        ) % (value, value)
 
 
     parser.add_formatter(
@@ -130,7 +130,7 @@ def _add_img_stub_tag(parser):
 
         return (
             'embedded image: <a class="img-link" href="%(value)s">%(value)s</a>'
-        ) % value
+        ) % (value, value)
 
     parser.add_formatter(
         'img',
@@ -149,7 +149,7 @@ def _add_video_stub_tag(parser):
 
         return (
             'embedded video: <a class="img-link" href="%(value)s">%(value)s</a>',
-        ) % value
+        ) % (value, value)
 
     parser.add_formatter(
         'video',
