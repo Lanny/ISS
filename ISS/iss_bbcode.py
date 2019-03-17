@@ -39,6 +39,9 @@ _yt_embed_pattern = ('<iframe width="640" height="480" class="yt-embed" '
     'src="https://www.youtube.com/embed/%s?start=%s" frameborder="0" '
     'allowfullscreen></iframe>')
 
+def _is_http_url(url):
+    prot = re.sub(r'[^a-z0-9+]', '', url.lower().split(':', 1)[0])
+    return prot in ('http', 'https')
 
 def _embed_youtube(url):
     query = urlparse.parse_qs(url.query, keep_blank_values=False)
@@ -100,11 +103,20 @@ def _video_markup_for_url(urlstr):
         raise EmbeddingNotSupportedException('Unrecognized service.')
 
 def _add_img_tag(parser):
-    parser.add_simple_formatter(
+    def render_image(tag_name, value, options, parent, context):
+        if not _is_http_url(value):
+            return ''
+
+        return (
+            '<a class="img-embed" href="%(value)s">'
+                '<img src="%(value)s">'
+            '</a>'
+        ) % value
+
+
+    parser.add_formatter(
         'img',
-        ('<a class="img-embed" href="%(value)s">'
-            '<img src="%(value)s">'
-        '</a>'),
+        render_image,
         render_embedded=False,
         replace_links=False,
         replace_cosmetic=False)
@@ -112,19 +124,36 @@ def _add_img_tag(parser):
     return parser
 
 def _add_img_stub_tag(parser):
-    parser.add_simple_formatter(
+    def render_image_stub(tag_name, value, options, parent, context):
+        if not _is_http_url(value):
+            return ''
+
+        return (
+            'embedded image: <a class="img-link" href="%(value)s">%(value)s</a>'
+        ) % value
+
+    parser.add_formatter(
         'img',
-        'embedded image: <a class="img-link" href="%(value)s">%(value)s</a>',
+        render_image_stub,
         render_embedded=False,
         replace_links=False,
         replace_cosmetic=False)
 
+
     return parser
 
 def _add_video_stub_tag(parser):
-    parser.add_simple_formatter(
+    def render_video_stub(tag_name, value, options, parent, context):
+        if not _is_http_url(value):
+            return ''
+
+        return (
+            'embedded video: <a class="img-link" href="%(value)s">%(value)s</a>',
+        ) % value
+
+    parser.add_formatter(
         'video',
-        'embedded video: <a class="img-link" href="%(value)s">%(value)s</a>',
+        render_video_stub,
         render_embedded=False,
         replace_links=False,
         replace_cosmetic=False)
@@ -203,7 +232,7 @@ def _add_code_tag(parser):
 
 def _add_bc_tag(parser):
     def render_bc(tag_name, value, options, parent, context):
-        if re.sub(r'[^a-z0-9+]', '', value.lower().split(':', 1)[0]) not in ('http', 'https'):
+        if not _is_http_url(value):
             return ''
 
         return ('<a class="unproc-embed" href="%s">embedded bandcamp link</a>'
