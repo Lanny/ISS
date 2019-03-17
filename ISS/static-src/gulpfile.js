@@ -38,7 +38,8 @@ gulp.task('clean', function() {
 gulp.task('icons', function() {
   return gulp.src('src/assets/svg/*.svg')
     .pipe(svg({
-      className: '.icn-%s()'
+      className: ".icn-%s(@a1: '', @a2: '')",
+      encoding: 'utf8'
     }))
     .pipe(concat('icons.less'))
     .pipe(gulp.dest('src/base'));

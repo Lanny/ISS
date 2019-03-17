@@ -360,3 +360,17 @@
   clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
   clip: rect(1px, 1px, 1px, 1px);
 }
+
+.read-status-indicator() {
+  .read-icon {
+    .icn(15px);
+    color: red;
+    &.unread { .icn-circ-full('black', '%23d23131'); }
+    &.read { .icn-circ-hollow('black'); }
+
+    & when (@THEME = 'amoled') {
+      &.unread { .icn-circ-full('white', '%23d23131'); }
+      &.read { .icn-circ-hollow('white'); }
+    }
+  }
+}

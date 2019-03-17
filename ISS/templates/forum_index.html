@@ -33,9 +33,9 @@
           <td>
             <div class="read-status">
             {% if forum.is_unread %}
-              <img src="{% static 'img/forum_new.gif' %}" alt="Unread posts" />
+              <i class="read-icon unread" title="Unread posts" ></i>
             {% else %}
-              <img src="{% static 'img/forum_old.gif' %}" alt="No new posts" />
+              <i class="read-icon read" title="No new posts" ></i>
             {% endif %}
             </div>
           </td>
