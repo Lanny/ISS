@@ -148,7 +148,7 @@ def _add_video_stub_tag(parser):
             return ''
 
         return (
-            'embedded video: <a class="img-link" href="%s">%s</a>',
+            'embedded video: <a class="img-link" href="%s">%s</a>'
         ) % (value, value)
 
     parser.add_formatter(
