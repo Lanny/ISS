@@ -170,11 +170,12 @@ def _add_very_cool_tag(parser):
 
 def _add_quote_tag(parser):
     def render_quote(tag_name, value, options, parent, context):
-        author = html.escape(options.get('author', None))
+        author = options.get('author', None)
         pk = options.get('pk', None)
 
         if author:
-            attribution = 'Originally posted by %s' % author
+            author_str = html.escape(author)
+            attribution = 'Originally posted by %s' % author_str
 
             if pk:
                 try:
@@ -185,7 +186,7 @@ def _add_quote_tag(parser):
                     attribution = """
                         Originally posted by %s
                         <a class="jump-to-post" href="%s"></a>
-                    """ % (author, url)
+                    """ % (author_str, url)
 
             template = """
                 <blockquote>
