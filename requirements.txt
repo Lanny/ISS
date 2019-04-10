@@ -8,7 +8,7 @@ django-recaptcha==1.3.1
 django-houston==0.1.0
 email-normalize==0.2.1
 git+https://github.com/RyanJenkins/django-recaptcha2.git
-git+https://github.com/RyanJenkins/bbcode.git@017533485082de9b717e6b0d31ca49706710b801
+git+https://github.com/RyanJenkins/bbcode.git@7dadc5e1f2b8cfe9008477f767e3feddf5dad93a
 
 # Dev dependencies
 django-debug-toolbar==1.6
