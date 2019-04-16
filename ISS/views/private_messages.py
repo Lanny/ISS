@@ -110,7 +110,12 @@ class NewPrivateMessage(utils.MethodSplitView):
     def GET(self, request):
         initials = {}
         if 'replyto' in request.GET:
-            rt = get_object_or_404(PrivateMessage, pk=request.GET['replyto'])
+            try:
+                quote_pk = int(request.GET['replyto'])
+            except ValueError:
+                raise PermissionDenied('You can\'t quote that!')
+
+            rt = get_object_or_404(PrivateMessage, pk=quote_pk)
 
             if rt.inbox != request.user:
                 raise PermissionDenied('You can\'t quote that!')
