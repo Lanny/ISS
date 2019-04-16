@@ -15,4 +15,4 @@ django-debug-toolbar==1.6
 
 # Regardless of the forum db, this is required for migrations. Can be removed
 # if you are not migrating from a vB forum.
-mysql-connector==2.1.4
+mysql-connector==2.2.9
