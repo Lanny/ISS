@@ -12,7 +12,7 @@ SIGNED_MESSAGE = """
 Hash: SHA256
 
 [quote author="Don Knuth"]
-The whole thing that makes a mathematician’s life worthwhile is that he gets the grudging admiration of three or four colleagues.
+The whole thing that makes a mathematician's life worthwhile is that he gets the grudging admiration of three or four colleagues.
 [/quote]
 
 The mathematician in question had received just a bit more admiration than that.
