@@ -122,7 +122,7 @@ class PGPPublicKeyField(forms.CharField):
 
         return value.strip()
 
-class InitialPeriodLimitingForm(forms.Form):
+class AuthorshipForm(forms.Form):
     def __init__(self, *args, **kwargs):
         if 'author' not in kwargs:
             raise ValueError('Must be inited with a author')
@@ -130,17 +130,21 @@ class InitialPeriodLimitingForm(forms.Form):
         self._author = kwargs['author']
         del kwargs['author']
 
-        super(InitialPeriodLimitingForm, self).__init__(*args, **kwargs)
+        super(AuthorshipForm, self).__init__(*args, **kwargs)
 
+    def get_author(self):
+        return self._author
+
+class InitialPeriodLimitingForm(AuthorshipForm):
     def clean(self, *args, **kwargs):
         super(InitialPeriodLimitingForm, self).clean(*args, **kwargs)
 
-        post_count = self._author.post_set.count()
+        post_count = self.get_author().post_set.count()
         if post_count < utils.get_config('initial_account_period_total'):
             window_start = timezone.now() - utils.get_config(
                 'initial_account_period_width')
 
-            posts_in_window = (self._author
+            posts_in_window = (self.get_author()
                                    .post_set
                                    .order_by('-created')
                                    .filter(created__gte=window_start)
@@ -154,7 +158,23 @@ class InitialPeriodLimitingForm(forms.Form):
                      'established.'),
                     code='FLOOD_CONTROL')
 
-class NewThreadForm(InitialPeriodLimitingForm):
+class PostDuplicationPreventionForm(AuthorshipForm):
+    def clean(self, *args, **kwargs):
+        super(PostDuplicationPreventionForm, self).clean(*args, **kwargs)
+        
+        try:
+            last_post = self.get_author().post_set.order_by('-created')[0]
+        except IndexError:
+            return self.cleaned_data
+
+
+        if last_post.content == self.cleaned_data.get('content', ''):
+            raise ValidationError('Duplicate of your last post.', code='DUPE')
+
+        return self.cleaned_data
+
+
+class NewThreadForm(InitialPeriodLimitingForm, PostDuplicationPreventionForm):
     error_css_class = 'in-error'
     thread_min_len = utils.get_config('min_thread_title_chars')
     post_min_len = utils.get_config('min_post_chars')
@@ -199,7 +219,7 @@ class NewThreadForm(InitialPeriodLimitingForm):
 
         return self.thread
 
-class NewPostForm(InitialPeriodLimitingForm):
+class NewPostForm(InitialPeriodLimitingForm, PostDuplicationPreventionForm):
     error_css_class = 'in-error'
     post_min_len = utils.get_config('min_post_chars')
     post_max_len = utils.get_config('max_post_chars')
@@ -223,25 +243,11 @@ class NewPostForm(InitialPeriodLimitingForm):
 
         return thread
 
-    def clean(self, *args, **kwargs):
-        super(NewPostForm, self).clean(*args, **kwargs)
-        
-        try:
-            last_post = self._author.post_set.order_by('-created')[0]
-        except IndexError:
-            return self.cleaned_data
-
-
-        if last_post.content == self.cleaned_data.get('content', ''):
-            raise ValidationError('Duplicate of your last post.', code='DUPE')
-
-        return self.cleaned_data
-
     def get_post(self):
         self.post = Post(
             thread=self.cleaned_data['thread'],
             content=self.cleaned_data['content'],
-            author=self._author)
+            author=self.get_author())
 
         return self.post
 

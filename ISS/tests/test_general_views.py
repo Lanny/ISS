@@ -17,7 +17,7 @@ import tutils
 class GeneralViewTestCase(tutils.ForumConfigTestCase):
     forum_config = {'captcha_period': 0}
 
-    def setUp2(self):
+    def setUp(self):
         tutils.create_std_forums()
 
         self.scrub = tutils.create_user(thread_count=5, post_count=10)
