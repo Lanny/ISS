@@ -316,6 +316,7 @@ class ThreadActionForm(forms.Form):
         choices = [('edit-thread', 'Edit Thread'),
                    ('delete-posts', 'Delete Posts'),
                    ('sticky-thread', 'Sticky Thread'),
+                   ('lock-thread', 'Lock Thread'),
                    ('trash-thread', 'Trash Thread')]
 
         for forum in Forum.objects.all():

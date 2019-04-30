@@ -119,6 +119,8 @@ class ThreadActions(utils.MethodSplitView):
                 return self._handle_delete_posts(request, thread)
             elif action == 'sticky-thread':
                 return self._handle_sticky_thread(request, thread)
+            elif action == 'lock-thread':
+                return self._handle_lock_thread(request, thread)
             elif action == 'trash-thread':
                 return self._handle_trash_thread(request, thread)
             elif re.match('move-to-(\d+)', action):
@@ -138,6 +140,16 @@ class ThreadActions(utils.MethodSplitView):
             thread.stickied = False
         else:
             thread.stickied = True
+        thread.save()
+
+        target = reverse('thread', kwargs={'thread_id': thread.pk})
+        return HttpResponseRedirect(target)
+
+    def _handle_lock_thread(self, request, thread):
+        if thread.locked:
+            thread.locked = False
+        else:
+            thread.locked = True
         thread.save()
 
         target = reverse('thread', kwargs={'thread_id': thread.pk})
