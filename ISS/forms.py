@@ -315,6 +315,7 @@ class ThreadActionForm(forms.Form):
     def _get_action_field(cls):
         choices = [('edit-thread', 'Edit Thread'),
                    ('delete-posts', 'Delete Posts'),
+                   ('sticky-thread', 'Sticky Thread'),
                    ('trash-thread', 'Trash Thread')]
 
         for forum in Forum.objects.all():
@@ -773,3 +774,4 @@ class SearchForm(forms.Form):
                 reverse('api-user-serach'))
 
         super(SearchForm, self).__init__(*args, **kwargs)
+

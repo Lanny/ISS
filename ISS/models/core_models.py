@@ -360,6 +360,7 @@ class Thread(models.Model):
     created = models.DateTimeField(default=timezone.now)
     last_update = models.DateTimeField(default=timezone.now, db_index=True)
     locked = models.BooleanField(default=False)
+    stickied = models.BooleanField(default=False)
 
     forum = models.ForeignKey(Forum)
     author = models.ForeignKey(Poster)
@@ -720,3 +721,4 @@ def set_normalized_email(sender, instance, **kwargs):
 def reject_auto_erotic_athanksication(sender, instance, **kwargs):
     if instance.thanker.pk == instance.thankee.pk:
         raise IntegrityError('A user may not thank themselves')
+

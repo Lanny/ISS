@@ -57,7 +57,7 @@ def forum_index(request):
 @cache_control(no_cache=True, max_age=0, must_revalidate=True, no_store=True)
 def thread_index(request, forum_id):
     forum = get_object_or_404(Forum, pk=forum_id)
-    threads = forum.thread_set.order_by('-last_update')
+    threads = forum.thread_set.order_by('-stickied', '-last_update')
     threads_per_page = utils.get_config('threads_per_forum_page')
     paginator = utils.MappingPaginator(threads, threads_per_page)
 
@@ -117,6 +117,8 @@ class ThreadActions(utils.MethodSplitView):
                 return self._handle_edit_thread(request, thread)
             elif action == 'delete-posts':
                 return self._handle_delete_posts(request, thread)
+            elif action == 'sticky-thread':
+                return self._handle_sticky_thread(request, thread)
             elif action == 'trash-thread':
                 return self._handle_trash_thread(request, thread)
             elif re.match('move-to-(\d+)', action):
@@ -129,6 +131,16 @@ class ThreadActions(utils.MethodSplitView):
     def _handle_edit_thread(self, request, thread):
         target = reverse('admin:ISS_thread_change',
                          args=[thread.pk])
+        return HttpResponseRedirect(target)
+
+    def _handle_sticky_thread(self, request, thread):
+        if thread.stickied:
+            thread.stickied = False
+        else:
+            thread.stickied = True
+        thread.save()
+
+        target = reverse('thread', kwargs={'thread_id': thread.pk})
         return HttpResponseRedirect(target)
 
     def _handle_trash_thread(self, request, thread):
@@ -967,3 +979,4 @@ class BanPoster(utils.MethodSplitView):
             }
 
             return render(request, 'ban_poster.html', ctx)
+
