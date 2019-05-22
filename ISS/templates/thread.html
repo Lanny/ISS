@@ -65,6 +65,15 @@
         </fieldset>
       </form>
     {% endif %}
+
+    {% if not thread.can_reply %}
+      <form class="quick-reply editor" method="POST"
+            action="{% url 'new-reply' thread.pk %}">
+        <h2>This Thread Has Been Locked</h2>
+
+      </form>
+    {% endif %}
+
   </div>
 {% endblock %}
 
