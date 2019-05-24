@@ -67,11 +67,14 @@
     {% endif %}
 
     {% if not thread.can_reply %}
-      <form class="quick-reply editor" method="POST"
-            action="{% url 'new-reply' thread.pk %}">
-        <h2>This Thread Has Been Locked</h2>
-
-      </form>
+      <div class="page-message">
+        <div class="icon-container">
+          <div class="alert-icon"></div>
+        </div>
+        <div class="message-content">
+          <p>This Thread Has Been Locked</p>
+        </div>
+      </div>
     {% endif %}
 
   </div>
