@@ -25,6 +25,7 @@ def inbox(request):
         'active_tab': 'inbox',
         'show_from': True,
         'show_to': False,
+        'pm_action_form': forms.PrivateMessageActionForm(),
         'breadcrumbs': [
             ('Private Messages', ''),
             ('Inbox', 'inbox')
@@ -152,3 +153,18 @@ class NewPrivateMessage(utils.MethodSplitView):
 
             return render(request, 'private_messages/compose.html', ctx)
 
+class PrivateMessageActions(utils.MethodSplitView):
+    staff_required = False
+    unbanned_required = True
+
+    def POST(self, request):
+        form = forms.PrivateMessageActionForm(request.POST)
+
+        if form.is_valid():
+            action = form.cleaned_data['action']
+            if action == 'delete-posts':
+                raise Exception('Unexpected action.')
+            else:
+                raise Exception('Unexpected action.')
+        else:
+            return HttpResponseBadRequest('Invalid form.')

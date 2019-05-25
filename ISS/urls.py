@@ -181,6 +181,9 @@ urlpatterns = [
     url(r'^pms/read/(?P<pm_id>\d+)$',
         views.private_messages.read_pm,
         name='read-pm'),
+    url(r'^pms/inbox/action$',
+        views.private_messages.PrivateMessageActions.as_view(),
+        name='pms-action'),
 
     url(r'^api/users/search$',
         views.user.user_fuzzy_search,

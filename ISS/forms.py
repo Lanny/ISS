@@ -332,6 +332,21 @@ class ThreadActionForm(forms.Form):
         super(ThreadActionForm, self).__init__(*args, **kwargs)
         self.fields['action'] = self._get_action_field()
 
+class PrivateMessageActionForm(forms.Form):
+    @classmethod
+    def _get_action_field(cls):
+        choices = [('delete-posts', 'Delete Message')]
+
+        return forms.ChoiceField(
+            label="",
+            required=True,
+            choices=choices)
+
+    def __init__(self, *args, **kwargs):
+        super(PrivateMessageActionForm, self).__init__(*args, **kwargs)
+        self.fields['action'] = self._get_action_field()
+
+
 class LatestThreadsPreferencesForm(forms.Form):
     def __init__(self, *args, **kwargs):
         poster = kwargs.pop('poster', None)
