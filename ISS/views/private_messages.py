@@ -51,6 +51,7 @@ def sent(request):
         'active_tab': 'sent',
         'show_from': False,
         'show_to': True,
+        'pm_action_form': forms.PrivateMessageActionForm(),
         'breadcrumbs': [
             ('Private Messages', ''),
             ('Sent', 'sent-pms')

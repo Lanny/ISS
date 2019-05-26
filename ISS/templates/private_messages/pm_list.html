@@ -42,7 +42,7 @@
           <td>
             {{ message.created|date:"Y-m-d" }} at
             {{ message.created|time:"f A e" }}
-              {% if show_from %}
+              {% if show_from or show_to %}
                 {% if user.is_authenticated %}
                 <input type="checkbox" class="select-pm" form="post-actions"
                        name="message" value="{{ message.pk }}" />
