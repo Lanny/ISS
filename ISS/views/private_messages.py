@@ -175,7 +175,7 @@ class PrivateMessageActions(utils.MethodSplitView):
         messages = [get_object_or_404(PrivateMessage, pk=pk) for pk in message_pks]
 
         for message in messages:
-            raise Exception('Unexpected action.')
+            message.delete()
 
         target = request.POST.get('next', None)
         return HttpResponseRedirect(target)
