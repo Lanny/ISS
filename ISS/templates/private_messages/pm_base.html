@@ -16,6 +16,7 @@
 {% endblock %}
 
 {% block content %}
+  {% if show_from %}
   <div class="thread">
     <div class="actions-and-pages">
       <div>
@@ -32,6 +33,7 @@
       </div>
     </div>
   </div>
+  {% endif %}
 
   <div class="private-messages">
     <h1>{{ page_name }}</h1>
