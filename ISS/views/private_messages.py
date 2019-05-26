@@ -163,8 +163,19 @@ class PrivateMessageActions(utils.MethodSplitView):
         if form.is_valid():
             action = form.cleaned_data['action']
             if action == 'delete-posts':
-                raise Exception('Unexpected action.')
+                return self._handle_delete_messages(request)
             else:
                 raise Exception('Unexpected action.')
         else:
             return HttpResponseBadRequest('Invalid form.')
+
+    @transaction.atomic
+    def _handle_delete_messages(self, request):
+        message_pks = request.POST.getlist('message', [])
+        messages = [get_object_or_404(PrivateMessage, pk=pk) for pk in message_pks]
+
+        for message in messages:
+            raise Exception('Unexpected action.')
+
+        target = request.POST.get('next', None)
+        return HttpResponseRedirect(target)
