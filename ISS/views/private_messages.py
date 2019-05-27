@@ -176,6 +176,8 @@ class PrivateMessageActions(utils.MethodSplitView):
         messages = [get_object_or_404(PrivateMessage, pk=pk) for pk in message_pks]
 
         for message in messages:
+            if message.inbox != request.user:
+                raise PermissionDenied('You can\'t delete that!')
             message.delete()
 
         target = request.POST.get('next', None)
