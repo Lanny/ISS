@@ -163,7 +163,7 @@ class PrivateMessageActions(utils.MethodSplitView):
 
         if form.is_valid():
             action = form.cleaned_data['action']
-            if action == 'delete-posts':
+            if action == 'delete-message':
                 return self._handle_delete_messages(request)
             else:
                 raise Exception('Unexpected action.')

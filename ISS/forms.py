@@ -335,7 +335,7 @@ class ThreadActionForm(forms.Form):
 class PrivateMessageActionForm(forms.Form):
     @classmethod
     def _get_action_field(cls):
-        choices = [('delete-posts', 'Delete Message')]
+        choices = [('delete-message', 'Delete Message')]
 
         return forms.ChoiceField(
             label="",
