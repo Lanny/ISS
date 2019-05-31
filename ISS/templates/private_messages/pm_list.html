@@ -42,6 +42,10 @@
           <td>
             {{ message.created|date:"Y-m-d" }} at
             {{ message.created|time:"f A e" }}
+              {% if show_from or show_to %}
+                <input type="checkbox" class="select-pm" form="post-actions"
+                       name="message" value="{{ message.pk }}" />
+              {% endif %}
           </td>
         </tr>
       {% empty %}

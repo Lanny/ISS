@@ -16,6 +16,23 @@
 {% endblock %}
 
 {% block content %}
+  {% if show_from or show_to %}
+  <div class="thread">
+    <div class="actions-and-pages">
+      <div>
+        <form method="POST" action="{% url 'pms-action' %}"
+              id="post-actions">
+          {% csrf_token %}
+          <div class="form-wrapper">{{ pm_action_form.as_p }}</div>
+
+          <input type="hidden" name="next" value="{{ request.get_full_path }}" />
+          <input type="submit" value="Go" />
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   <div class="private-messages">
     <h1>{{ page_name }}</h1>
     <div class="content">
