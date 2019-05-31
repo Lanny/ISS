@@ -20,7 +20,6 @@
   <div class="thread">
     <div class="actions-and-pages">
       <div>
-      {% if user.is_authenticated %}
         <form method="POST" action="{% url 'pms-action' %}"
               id="post-actions">
           {% csrf_token %}
@@ -29,7 +28,6 @@
           <input type="hidden" name="next" value="{{ request.get_full_path }}" />
           <input type="submit" value="Go" />
         </form>
-      {% endif %}
       </div>
     </div>
   </div>

@@ -157,6 +157,7 @@ class NewPrivateMessage(utils.MethodSplitView):
 class PrivateMessageActions(utils.MethodSplitView):
     staff_required = False
     unbanned_required = True
+    require_login = True
 
     def POST(self, request):
         form = forms.PrivateMessageActionForm(request.POST)

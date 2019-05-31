@@ -643,9 +643,6 @@ class PrivateMessage(models.Model):
         if commit:
             self.save()
 
-    def delete(self, *args, **kwargs):
-        super(PrivateMessage, self).delete(*args, **kwargs)
-
     def __unicode__(self):
         return self.subject
 
