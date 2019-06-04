@@ -25,7 +25,7 @@
   <script type="text/javascript" src="{% static 'js/require.js' %}"></script>
   <script type="text/javascript">
     requirejs.config({
-      baseUrl: '{% static "js" %}',
+      baseUrl: '{% static "js/base.js" %}.'.split('/').slice(0,-1).join('/'),
       paths: {
       '{{ bootstrap }}': '{% static "js/"|add:bootstrap|add:".js" %}'.split('.').slice(0,-1).join('.')
       }
