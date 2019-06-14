@@ -10,7 +10,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import transaction
 from django.forms import ValidationError
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import timezone, safestring
 from PIL import Image
 
 from tripphrase import tripphrase
@@ -563,6 +563,34 @@ class ReportPostForm(forms.Form):
                                   code='ALREADY_BANNED')
 
         return self.cleaned_data['post']
+
+
+class FastSelectWidget(forms.Select):
+    """
+    Shitty insecure version of `forms.Select` that doesn't use the templating
+    system. When there are a lot of options, `forms.Select` will render an
+    absurd number of sub-templates, the overhead of which kills performance and
+    dominating response time. We make no effort at escaping strings so make
+    sure choices are not user specified and don't contain HTML.
+    """
+    def _get_opts_str(self, value):
+        template = '<option value="%s" %s>%s</option>'
+        parts = [template % (c, 'selected' if c == value else '', l)
+                 for c, l in self.choices]
+        return '\n'.join(parts)
+
+    def render(self, name, value, attrs=None, renderer=None):
+        markup = """
+            <select name="%(name)s" id="%(id)s">%(opts)s</select>
+        """ % {
+            'id': 'id_%s' % name,
+            'name': name,
+            'opts': self._get_opts_str(value)
+        }
+
+        return safestring.mark_safe(markup)
+
+TZ_CHOICES = reversed([(tz, tz) for tz in pytz.common_timezones])
     
 class UserSettingsForm(forms.Form):
     error_css_class = 'in-error'
@@ -570,7 +598,8 @@ class UserSettingsForm(forms.Form):
     email = forms.EmailField(label="Email address")
     timezone = forms.ChoiceField(
             label="Timezone",
-            choices=[(tz, tz) for tz in pytz.common_timezones])
+            choices=TZ_CHOICES,
+            widget=FastSelectWidget)
     posts_per_page = forms.IntegerField(
             label="Posts to show per page",
             max_value=50,
