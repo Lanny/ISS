@@ -551,19 +551,6 @@ class ReportPostForm(forms.Form):
                               max_length=post_max_len,
                               widget=forms.Textarea())
 
-    @classmethod
-    def _get_action_field(cls):
-        choices = [('edit-thread', 'Edit Thread'),
-                   ('delete-posts', 'Delete Posts'),
-                   ('sticky-thread', 'Sticky Thread'),
-                   ('lock-thread', 'Lock Thread'),
-                   ('trash-thread', 'Trash Thread')]
-
-        for forum in Forum.objects.all():
-            choices.append(('move-to-%d' % forum.pk,
-                            '-> Move to %s' % forum.name))
-
-
     def __init__(self, *args, **kwargs):
         super(ReportPostForm, self).__init__(*args, **kwargs)
         self.fields['reason'] = forms.ChoiceField(

@@ -12,6 +12,7 @@ from django.http import (HttpResponseRedirect, HttpResponseBadRequest,
     JsonResponse, HttpResponseForbidden, HttpResponse)
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
+from django.template.defaultfilters import truncatechars
 from django.views.decorators.cache import cache_control, cache_page
 
 from ISS import utils, forms, iss_bbcode
@@ -930,10 +931,13 @@ class ReportPost(utils.MethodSplitView):
         form = forms.ReportPostForm(request.POST)
 
         if form.is_valid():
+            max_subject_len = (PrivateMessage._meta
+                .get_field('subject')
+                .max_length)
             subject = '%s has reported a post by %s' % (
-                request.user.username,
-                form.cleaned_data['post'].author.username)
-
+                truncatechars(request.user.username, 75),
+                truncatechars(form.cleaned_data['post'].author.username, 75),
+            )
             content = render_to_string('pmt/report_post.bbc', form.cleaned_data,
                                        request=request)
 
