@@ -56,12 +56,13 @@ def create_posts(user, count, bulk=False):
         for post in posts:
             post.save()
 
-def create_user(thread_count=0, post_count=0, acgs=()): 
+def create_user(thread_count=0, post_count=0, username=None, acgs=()): 
     global USERS_CREATED
     global THREADS_CREATED
 
     USERS_CREATED += 1
-    user = Poster(username=u'TEST_USER-%d' % USERS_CREATED)
+    username = username or (u'TEST_USER-%d' % USERS_CREATED)
+    user = Poster(username=username)
     user.save()
 
     for acg in acgs:

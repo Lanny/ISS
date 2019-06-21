@@ -545,15 +545,31 @@ class ReportPostForm(forms.Form):
 
     post = forms.ModelChoiceField(queryset=Post.objects.all(),
                                   widget=forms.HiddenInput())
-    reason = forms.ChoiceField(
-        label='Reason for reporting',
-        choices=utils.get_config('report_reasons'),
-        required=True)
 
     explanation = BBCodeField(label='Explanation for reporting',
-                               min_length=post_min_len,
-                               max_length=post_max_len,
-                               widget=forms.Textarea())
+                              min_length=post_min_len,
+                              max_length=post_max_len,
+                              widget=forms.Textarea())
+
+    @classmethod
+    def _get_action_field(cls):
+        choices = [('edit-thread', 'Edit Thread'),
+                   ('delete-posts', 'Delete Posts'),
+                   ('sticky-thread', 'Sticky Thread'),
+                   ('lock-thread', 'Lock Thread'),
+                   ('trash-thread', 'Trash Thread')]
+
+        for forum in Forum.objects.all():
+            choices.append(('move-to-%d' % forum.pk,
+                            '-> Move to %s' % forum.name))
+
+
+    def __init__(self, *args, **kwargs):
+        super(ReportPostForm, self).__init__(*args, **kwargs)
+        self.fields['reason'] = forms.ChoiceField(
+            label='Reason for reporting',
+            choices=utils.get_config('report_reasons'),
+            required=True)
 
     def clean_post(self):
         author = self.cleaned_data['post'].author
@@ -570,7 +586,7 @@ class FastSelectWidget(forms.Select):
     Shitty insecure version of `forms.Select` that doesn't use the templating
     system. When there are a lot of options, `forms.Select` will render an
     absurd number of sub-templates, the overhead of which kills performance and
-    dominating response time. We make no effort at escaping strings so make
+    dominates response time. We make no effort at escaping strings so make
     sure choices are not user specified and don't contain HTML.
     """
     def _get_opts_str(self, value):
