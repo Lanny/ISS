@@ -1,7 +1,7 @@
 {% extends "private_messages/pm_base.html" %}
 
 {% block pm_content %}
-  <table class="private-message-list">
+  <table class="private-message-list" data-checkbox-list-container="select-pm">
     <thead>
       <tr>
         {% if show_from or show_to %}
@@ -23,7 +23,8 @@
           {% if show_from or show_to %}
           <td>
             <input type="checkbox" class="select-pm" form="post-actions"
-                   name="message" value="{{ message.pk }}" />
+                   name="message" value="{{ message.pk }}"
+                   data-checkbox-list="select-pm" />
           </td>
           {% endif %}
 
