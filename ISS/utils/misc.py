@@ -75,8 +75,6 @@ def get_ban_403_response(request):
 
     return render(request, 'ban_notification.html', ctx, status=403)
 
-
-
 __all__ = [
     'rmerge',
     'render_mixed_mode',

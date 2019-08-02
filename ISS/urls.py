@@ -32,9 +32,9 @@ urlpatterns = [
     url(r'^sitemap.xml$', sitemap, {'sitemaps': iss_sitemaps}, name='sitemap'),
 
     url(r'^smilies.css', views.misc.smilies_css, name='smilies-css'),
-    url(r'^smiley-refrence',
-        TemplateView.as_view(template_name="smilies_refrence.html"),
-        name='smilies-refrence'),
+    url(r'^smiley-reference',
+        TemplateView.as_view(template_name="smilies_reference.html"),
+        name='smilies-reference'),
 
     url('^thread/(?P<thread_id>\d+)/?$',
         views.forum.thread,

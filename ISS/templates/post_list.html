@@ -2,7 +2,7 @@
 {% load bbc %}
 
 {% with selectable=request.user.is_staff %}
-  <ol class="post-list">
+  <ol class="post-list" data-checkbox-list-container="select-post">
   {% for post in posts %}
     <li class="post" id="post-{{ post.pk }}">
       <div class="post-hat">
@@ -38,7 +38,8 @@
 
             {% if user.is_authenticated and user.is_staff %}
               <input type="checkbox" class="select-post" form="post-actions"
-                     name="post" value="{{ post.pk }}" />
+                     name="post" value="{{ post.pk }}"
+                     data-checkbox-list="select-post" />
             {% endif %}
           {% endif %}
         </div>

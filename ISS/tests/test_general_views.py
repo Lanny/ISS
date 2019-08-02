@@ -875,3 +875,57 @@ class UserCPTestCase(tutils.ForumConfigTestCase):
         response = self.don_client.get(ucp_path)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context['threads']), 1)
+
+class ReportPostTestCase(tutils.ForumConfigTestCase):
+    forum_config = {
+        'recaptcha_settings': None,
+        'report_reasons': (('TOO_PRETTY', 'Too pretty'),),
+    }
+
+    def setUp(self):
+        tutils.create_std_forums()
+
+        self.don = tutils.create_user(thread_count=1, post_count=1)
+        self.fran = tutils.create_user(thread_count=0, post_count=0)
+        self.lanny = tutils.create_user(thread_count=0, post_count=0)
+
+        self.lanny.is_staff = True
+        self.lanny.is_admin = True
+        self.lanny.save()
+
+        self.don_post = self.don.post_set.all()[0]
+
+        self.fran_client = Client()
+        self.fran_client.force_login(self.fran)
+
+
+    def _report_post(self, post):
+        path = reverse('report-post', args=(post.pk,))
+        return self.fran_client.post(path, {
+            'post': post.pk,
+            'reason': 'TOO_PRETTY',
+            'explanation': ('Post was made by a user who is too pretty '
+                            'and that offends me.')}
+        )
+
+    def test_happy_path_report(self):
+        pm_count = PrivateMessage.objects.count()
+        response = self._report_post(self.don_post)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(PrivateMessage.objects.count(), pm_count + 2)
+
+
+    def test_extra_long_username_report(self):
+        pm_count = PrivateMessage.objects.count()
+
+        max_len = Poster._meta.get_field('username').max_length
+        username = u'I\'m a pretty princess'
+        username = username + ('!' * (max_len - len(username)))
+
+        fin = tutils.create_user(post_count=1, username=username)
+        post = fin.post_set.all()[0]
+        response = self._report_post(post)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(PrivateMessage.objects.count(), pm_count + 2)

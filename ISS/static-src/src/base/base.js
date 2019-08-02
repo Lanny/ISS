@@ -1,6 +1,6 @@
 ;(function() {
 
-  function wrap($, config, bbcode, paginator, hyperDrive) {
+  function wrap($, config, bbcode, paginator, CheckboxList, hyperDrive) {
     $(document).on('click', '.hyper-drive', function() {
       hyperDrive.start()
     });
@@ -19,6 +19,10 @@
         $(document.documentElement).append(
           '<script src="https://www.google.com/recaptcha/api.js"></script>');
       }
+
+      $('[data-checkbox-list-container]').each(function(i, el) {
+        new CheckboxList(el);
+      });
     });
   }
 
@@ -27,6 +31,7 @@
     'config',
     'bbcode',
     'paginator',
+    'checkbox-list',
     'hyper-drive'
   ], wrap);
 })();
