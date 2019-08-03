@@ -318,6 +318,7 @@ class ThreadActionForm(forms.Form):
                    ('sticky-thread', 'Sticky Thread'),
                    ('lock-thread', 'Lock Thread'),
                    ('trash-thread', 'Trash Thread')]
+        actions_choices.sort()
         moveto_choices = []
         for forum in Forum.objects.all():
             moveto_choices.append(('move-to-%d' % forum.pk,
