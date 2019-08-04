@@ -410,20 +410,33 @@ class MarkSubsriptionsRead(utils.MethodSplitView):
             .update(last_read_date=timezone.now()))
         return HttpResponseRedirect(reverse('usercp'))
 
-@login_required
-def user_list(request):
-    posters = Poster.objects.all().order_by('username')
-    posters_per_page = 20
-    pagniator = Paginator(posters, posters_per_page)
+#def user_index(request):
+#    posters = Poster.objects.all().order_by('username')
+#    posters_per_page = 20
+#    pagniator = Paginator(posters, posters_per_page)
+#
+#    page = utils.page_by_request(posters, posters_per_page)
+#
+#    ctx = {
+#        'rel_page': page,
+#        'posters': page
+#    }
+#
+#    return render(request, 'user_list.html', ctx)
 
-    page = utils.page_by_request(posters, posters_per_page)
+def user_index(request):
+    posters = Poster.objects.all().order_by('-username')
+    posters_per_page = 20
+
+    paginator = Paginator(posters, posters_per_page)
+    page = utils.page_by_request(paginator, request)
 
     ctx = {
         'rel_page': page,
         'posters': page
     }
 
-    return render(request, 'user_list.html', ctx)
+    return render(request, 'user_index.html', ctx)
 
 def search(request):
     q = request.GET.get('q', None)

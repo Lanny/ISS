@@ -1,0 +1,37 @@
+{% load util_tags %}
+{% load humanize %}
+{% load static from staticfiles %}
+
+<table class="threads">
+  <tr>
+    <th>Avatar</th>
+    <th>Name</th>
+    <th>Join Date</th>
+    <th>Posts</th>
+  </tr>
+  {% for poster in posters %}
+  <tr>
+    <td>
+      {% if allow_avatars and poster.avatar %}
+        <img src="{{ poster.avatar.url }}">
+      {% endif %}
+    </td>
+    <td>
+      <a href="{{ poster.get_url }}">
+        {{ poster.username }}
+      </a>
+    </td>
+    <td>
+      {{ poster.date_joined|date:"Y-m-d" }}
+    </td>
+    <td>
+      <a href="{% url 'posts-by-user' poster.pk %}">
+        {{ poster.post_set.count|intcomma }}
+      </a>
+    </td>
+
+  </tr>
+
+  {% endfor %}
+</table>
+
