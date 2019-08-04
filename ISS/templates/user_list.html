@@ -5,12 +5,13 @@
 <table class="threads">
   <tr>
     <th>Avatar</th>
-    <th>Name</th>
+    <th>Username</th>
     <th>Join Date</th>
     <th>Posts</th>
   </tr>
   {% for poster in posters %}
   <tr>
+
     <td>
       {% if allow_avatars and poster.avatar %}
         <img src="{{ poster.avatar.url }}">
@@ -31,7 +32,6 @@
     </td>
 
   </tr>
-
   {% endfor %}
 </table>
 
