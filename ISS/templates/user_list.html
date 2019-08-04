@@ -8,6 +8,9 @@
     <th>Username</th>
     <th>Join Date</th>
     <th>Posts</th>
+    {% if user.is_authenticated and user.is_admin %}
+    <th>SPAM</th>
+    {% endif %}
   </tr>
   {% for poster in posters %}
   <tr>
@@ -30,6 +33,13 @@
         {{ poster.post_set.count|intcomma }}
       </a>
     </td>
+    {% if user.is_authenticated and user.is_admin %}
+    <td>
+      <a href="{% url 'spam-can-user' poster.pk %}"
+         class="spam-can">
+      </a>
+    </td>
+    {% endif %}
 
   </tr>
   {% endfor %}
