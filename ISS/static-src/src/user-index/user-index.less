@@ -1,0 +1,59 @@
+@import "../base/config.less";
+
+.user-index {
+
+  .users {
+    .index-table;
+    .region(0,0,0,20px);
+    width: 100%;
+    table-layout: fixed;
+
+
+      @media(max-width: @breakpoint) {
+        &.mobile-thread-controls {
+          display: table-row;
+        }
+
+        // Disable last post block
+        > :nth-child(3) {
+          display: none;
+        }
+
+        > td:nth-child(4) {
+          background-color: @bg_light;
+        }
+
+        ul.mobile-thread-controls:not(:empty) {
+          .flex-stretch();
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          border-radius: 3px;
+          margin-top: 5px;
+          border: 1px solid @white;
+          overflow: hidden;
+
+          li {
+            a {
+              text-align: center;
+              height: auto;
+              width: 100%;
+              padding: 7px 5px;
+
+              &:before {
+                display: block;
+                position: relative;
+                content: "";
+                width: 20px;
+                height: 20px;
+                top: 0;
+                left: 50%;
+                margin-left: -10px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
