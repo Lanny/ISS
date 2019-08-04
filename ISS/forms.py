@@ -313,20 +313,23 @@ class RenderBBCodeForm(forms.Form):
 class ThreadActionForm(forms.Form):
     @classmethod
     def _get_action_field(cls):
-        choices = [('edit-thread', 'Edit Thread'),
+        actions_choices = [('edit-thread', 'Edit Thread'),
                    ('delete-posts', 'Delete Posts'),
                    ('sticky-thread', 'Sticky Thread'),
                    ('lock-thread', 'Lock Thread'),
                    ('trash-thread', 'Trash Thread')]
-
+        actions_choices.sort()
+        moveto_choices = []
         for forum in Forum.objects.all():
-            choices.append(('move-to-%d' % forum.pk,
+            moveto_choices.append(('move-to-%d' % forum.pk,
                             '-> Move to %s' % forum.name))
+        moveto_choices.sort(key=lambda name: name[1])
+        actions_choices.extend(moveto_choices)
 
         return forms.ChoiceField(
             label="",
             required=True,
-            choices=choices)
+            choices=actions_choices)
 
     def __init__(self, *args, **kwargs):
         super(ThreadActionForm, self).__init__(*args, **kwargs)
