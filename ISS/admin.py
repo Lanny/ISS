@@ -6,7 +6,6 @@ class ForumInline(admin.TabularInline):
     model = Forum
     extra = 0
 
-admin.site.register(Thread)
 admin.site.register(Thanks)
 admin.site.register(AuthPackage)
 admin.site.register(RegistrationCode)
@@ -22,9 +21,14 @@ class PosterAdmin(admin.ModelAdmin):
     exclude = ('avatar',)
     inlines = [BanInline]
 
+@admin.register(Thread)
+class ThreadAdmin(admin.ModelAdmin):
+    readonly_fields = ('author',)
+
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     list_display = ('author', 'thread_name', 'short_content')
+    readonly_fields = ('author',)
 
     def thread_name(self, obj):
         return obj.thread.title[:100]
