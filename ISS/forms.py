@@ -320,10 +320,17 @@ class ThreadActionForm(forms.Form):
                    ('trash-thread', 'Trash Thread')]
         actions_choices.sort()
         moveto_choices = []
-        for forum in Forum.objects.all():
+
+        forums = Forum.objects.all().order_by(
+            'category__priority',
+            'category__id',
+            'priority',
+            'id')
+
+        for forum in forums:
             moveto_choices.append(('move-to-%d' % forum.pk,
-                            '-> Move to %s' % forum.name))
-        moveto_choices.sort(key=lambda name: name[1])
+                                   '-> Move to %s' % forum.name))
+
         actions_choices.extend(moveto_choices)
 
         return forms.ChoiceField(
