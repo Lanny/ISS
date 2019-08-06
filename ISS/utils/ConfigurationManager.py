@@ -44,6 +44,7 @@ class ConfigurationManager(Singleton):
             ('RLINK', 'Latest Threads', 'latest-threads', 'always', None),
             ('PMS', 'Inbox', 'inbox', 'is_authenticated', None),
             ('RLINK', 'Search', 'search', 'always', None),
+            ('RLINK', 'Members List', 'members', 'always', None),
             ('RLINK', 'Admin', 'admin:index', 'is_admin', None),
             ('FORM', 'Logout', 'logout', 'is_authenticated', 'logout-form'),
             ('RLINK', 'Register', 'register', 'is_not_authenticated', None),
