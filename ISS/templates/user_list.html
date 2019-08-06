@@ -25,9 +25,10 @@
     {% endif %}
 
     <td>
-      <a href="{{ poster.get_url }}">
-        {{ poster.username }}
-      </a>
+      <a href="{{ poster.get_url }}">{{ poster.username }}</a>
+      <div class="usertitle">
+        {{ poster.get_user_title }}
+      </div>
     </td>
     <td class="join-date">
       {{ poster.date_joined|date:"Y-m-d" }}
