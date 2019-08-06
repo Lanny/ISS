@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from django.core.mail import send_mail
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from django.conf import settings
 from django.contrib.auth import login, authenticate
 from django.db import transaction
@@ -384,6 +385,20 @@ class GenerateInvite(utils.MethodSplitView):
         reg_code.save()
         url = reverse('view-generated-invite') + '?code=%s' % reg_code.code
         return HttpResponseRedirect(url)
+
+def user_index(request):
+    posters = Poster.objects.all().order_by('id')
+    posters_per_page = utils.get_config('general_items_per_page')
+
+    paginator = Paginator(posters, posters_per_page)
+    page = utils.page_by_request(paginator, request)
+
+    ctx = {
+        'rel_page': page,
+        'posters': page
+    }
+
+    return render(request, 'user_index.html', ctx)
 
 def view_generated_invite(request):
     reg_code = get_object_or_404(RegistrationCode, code=request.GET.get('code'))
