@@ -6,11 +6,6 @@ class ForumInline(admin.TabularInline):
     model = Forum
     extra = 0
 
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'priority')
-
-admin.site.register(Forum)
 admin.site.register(Thread)
 admin.site.register(Thanks)
 admin.site.register(AuthPackage)
@@ -71,6 +66,16 @@ class StaticPageAdmin(admin.ModelAdmin):
 
     def short_content(self, obj):
         return obj.content[:200]
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'priority')
+    ordering = ('priority', 'id')
+
+@admin.register(Forum)
+class ForumAdmin(admin.ModelAdmin):
+    list_display = ('name', 'category', 'priority')
+    ordering = ('category__priority', 'category__id', 'priority', 'id')
 
 @admin.register(LatestThreadsForumPreference)
 class LatestThreadsForumPreferenceAdmin(admin.ModelAdmin):
