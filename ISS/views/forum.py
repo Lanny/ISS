@@ -412,7 +412,7 @@ class MarkSubsriptionsRead(utils.MethodSplitView):
 
 def user_index(request):
     posters = Poster.objects.all().order_by('id')
-    posters_per_page = 20
+    posters_per_page = utils.get_config('general_items_per_page')
 
     paginator = Paginator(posters, posters_per_page)
     page = utils.page_by_request(paginator, request)

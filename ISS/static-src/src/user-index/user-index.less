@@ -1,8 +1,6 @@
 @import "../base/config.less";
 
 .user-index {
-
-
   .spam-can {
     .icn-btn-scaleable(35);
      display: block;
@@ -14,150 +12,9 @@
     .index-table;
     .region(0,0,0,20px);
     width: 100%;
-    table-layout: fixed;
 
-
-    tr {
-      .mobile-thread-controls {
-        display: none;
-      }
-
-      td, th {
-        &:nth-child(1) {
-          width: 125px;
-          text-align: center;
-        }
-
-        &:nth-child(3) {
-          width: 95px;
-        }
-
-        &:nth-child(4) {
-          width: 60px;
-          text-align: center;
-        }
-        &:nth-child(5) {
-          width: 65px;
-          text-align: center;
-        }
-      }
-
-      td {
-        &:nth-child(4) {
-          text-align: center;
-        }
-
-        &.empty-message {
-          text-align: center;
-        }
-
-        .thread-author {
-          display: inline-block;
-          font-size: 10px;
-          text-decoration: none;
-          font-weight: normal;
-          color: @fg_low_contrast;
-          word-break: break-all;
-        }
-
-        .unsubscribe-form {
-          display: inline-block;
-          margin-left: 5px;
-
-          input[type="submit"] {
-            .link-style();
-
-            text-decoration: underline;
-            border: none;
-            background-color: transparent;
-            font-weight: bold;
-            cursor: pointer;
-            padding: 2px;
-          }
-        }
-
-        .last-post-date {
-          font-size: 10px;
-          display: block;
-        }
-
-        .last-post-author {
-          display: flex;
-
-          & > * {
-            margin-right: 5px;
-          }
-
-          .author-username {
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-            max-width: 12em;
-          }
-        }
-
-        .last-post, .oldest-unread-post {
-          .icn-btn();
-          vertical-align: middle;
-          flex-shrink: 0;
-
-          &:before {
-            .icn-right-arrow();
-          }
-        }
-      }
-
-      @media(max-width: @breakpoint) {
-        &.mobile-thread-controls {
-          display: table-row;
-        }
-
-        // Disable last post block
-        > :nth-child(3) {
-          display: none;
-        }
-
-        > td:nth-child(4) {
-          background-color: @bg_light;
-        }
-
-        td {
-          .oldest-unread-post {
-            display: none;
-          }
-        }
-
-        ul.mobile-thread-controls:not(:empty) {
-          .flex-stretch();
-          list-style: none;
-          margin: 0;
-          padding: 0;
-          border-radius: 3px;
-          margin-top: 5px;
-          border: 1px solid @white;
-          overflow: hidden;
-
-          li {
-            a {
-              text-align: center;
-              height: auto;
-              width: 100%;
-              padding: 7px 5px;
-
-              &:before {
-                display: block;
-                position: relative;
-                content: "";
-                width: 20px;
-                height: 20px;
-                top: 0;
-                left: 50%;
-                margin-left: -10px;
-              }
-            }
-          }
-        }
-      }
+    .avatar-cell, .join-date, .post-count {
+      text-align: center
     }
   }
 }

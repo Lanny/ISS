@@ -4,7 +4,9 @@
 
 <table class="users">
   <tr>
+    {% if allow_avatars %}
     <th>Avatar</th>
+    {% endif %}
     <th>Username</th>
     <th>Join Date</th>
     <th>Posts</th>
@@ -14,21 +16,23 @@
   </tr>
   {% for poster in posters %}
   <tr>
-
-    <td>
-      {% if allow_avatars and poster.avatar %}
-        <img src="{{ poster.avatar.url }}">
+    {% if allow_avatars %}
+    <td class="avatar-cell">
+      {% if poster.avatar %}
+      <img src="{{ poster.avatar.url }}">
       {% endif %}
     </td>
+    {% endif %}
+
     <td>
       <a href="{{ poster.get_url }}">
         {{ poster.username }}
       </a>
     </td>
-    <td>
+    <td class="join-date">
       {{ poster.date_joined|date:"Y-m-d" }}
     </td>
-    <td>
+    <td class="post-count">
       <a href="{% url 'posts-by-user' poster.pk %}">
         {{ poster.post_set.count|intcomma }}
       </a>
