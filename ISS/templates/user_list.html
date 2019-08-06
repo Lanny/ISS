@@ -38,7 +38,7 @@
       </a>
     </td>
     {% if user.is_authenticated and user.is_admin %}
-    <td>
+    <td class="spam-cell">
       <a href="{% url 'spam-can-user' poster.pk %}"
          class="spam-can">
       </a>

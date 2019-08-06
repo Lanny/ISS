@@ -3,9 +3,8 @@
 .user-index {
   .spam-can {
     .icn-btn-scaleable(35);
-     display: block;
-
-      &:before { .icn-spam-can(); }
+    &:before { .icn-spam-can(); }
+    display: inline-block;
   }
 
   .users {
@@ -13,7 +12,7 @@
     .region(0,0,0,20px);
     width: 100%;
 
-    .avatar-cell, .join-date, .post-count {
+    .avatar-cell, .join-date, .post-count, .spam-cell {
       text-align: center
     }
   }
