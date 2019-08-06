@@ -24,8 +24,8 @@ def _get_new_post_form(request):
 
 @cache_control(max_age=60)
 def forum_index(request):
-    categories = Category.objects.all().order_by('priority')
-    forums = Forum.objects.all().order_by('priority')
+    categories = Category.objects.all().order_by('priority', 'id')
+    forums = Forum.objects.all().order_by('priority', 'id')
 
     # Start: optimization to prefetch additional stats and flags for forums in
     # one go as opposed to querying per-forum
