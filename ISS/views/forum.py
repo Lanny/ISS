@@ -24,8 +24,8 @@ def _get_new_post_form(request):
 
 @cache_control(max_age=60)
 def forum_index(request):
-    categories = Category.objects.all().order_by('priority')
-    forums = Forum.objects.all().order_by('priority')
+    categories = Category.objects.all().order_by('priority', 'id')
+    forums = Forum.objects.all().order_by('priority', 'id')
 
     # Start: optimization to prefetch additional stats and flags for forums in
     # one go as opposed to querying per-forum
@@ -409,20 +409,6 @@ class MarkSubsriptionsRead(utils.MethodSplitView):
             .filter(subscribed=True)
             .update(last_read_date=timezone.now()))
         return HttpResponseRedirect(reverse('usercp'))
-
-def user_index(request):
-    posters = Poster.objects.all().order_by('id')
-    posters_per_page = 20
-
-    paginator = Paginator(posters, posters_per_page)
-    page = utils.page_by_request(paginator, request)
-
-    ctx = {
-        'rel_page': page,
-        'posters': page
-    }
-
-    return render(request, 'user_index.html', ctx)
 
 def search(request):
     q = request.GET.get('q', None)

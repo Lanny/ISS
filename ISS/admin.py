@@ -6,12 +6,6 @@ class ForumInline(admin.TabularInline):
     model = Forum
     extra = 0
 
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'priority')
-
-admin.site.register(Forum)
-admin.site.register(Thread)
 admin.site.register(Thanks)
 admin.site.register(AuthPackage)
 admin.site.register(RegistrationCode)
@@ -27,9 +21,14 @@ class PosterAdmin(admin.ModelAdmin):
     exclude = ('avatar',)
     inlines = [BanInline]
 
+@admin.register(Thread)
+class ThreadAdmin(admin.ModelAdmin):
+    readonly_fields = ('author',)
+
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     list_display = ('author', 'thread_name', 'short_content')
+    readonly_fields = ('author',)
 
     def thread_name(self, obj):
         return obj.thread.title[:100]
@@ -71,6 +70,16 @@ class StaticPageAdmin(admin.ModelAdmin):
 
     def short_content(self, obj):
         return obj.content[:200]
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'priority')
+    ordering = ('priority', 'id')
+
+@admin.register(Forum)
+class ForumAdmin(admin.ModelAdmin):
+    list_display = ('name', 'category', 'priority')
+    ordering = ('category__priority', 'category__id', 'priority', 'id')
 
 @admin.register(LatestThreadsForumPreference)
 class LatestThreadsForumPreferenceAdmin(admin.ModelAdmin):
