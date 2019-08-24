@@ -12,7 +12,21 @@
 {% block content %}
   <div class="members user-index">
 
-    {% include "page_list.html" with page=posters %}
+    <div class="thread">
+      <div class="actions-and-pages">
+        <div>
+          <form method="POST" action="{% url 'members-action' %}"
+                id="post-actions">
+            {% csrf_token %}
+            <div class="form-wrapper">{{ members_actions_form.as_p }}</div>
+
+            <input type="hidden" name="next" value="{{ request.get_full_path }}" />
+            <input type="submit" value="Go" />
+          </form>
+        </div>
+            {% include "page_list.html" with page=posters %}
+      </div>
+    </div>
 
     {% include 'user_list.html' %}
 

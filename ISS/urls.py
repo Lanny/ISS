@@ -156,6 +156,9 @@ urlpatterns = [
     url(r'^members',
         views.user.user_index,
         name='members'),
+    url(r'^members/action',
+        views.user.MembersListActions.as_view(),
+        name='members-action'),
 
     url('^page/(?P<page_id>.*)',
         views.misc.view_static_page,
