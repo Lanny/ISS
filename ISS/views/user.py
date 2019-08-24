@@ -427,7 +427,7 @@ class MembersListActions(utils.MethodSplitView):
         return HttpResponseRedirect(target)
 
     @transaction.atomic
-    def _sort_by_username(self, request):')
+    def _sort_by_username(self, request):
         return HttpResponseRedirect(target)
 
     @transaction.atomic
