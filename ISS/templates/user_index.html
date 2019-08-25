@@ -18,7 +18,7 @@
           <form method="POST" action="{% url 'members-action' %}"
                 id="post-actions">
             {% csrf_token %}
-            <div class="form-wrapper">{{ members_actions_form.as_p }}</div>
+            <div class="form-wrapper">{{ members_action_form.as_p }}</div>
 
             <input type="hidden" name="next" value="{{ request.get_full_path }}" />
             <input type="submit" value="Go" />

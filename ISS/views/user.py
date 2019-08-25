@@ -396,23 +396,19 @@ def user_index(request):
     ctx = {
         'rel_page': page,
         'posters': page,
-        'members_actions_form': forms.MembersListActionsForm()
+        'members_action_form': forms.MembersListActionsForm()
     }
 
     return render(request, 'user_index.html', ctx)
 
 class MembersListActions(utils.MethodSplitView):
-    staff_required = False
-    unbanned_required = True
-    require_login = False
 
     def POST(self, request):
-        form = forms.MembersListActions(request.POST)
-
+        form = forms.MembersListActionsForm(request.POST)
         if form.is_valid():
             action = form.cleaned_data['action']
             if action == 'sort-by-id':
-                return self._sort_by_id(request)
+                return self._sort_by_username(request)
             elif action == 'sort-by-username':
                 return self._sort_by_username(request)
             elif action == 'sort-by-post-count':
@@ -424,15 +420,15 @@ class MembersListActions(utils.MethodSplitView):
 
     @transaction.atomic
     def _sort_by_id(self, request):
-        return HttpResponseRedirect(target)
+        return HttpResponseBadRequest('Invalid form.')
 
     @transaction.atomic
     def _sort_by_username(self, request):
-        return HttpResponseRedirect(target)
+        return HttpResponseBadRequest('Invalid form.')
 
     @transaction.atomic
     def _sort_by_post_count(self, request):
-        return HttpResponseRedirect(target)
+        return HttpResponseBadRequest('Invalid form.')
 
 def view_generated_invite(request):
     reg_code = get_object_or_404(RegistrationCode, code=request.GET.get('code'))
