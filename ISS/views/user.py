@@ -386,8 +386,13 @@ class GenerateInvite(utils.MethodSplitView):
         url = reverse('view-generated-invite') + '?code=%s' % reg_code.code
         return HttpResponseRedirect(url)
 
-def user_index(request):
-    posters = Poster.objects.all().order_by('id')
+def user_index(request, orderBy='id'):
+
+    if (orderBy != 'post_count'):
+        posters = Poster.objects.all().order_by(orderBy)
+    else:
+        posters = Poster.objects.annotate(post_count=Count('post')).order_by('-post_count')
+
     posters_per_page = utils.get_config('general_items_per_page')
 
     paginator = Paginator(posters, posters_per_page)
@@ -408,27 +413,15 @@ class MembersListActions(utils.MethodSplitView):
         if form.is_valid():
             action = form.cleaned_data['action']
             if action == 'sort-by-id':
-                return self._sort_by_username(request)
+                return user_index(request, 'id')
             elif action == 'sort-by-username':
-                return self._sort_by_username(request)
+                return user_index(request, 'username')
             elif action == 'sort-by-post-count':
-                return self._sort_by_post_count(request)
+                return user_index(request, 'post_count')
             else:
                 raise Exception('Unexpected action.')
         else:
             return HttpResponseBadRequest('Invalid form.')
-
-    @transaction.atomic
-    def _sort_by_id(self, request):
-        return HttpResponseBadRequest('Invalid form.')
-
-    @transaction.atomic
-    def _sort_by_username(self, request):
-        return HttpResponseBadRequest('Invalid form.')
-
-    @transaction.atomic
-    def _sort_by_post_count(self, request):
-        return HttpResponseBadRequest('Invalid form.')
 
 def view_generated_invite(request):
     reg_code = get_object_or_404(RegistrationCode, code=request.GET.get('code'))

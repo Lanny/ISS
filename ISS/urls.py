@@ -156,7 +156,7 @@ urlpatterns = [
     url(r'^members$',
         views.user.user_index,
         name='members'),
-    url(r'^members/action$',
+    url(r'^members/action',
         views.user.MembersListActions.as_view(),
         name='members-action'),
 
