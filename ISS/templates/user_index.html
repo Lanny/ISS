@@ -15,7 +15,7 @@
     <div class="thread">
       <div class="actions-and-pages">
         <div>
-          <form method="POST" action="{% url 'members-action' %}"
+          <form method="POST" action="{% url 'members' %}"
                 id="post-actions">
             {% csrf_token %}
             <div class="form-wrapper">{{ members_action_form.as_p }}</div>

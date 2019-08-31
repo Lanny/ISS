@@ -386,12 +386,38 @@ class GenerateInvite(utils.MethodSplitView):
         url = reverse('view-generated-invite') + '?code=%s' % reg_code.code
         return HttpResponseRedirect(url)
 
-def user_index(request, orderBy='id'):
+def user_index(request):
+    if request.POST:
+        form = forms.MembersListActionsForm(request.POST)
+        if form.is_valid():
+            action = form.cleaned_data['action']
+            if action == 'sort-by-id':
+                url = reverse('members') + '?sortby=id'
+                return HttpResponseRedirect(url)
+            elif action == 'sort-by-username':
+                url = reverse('members') + '?sortby=username'
+                return HttpResponseRedirect(url)
+            elif action == 'sort-by-post-count':
+                url = reverse('members') + '?sortby=post_count'
+                return HttpResponseRedirect(url)
+            else:
+                raise Exception('Unexpected action.')
+        else:
+            return HttpResponseBadRequest('Invalid form.')
 
-    if (orderBy != 'post_count'):
-        posters = Poster.objects.all().order_by(orderBy)
+    sortBy = request.GET.get('sortby', None)
+
+    if not sortBy:
+        posters = Poster.objects.all().order_by('id')
     else:
-        posters = Poster.objects.annotate(post_count=Count('post')).order_by('-post_count')
+        if sortBy == 'post_count':
+            posters = Poster.objects.annotate(post_count=Count('post')).order_by('-post_count')
+        elif sortBy == 'username':
+            posters = Poster.objects.all().order_by('username')
+        elif sortBy == 'id':
+            posters = Poster.objects.all().order_by('id')
+        else:
+            raise PermissionDenied('You can\'t quote that!')
 
     posters_per_page = utils.get_config('general_items_per_page')
 
@@ -405,23 +431,6 @@ def user_index(request, orderBy='id'):
     }
 
     return render(request, 'user_index.html', ctx)
-
-class MembersListActions(utils.MethodSplitView):
-
-    def POST(self, request):
-        form = forms.MembersListActionsForm(request.POST)
-        if form.is_valid():
-            action = form.cleaned_data['action']
-            if action == 'sort-by-id':
-                return user_index(request, 'id')
-            elif action == 'sort-by-username':
-                return user_index(request, 'username')
-            elif action == 'sort-by-post-count':
-                return user_index(request, 'post_count')
-            else:
-                raise Exception('Unexpected action.')
-        else:
-            return HttpResponseBadRequest('Invalid form.')
 
 def view_generated_invite(request):
     reg_code = get_object_or_404(RegistrationCode, code=request.GET.get('code'))
