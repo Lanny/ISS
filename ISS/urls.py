@@ -154,7 +154,7 @@ urlpatterns = [
         views.forum.AutoAnonymize.as_view(),
         name='auto-anonymize'),
     url(r'^members$',
-        views.user.user_index,
+        views.user.UserIndex.as_view(),
         name='members'),
 
     url('^page/(?P<page_id>.*)',

@@ -386,8 +386,8 @@ class GenerateInvite(utils.MethodSplitView):
         url = reverse('view-generated-invite') + '?code=%s' % reg_code.code
         return HttpResponseRedirect(url)
 
-def user_index(request):
-    if request.POST:
+class UserIndex(utils.MethodSplitView):
+    def POST(self, request):
         form = forms.MembersListActionsForm(request.POST)
         if form.is_valid():
             action = form.cleaned_data['action']
@@ -405,32 +405,32 @@ def user_index(request):
         else:
             return HttpResponseBadRequest('Invalid form.')
 
-    sortBy = request.GET.get('sortby', None)
+    def GET(self, request):
+        sortBy = request.GET.get('sortby', 'id')
 
-    if not sortBy:
-        posters = Poster.objects.all().order_by('id')
-    else:
         if sortBy == 'post_count':
-            posters = Poster.objects.annotate(post_count=Count('post')).order_by('-post_count')
+            posters = (Poster.objects
+                .annotate(post_count=Count('post'))
+                .order_by('-post_count'))
         elif sortBy == 'username':
             posters = Poster.objects.all().order_by('username')
         elif sortBy == 'id':
             posters = Poster.objects.all().order_by('id')
         else:
-            raise PermissionDenied('You can\'t quote that!')
+            raise PermissionDenied('Invalid sortby value')
 
-    posters_per_page = utils.get_config('general_items_per_page')
+        posters_per_page = utils.get_config('general_items_per_page')
 
-    paginator = Paginator(posters, posters_per_page)
-    page = utils.page_by_request(paginator, request)
+        paginator = Paginator(posters, posters_per_page)
+        page = utils.page_by_request(paginator, request)
 
-    ctx = {
-        'rel_page': page,
-        'posters': page,
-        'members_action_form': forms.MembersListActionsForm()
-    }
+        ctx = {
+            'rel_page': page,
+            'posters': page,
+            'members_action_form': forms.MembersListActionsForm()
+        }
 
-    return render(request, 'user_index.html', ctx)
+        return render(request, 'user_index.html', ctx)
 
 def view_generated_invite(request):
     reg_code = get_object_or_404(RegistrationCode, code=request.GET.get('code'))
