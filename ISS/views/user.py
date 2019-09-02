@@ -387,7 +387,38 @@ class GenerateInvite(utils.MethodSplitView):
         return HttpResponseRedirect(url)
 
 def user_index(request):
-    posters = Poster.objects.all().order_by('id')
+    if request.POST:
+        form = forms.MembersListActionsForm(request.POST)
+        if form.is_valid():
+            action = form.cleaned_data['action']
+            if action == 'sort-by-id':
+                url = reverse('members') + '?sortby=id'
+                return HttpResponseRedirect(url)
+            elif action == 'sort-by-username':
+                url = reverse('members') + '?sortby=username'
+                return HttpResponseRedirect(url)
+            elif action == 'sort-by-post-count':
+                url = reverse('members') + '?sortby=post_count'
+                return HttpResponseRedirect(url)
+            else:
+                raise Exception('Unexpected action.')
+        else:
+            return HttpResponseBadRequest('Invalid form.')
+
+    sortBy = request.GET.get('sortby', None)
+
+    if not sortBy:
+        posters = Poster.objects.all().order_by('id')
+    else:
+        if sortBy == 'post_count':
+            posters = Poster.objects.annotate(post_count=Count('post')).order_by('-post_count')
+        elif sortBy == 'username':
+            posters = Poster.objects.all().order_by('username')
+        elif sortBy == 'id':
+            posters = Poster.objects.all().order_by('id')
+        else:
+            raise PermissionDenied('You can\'t quote that!')
+
     posters_per_page = utils.get_config('general_items_per_page')
 
     paginator = Paginator(posters, posters_per_page)
@@ -395,7 +426,8 @@ def user_index(request):
 
     ctx = {
         'rel_page': page,
-        'posters': page
+        'posters': page,
+        'members_action_form': forms.MembersListActionsForm()
     }
 
     return render(request, 'user_index.html', ctx)

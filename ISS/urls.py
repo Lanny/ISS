@@ -153,7 +153,7 @@ urlpatterns = [
     url('^auto-anonymize$',
         views.forum.AutoAnonymize.as_view(),
         name='auto-anonymize'),
-    url(r'^members',
+    url(r'^members$',
         views.user.user_index,
         name='members'),
 

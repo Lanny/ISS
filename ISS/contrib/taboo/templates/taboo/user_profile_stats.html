@@ -1,6 +1,10 @@
 {% if poster.taboo_profile %}
 <div class="stat">
   <span class="label">Taboo Victories</span>
-  <span class="value">{{ poster.taboo_successes.count }}</span>
+  <span class="value">
+    <a href="{% url 'taboo-status' %}">
+      {{ poster.taboo_successes.count }}
+    </a>
+  </span>
 </div>
 {% endif %}
