@@ -79,6 +79,7 @@ class Ban(models.Model):
 
 class IPBan(models.Model):
     on = models.GenericIPAddressField(null=True)
+    expires = models.DateTimeField(default=None, null=True)
     given = models.DateTimeField(auto_now_add=True)
     memo = models.TextField(blank=True, default='')
 

@@ -1,4 +1,5 @@
 from collections import defaultdict
+import datetime
 
 from django.contrib.auth import login, logout, authenticate, _get_backends
 from django.contrib.auth.backends import ModelBackend
@@ -700,21 +701,21 @@ class LoginUser(utils.MethodSplitView):
         ctx = {'form': form}
         return render(request, 'login.html', ctx)
 
+    @RateLimitedAccess.rate_limit('login', 10, datetime.timedelta(hours=1))
     def POST(self, request):
         logout(request)
-        if request.POST:
-            form = forms.ISSAuthenticationForm(autofocus=True,
-                                               data=request.POST,
-                                               request=request)
+        form = forms.ISSAuthenticationForm(autofocus=True,
+                                           data=request.POST,
+                                           request=request)
 
-            if form.is_valid():
-                login(request, form.user_cache)
-                next_url = request.POST.get('next', '/')
-                return HttpResponseRedirect(next_url)
+        if form.is_valid():
+            login(request, form.user_cache)
+            next_url = request.POST.get('next', '/')
+            return HttpResponseRedirect(next_url)
 
-            else:
-                ctx = {'form': form}
-                return render(request, 'login.html', ctx)
+        else:
+            ctx = {'form': form}
+            return render(request, 'login.html', ctx)
 
 class LogoutUser(utils.MethodSplitView):
     def POST(self, request):

@@ -314,6 +314,7 @@ def captchatize_form(form, label="Captcha"):
     else:
         return form
 
+
 GENERIC_CAPTCHA_LABEL = 'Captcha (required for your first %d posts)' % (
     get_config('captcha_period')
 )

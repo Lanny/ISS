@@ -139,10 +139,20 @@ class InitialPeriodLimitingForm(AuthorshipForm):
     def clean(self, *args, **kwargs):
         super(InitialPeriodLimitingForm, self).clean(*args, **kwargs)
 
+
+        (
+            period_total,
+            period_width,
+            period_limit
+        ) = utils.get_config(
+            'initial_account_period_total',
+            'initial_account_period_width',
+            'initial_account_period_limit'
+        )
+
         post_count = self.get_author().post_set.count()
-        if post_count < utils.get_config('initial_account_period_total'):
-            window_start = timezone.now() - utils.get_config(
-                'initial_account_period_width')
+        if post_count < period_total:
+            window_start = timezone.now() - period_width
 
             posts_in_window = (self.get_author()
                                    .post_set
@@ -150,13 +160,15 @@ class InitialPeriodLimitingForm(AuthorshipForm):
                                    .filter(created__gte=window_start)
                                    .count())
 
-            if posts_in_window >= utils.get_config(
-                    'initial_account_period_limit'):
-                raise ValidationError(
-                    ('You\'ve made too many posts on a new account. This '
-                     'control will be removed once your account is better '
-                     'established.'),
-                    code='FLOOD_CONTROL')
+            if posts_in_window >= period_limit:
+                formated_width = utils.format_duration(period_width)
+                message = (
+                    'While you\'ve made less than %d posts, your account is '
+                    'limited in creation of new posts. You can make at most '
+                    '%d posts in a period of %s. You will be able to continue '
+                    'to post as prior posts roll out of this window.'
+                 ) % (period_total, period_limit, formated_width)
+                raise ValidationError(message, code='FLOOD_CONTROL')
 
 class PostDuplicationPreventionForm(AuthorshipForm):
     def clean(self, *args, **kwargs):
