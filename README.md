@@ -20,7 +20,7 @@ $ sudo apt-get install gcc perl make git python-pip postgresql npm gulp
 
 IDE entirely optional:
 ```
-sudo snap install pycharm-community --classic
+$ sudo snap install pycharm-community --classic
 ```
 
 Start by cloning the project. Copy the `test_settings.py` file into the ISS app directory and rename it `settings.py`. This defines a test forum and uses the postgres driver. ~~If you'd like to use a different DB edit the file
