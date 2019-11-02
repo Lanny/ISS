@@ -15,7 +15,7 @@ Oldschool Forum Software. Design tenets are:
 Using a virutal env is encouraged for your sanity but entirely optional.
 You'll need to grab dependencies a few debendencies, assuming you are running a virutal env:
 ```
-$ sudo apt-get install gcc perl make git python-pip npm gulp
+$ sudo apt-get install gcc perl make git python-pip postgresql npm gulp
 ```
 
 IDE entirely optional:
@@ -32,10 +32,18 @@ Next install serverside dependencies from the top level of the project:
 $ pip install -r requirements.txt
 ```
 
-Next run the migrations to init the DB:
+Next run the migrations to init the DB (Dont forget to fill in the DB details in settings.py):
 
 ```
 $ ./manage.py migrate
+```
+
+If you are just developing, use this as a refrence for creating the DB:
+```
+$ sudo -u postgres psql
+# create database iss_db;
+# create user iss_user with password 'iss_pass';
+# grant all privileges on database iss_db to iss_user;
 ```
 
 We also use a DB cache so you need to create that table separately:
