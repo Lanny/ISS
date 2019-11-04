@@ -1,6 +1,6 @@
 Django==1.11.23
 pytz==2016.7
-Pillow==3.4.2
+Pillow==6.2.0
 psycopg2==2.7.3.2
 lxml==4.1.1
 tripphrase==0.4
