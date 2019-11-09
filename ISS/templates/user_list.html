@@ -42,7 +42,7 @@
     </td>
     {% if user.is_authenticated and user.is_admin %}
     <td class="spam-cell">
-      <a href="{% url 'spam-can-user' poster.pk %}?next={% url 'members' %}"
+      <a href="{% url 'spam-can-user' poster.pk %}?next={{ request.get_full_path }}"
          class="spam-can">
       </a>
     </td>
