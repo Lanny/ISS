@@ -387,24 +387,6 @@ class GenerateInvite(utils.MethodSplitView):
         return HttpResponseRedirect(url)
 
 class UserIndex(utils.MethodSplitView):
-    def POST(self, request):
-        form = forms.MembersListActionsForm(request.POST)
-        if form.is_valid():
-            action = form.cleaned_data['action']
-            if action == 'sort-by-id':
-                url = reverse('members') + '?sortby=id'
-                return HttpResponseRedirect(url)
-            elif action == 'sort-by-username':
-                url = reverse('members') + '?sortby=username'
-                return HttpResponseRedirect(url)
-            elif action == 'sort-by-post-count':
-                url = reverse('members') + '?sortby=post_count'
-                return HttpResponseRedirect(url)
-            else:
-                raise Exception('Unexpected action.')
-        else:
-            return HttpResponseBadRequest('Invalid form.')
-
     def GET(self, request):
         sortBy = request.GET.get('sortby', 'id')
 
@@ -426,8 +408,7 @@ class UserIndex(utils.MethodSplitView):
 
         ctx = {
             'rel_page': page,
-            'posters': page,
-            'members_action_form': forms.MembersListActionsForm()
+            'posters': page
         }
 
         return render(request, 'user_index.html', ctx)

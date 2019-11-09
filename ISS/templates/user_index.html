@@ -15,12 +15,14 @@
     <div class="thread">
       <div class="actions-and-pages">
         <div>
-          <form method="POST" action="{% url 'members' %}"
-                id="post-actions">
-            {% csrf_token %}
-            <div class="form-wrapper">{{ members_action_form.as_p }}</div>
-
-            <input type="hidden" name="next" value="{{ request.get_full_path }}" />
+          <form method="GET" action="{% url 'members' %}" id="post-actions">
+            <div class="form-wrapper">
+              <select name="sortby" id="id_action">
+                <option value="id">Sort by ID</option>
+                <option value="username">Sort by Username</option>
+                <option value="post_count">Sort by Post Count</option>
+              </select>
+            </div>
             <input type="submit" value="Go" />
           </form>
         </div>

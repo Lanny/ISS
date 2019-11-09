@@ -368,23 +368,6 @@ class PrivateMessageActionForm(forms.Form):
         super(PrivateMessageActionForm, self).__init__(*args, **kwargs)
         self.fields['action'] = self._get_action_field()
 
-class MembersListActionsForm(forms.Form):
-    @classmethod
-    def _get_action_field(cls):
-        choices = [('sort-by-id', 'Sort by ID'),
-                   ('sort-by-username', 'Sort by Username'),
-                   ('sort-by-post-count', 'Sort by Post Count')]
-
-        return forms.ChoiceField(
-            label="",
-            required=True,
-            choices=choices)
-
-    def __init__(self, *args, **kwargs):
-        super(MembersListActionsForm, self).__init__(*args, **kwargs)
-        self.fields['action'] = self._get_action_field()
-
-
 class LatestThreadsPreferencesForm(forms.Form):
     def __init__(self, *args, **kwargs):
         poster = kwargs.pop('poster', None)
