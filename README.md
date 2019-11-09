@@ -13,7 +13,8 @@ Oldschool Forum Software. Design tenets are:
 # Setting it up
 
 Using a virutal env is encouraged for your sanity but entirely optional.
-You'll need to grab dependencies a few debendencies, assuming you are running a virutal env:
+
+You'll need to grab a few debendencies, assuming you are running a virutal env:
 ```
 $ sudo apt-get install gcc perl make git python-pip postgresql npm gulp
 ```
