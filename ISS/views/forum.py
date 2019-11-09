@@ -18,6 +18,7 @@ from django.views.decorators.cache import cache_control, cache_page
 
 from ISS import utils, forms, iss_bbcode
 from ISS.models import *
+from ISS import models as iss_models
 from ISS.hooks import HookManager
 
 def _get_new_post_form(request):
@@ -125,6 +126,8 @@ class ThreadActions(utils.MethodSplitView):
                 return self._handle_lock_thread(request, thread)
             elif action == 'trash-thread':
                 return self._handle_trash_thread(request, thread)
+            elif action == 'off-topic-posts':
+                return self._handle_off_topic_posts(request, thread)
             elif re.match('move-to-(\d+)', action):
                 return self._handle_move_thread(request, thread, action)
             else:
@@ -182,6 +185,27 @@ class ThreadActions(utils.MethodSplitView):
         posts = [get_object_or_404(Post, pk=pk) for pk in post_pks]
 
         for post in posts:
+            post.delete()
+
+        target = request.POST.get('next', None)
+        target = target or reverse('thread', kwargs={'thread_id': thread.pk})
+        return HttpResponseRedirect(target)
+
+    @transaction.atomic
+    def _handle_off_topic_posts(self, request, thread):
+        post_pks = request.POST.getlist('post', [])
+        posts = [get_object_or_404(Post, pk=pk) for pk in post_pks]
+
+        for post in posts:
+            content = render_to_string(
+                'pmt/off_topic_post.bbc',
+                { 'post': post.content })
+
+            iss_models.PrivateMessage.send_pm(
+                iss_models.Poster.get_or_create_system_user(),
+                [post.author],
+                'Post marked as off-topic',
+                content)
             post.delete()
 
         target = request.POST.get('next', None)

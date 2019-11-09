@@ -329,7 +329,8 @@ class ThreadActionForm(forms.Form):
                    ('delete-posts', 'Delete Posts'),
                    ('sticky-thread', 'Sticky Thread'),
                    ('lock-thread', 'Lock Thread'),
-                   ('trash-thread', 'Trash Thread')]
+                   ('trash-thread', 'Trash Thread'),
+                   ('off-topic-posts', 'Off-Topic Posts')]
         actions_choices.sort()
         moveto_choices = []
 
