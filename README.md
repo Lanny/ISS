@@ -12,7 +12,16 @@ Oldschool Forum Software. Design tenets are:
 
 # Setting it up
 
-You'll need pip and npm installed to grab dependencies, both should be available through your OS's package manager.
+Using a virutal env is encouraged for your sanity but entirely optional.
+You'll need to grab dependencies a few debendencies, assuming you are running a virutal env:
+```
+$ sudo apt-get install gcc perl make git python-pip postgresql npm gulp
+```
+
+IDE entirely optional:
+```
+$ sudo snap install pycharm-community --classic
+```
 
 Start by cloning the project. Copy the `test_settings.py` file into the ISS app directory and rename it `settings.py`. This defines a test forum and uses the postgres driver. ~~If you'd like to use a different DB edit the file
 appropriately~~ the search functionality depends on postgres' text search and indexing behavior in a non-driver-portable way. You could probably use another DB with some minor fiddling with the source but only postgres is being tested against.
@@ -23,9 +32,15 @@ Next install serverside dependencies from the top level of the project:
 $ pip install -r requirements.txt
 ```
 
-Using a virutal env is encouraged for your sanity but entirely optional.
+If you are just developing, use this as a refrence for creating the DB:
+```
+$ sudo -u postgres psql
+# create database iss_db;
+# create user iss_user with password 'iss_pass';
+# grant all privileges on database iss_db to iss_user;
+```
 
-Next run the migrations to init the DB:
+Next run the migrations to init the DB (Dont forget to fill in the DB details in settings.py):
 
 ```
 $ ./manage.py migrate
