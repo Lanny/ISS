@@ -14,14 +14,21 @@ Oldschool Forum Software. Design tenets are:
 
 Using a virutal env is encouraged for your sanity but entirely optional.
 
-You'll need to grab a few debendencies for this project:
+You'll need pip, node/npm, and postgres installed. On debian based distros you can do:
+
 ```
-$ sudo apt-get install python-pip postgresql npm gulp
+$ sudo apt-get install python-pip postgresql npm
 ```
 
 IDE entirely optional:
 ```
 $ sudo snap install pycharm-community --classic
+```
+
+Alternately (preferred):
+
+```
+$ notepad.exe
 ```
 
 Start by cloning the project. Copy the `test_settings.py` file into the ISS app directory and rename it `settings.py`. This defines a test forum and uses the postgres driver. ~~If you'd like to use a different DB edit the file
@@ -33,7 +40,7 @@ Next install serverside dependencies from the top level of the project:
 $ pip install -r requirements.txt
 ```
 
-If you are just developing, use this as a refrence for creating the DB:
+If you are just developing, use this as a reference for creating the DB:
 ```
 $ sudo -u postgres psql
 # create database iss_db;
@@ -41,7 +48,7 @@ $ sudo -u postgres psql
 # grant all privileges on database iss_db to iss_user;
 ```
 
-Next run the migrations to init the DB (Dont forget to fill in the DB details in settings.py):
+Next run the migrations to init the DB (Don't forget to fill in the DB details in settings.py):
 
 ```
 $ ./manage.py migrate
@@ -64,17 +71,11 @@ Password (again):
 Superuser created successfully.
 ```
 
-Install the frontend dependencies:
+Install the frontend dependencies and build the frontend assets:
 
 ```
 $ cd ISS/static-src
 $ npm install
-```
-
-And build the frontend assets:
-
-```
-$ cd ISS/static-src
 $ gulp generate
 ```
 
@@ -89,7 +90,7 @@ $ ./manage.py runserver
 If you want rotating banners drop them in `ISS/static/banners` and restart the server. You can make up some test data using thing admin interface (url `/admin/`)
 
 # Development Tips
-- When `DEBUG` is true, you can use ctrl+P on any page to cycle through the available themes.
+- When `DEBUG` is true in settings.py, you can use ctrl+P on any page to cycle through the available themes.
 
 # Configuration
 Every ISS instance must define a `FORUM_CONFIG` setting. Default values exist
