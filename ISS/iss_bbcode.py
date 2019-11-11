@@ -39,6 +39,10 @@ _yt_embed_pattern = ('<iframe width="640" height="480" class="yt-embed" '
     'src="https://www.youtube.com/embed/%s?start=%s" frameborder="0" '
     'allowfullscreen></iframe>')
 
+_bc_embed_pattern = ('<iframe width="640" height="480" class="yt-embed" '
+    'src="https://www.bitchute.com/%s" frameborder="0" '
+    'allowfullscreen></iframe>')
+
 def _is_http_url(url):
     prot = re.sub(r'[^a-z0-9+]', '', url.lower().split(':', 1)[0])
     return prot in ('http', 'https')
@@ -55,6 +59,16 @@ def _embed_youtube(url):
         raise EmbeddingNotSupportedException('Bad video ID.')
 
     return _yt_embed_pattern % (v, '0')
+
+def _embed_bitchute(url):
+    path = url.path
+    if "video" in path:
+        path.replace("video", "embed")
+
+    if not re.match('[/-_0-9a-zA-Z]+', path):
+        raise EmbeddingNotSupportedException('Bad video ID.')
+
+    return _bc_embed_pattern % path
 
 def _embed_youtube_shortcode(url):
     query = urlparse.parse_qs(url.query, keep_blank_values=False)
@@ -97,6 +111,8 @@ def _video_markup_for_url(urlstr):
         return _embed_youtube(url)
     elif url.netloc in ('youtu.be',):
         return _embed_youtube_shortcode(url)
+    elif url.netloc in ('www.bitchute.com'):
+        return _embed_bitchute(url)
     elif ext in ('webm', 'mp4'):
         return _embed_html5_video(url)
     else:
