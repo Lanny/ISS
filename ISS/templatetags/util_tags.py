@@ -28,14 +28,24 @@ def url_apply(pat, args_and_kwargs=None):
     args, kwargs = args_and_kwargs if args_and_kwargs else ((), {})
     return reverse(pat, args=args, kwargs=kwargs)
 
-@register.simple_tag(name='get_theme')
-def get_theme(user):
+def _get_theme(user):
     if user.is_authenticated:
         theme_name = user.theme
     else:
         theme_name = utils.get_config('default_theme')
 
-    return staticfiles.static("css/%s.css" % theme_name)
+    return theme_name
+
+@register.simple_tag(name='get_theme')
+def get_theme(user):
+    return staticfiles.static("css/%s.css" % _get_theme(user))
+
+@register.simple_tag(name='get_theme_color')
+def get_theme_color(user):
+    theme_code = _get_theme(user)
+    default_theme = utils.get_config('default_theme')
+    theme = utils.get_config('themes').get(theme_code, default_theme)
+    return theme['color']
 
 @register.simple_tag(name='pgp_block')
 def pgp_block(pgp_key, js_enabled=True):

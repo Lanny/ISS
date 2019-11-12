@@ -27,6 +27,7 @@
     {% endif %}
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="theme-color" content="{% get_theme_color request.user %}">
     <link rel="stylesheet" id="theme-sheet" href="{% get_theme request.user %}">
     {% block css %} {% endblock %}
 

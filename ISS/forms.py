@@ -17,6 +17,7 @@ from tripphrase import tripphrase
 
 import utils
 from models import *
+from models.core_models import THEME_CHOICES
 
 class DurationField(forms.Field):
     def clean(self, value):
@@ -639,7 +640,7 @@ class UserSettingsForm(forms.Form):
     theme = forms.ChoiceField(
         label="Theme",
         required=True,
-        choices=utils.get_config('themes'))
+        choices=THEME_CHOICES)
     allow_js = forms.BooleanField(label="Enable javascript", required=False)
     allow_avatars = forms.BooleanField(label="Show user avatars", required=False)
     enable_editor_buttons = forms.BooleanField(

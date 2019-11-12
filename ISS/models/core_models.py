@@ -20,6 +20,10 @@ from admin_models import Ban
 min_time = timezone.make_aware(timezone.datetime.min,
                                timezone.get_default_timezone())
 
+THEME_CHOICES = tuple(
+    [(k, v['name']) for k,v in utils.get_config('themes').items()]
+)
+
 @models.fields.Field.register_lookup
 class TSVectorLookup(models.Lookup):
     lookup_name = 'tsmatch'
@@ -87,7 +91,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         max_length=256,
         null=False,
         default=utils.get_config('default_theme'),
-        choices=utils.get_config('themes'))
+        choices=THEME_CHOICES)
     pgp_key = models.TextField(default='', blank=True)
 
     # For support of vB backends

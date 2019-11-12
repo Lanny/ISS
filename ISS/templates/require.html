@@ -8,11 +8,11 @@
       'development': {% if config.DEBUG %}true{% else %}false{% endif %},
       {% if config.DEBUG %}
       'themes': [
-        {% for code, name in config.themes %}
+        {% for code, theme in config.themes.items %}
         {% autoescape off %}
         {
           code: '{{ code }}',
-          name: '{{ name }}',
+          name: '{{ theme.name }}',
           stylesheet: '{% static "css/"|add:code|add:".css" %}'
         },
         {% endautoescape %}
