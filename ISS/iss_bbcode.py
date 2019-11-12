@@ -62,7 +62,7 @@ def _embed_youtube(url):
 
 def _embed_bitchute(url):
     path = url.path
-    match = re.match('/video/([-/-_0-9a-zA-Z]+)/?', path)
+    match = re.match('/video/([--_0-9a-zA-Z]+)/?', path)
 
     if not match:
         raise EmbeddingNotSupportedException('Bad video ID.')
