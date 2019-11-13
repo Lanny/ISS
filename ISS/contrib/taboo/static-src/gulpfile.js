@@ -2,7 +2,7 @@ var gulp = require('gulp');
 var path = require('path');
 var argv = require('yargs').argv;
 var flatten = require('gulp-flatten');
-var less = require('gulp-sources-less');
+var less = require('gulp-less');
 var minifyCSS = require('gulp-minify-css');
 var clean = require('gulp-clean');
 
@@ -34,8 +34,8 @@ gulp.task('less', function() {
 });
 
 var generateTasks = ['less']
-gulp.task('generate', generateTasks);
+gulp.task('generate', gulp.parallel(generateTasks));
 
-gulp.task('watch', ['generate'], function() {
+gulp.task('watch', gulp.parallel('generate'), function() {
   gulp.watch([ './src/**/*.less' ], ['less']);
 });
