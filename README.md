@@ -92,6 +92,18 @@ If you want rotating banners drop them in `ISS/static/banners` and restart the s
 # Development Tips
 - When `DEBUG` is true in settings.py, you can use ctrl+P on any page to cycle through the available themes.
 
+# Production Notes
+- As with any Django project *be sure `DEBUG` in settings.py is false*
+  - Also be sure to your `SECRET_KEY` is not in any repo (e.g. copied out of test_settings.py)
+- Set up redis or memcachd for the default cache
+- Set up the email settings (see https://docs.djangoproject.com/en/2.2/topics/email/)
+- You want to run nginx in front of ISS, Python should not be serving static assets
+- To produce production ready statics:
+  - Build the assets using `gulp generate --optimizeAssets` (from the static-src directory)
+  - Set `STATIC_ROOT` to point to some writable directory to hold generated statics
+  - Run `./manage.py collectstatic` to schlep files over to `STATIC_ROOT`
+
+
 # Configuration
 Every ISS instance must define a `FORUM_CONFIG` setting. Default values exist
 for every key so it may be empty. Here is a list of the recognized properties
