@@ -1,6 +1,31 @@
 @import "../base/config.less";
 
+.mobile-hidden() {
+  @media (max-width: @breakpoint) {
+    display: none;
+  }
+}
+
 .user-index {
+  .sort-and-pages {
+    display: flex;
+    margin-bottom: @content_margin_bottom;
+
+    @media (max-width: @breakpoint) {
+      display: block;
+      margin-bottom: 0;
+    }
+
+    #sort-form {
+      .action-select();
+    }
+
+    .paginator {
+      flex: 1;
+      margin-bottom: 0;
+    }
+  }
+
   .spam-can {
     .icn-btn-scaleable(35);
     &:before { .icn-spam-can(); }
@@ -8,19 +33,39 @@
   }
 
   .users {
-    .index-table;
+    .index-table();
     .region(0,0,0,20px);
     width: 100%;
+    table-layout: fixed;
+    word-break: break-all;
+
+    .avatar-cell {
+      .mobile-hidden();
+      width: 107px;
+
+      img {
+        max-width: 100%;
+      }
+    }
 
     .name-cell {
-      a, .usertitle {
-        word-wrap: anywhere;
-      }
-
       .usertitle {
         padding-top: 3px;
         font-size: .85em;
       }
+    }
+
+    .join-date {
+      .mobile-hidden();
+      width: 120px;
+    }
+
+    .post-count {
+      width: 100px;
+    }
+
+    .spam-cell {
+      width: 70px;
     }
 
     .avatar-cell, .join-date, .post-count, .spam-cell {
