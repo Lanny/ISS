@@ -1,5 +1,20 @@
 @import "../base/config.less";
 
+
+.pm-action-container {
+  display: inline-block;
+  margin-bottom: @content_margin_bottom;
+
+  @media (max-width: @breakpoint) {
+    display: block;
+    margin-bottom: 0;
+  }
+
+  #post-actions {
+    .action-select();
+  }
+}
+
 .private-messages {
   .region();
 
@@ -64,6 +79,7 @@
           &:nth-child(1) { 
             width: 0;
             padding: 5px;
+            text-align: center;
           }
 
           &:nth-child(3) { 

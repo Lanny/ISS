@@ -17,20 +17,15 @@
 
 {% block content %}
   {% if show_from or show_to %}
-  <div class="thread">
-    <div class="actions-and-pages">
-      <div>
-        <form method="POST" action="{% url 'pms-action' %}"
-              id="post-actions">
-          {% csrf_token %}
-          <div class="form-wrapper">{{ pm_action_form.as_p }}</div>
+    <div class="pm-action-container">
+      <form method="POST" action="{% url 'pms-action' %}" id="post-actions">
+        {% csrf_token %}
+        {{ pm_action_form.action }}
 
-          <input type="hidden" name="next" value="{{ request.get_full_path }}" />
-          <input type="submit" value="Go" />
-        </form>
-      </div>
+        <input type="hidden" name="next" value="{{ request.get_full_path }}" />
+        <input type="submit" value="Go" />
+      </form>
     </div>
-  </div>
   {% endif %}
 
   <div class="private-messages">

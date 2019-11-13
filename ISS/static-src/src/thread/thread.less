@@ -24,47 +24,7 @@
     }
 
     #post-actions {
-      display: flex;
-      justify-content: stretch;
-      align-items: stretch;
-      height: 30px;
-
-      input[type="submit"] {
-        .primary();
-        border: none;
-        padding: 0 20px;
-
-        & when (@THEME = 'amoled') {
-          border: 1px solid @seperator_color_major;
-        }
-      }
-
-      select {
-        flex: 1;
-        margin-right: 5px;
-        border: 1px solid @seperator_color_major;
-      }
-
-      @media (max-width: @breakpoint) {
-        height: 40px;
-        border-width: 1px 0;
-        border-style: solid;
-        border-color: @seperator_color_major;
-
-        input[type="submit"] {
-          border-radius: 0;
-          margin: 0;
-          border-left: 1px solid @seperator_color_major;
-        }
-
-        select {
-          border: none;
-          background-color: @bg_dark;
-          border-radius: 0;
-          margin: 0;
-          width: 0;
-        }
-      }
+      .action-select();
     }
     
   }
