@@ -20,7 +20,7 @@
         <form method="POST" action="{% url 'thread-action' thread.pk %}"
               id="post-actions">
           {% csrf_token %}
-          <div class="form-wrapper">{{ thread_action_form.as_p }}</div>
+          {{ thread_action_form.action }}
 
           <input type="hidden" name="next" value="{{ request.get_full_path }}" />
           <input type="submit" value="Go" />
