@@ -59,12 +59,12 @@ gulp.task('less', gulp.series('icons', function() {
 
   var stream = gulp.src('./src/themes/*.less');
 
-  stream = argv.optimize ? stream : stream.pipe(sourcemaps.init());
+  stream = argv.optimizeAssets ? stream : stream.pipe(sourcemaps.init());
   stream = stream.pipe(lessStream);
-  stream = argv.optimize ? stream : stream.pipe(sourcemaps.write());
+  stream = argv.optimizeAssets ? stream : stream.pipe(sourcemaps.write());
   stream = stream.pipe(flatten());
   stream = stream.pipe(autoprefixer());
-  stream = argv.optimize ? stream.pipe(minifyCSS()) : stream;
+  stream = argv.optimizeAssets ? stream.pipe(minifyCSS()) : stream;
   stream = stream.pipe(gulp.dest(cssDir));
 
   return stream;
@@ -104,7 +104,7 @@ gulp.task('generate-extensions', function(done) {
 });
 
 var generateTasks = ['less', 'smilies', 'generate-extensions'];
-generateTasks.push(argv.optimize ? 'optimize-js' : 'javascript');
+generateTasks.push(argv.optimizeAssets ? 'optimize-js' : 'javascript');
 gulp.task('generate', gulp.parallel(generateTasks));
 
 gulp.task('watch', gulp.series('generate', function() {
