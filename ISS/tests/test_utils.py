@@ -2,6 +2,8 @@
 
 from datetime import timedelta
 
+from django.test import TestCase
+
 from ISS import utils
 import tutils
 
@@ -10,7 +12,7 @@ SIGNED_MESSAGE = """
 Hash: SHA256
 
 [quote author="Don Knuth"]
-The whole thing that makes a mathematician’s life worthwhile is that he gets the grudging admiration of three or four colleagues.
+The whole thing that makes a mathematician's life worthwhile is that he gets the grudging admiration of three or four colleagues.
 [/quote]
 
 The mathematician in question had received just a bit more admiration than that.
@@ -111,3 +113,16 @@ class UtilsTestCase(tutils.ForumConfigTestCase):
         self.assertEqual(depgpd.strip(), 'The mathematician in question '
                 'had received just a bit more admiration than that.')
 
+class PureUtilsTestCase(TestCase):
+    rmerge_cases = (
+        (((1,2,3), (0,0)), 'replace', (0,0)),
+        (((1,2,3), (0,0)), 'merge', (0,0,3)),
+        (((1,2,3), (0,0)), 'append', (1,2,3,0,0)),
+        (({'a': 1, 'b': 2}, {'a': 3, 'c': 4}), 'replace', {'a': 3, 'b': 2, 'c': 4}),
+        (({'a': 1, 'b': 2}, {'a': 3, 'c': 4}, {'a': 9}), 'replace', {'a': 9, 'b': 2, 'c': 4}),
+    )
+
+    def test_rmerge(self):
+        for args, mode, expected in self.rmerge_cases:
+            actual = utils.rmerge(*args, seq_mode=mode)
+            self.assertEqual(actual, expected)

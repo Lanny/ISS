@@ -37,17 +37,18 @@
           background-color: @bg_dark;
           cursor: pointer;
           height: 100%;
+          font-size: @body_font_size;
 
           &:hover {
             background-color: @bg_light;
           }
 
-          & when (@THEME = "&T") {
+          & when (@THEME = "web-2.0") {
             text-decoration: none;
             font-size: 12px;
           }
 
-          & when (@THEME = "bibliotek") {
+          & when (@ARCH = "library") {
             padding: 10px 20px;
           }
         }

@@ -5,7 +5,7 @@ import json
 
 from django.conf import settings
 from django.core import mail
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user
 from django.test import TestCase, Client
 from django.urls import reverse, resolve
 from django.utils import timezone
@@ -17,7 +17,7 @@ import tutils
 class GeneralViewTestCase(tutils.ForumConfigTestCase):
     forum_config = {'captcha_period': 0}
 
-    def setUp2(self):
+    def setUp(self):
         tutils.create_std_forums()
 
         self.scrub = tutils.create_user(thread_count=5, post_count=10)
@@ -390,7 +390,6 @@ class AdminThreadCreationForum(TestCase):
         })
         self.assertEqual(response.status_code, 403)
 
-
 class PasswordResetTestCase(TestCase):
     def setUp(self):
         self.franz = tutils.create_user()
@@ -495,30 +494,135 @@ class PasswordResetTestCase(TestCase):
             })
         self.assertEqual(response.status_code, 404)
 
-class RegistrationTestCase(tutils.ForumConfigTestCase):
+class AbstractRegistrationTestCase(tutils.ForumConfigTestCase):
+    def _register(self,
+                  username="Leslie Lamport",
+                  email="lamport@softmicro.com",
+                  password='TLA Rules'):
+        response = self.anon_client.post(
+            self.path,
+            {
+                'username': username,
+                'password1': password,
+                'password2': password,
+                'email': email
+            })
+
+        return response
+
+class RegistrationTestCase(AbstractRegistrationTestCase):
     forum_config = {
         'recaptcha_settings': None,
         'enable_registration': True
     }
 
-    def setUp2(self):
+    def setUp(self):
         tutils.create_std_forums()
         self.anon_client = Client()
         self.path = reverse('register')
 
     def test_happy_path(self):
         initial_user_count = Poster.objects.count()
-
-        response = self.anon_client.post(
-            self.path,
-            {
-                'username': 'Groucho Marx',
-                'password1': 'BD08081890',
-                'password2': 'BD08081890',
-                'email': 'gmarx@contrarian.club'
-            })
-
+        response = self._register() 
         self.assertEqual(Poster.objects.count(), initial_user_count + 1)
+
+    def test_poster_starts_inavtive(self):
+        username =  'Leslie Lamport'
+        response = self._register() 
+        leslie = Poster.objects.get(username=username)
+        self.assertFalse(leslie.is_active)
+
+    def test_poster_cant_login(self):
+        username = 'Leslie Lamport'
+        password = 'BD08081890'
+        response = self._register(username=username, password=password) 
+        leslie = Poster.objects.get(username=username)
+
+        login_path  = reverse('login')
+        client = Client()
+        response = client.post(
+            login_path, { 'username': username, 'password': password })
+        user = auth.get_user(client)
+
+        self.assertFalse(user.is_authenticated())
+
+    def test_email_verification_invalid_code(self):
+        path = reverse('verify-email')
+        client = Client()
+        response = client.get(path, data={'code': 'invalid_code'})
+        self.assertEqual(response.status_code, 404)
+
+    def test_email_verification_missing_code(self):
+        path = reverse('verify-email')
+        client = Client()
+        response = client.get(path, data={'kode': 'zork'})
+        self.assertEqual(response.status_code, 404)
+
+    def test_email_verification_not_in_db_code(self):
+        path = reverse('verify-email')
+        client = Client()
+        response = client.get(path, data={'code': 'a15d9e9d-caf0-4196-b389-6f4ad5dbcf8d'})
+        self.assertEqual(response.status_code, 404)
+
+    def test_email_verification_happy_path(self):
+        username =  'Leslie Lamport'
+        password = 'Now is when I got my last message'
+        response = self._register(username=username, password=password)
+        leslie = Poster.objects.get(username=username)
+
+        path = reverse('verify-email')
+        client = Client()
+        response = client.get(path, data={'code': str(leslie.email_verification_code)})
+        self.assertEqual(response.status_code, 200)
+
+        login_path  = reverse('login')
+        client = Client()
+        response = client.post(login_path,
+                               { 'username': username, 'password': password })
+        user = auth.get_user(client)
+        self.assertEqual(user, leslie)
+
+
+class EmailNormalizationTestCase(AbstractRegistrationTestCase):
+    forum_config = {
+        'recaptcha_settings': None,
+        'enable_registration': True,
+        'email_host_blacklist': ['damnthespam.com']
+    }
+
+    def setUp(self):
+        tutils.create_std_forums()
+        self.anon_client = Client()
+        self.client = Client()
+        self.path = reverse('register')
+
+    def test_identical_address(self):
+        email = "Colin.Maclaurin@gov.scot"
+        self._register(username="CM1", email=email)
+
+        user_count = Poster.objects.count()
+        self._register(username="CM2", email=email)
+
+        self.assertEqual(Poster.objects.count(), user_count)
+
+    def test_similar_address(self):
+        self._register(username="CM1", email= "colinMaclaurin+z@gmail.com")
+        user_count = Poster.objects.count()
+
+        self._register(username="CM2", email="Colin.Maclaurin@gmail.com")
+
+        self.assertEqual(Poster.objects.count(), user_count)
+
+    def test_blacklisted_address(self):
+        user_count = Poster.objects.count()
+        self._register(username="I.N.", email= "isaac.newton@damnthespam.com")
+        self.assertEqual(Poster.objects.count(), user_count)
+
+    def test_diff_addres(self):
+        self._register(username="CM1", email= "Colin.Maclaurin@gov.scot")
+        user_count = Poster.objects.count()
+        self._register(username="CM2", email= "Maclaurin.Colin@gov.scot")
+        self.assertEqual(Poster.objects.count(), user_count + 1)
 
 class RegistrationDisabledTestCase(tutils.ForumConfigTestCase):
     forum_config = {
@@ -704,13 +808,9 @@ class LoginTestCase(TestCase):
                 'password': self.password,
             })
 
-        uid = (self.otsu_client
-                .session
-                .load()
-                .get('_auth_user_id'))
-
+        user = auth.get_user(self.otsu_client)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(int(uid), self.otsu.pk)
+        self.assertEqual(user.pk, self.otsu.pk)
         
     def test_incorrect_unicode_password_success(self):
         response = self.otsu_client.post(
@@ -720,15 +820,9 @@ class LoginTestCase(TestCase):
                 'password': self.password[:-1],
             })
 
-        uid = (self.otsu_client
-                .session
-                .load()
-                .get('_auth_user_id'))
-
+        user = auth.get_user(self.otsu_client)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(uid, None)
-        
-
+        self.assertFalse(user.is_authenticated())
 
 class UserCPTestCase(tutils.ForumConfigTestCase):
     forum_config = {'captcha_period': 0}
@@ -781,3 +875,57 @@ class UserCPTestCase(tutils.ForumConfigTestCase):
         response = self.don_client.get(ucp_path)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context['threads']), 1)
+
+class ReportPostTestCase(tutils.ForumConfigTestCase):
+    forum_config = {
+        'recaptcha_settings': None,
+        'report_reasons': (('TOO_PRETTY', 'Too pretty'),),
+    }
+
+    def setUp(self):
+        tutils.create_std_forums()
+
+        self.don = tutils.create_user(thread_count=1, post_count=1)
+        self.fran = tutils.create_user(thread_count=0, post_count=0)
+        self.lanny = tutils.create_user(thread_count=0, post_count=0)
+
+        self.lanny.is_staff = True
+        self.lanny.is_admin = True
+        self.lanny.save()
+
+        self.don_post = self.don.post_set.all()[0]
+
+        self.fran_client = Client()
+        self.fran_client.force_login(self.fran)
+
+
+    def _report_post(self, post):
+        path = reverse('report-post', args=(post.pk,))
+        return self.fran_client.post(path, {
+            'post': post.pk,
+            'reason': 'TOO_PRETTY',
+            'explanation': ('Post was made by a user who is too pretty '
+                            'and that offends me.')}
+        )
+
+    def test_happy_path_report(self):
+        pm_count = PrivateMessage.objects.count()
+        response = self._report_post(self.don_post)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(PrivateMessage.objects.count(), pm_count + 2)
+
+
+    def test_extra_long_username_report(self):
+        pm_count = PrivateMessage.objects.count()
+
+        max_len = Poster._meta.get_field('username').max_length
+        username = u'I\'m a pretty princess'
+        username = username + ('!' * (max_len - len(username)))
+
+        fin = tutils.create_user(post_count=1, username=username)
+        post = fin.post_set.all()[0]
+        response = self._report_post(post)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(PrivateMessage.objects.count(), pm_count + 2)

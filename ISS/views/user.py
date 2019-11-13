@@ -1,11 +1,15 @@
 import uuid
+from smtplib import SMTPRecipientsRefused
 from datetime import timedelta
 
 from django.core.mail import send_mail
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from django.conf import settings
 from django.contrib.auth import login, authenticate
+from django.db import transaction
 from django.db.models import Count
+from django.forms import ValidationError
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -135,10 +139,8 @@ class InitiatePasswordRecovery(utils.MethodSplitView):
             forum_name = utils.get_config('forum_name')
             ctx = {
                 'forum_name': forum_name,
-                'url': ('http://' +
-                        utils.get_config('forum_domain') +
-                        reverse('recovery-reset') +
-                        '?code=' + user.recovery_code),
+                'url': (utils.reverse_absolute('recovery-reset') +
+                    '?code=' + user.recovery_code)
             }
 
             send_mail(
@@ -226,6 +228,38 @@ class RegisterUser(utils.MethodSplitView):
                 'message': message
             })
 
+    def _form_error(self, request, form):
+        ctx = { 'form': form }
+        return render(request, 'register.html', ctx)
+
+    def _create_poster(self, form):
+        poster = form.save()
+        poster.is_active = False
+        poster.save()
+
+        return poster
+
+    def _send_verificaiton_email(self, poster):
+        forum_name = utils.get_config('forum_name')
+        email_address = poster.email
+
+        verification_url = '%s?code=%s' % (
+            utils.reverse_absolute('verify-email'),
+            poster.email_verification_code)
+        
+        ctx = {
+            'forum_name': forum_name,
+            'username': poster.username,
+            'email_address': email_address,
+            'verification_url': verification_url,
+        }
+
+        send_mail(
+            'Account Verification for %s' % forum_name,
+            render_to_string('email/account_verification.txt', ctx),
+            settings.EMAIL_HOST_USER,
+            [email_address])
+
     def GET(self, request):
         form = forms.RegistrationForm()
         ctx = {'form': form}
@@ -235,16 +269,80 @@ class RegisterUser(utils.MethodSplitView):
         form = forms.RegistrationForm(request.POST)
 
         if form.is_valid():
-            poster = form.save()
+            try:
+                with transaction.atomic():
+                    poster = self._create_poster(form)
+                    self._send_verificaiton_email(poster)
 
-            poster = authenticate(username = form.cleaned_data['username'],
-                                  password = form.cleaned_data['password1'])
-            login(request, poster)
-            return HttpResponseRedirect('/')
+            except SMTPRecipientsRefused:
+                error = ValidationError(
+                    'Unable to send verification email to: %(email)s.',
+                    params={ 'email': form.cleaned_data['email'] },
+                    code="SMTP_ERROR")
+                form.add_error('email', error)
+                return self._form_error(request, form)
+
+            forum_name = utils.get_config('forum_name')
+            email_address = poster.email
+            message = (
+                'Thank you for registering with %s. You\'ll need to verify '
+                'your email address before logging in. We\'ve send an email '
+                'to %s. Please check that address and follow the instructions '
+                'in the email. Note that it may take a few minutes for the '
+                'email to arrive. If you don\'t receive an email check your '
+                'spam folder.'
+            ) % (forum_name, email_address)
+
+            return render(request, 'generic_message.html', {
+                'page_title': 'Regristration Successful',
+                'heading': 'Regristration Successful',
+                'message': message
+            })
 
         else:
-            ctx = { 'form': form }
-            return render(request, 'register.html', ctx)
+            return self._form_error(request, form)
+
+class VerifyEmail(utils.MethodSplitView):
+    def _error_out(self, request):
+        message = ('The verification code is either invalid or already '
+            'used. Please check the code sent in the verification email.')
+
+        return render(
+            request,
+            'generic_message.html',
+            {
+                'page_title': 'Error',
+                'heading': 'Verification Code Invalid',
+                'message': message
+            },
+            status=404)
+
+    def GET(self, request):
+        try:
+            code = uuid.UUID(request.GET.get('code', ''))
+        except ValueError:
+            return self._error_out(request)
+
+        try :
+            poster = Poster.objects.get(email_verification_code=code)
+        except Poster.DoesNotExist:
+            return self._error_out(request)
+
+        if poster.is_active:
+            return self._error_out(request)
+
+        poster.is_active = True
+        poster.save()
+
+        message = ('You\'ve successfully verified your account, welcome to '
+            '%s. You can now [url="%s"]log in[/url] to your account.')
+        message = message % (utils.get_config('forum_name'), reverse('login'))
+
+        return render(request, 'generic_message.html', {
+            'page_title': 'Verification Successful',
+            'heading': 'Verification Successful',
+            'message': message
+        })
 
 class RegisterUserWithCode(utils.MethodSplitView):
     def GET(self, request):
@@ -287,6 +385,33 @@ class GenerateInvite(utils.MethodSplitView):
         reg_code.save()
         url = reverse('view-generated-invite') + '?code=%s' % reg_code.code
         return HttpResponseRedirect(url)
+
+class UserIndex(utils.MethodSplitView):
+    def GET(self, request):
+        sortBy = request.GET.get('sortby', 'id')
+
+        if sortBy == 'post_count':
+            posters = (Poster.objects
+                .annotate(post_count=Count('post'))
+                .order_by('-post_count'))
+        elif sortBy == 'username':
+            posters = Poster.objects.all().order_by('username')
+        elif sortBy == 'id':
+            posters = Poster.objects.all().order_by('id')
+        else:
+            raise PermissionDenied('Invalid sortby value')
+
+        posters_per_page = utils.get_config('general_items_per_page')
+
+        paginator = Paginator(posters, posters_per_page)
+        page = utils.page_by_request(paginator, request)
+
+        ctx = {
+            'rel_page': page,
+            'posters': page
+        }
+
+        return render(request, 'user_index.html', ctx)
 
 def view_generated_invite(request):
     reg_code = get_object_or_404(RegistrationCode, code=request.GET.get('code'))

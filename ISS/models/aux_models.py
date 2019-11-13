@@ -1,9 +1,11 @@
+from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.utils import timezone
+from django import forms
 
 from ISS import utils
 from core_models import Forum, Poster, Thread
-
+from admin_models import IPBan
 
 class LatestThreadsForumPreference(models.Model):
     class Meta:
@@ -48,3 +50,48 @@ class LatestThreadsForumPreference(models.Model):
 
     def __unicode__(self):
         return u'%s to %s' % (self.poster, self.forum)
+
+class RateLimitedAccess(models.Model):
+    limit_key = models.CharField(max_length=1024)
+    address = models.GenericIPAddressField()
+    at = models.DateTimeField(auto_now_add=True)
+    expires = models.DateTimeField()
+
+    @classmethod
+    def check_limit(cls, limit_key, access_limit, address, window):
+        now = timezone.now()
+        cls.objects.filter(expires__lt=now).delete()
+        cls.objects.create(
+            limit_key=limit_key,
+            address=address,
+            expires=now + window
+        )
+
+        access_count = cls.objects.filter(
+            limit_key=limit_key,
+            address=address,
+            at__gte=now - window
+        ).count()
+
+        return access_count < access_limit
+
+    @classmethod
+    def rate_limit(cls, limit_key, access_limit, window):
+        def decorator(view):
+            def wrapped_view(self, request, *args, **kwargs):
+                addr = request.META.get(
+                    utils.get_config('client_ip_field'), None)
+                is_valid = cls.check_limit(
+                    limit_key,
+                    access_limit,
+                    addr,
+                    window
+                )
+
+                if is_valid:
+                    return view(self, request, *args, **kwargs)
+                else:
+                    raise PermissionDenied('Rate limit exceded.')
+
+            return wrapped_view
+        return decorator

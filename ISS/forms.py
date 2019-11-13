@@ -3,19 +3,21 @@ import json
 import pytz
 import urllib
 import urllib2
+import email_normalize
 
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import transaction
 from django.forms import ValidationError
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import timezone, safestring
 from PIL import Image
 
 from tripphrase import tripphrase
 
 import utils
 from models import *
+from models.core_models import THEME_CHOICES
 
 class DurationField(forms.Field):
     def clean(self, value):
@@ -121,7 +123,7 @@ class PGPPublicKeyField(forms.CharField):
 
         return value.strip()
 
-class InitialPeriodLimitingForm(forms.Form):
+class AuthorshipForm(forms.Form):
     def __init__(self, *args, **kwargs):
         if 'author' not in kwargs:
             raise ValueError('Must be inited with a author')
@@ -129,31 +131,63 @@ class InitialPeriodLimitingForm(forms.Form):
         self._author = kwargs['author']
         del kwargs['author']
 
-        super(InitialPeriodLimitingForm, self).__init__(*args, **kwargs)
+        super(AuthorshipForm, self).__init__(*args, **kwargs)
 
+    def get_author(self):
+        return self._author
+
+class InitialPeriodLimitingForm(AuthorshipForm):
     def clean(self, *args, **kwargs):
         super(InitialPeriodLimitingForm, self).clean(*args, **kwargs)
 
-        post_count = self._author.post_set.count()
-        if post_count < utils.get_config('initial_account_period_total'):
-            window_start = timezone.now() - utils.get_config(
-                'initial_account_period_width')
 
-            posts_in_window = (self._author
+        (
+            period_total,
+            period_width,
+            period_limit
+        ) = utils.get_config(
+            'initial_account_period_total',
+            'initial_account_period_width',
+            'initial_account_period_limit'
+        )
+
+        post_count = self.get_author().post_set.count()
+        if post_count < period_total:
+            window_start = timezone.now() - period_width
+
+            posts_in_window = (self.get_author()
                                    .post_set
                                    .order_by('-created')
                                    .filter(created__gte=window_start)
                                    .count())
 
-            if posts_in_window >= utils.get_config(
-                    'initial_account_period_limit'):
-                raise ValidationError(
-                    ('You\'ve made too many posts on a new account. This '
-                     'control will be removed once your account is better '
-                     'established.'),
-                    code='FLOOD_CONTROL')
+            if posts_in_window >= period_limit:
+                formated_width = utils.format_duration(period_width)
+                message = (
+                    'While you\'ve made less than %d posts, your account is '
+                    'limited in creation of new posts. You can make at most '
+                    '%d posts in a period of %s. You will be able to continue '
+                    'to post as prior posts roll out of this window.'
+                 ) % (period_total, period_limit, formated_width)
+                raise ValidationError(message, code='FLOOD_CONTROL')
 
-class NewThreadForm(InitialPeriodLimitingForm):
+class PostDuplicationPreventionForm(AuthorshipForm):
+    def clean(self, *args, **kwargs):
+        super(PostDuplicationPreventionForm, self).clean(*args, **kwargs)
+        
+        try:
+            last_post = self.get_author().post_set.order_by('-created')[0]
+        except IndexError:
+            return self.cleaned_data
+
+
+        if last_post.content == self.cleaned_data.get('content', ''):
+            raise ValidationError('Duplicate of your last post.', code='DUPE')
+
+        return self.cleaned_data
+
+
+class NewThreadForm(InitialPeriodLimitingForm, PostDuplicationPreventionForm):
     error_css_class = 'in-error'
     thread_min_len = utils.get_config('min_thread_title_chars')
     post_min_len = utils.get_config('min_post_chars')
@@ -198,7 +232,7 @@ class NewThreadForm(InitialPeriodLimitingForm):
 
         return self.thread
 
-class NewPostForm(InitialPeriodLimitingForm):
+class NewPostForm(InitialPeriodLimitingForm, PostDuplicationPreventionForm):
     error_css_class = 'in-error'
     post_min_len = utils.get_config('min_post_chars')
     post_max_len = utils.get_config('max_post_chars')
@@ -222,25 +256,11 @@ class NewPostForm(InitialPeriodLimitingForm):
 
         return thread
 
-    def clean(self, *args, **kwargs):
-        super(NewPostForm, self).clean(*args, **kwargs)
-        
-        try:
-            last_post = self._author.post_set.order_by('-created')[0]
-        except IndexError:
-            return self.cleaned_data
-
-
-        if last_post.content == self.cleaned_data.get('content', ''):
-            raise ValidationError('Duplicate of your last post.', code='DUPE')
-
-        return self.cleaned_data
-
     def get_post(self):
         self.post = Post(
             thread=self.cleaned_data['thread'],
             content=self.cleaned_data['content'],
-            author=self._author)
+            author=self.get_author())
 
         return self.post
 
@@ -306,13 +326,40 @@ class RenderBBCodeForm(forms.Form):
 class ThreadActionForm(forms.Form):
     @classmethod
     def _get_action_field(cls):
-        choices = [('edit-thread', 'Edit Thread'),
+        actions_choices = [('edit-thread', 'Edit Thread'),
                    ('delete-posts', 'Delete Posts'),
-                   ('trash-thread', 'Trash Thread')]
+                   ('sticky-thread', 'Sticky Thread'),
+                   ('lock-thread', 'Lock Thread'),
+                   ('trash-thread', 'Trash Thread'),
+                   ('off-topic-posts', 'Off-Topic Posts')]
+        actions_choices.sort()
+        moveto_choices = []
 
-        for forum in Forum.objects.all():
-            choices.append(('move-to-%d' % forum.pk,
-                            '-> Move to %s' % forum.name))
+        forums = Forum.objects.all().order_by(
+            'category__priority',
+            'category__id',
+            'priority',
+            'id')
+
+        for forum in forums:
+            moveto_choices.append(('move-to-%d' % forum.pk,
+                                   '-> Move to %s' % forum.name))
+
+        actions_choices.extend(moveto_choices)
+
+        return forms.ChoiceField(
+            label="",
+            required=True,
+            choices=actions_choices)
+
+    def __init__(self, *args, **kwargs):
+        super(ThreadActionForm, self).__init__(*args, **kwargs)
+        self.fields['action'] = self._get_action_field()
+
+class PrivateMessageActionForm(forms.Form):
+    @classmethod
+    def _get_action_field(cls):
+        choices = [('delete-message', 'Delete Message')]
 
         return forms.ChoiceField(
             label="",
@@ -320,7 +367,7 @@ class ThreadActionForm(forms.Form):
             choices=choices)
 
     def __init__(self, *args, **kwargs):
-        super(ThreadActionForm, self).__init__(*args, **kwargs)
+        super(PrivateMessageActionForm, self).__init__(*args, **kwargs)
         self.fields['action'] = self._get_action_field()
 
 class LatestThreadsPreferencesForm(forms.Form):
@@ -420,6 +467,24 @@ class RegistrationForm(UserCreationForm):
 
         return username
 
+    def clean_email(self, *args, **kwargs):
+        address = self.cleaned_data['email']
+        norm_addr = email_normalize.normalize(address)
+        _, domain = norm_addr.rsplit('@', 1)
+
+        if domain in utils.get_config('email_host_blacklist'):
+            raise ValidationError(
+                ('Accounts can not be resistered with email addresses '
+                 'provided by this host.'),
+                code='BAD_HOST')
+
+        if Poster.objects.filter(normalized_email=norm_addr).count():
+            raise ValidationError(
+                'Email address is already associated with an account',
+                code='TOO_SIMILAR')
+
+        return address
+
     def save(self):
         poster = UserCreationForm.save(self)
         return poster
@@ -503,15 +568,18 @@ class ReportPostForm(forms.Form):
 
     post = forms.ModelChoiceField(queryset=Post.objects.all(),
                                   widget=forms.HiddenInput())
-    reason = forms.ChoiceField(
-        label='Reason for reporting',
-        choices=utils.get_config('report_reasons'),
-        required=True)
 
     explanation = BBCodeField(label='Explanation for reporting',
-                               min_length=post_min_len,
-                               max_length=post_max_len,
-                               widget=forms.Textarea())
+                              min_length=post_min_len,
+                              max_length=post_max_len,
+                              widget=forms.Textarea())
+
+    def __init__(self, *args, **kwargs):
+        forms.Form.__init__(self, *args, **kwargs)
+        self.fields['reason'] = forms.ChoiceField(
+            label='Reason for reporting',
+            choices=utils.get_config('report_reasons'),
+            required=True)
 
     def clean_post(self):
         author = self.cleaned_data['post'].author
@@ -521,6 +589,34 @@ class ReportPostForm(forms.Form):
                                   code='ALREADY_BANNED')
 
         return self.cleaned_data['post']
+
+
+class FastSelectWidget(forms.Select):
+    """
+    Shitty insecure version of `forms.Select` that doesn't use the templating
+    system. When there are a lot of options, `forms.Select` will render an
+    absurd number of sub-templates, the overhead of which kills performance and
+    dominates response time. We make no effort at escaping strings so make
+    sure choices are not user specified and don't contain HTML.
+    """
+    def _get_opts_str(self, value):
+        template = '<option value="%s" %s>%s</option>'
+        parts = [template % (c, 'selected' if c == value else '', l)
+                 for c, l in self.choices]
+        return '\n'.join(parts)
+
+    def render(self, name, value, attrs=None, renderer=None):
+        markup = """
+            <select name="%(name)s" id="%(id)s">%(opts)s</select>
+        """ % {
+            'id': 'id_%s' % name,
+            'name': name,
+            'opts': self._get_opts_str(value)
+        }
+
+        return safestring.mark_safe(markup)
+
+TZ_CHOICES = reversed([(tz, tz) for tz in pytz.common_timezones])
     
 class UserSettingsForm(forms.Form):
     error_css_class = 'in-error'
@@ -528,7 +624,8 @@ class UserSettingsForm(forms.Form):
     email = forms.EmailField(label="Email address")
     timezone = forms.ChoiceField(
             label="Timezone",
-            choices=[(tz, tz) for tz in pytz.common_timezones])
+            choices=TZ_CHOICES,
+            widget=FastSelectWidget)
     posts_per_page = forms.IntegerField(
             label="Posts to show per page",
             max_value=50,
@@ -543,7 +640,7 @@ class UserSettingsForm(forms.Form):
     theme = forms.ChoiceField(
         label="Theme",
         required=True,
-        choices=utils.get_config('themes'))
+        choices=THEME_CHOICES)
     allow_js = forms.BooleanField(label="Enable javascript", required=False)
     allow_avatars = forms.BooleanField(label="Show user avatars", required=False)
     enable_editor_buttons = forms.BooleanField(
@@ -748,3 +845,4 @@ class SearchForm(forms.Form):
                 reverse('api-user-serach'))
 
         super(SearchForm, self).__init__(*args, **kwargs)
+

@@ -65,6 +65,18 @@
         </fieldset>
       </form>
     {% endif %}
+
+    {% if not thread.can_reply %}
+      <div class="page-message">
+        <div class="icon-container">
+          <div class="alert-icon"></div>
+        </div>
+        <div class="message-content">
+          <p>This Thread Has Been Locked</p>
+        </div>
+      </div>
+    {% endif %}
+
   </div>
 {% endblock %}
 

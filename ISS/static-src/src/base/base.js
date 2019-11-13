@@ -1,18 +1,6 @@
 ;(function() {
 
-  function wrap($, config, bbcode, paginator, hyperDrive) {
-    function peek() {
-      return;
-      var peekaboo = $('.peekaboo').first()
-        .css('display', 'block');
-
-      peekaboo.animate({'left': -100}, 1500, 'linear', function() {
-        window.setTimeout(function() {
-          peekaboo.animate({'left': 0}, 500);
-        }, 250);
-      });
-    }
-
+  function wrap($, config, bbcode, paginator, CheckboxList, hyperDrive) {
     $(document).on('click', '.hyper-drive', function() {
       hyperDrive.start()
     });
@@ -21,12 +9,20 @@
       bbcode.bindRegion($('.page-content'));
       paginator.bindKeyboardControls();
 
-      //window.setTimeout(peek, Math.random()*1000*60*60);
+      $('[data-form-name="logout-form"]').on('submit', function(e) {
+        if (!window.confirm('Are you sure you want to log out?')) {
+          e.preventDefault();
+        }
+      });
 
       if ($('.g-recaptcha').length > 0) {
         $(document.documentElement).append(
           '<script src="https://www.google.com/recaptcha/api.js"></script>');
       }
+
+      $('[data-checkbox-list-container]').each(function(i, el) {
+        new CheckboxList(el);
+      });
     });
   }
 
@@ -35,6 +31,7 @@
     'config',
     'bbcode',
     'paginator',
+    'checkbox-list',
     'hyper-drive'
   ], wrap);
 })();

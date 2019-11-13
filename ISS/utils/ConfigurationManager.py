@@ -5,12 +5,15 @@ from django.conf import settings
 
 from .GlobShortcodeRegistrar import GlobShortcodeRegistrar
 from .Singleton import Singleton
+from . import misc
 
 
 class ConfigurationManager(Singleton):
     CONFIG_DEFAULTS = {
         'forum_name': 'INTERNATIONAL SPACE STATION',
         'forum_domain': 'yourdomain.space',
+        'default_protocol': 'http',
+        'email_host_blacklist': [],
         'banner_dir': 'banners',
         'min_post_chars': 1,
         'max_post_chars': 19475, # No. characters in the first chapter of Dune
@@ -41,8 +44,9 @@ class ConfigurationManager(Singleton):
             ('RLINK', 'Latest Threads', 'latest-threads', 'always', None),
             ('PMS', 'Inbox', 'inbox', 'is_authenticated', None),
             ('RLINK', 'Search', 'search', 'always', None),
+            ('RLINK', 'Members List', 'members', 'always', None),
             ('RLINK', 'Admin', 'admin:index', 'is_admin', None),
-            ('FORM', 'Logout', 'logout', 'is_authenticated', None),
+            ('FORM', 'Logout', 'logout', 'is_authenticated', 'logout-form'),
             ('RLINK', 'Register', 'register', 'is_not_authenticated', None),
         ),
         'static_pages': (),
@@ -63,23 +67,28 @@ class ConfigurationManager(Singleton):
         'enable_registration': True,
         'enable_invites': False,
         'invite_expiration_time': datetime.timedelta(days=14),
-        'themes': (
-            ('&T', '&T'),
-            ('bibliotek', 'Bibliotek')
-        ),
+        'themes': {
+            '&T': {'name': '&T', 'color': '#D5DEE5'},
+            'bibliotek': {'name': 'Bibliotek', 'color': '#FFFFFF'},
+            'amoled': {'name': 'AMOLED', 'color': '#000000'},
+        },
         'default_theme': '&T',
         'hot_topics_count': 5,
         'hot_topics_recent_span': datetime.timedelta(days=3),
         'hot_topics_cache_time': datetime.timedelta(minutes=30)
     }
 
-    def __init__(self, overrides=None):
-        self._config = self.CONFIG_DEFAULTS.copy()
+    def reinit(self, overrides):
+        """
+        Exists only for purposes of testing. Never use this in actual code.
+        """
+        self._config = misc.rmerge(self.CONFIG_DEFAULTS.copy(), overrides)
+        self._config['DEBUG'] = settings.DEBUG
 
-        if overrides is None:
-            overrides = settings.FORUM_CONFIG
-
-        self._config.update(overrides)
+        # Turn the blacklist into a set for faster lookups
+        self._config['email_host_blacklist'] = set(
+            self._config['email_host_blacklist'])
+        
 
         for extension in self._config['extensions']:
             module = importlib.import_module(extension)
@@ -98,6 +107,12 @@ class ConfigurationManager(Singleton):
         registrar = self._config['shortcode_registrar']
         self._config['shortcode_map'] = registrar.get_shortcode_map()
 
+    def __init__(self, overrides=None):
+        if overrides is None:
+            overrides = settings.FORUM_CONFIG
+
+        self.reinit(overrides=overrides)
+
     def get(self, *keys):
         if len(keys) == 0:
             return self._config
@@ -115,4 +130,21 @@ class ConfigurationManager(Singleton):
             return ext_config.get(keys[0])
         else:
             return tuple(ext_config.get(key) for key in keys)
+
+    def set(self, key_path, value):
+        """
+        Exists only for purposes of testing. Never use this in actual code.
+        """
+        if isinstance(keys, basestring):
+            key_path = (key_path,)
+
+        target = self._config
+        
+        for key in key_path[:-1]:
+            target = target[key_path]
+
+        target[key_path[-1]] = value
+
+
+
 

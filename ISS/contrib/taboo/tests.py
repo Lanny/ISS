@@ -18,8 +18,8 @@ class TabooModelsTest(TestCase):
     def setUp(self):
         tutils.create_std_forums()
 
-        self.mark = tutils.create_user(thread_count=1)
-        self.assassin = tutils.create_user()
+        self.mark = tutils.create_user(thread_count=1, post_count=1)
+        self.assassin = tutils.create_user(thread_count=1, post_count=1)
 
         self.profile = TabooProfile.objects.create(
             poster=self.assassin,
@@ -99,6 +99,154 @@ class TabooModelsTest(TestCase):
                          iss_utils.get_ext_config(EXT, 'usertitle_reward'))
 
 
+class TabooMarkAssignmentTest(tutils.ForumConfigTestCase):
+    forum_config = {
+        'extensions': ['ISS.contrib.taboo'],
+        'initial_account_period_total': 199,
+        'extension_config': {
+            'ISS.contrib.taboo': {
+                'time_to_inactivity': datetime.timedelta(days=355)
+            }
+        }
+    }
+
+    def setUp(self):
+        tutils.create_std_forums()
+
+        self.mark = tutils.create_user(thread_count=1, post_count=1)
+        self.assassin = tutils.create_user(post_count=1)
+
+
+        TabooProfile.objects.create(
+            poster=self.assassin,
+            mark=None,
+            phrase='foobar')
+
+        TabooProfile.objects.create(
+            poster=self.mark,
+            mark=None,
+            phrase='foobar')
+
+    def test_unregistered_users_not_elligilbe(self):
+        unregistered_poster = tutils.create_user(post_count=1)
+
+        self.assertFalse(
+            TabooProfile.objects.filter(poster=unregistered_poster))
+
+        candidates = self.assassin.taboo_profile._get_candidate_marks()
+
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(candidates[0], self.mark.taboo_profile)
+
+    def test_inactive_users_not_elligilbe(self):
+        inactive_poster = tutils.create_user(post_count=1)
+        post = inactive_poster.post_set.all()[0]
+        post.created -= datetime.timedelta(days=356)
+        post.save()
+
+        TabooProfile.objects.create(
+            poster=inactive_poster,
+            active=True,
+            mark=None,
+            phrase='foobar')
+
+        candidates = self.assassin.taboo_profile._get_candidate_marks()
+
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(candidates[0], self.mark.taboo_profile)
+
+
+    def test_barely_active_users_not_elligilbe(self):
+        active_poster = tutils.create_user(post_count=1)
+        post = active_poster.post_set.all()[0]
+        post.created -= datetime.timedelta(days=354)
+        post.save()
+
+        TabooProfile.objects.create(
+            poster=active_poster,
+            active=True,
+            mark=None,
+            phrase='foobar')
+
+        candidates = self.assassin.taboo_profile._get_candidate_marks()
+
+        self.assertEqual(len(candidates), 2)
+
+
+class TabooUsernameRectificationTest(tutils.ForumConfigTestCase):
+    forum_config = {
+        'extensions': ['ISS.contrib.taboo'],
+        'initial_account_period_total': 199,
+        'extension_config': {
+            'ISS.contrib.taboo': {
+                'usertitle_punishment': 'Cato',
+                'usertitle_reward': 'Caesar',
+                'usertitle_duration': timedelta(days=1),
+            }
+        }
+    }
+
+    def setUp(self):
+        tutils.create_std_forums()
+
+        self.mark = tutils.create_user(thread_count=1, post_count=1)
+        self.assassin = tutils.create_user(post_count=1)
+
+        # Please don't ask how this analogy is supposed to work
+        self.mark.custom_user_title = 'General Antonius'
+        self.mark.save()
+
+        TabooProfile.objects.create(
+            poster=self.assassin,
+            mark=self.mark,
+            phrase='march')
+
+        TabooProfile.objects.create(
+            poster=self.mark,
+            mark=self.assassin,
+            phrase='foobar')
+
+    def test_loser_rectification(self):
+        thread = iss_models.Thread.objects.all()[0]
+        post_content = 'Beware the ides of march!'
+        post = iss_models.Post.objects.create(
+            author=self.mark,
+            content=post_content,
+            thread=thread)
+
+        self.mark = iss_models.Poster.objects.get(pk=self.mark.pk)
+        self.assertEqual(self.mark.custom_user_title, 'Cato')
+
+        violation = TabooViolationRecord.objects.all()[0]
+        violation.created -= datetime.timedelta(days=2)
+        violation.save()
+
+        TabooViolationRecord.rectify_all_usertitles()
+
+        self.mark = iss_models.Poster.objects.get(pk=self.mark.pk)
+        self.assertEqual(self.mark.custom_user_title, 'General Antonius')
+
+    def test_victor_rectification(self):
+        thread = iss_models.Thread.objects.all()[0]
+        post_content = 'Beware the ides of march!'
+        post = iss_models.Post.objects.create(
+            author=self.mark,
+            content=post_content,
+            thread=thread)
+
+        self.assassin = iss_models.Poster.objects.get(pk=self.assassin.pk)
+        self.assertEqual(self.assassin.custom_user_title, 'Caesar')
+
+        violation = TabooViolationRecord.objects.all()[0]
+        violation.created -= datetime.timedelta(days=2)
+        violation.save()
+
+        TabooViolationRecord.rectify_all_usertitles()
+
+        self.assassin = iss_models.Poster.objects.get(pk=self.assassin.pk)
+        self.assertEqual(self.assassin.custom_user_title, None)
+
+
 class TabooViewTest(TestCase):
     def setUp(self):
         tutils.create_std_forums()
@@ -107,7 +255,7 @@ class TabooViewTest(TestCase):
         self.tu_1_client = Client()
         self.tu_1_client.force_login(self.tu_1)
         
-        self.tu_2 = tutils.create_user()
+        self.tu_2 = tutils.create_user(post_count=1)
         self.tu_2_client = Client()
         self.tu_2_client.force_login(self.tu_2)
 

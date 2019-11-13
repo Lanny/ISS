@@ -32,9 +32,9 @@ urlpatterns = [
     url(r'^sitemap.xml$', sitemap, {'sitemaps': iss_sitemaps}, name='sitemap'),
 
     url(r'^smilies.css', views.misc.smilies_css, name='smilies-css'),
-    url(r'^smiley-refrence',
-        TemplateView.as_view(template_name="smilies_refrence.html"),
-        name='smilies-refrence'),
+    url(r'^smiley-reference',
+        TemplateView.as_view(template_name="smilies_reference.html"),
+        name='smilies-reference'),
 
     url('^thread/(?P<thread_id>\d+)/?$',
         views.forum.thread,
@@ -83,6 +83,9 @@ urlpatterns = [
     url(r'^register/invite$',
         views.user.RegisterUserWithCode.as_view(),
         name='register-with-code'),
+    url(r'^register/verify-email',
+        views.user.VerifyEmail.as_view(),
+        name='verify-email'),
     url(r'^recovery/initiate$',
         views.user.InitiatePasswordRecovery.as_view(),
         name='recovery-initiate'),
@@ -150,6 +153,9 @@ urlpatterns = [
     url('^auto-anonymize$',
         views.forum.AutoAnonymize.as_view(),
         name='auto-anonymize'),
+    url(r'^members$',
+        views.user.UserIndex.as_view(),
+        name='members'),
 
     url('^page/(?P<page_id>.*)',
         views.misc.view_static_page,
@@ -178,6 +184,9 @@ urlpatterns = [
     url(r'^pms/read/(?P<pm_id>\d+)$',
         views.private_messages.read_pm,
         name='read-pm'),
+    url(r'^pms/inbox/action$',
+        views.private_messages.PrivateMessageActions.as_view(),
+        name='pms-action'),
 
     url(r'^api/users/search$',
         views.user.user_fuzzy_search,

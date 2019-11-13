@@ -1,4 +1,5 @@
 @import "../combined/combined.less";
+@import "../theme-archetypes/library.less";
 
 @THEME: "bibliotek";
 
@@ -9,35 +10,11 @@
 @bg_primary: #000;
 @fg: #000;
 @fg_alt: #FFF;
+@bg_primary_disabled: @bg_light;
+@fg_disabled: #B9B9B9;
 @link_color: #000;
 @fg_low_contrast: #333333;
 @alert_red: #EC0000;
 @seperator_color: #BBB;
 @seperator_color_major: #000;
 @white: #FFFFFF;
-
-@body_font_family: Georgia, "Times New Roman", serif;
-@body_font_size: 14px;
-@rounding_factor: 0;
-@minor_rounding_factor: 0;
-
-.index-table() {
-  td:not(:last-child) {
-    border-right: none;
-  }
-}
-
-.link-style() {
-  color: @link_color;
-  font-weight: normal;
-  text-decoration: underline;
-}
-
-.btn() {
-  border-radius: 0px;
-  background-color: @bg_light;
-  border: 1px solid @seperator_color_major;
-  padding: 10px 20px;
-  cursor: pointer;
-  text-decoration: none;
-}

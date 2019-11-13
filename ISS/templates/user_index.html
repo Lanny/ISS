@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static from staticfiles %} 
+
+{% block page_name %}
+  Members List -
+{% endblock %}
+
+{% block breadcrumb %}
+  &gt; <a href="{{ request.get_full_path }}">Members List</a>
+{% endblock %}
+
+{% block content %}
+  <div class="members user-index">
+
+    <div class="thread">
+      <div class="actions-and-pages">
+        <div>
+          <form method="GET" action="{% url 'members' %}" id="post-actions">
+            <div class="form-wrapper">
+              <select name="sortby" id="id_action">
+                <option value="id">Sort by ID</option>
+                <option value="username">Sort by Username</option>
+                <option value="post_count">Sort by Post Count</option>
+              </select>
+            </div>
+            <input type="submit" value="Go" />
+          </form>
+        </div>
+            {% include "page_list.html" with page=posters %}
+      </div>
+    </div>
+
+    {% include 'user_list.html' %}
+
+    {% include "page_list.html" with page=posters %}
+
+  </div>
+{% endblock %}

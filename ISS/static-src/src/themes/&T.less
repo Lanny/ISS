@@ -1,4 +1,5 @@
 @import "../combined/combined.less";
+@import "../theme-archetypes/web-two-point-oh.less";
 
 @THEME: "&T";
 
@@ -7,8 +8,10 @@
 @fg_ultra_dark: #D2D2D2;
 @bg_light: #E8EFF4;
 @bg_primary: #008080;
+@bg_primary_disabled: #79b1b1;
 @fg: #000000;
 @fg_alt: #FFFFFF;
+@fg_disabled: @fg_alt; 
 @link_color: #008080;
 @fg_low_contrast: #333333;
 @alert_red: #EC0000;
@@ -24,11 +27,10 @@
   font-weight: bold;
 }
 
-.btn() {
+._theme_button() {
   border-radius: 0px;
   border: 0;
   padding: 10px 20px;
-  cursor: pointer;
   text-decoration: none;
 
   .primary();

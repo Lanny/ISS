@@ -14,9 +14,21 @@
     <td>
       <div class="read-status">
       {% if thread.has_unread_posts %}
-        <img src="{% static 'img/forum_new.gif' %}" alt="Unread posts" />
+        {% if thread.stickied %}
+          <img src="{% static 'img/pin_new.gif' %}" alt="Unread pin" />
+        {% elif thread.locked %}
+          <img src="{% static 'img/lock_new.gif' %}" alt="Unread lock" />
+        {% else %}
+          <img src="{% static 'img/forum_new.gif' %}" alt="Unread posts" />
+        {% endif %}
       {% else %}
-        <img src="{% static 'img/forum_old.gif' %}" alt="No new posts" />
+        {% if thread.stickied %}
+          <img src="{% static 'img/pin_old.gif' %}" alt="No new pin" />
+        {% elif thread.locked %}
+          <img src="{% static 'img/lock_old.gif' %}" alt="No new lock" />
+        {% else %}
+          <img src="{% static 'img/forum_old.gif' %}" alt="No new posts" />
+        {% endif %}
       {% endif %}
       </div>
     </td>
@@ -105,3 +117,4 @@
     {% endif %}
   {% endfor %}
 </table>
+

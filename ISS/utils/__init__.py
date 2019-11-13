@@ -24,11 +24,25 @@ from snowpenguin.django.recaptcha2.fields import ReCaptchaField
 
 from ISS.models import *
 from ISS import iss_bbcode
+from ISS.utils import misc
 
 
+# Functions and classes defined in the misc submodule should be available as
+# properties of the `utils` module, however some other utils submodules which
+# can't import this module due to circularity require them as well. Utils
+# submodules refer to `utils.misc.foo()` but consumers of the utils lib refer 
+# to `utils.foo()` so here we're dumping the misc module's "exports" into our
+# own.
+for def_name in misc.__all__:
+    locals()[def_name] = getattr(misc, def_name)
+
+# We keep these classes in seperate files but would like to export them as part
+# of this module directly rather than a submodule. This isn't super pretty but
+# it makes working with them elsewhere a bit nicer.
 CLASSES = (
     'HomoglyphNormalizer',
-    'ConfigurationManager'
+    'ConfigurationManager',
+    'MethodSplitView',
 )
 
 for klass_name in CLASSES:
@@ -47,68 +61,6 @@ TIME_HIERARCHY = (
 )
 SECONDS_IN = dict(TIME_HIERARCHY)
 
-class MethodSplitView(object):
-    """
-    A flexible class for splitting handling of different HTTP methods being
-    dispatched to the same view into separate class methods. Subclasses may
-    define a separate class method for each HTTP method the view handles (e.g.
-    GET(self, request, ...), POST(self, request, ...) which will be called with
-    the usual view signature when that sort of request is made.
-    
-    Subclasses may also define a `pre_method_check` method which, if it returns
-    a HttpResponse, will be used to response to the request instead of
-    delegating to the corresponding method.
-    """
-
-    _MAGIC = 'haderach kwisatz'
-
-    def __init__(self, magic='melange', *args, **kwargs):
-        if magic != self._MAGIC:
-            raise RuntimeError(
-                'MethodSplitViews should be instantiated through the '
-                '.as_view() method, not directly. Check your urls file.')
-
-    def __call__(self, request, *args, **kwargs):
-        if getattr(self, 'active_required', False):
-            if not request.user.is_active:
-                return HttpResponseForbidden('You must be an active user '
-                                             'to do this')
-        if getattr(self, 'staff_required', False):
-            if not request.user.is_staff:
-                return HttpResponseForbidden('You must be staff to do this.')
-
-        if getattr(self, 'unbanned_required', False):
-            if not request.user.is_authenticated() :
-                return HttpResponseForbidden(
-                    'You must be authenticated to take this action.')
-
-            if request.user.is_banned():
-                return get_ban_403_response(request)
-
-        meth = getattr(self, request.method, None)
-
-        if not meth:
-            return HttpResponseBadRequest('Request method %s not supported'
-                                          % request.method)
-        
-        response_maybe = self.pre_method_check(request, *args, **kwargs)
-
-        if isinstance(response_maybe, HttpResponse):
-            return response_maybe
-
-        return meth(request, *args, **kwargs)
-
-    def pre_method_check(request, *args, **kwargs):
-        return None
-
-    @classmethod
-    def as_view(cls):
-        view = cls(magic=cls._MAGIC)
-        if getattr(cls, 'require_login', False):
-            return login_required(view)
-        else:
-            return view
-
 def memoize(f):
     memo = {}
     def memoized(*args):
@@ -125,16 +77,17 @@ def get_config(*keys):
 def get_ext_config(ext, *keys):
     return ConfigurationManager.get_instance().get_ext(ext, *keys)
 
-def get_ban_403_response(request):
-    bans = request.user.get_pending_bans().order_by('-end_date')
+def reverse_absolute(*args, **kwargs):
+    return '%s://%s%s' % (
+            get_config('default_protocol'),
+            get_config('forum_domain'),
+            reverse(*args, **kwargs))
 
-    ctx = {
-        'end_date': bans[0].end_date,
-        'reasons': [ban.reason for ban in bans],
-        'staff': auth.get_user_model().objects.filter(is_staff=True)
-    }
-
-    return render(request, 'ban_notification.html', ctx, status=403)
+def get_posts_per_page(poster):
+    if poster.is_authenticated():
+        return poster.posts_per_page
+    else:
+        return get_config('posts_per_thread_page')
 
 def page_by_request(paginator, request):
     page_num = request.GET.get('p')
@@ -148,29 +101,12 @@ def page_by_request(paginator, request):
 
     return page
 
-def get_posts_per_page(poster):
-    if poster.is_authenticated():
-        return poster.posts_per_page
-    else:
-        return get_config('posts_per_thread_page')
-
 def get_posts_page(qs, request):
     posts_per_page = get_posts_per_page(request.user)
     paginator = Paginator(qs, posts_per_page)
     page = page_by_request(paginator, request)
 
     return page
-
-def render_mixed_mode(request, templates, additional={}):
-    data = {}
-
-    for key_name, template, ctx in templates:
-        markup = render(request, template, ctx).content
-        data[key_name] = markup
-
-    data.update(additional)
-
-    return JsonResponse(data)
 
 def bandcamp_markup_for_url(urlstr):
     url = urlparse.urlparse(urlstr)
@@ -377,6 +313,7 @@ def captchatize_form(form, label="Captcha"):
 
     else:
         return form
+
 
 GENERIC_CAPTCHA_LABEL = 'Captcha (required for your first %d posts)' % (
     get_config('captcha_period')

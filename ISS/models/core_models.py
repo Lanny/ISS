@@ -10,6 +10,8 @@ from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import timezone
 
+import email_normalize
+
 from ISS import utils
 from ISS.utils import HomoglyphNormalizer
 from auth_package import AuthPackage, AccessControlList
@@ -17,6 +19,10 @@ from admin_models import Ban
 
 min_time = timezone.make_aware(timezone.datetime.min,
                                timezone.get_default_timezone())
+
+THEME_CHOICES = tuple(
+    [(k, v['name']) for k,v in utils.get_config('themes').items()]
+)
 
 @models.fields.Field.register_lookup
 class TSVectorLookup(models.Lookup):
@@ -30,7 +36,6 @@ class TSVectorLookup(models.Lookup):
             lhs, rhs)
 
         return sql, params
-    
 
 class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     USERNAME_FIELD = 'username'
@@ -46,6 +51,10 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     username = models.CharField(max_length=256, unique=True)
     normalized_username = models.CharField(max_length=2048)
     email = models.EmailField()
+
+    # TODO: Make this non-nullable somehow
+    normalized_email = models.EmailField(null=True)
+
     date_joined = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
@@ -56,7 +65,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     recovery_code = models.CharField(max_length=256, null=True, blank=True,
                                      default=None)
     recovery_expiration = models.DateTimeField(default=timezone.now)
-
+    email_verification_code = models.UUIDField(default=uuid.uuid4)
     avatar = models.ImageField(upload_to='avatars', null=True)
 
     posts_per_page = models.PositiveSmallIntegerField(default=20)
@@ -82,8 +91,8 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         max_length=256,
         null=False,
         default=utils.get_config('default_theme'),
-        choices=utils.get_config('themes'))
-    pgp_key = models.TextField(default='')
+        choices=THEME_CHOICES)
+    pgp_key = models.TextField(default='', blank=True)
 
     # For support of vB backends
     backend = models.TextField(
@@ -178,9 +187,6 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
            return None
 
     def is_banned(self):
-        if not self.is_active:
-            return True
-
         pending_bans = self.get_pending_bans()
         if pending_bans.count() > 0:
             return True
@@ -356,13 +362,18 @@ class Forum(models.Model):
 
 class Thread(models.Model):
     created = models.DateTimeField(default=timezone.now)
-    last_update = models.DateTimeField(default=timezone.now)
+    last_update = models.DateTimeField(default=timezone.now, db_index=True)
     locked = models.BooleanField(default=False)
+    stickied = models.BooleanField(default=False)
 
     forum = models.ForeignKey(Forum)
     author = models.ForeignKey(Poster)
     title = models.TextField()
     log = models.TextField(blank=True)
+
+    def __init__(self, *args, **kwargs):
+        super(Thread, self).__init__(*args, **kwargs)
+        self._flag_cache = {}
 
     def get_last_post(self):
         return (self.post_set
@@ -378,7 +389,10 @@ class Thread(models.Model):
         return self.author
 
     def get_post_count(self):
-        return self.post_set.count()
+        if not hasattr(self, 'post_count'):
+            self.post_count = self.post_set.count()
+
+        return self.post_count
 
     def get_posts_in_thread_order(self, reverse=False):
         return self.post_set.order_by('-created' if reverse else 'created')
@@ -413,14 +427,17 @@ class Thread(models.Model):
         return not self.locked
 
     def _get_flag(self, user, save=True):
-        flag, created = ThreadFlag.objects.get_or_create(
-            poster=user,
-            thread=self)
+        if not (user.pk in self._flag_cache):
+            flag, created = ThreadFlag.objects.get_or_create(
+                poster=user,
+                thread=self)
 
-        if created and save:
-            flag.save()
+            if created and save:
+                flag.save()
 
-        return flag
+            self._flag_cache[user.pk] = flag
+
+        return self._flag_cache[user.pk]
 
     def has_unread_posts(self, user):
         if not user.is_authenticated():
@@ -699,7 +716,13 @@ def set_normalized_username(sender, instance, **kwargs):
     if not instance.normalized_username:
         instance.normalized_username = Poster.normalize_username(instance.username)
 
+@receiver(models.signals.pre_save, sender=Poster)
+def set_normalized_email(sender, instance, **kwargs):
+    if instance.email:
+        instance.normalized_email = email_normalize.normalize(instance.email)
+
 @receiver(models.signals.pre_save, sender=Thanks)
 def reject_auto_erotic_athanksication(sender, instance, **kwargs):
     if instance.thanker.pk == instance.thankee.pk:
         raise IntegrityError('A user may not thank themselves')
+

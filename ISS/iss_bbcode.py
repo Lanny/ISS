@@ -39,6 +39,13 @@ _yt_embed_pattern = ('<iframe width="640" height="480" class="yt-embed" '
     'src="https://www.youtube.com/embed/%s?start=%s" frameborder="0" '
     'allowfullscreen></iframe>')
 
+_bc_embed_pattern = ('<iframe width="640" height="480" class="yt-embed" '
+    'src="https://www.bitchute.com/embed/%s" frameborder="0" '
+    'allowfullscreen></iframe>')
+
+def _is_http_url(url):
+    prot = re.sub(r'[^a-z0-9+]', '', url.lower().split(':', 1)[0])
+    return prot in ('http', 'https')
 
 def _embed_youtube(url):
     query = urlparse.parse_qs(url.query, keep_blank_values=False)
@@ -52,6 +59,15 @@ def _embed_youtube(url):
         raise EmbeddingNotSupportedException('Bad video ID.')
 
     return _yt_embed_pattern % (v, '0')
+
+def _embed_bitchute(url):
+    path = url.path
+    match = re.match('/video/([-_0-9a-zA-Z]+)/?', path)
+
+    if not match:
+        raise EmbeddingNotSupportedException('Bad video ID.')
+
+    return _bc_embed_pattern % match.group(1)
 
 def _embed_youtube_shortcode(url):
     query = urlparse.parse_qs(url.query, keep_blank_values=False)
@@ -81,6 +97,11 @@ def _video_markup_for_url(urlstr):
     a page. If the link it malformed or to an unknown video hosting service
     throws EmbeddingNotSupportedException.
     """
+    if not _is_http_url(urlstr):
+        raise EmbeddingNotSupportedException(
+            'Only HTTP/HTTPS urls are embeddable'
+        )
+
     try :
         url = urlparse.urlparse(urlstr)
     except ValueError:
@@ -94,17 +115,28 @@ def _video_markup_for_url(urlstr):
         return _embed_youtube(url)
     elif url.netloc in ('youtu.be',):
         return _embed_youtube_shortcode(url)
+    elif url.netloc in ('bitchute.com', 'www.bitchute.com'):
+        return _embed_bitchute(url)
     elif ext in ('webm', 'mp4'):
         return _embed_html5_video(url)
     else:
         raise EmbeddingNotSupportedException('Unrecognized service.')
 
 def _add_img_tag(parser):
-    parser.add_simple_formatter(
+    def render_image(tag_name, value, options, parent, context):
+        if not _is_http_url(value):
+            return ''
+
+        return (
+            '<a class="img-embed" href="%s">'
+                '<img src="%s">'
+            '</a>'
+        ) % (value, value)
+
+
+    parser.add_formatter(
         'img',
-        ('<a class="img-embed" href="%(value)s">'
-            '<img src="%(value)s">'
-        '</a>'),
+        render_image,
         render_embedded=False,
         replace_links=False,
         replace_cosmetic=False)
@@ -112,19 +144,36 @@ def _add_img_tag(parser):
     return parser
 
 def _add_img_stub_tag(parser):
-    parser.add_simple_formatter(
+    def render_image_stub(tag_name, value, options, parent, context):
+        if not _is_http_url(value):
+            return ''
+
+        return (
+            'embedded image: <a class="img-link" href="%s">%s</a>'
+        ) % (value, value)
+
+    parser.add_formatter(
         'img',
-        'embedded image: <a class="img-link" href="%(value)s">%(value)s</a>',
+        render_image_stub,
         render_embedded=False,
         replace_links=False,
         replace_cosmetic=False)
 
+
     return parser
 
 def _add_video_stub_tag(parser):
-    parser.add_simple_formatter(
+    def render_video_stub(tag_name, value, options, parent, context):
+        if not _is_http_url(value):
+            return ''
+
+        return (
+            'embedded video: <a class="img-link" href="%s">%s</a>'
+        ) % (value, value)
+
+    parser.add_formatter(
         'video',
-        'embedded video: <a class="img-link" href="%(value)s">%(value)s</a>',
+        render_video_stub,
         render_embedded=False,
         replace_links=False,
         replace_cosmetic=False)
@@ -145,7 +194,8 @@ def _add_quote_tag(parser):
         pk = options.get('pk', None)
 
         if author:
-            attribution = 'Originally posted by %s' % author
+            author_str = html.escape(author)
+            attribution = 'Originally posted by %s' % author_str
 
             if pk:
                 try:
@@ -156,7 +206,7 @@ def _add_quote_tag(parser):
                     attribution = """
                         Originally posted by %s
                         <a class="jump-to-post" href="%s"></a>
-                    """ % (author, url)
+                    """ % (author_str, url)
 
             template = """
                 <blockquote>
@@ -203,6 +253,9 @@ def _add_code_tag(parser):
 
 def _add_bc_tag(parser):
     def render_bc(tag_name, value, options, parent, context):
+        if not _is_http_url(value):
+            return ''
+
         return ('<a class="unproc-embed" href="%s">embedded bandcamp link</a>'
                 % value)
 
@@ -219,7 +272,7 @@ def _add_link_tag(parser):
 def _add_spoiler_tag(parser):
 
     def render_spoiler(tag_name, value, options, parent, context):
-        name = options.get(tag_name, 'spoiler')
+        name = html.escape(options.get(tag_name, 'spoiler'))
         return utils.render_spoiler(value, name=name, js_enabled=True)
 
     parser.add_formatter('spoiler', render_spoiler)
@@ -228,7 +281,7 @@ def _add_spoiler_tag(parser):
 def _add_nojs_spoiler_tag(parser):
 
     def render_nojs_spoiler(tag_name, value, options, parent, context):
-        name = options.get(tag_name, 'spoiler')
+        name = html.escape(options.get(tag_name, 'spoiler'))
         return utils.render_spoiler(value, name=name, js_enabled=False)
 
     parser.add_formatter('spoiler', render_nojs_spoiler)
@@ -369,7 +422,10 @@ _supported_tags = {
 }
 
 def build_parser(tags, escape_html=True, **kwargs):
-    opts = {'replace_cosmetic': False}
+    opts = {
+        'replace_cosmetic': False,
+        'max_tag_depth': 10
+    }
     opts.update(kwargs)
     parser = PreprocessingParser(escape_html=escape_html, **opts)
 

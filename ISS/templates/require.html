@@ -4,14 +4,28 @@
   <script>
     window.config = {
       'bandcamp-embed-url': "{% url 'embed-bandcamp' %}",
-      'editor-buttons': {% if editor_buttons %}true{% else %}false{% endif %}
-    };
+      'editor-buttons': {% if editor_buttons %}true{% else %}false{% endif %},
+      'development': {% if config.DEBUG %}true{% else %}false{% endif %},
+      {% if config.DEBUG %}
+      'themes': [
+        {% for code, theme in config.themes.items %}
+        {% autoescape off %}
+        {
+          code: '{{ code }}',
+          name: '{{ theme.name }}',
+          stylesheet: '{% static "css/"|add:code|add:".css" %}'
+        },
+        {% endautoescape %}
+        {% endfor %}
+      ],
+      {% endif %}
+    }
   </script>
 
   <script type="text/javascript" src="{% static 'js/require.js' %}"></script>
   <script type="text/javascript">
     requirejs.config({
-      baseUrl: '{% static "js" %}',
+      baseUrl: '{% static "js/base.js" %}.'.split('/').slice(0,-1).join('/'),
       paths: {
       '{{ bootstrap }}': '{% static "js/"|add:bootstrap|add:".js" %}'.split('.').slice(0,-1).join('.')
       }
@@ -22,6 +36,9 @@
     // intermingled with us so just wait for it to finish.
     document.addEventListener('DOMContentLoaded', function() {
       requirejs(['{{ bootstrap }}'], function() {});
+      {% if config.DEBUG %}
+        requirejs(['development'], function() {});
+      {% endif %}
     });
   </script>
 {% endif %}

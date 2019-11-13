@@ -1,7 +1,7 @@
 ;(function() {
   var sessionStorage = window.sessionStorage || {};
 
-  function wrap($, AutoSuggest, bbcode) {
+  function wrap($, AutoSuggest, config, bbcode) {
     var wrapOperations = [
       {
         name: 'bold',
@@ -82,7 +82,7 @@
         this._ta.val(sessionStorage[this._getStoreKey()]);
       }
 
-      if (window.config['editor-buttons']) {
+      if (config.getConfig('editor-buttons')) {
         this._edButtonContainer = $('<div class="editor-buttons">');
 
         for (var i=0; i<wrapOperations.length; i++) {
@@ -297,6 +297,7 @@
   define([
     'jquery',
     'auto-suggest',
+    'config',
     'bbcode'
   ], wrap);
 })();

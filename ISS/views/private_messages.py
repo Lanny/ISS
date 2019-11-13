@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
 
 from ISS import utils, forms
@@ -25,6 +25,7 @@ def inbox(request):
         'active_tab': 'inbox',
         'show_from': True,
         'show_to': False,
+        'pm_action_form': forms.PrivateMessageActionForm(),
         'breadcrumbs': [
             ('Private Messages', ''),
             ('Inbox', 'inbox')
@@ -50,6 +51,7 @@ def sent(request):
         'active_tab': 'sent',
         'show_from': False,
         'show_to': True,
+        'pm_action_form': forms.PrivateMessageActionForm(),
         'breadcrumbs': [
             ('Private Messages', ''),
             ('Sent', 'sent-pms')
@@ -110,7 +112,12 @@ class NewPrivateMessage(utils.MethodSplitView):
     def GET(self, request):
         initials = {}
         if 'replyto' in request.GET:
-            rt = get_object_or_404(PrivateMessage, pk=request.GET['replyto'])
+            try:
+                quote_pk = int(request.GET['replyto'])
+            except ValueError:
+                raise PermissionDenied('You can\'t quote that!')
+
+            rt = get_object_or_404(PrivateMessage, pk=quote_pk)
 
             if rt.inbox != request.user:
                 raise PermissionDenied('You can\'t quote that!')
@@ -147,3 +154,32 @@ class NewPrivateMessage(utils.MethodSplitView):
 
             return render(request, 'private_messages/compose.html', ctx)
 
+class PrivateMessageActions(utils.MethodSplitView):
+    staff_required = False
+    unbanned_required = True
+    require_login = True
+
+    def POST(self, request):
+        form = forms.PrivateMessageActionForm(request.POST)
+
+        if form.is_valid():
+            action = form.cleaned_data['action']
+            if action == 'delete-message':
+                return self._handle_delete_messages(request)
+            else:
+                raise Exception('Unexpected action.')
+        else:
+            return HttpResponseBadRequest('Invalid form.')
+
+    @transaction.atomic
+    def _handle_delete_messages(self, request):
+        message_pks = request.POST.getlist('message', [])
+        messages = [get_object_or_404(PrivateMessage, pk=pk) for pk in message_pks]
+
+        for message in messages:
+            if message.inbox != request.user:
+                raise PermissionDenied('You can\'t delete that!')
+            message.delete()
+
+        target = request.POST.get('next', None)
+        return HttpResponseRedirect(target)

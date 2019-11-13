@@ -134,7 +134,7 @@ class PosterTestCase(tutils.ForumConfigTestCase):
     def test_get_user_title_inactive(self):
         self.lanny.is_active = False
         self.lanny.invalidate_user_title_cache()
-        self.assertEqual(self.lanny.get_user_title(), 'Novice (banned)')
+        self.assertEqual(self.lanny.get_user_title(), 'Novice')
 
 class PostTestCase(tutils.ForumConfigTestCase):
     forum_config = {
@@ -235,6 +235,8 @@ class SubscriptionTestCase(TestCase):
         self.assertFalse(self.thread.has_unread_posts(self.tu_1))
 
         post.delete()
+
+        self.thread = Thread.objects.get(pk=self.thread.pk)
 
         self.assertTrue(self.thread.is_subscribed(self.tu_1))
         self.assertFalse(self.thread.has_unread_posts(self.tu_1))

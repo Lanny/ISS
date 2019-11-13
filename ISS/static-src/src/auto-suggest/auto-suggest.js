@@ -6,7 +6,7 @@
       this._container = this._el
         .wrap('<div class="auto-suggest-wrapper">')
         .parent();
-      this._suggestionsBox = $('<ul class="auto-suggestions">')
+      this._suggestionsBox = $('<ul class="auto-suggestions" aria-hidden="true">')
         .appendTo(this._container);
       this._qUrl = options.queryUrl;
       this._delimiter = options.delimiter;
@@ -15,6 +15,7 @@
       this._preventNextQuery = false;
       this._pendingQuery = null;
       this._selectedOption = 0;
+      this._hasFocus = false;
 
       this._bindHandlers();
     }
@@ -33,23 +34,38 @@
             self._selectedOption = Math.min(self._selectedOption + 1, optsLen - 1);
             self._rectifySelection();
           } else if (e.keyCode === 13) {
-            self._setCurrentTerm(self._suggestionsBox.find('.active').text());
-
-            // Hide the box and prevent the revently entered value from
-            // causing it to open again
-            self._preventNextQuery = true;
-            self._close();
+            self._confirmOption(self._selectedOption);
             e.preventDefault();
           } else if (e.keyCode === 27) {
             self._close();
           }
         });
-        this._el.on('focusin', function() { self._open(); })
-          .on('focusout', function() { self._close(); });
+
+        this._container.on('focusin', function() {
+            self._hasFocus = true;
+            self._open();
+          })
+          .on('focusout', function() {
+            self._hasFocus = false;
+            self._close();
+          });
 
         this._el.on('keyup', function(e) {
           self._queryMaybe();
         });
+
+        this._suggestionsBox.on('mousedown', 'li', function(e) {
+          self._confirmOption($(e.target).index());
+        });
+      },
+      _confirmOption: function(which) {
+        var selectedEl = $(this._suggestionsBox.find('li')[which])
+        this._setCurrentTerm(selectedEl.text());
+
+        // Hide the box and prevent the revently entered value from
+        // causing it to open again
+        this._preventNextQuery = true;
+        this._close();
       },
       _getCurrentTerm: function() {
         var rawVal = this._el.val();
@@ -106,6 +122,9 @@
           .addClass('active');
       },
       _open: function() {
+        if (!this._hasFocus)
+          return; 
+
         this._suggestionsBox.css('display', 'block');
       },
       _close: function() {

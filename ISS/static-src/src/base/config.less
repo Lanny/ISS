@@ -5,7 +5,9 @@
 @fg_ultra_dark: #FF00FF;
 @bg_light: #FF00FF;
 @bg_primary: #FF00FF;
+@bg_primary_disabled: #FF00FF;
 @fg: #FF00FF;
+@fg_disabled: #FF00FF;
 @fg_alt: #FF00FF;
 @link_color: #FF00FF;
 @fg_low_contrast: #FF00FF;
@@ -18,6 +20,7 @@
 @content_margin_bottom: 15px;
 @body_font_family: Verdana, Lucida, Arial, Helvetica, sans-serif;
 @body_font_size: 12px;
+@body_font_color: #000;
 
 @rounding_factor: 5px;
 @minor_rounding_factor: 3px;
@@ -53,8 +56,20 @@
   }
 }
 
+._btn_common() {
+  cursor: pointer;
 
-.btn() {}
+  &[aria-disabled], &[disabled] {
+    pointer-events: none;
+    color: @fg_disabled;
+    background-color: @bg_primary_disabled;
+  }
+}
+
+.btn() {
+  ._btn_common();
+  ._theme_button();
+}
 
 .resp-btn() {
   .btn();
@@ -89,18 +104,19 @@
 }
 
 .link-style() {}
+.input-style() {}
 
 .title-box(@header: false) {
   border-bottom: 1px solid @seperator_color_major;
   padding: 5px @std_lr_padding;
 
-  & when (@THEME = '&T') {
+  & when (@ARCH = 'web2.0') {
     .primary;
     font-size: 12px;
     font-weight: bold;
   }
 
-  & when (@THEME = 'bibliotek') {
+  & when (@ARCH = 'library') {
     & when (@header) {
       font-size: 24px;
       font-weight: bold
@@ -141,7 +157,7 @@
     padding: 5px 15px;
   }
 
-  & when (@THEME = "&T") {
+  & when (@ARCH = "web2.0") {
     th {
       .primary;
       &:not(:last-child) {
@@ -150,7 +166,7 @@
     }
   }
 
-  & when (@THEME = "bibliotek") {
+  & when (@ARCH = "library") {
     th {
       border-bottom: 1px solid @seperator_color_major;
     }
@@ -162,7 +178,14 @@
     .rounded();
   }
 
-  background-color: @white;
+  & when (@THEME = "&T") {
+    background-color: @white;
+  }
+
+  & when (@ARCH = "library") {
+    background-color: @body_bg_color;
+  }
+
   padding-bottom: 10px;
 
   h1, h2, h3, h4, h5, h6 {

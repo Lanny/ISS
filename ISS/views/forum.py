@@ -1,4 +1,5 @@
 from collections import defaultdict
+import datetime
 
 from django.contrib.auth import login, logout, authenticate, _get_backends
 from django.contrib.auth.backends import ModelBackend
@@ -6,16 +7,18 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, transaction, connection
 from django.db.models import Count, Max, F, Q
 from django.http import (HttpResponseRedirect, HttpResponseBadRequest,
     JsonResponse, HttpResponseForbidden, HttpResponse)
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
+from django.template.defaultfilters import truncatechars
 from django.views.decorators.cache import cache_control, cache_page
 
 from ISS import utils, forms, iss_bbcode
 from ISS.models import *
+from ISS import models as iss_models
 from ISS.hooks import HookManager
 
 def _get_new_post_form(request):
@@ -23,8 +26,8 @@ def _get_new_post_form(request):
 
 @cache_control(max_age=60)
 def forum_index(request):
-    categories = Category.objects.all().order_by('priority')
-    forums = Forum.objects.all().order_by('priority')
+    categories = Category.objects.all().order_by('priority', 'id')
+    forums = Forum.objects.all().order_by('priority', 'id')
 
     # Start: optimization to prefetch additional stats and flags for forums in
     # one go as opposed to querying per-forum
@@ -57,7 +60,7 @@ def forum_index(request):
 @cache_control(no_cache=True, max_age=0, must_revalidate=True, no_store=True)
 def thread_index(request, forum_id):
     forum = get_object_or_404(Forum, pk=forum_id)
-    threads = forum.thread_set.order_by('-last_update')
+    threads = forum.thread_set.order_by('-stickied', '-last_update')
     threads_per_page = utils.get_config('threads_per_forum_page')
     paginator = utils.MappingPaginator(threads, threads_per_page)
 
@@ -117,8 +120,14 @@ class ThreadActions(utils.MethodSplitView):
                 return self._handle_edit_thread(request, thread)
             elif action == 'delete-posts':
                 return self._handle_delete_posts(request, thread)
+            elif action == 'sticky-thread':
+                return self._handle_sticky_thread(request, thread)
+            elif action == 'lock-thread':
+                return self._handle_lock_thread(request, thread)
             elif action == 'trash-thread':
                 return self._handle_trash_thread(request, thread)
+            elif action == 'off-topic-posts':
+                return self._handle_off_topic_posts(request, thread)
             elif re.match('move-to-(\d+)', action):
                 return self._handle_move_thread(request, thread, action)
             else:
@@ -129,6 +138,26 @@ class ThreadActions(utils.MethodSplitView):
     def _handle_edit_thread(self, request, thread):
         target = reverse('admin:ISS_thread_change',
                          args=[thread.pk])
+        return HttpResponseRedirect(target)
+
+    def _handle_sticky_thread(self, request, thread):
+        if thread.stickied:
+            thread.stickied = False
+        else:
+            thread.stickied = True
+        thread.save()
+
+        target = reverse('thread', kwargs={'thread_id': thread.pk})
+        return HttpResponseRedirect(target)
+
+    def _handle_lock_thread(self, request, thread):
+        if thread.locked:
+            thread.locked = False
+        else:
+            thread.locked = True
+        thread.save()
+
+        target = reverse('thread', kwargs={'thread_id': thread.pk})
         return HttpResponseRedirect(target)
 
     def _handle_trash_thread(self, request, thread):
@@ -156,6 +185,27 @@ class ThreadActions(utils.MethodSplitView):
         posts = [get_object_or_404(Post, pk=pk) for pk in post_pks]
 
         for post in posts:
+            post.delete()
+
+        target = request.POST.get('next', None)
+        target = target or reverse('thread', kwargs={'thread_id': thread.pk})
+        return HttpResponseRedirect(target)
+
+    @transaction.atomic
+    def _handle_off_topic_posts(self, request, thread):
+        post_pks = request.POST.getlist('post', [])
+        posts = [get_object_or_404(Post, pk=pk) for pk in post_pks]
+
+        for post in posts:
+            content = render_to_string(
+                'pmt/off_topic_post.bbc',
+                { 'post': post.content })
+
+            iss_models.PrivateMessage.send_pm(
+                iss_models.Poster.get_or_create_system_user(),
+                [post.author],
+                'Post marked as off-topic',
+                content)
             post.delete()
 
         target = request.POST.get('next', None)
@@ -260,14 +310,45 @@ def latest_threads(request):
 
     threads = (Thread.objects.all()
         .filter(~Q(forum_id__in=excluded_forums))
-        .order_by('-last_update'))
+        .order_by('-last_update')
+        .select_related('author'))
 
     threads_per_page = utils.get_config('threads_per_forum_page')
     paginator = utils.MappingPaginator(threads, threads_per_page)
 
     paginator.install_map_func(lambda t: utils.ThreadFascet(t, request))
-
     page = utils.page_by_request(paginator, request)
+
+    # We can apparently do aggregate queries faster than the ORM, so do that.
+    # This is ugly but this is one of the highest traffic pages in the project
+    # and we can make a _big_ perf difference (as in an order of magnitude) by
+    # doing these queries together like this.
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT post.thread_id, COUNT(*) FROM "ISS_post" AS post
+                WHERE post.thread_id = ANY(%s)
+                GROUP BY post.thread_id
+        """, ([tf._thread.pk for tf in page],))
+        counts = dict(cursor.fetchall())
+
+        for tf in page:
+            tf._thread.post_count = counts[tf._thread.pk]
+
+
+        if request.user.is_authenticated():
+            ppk = request.user.pk
+            flags = ThreadFlag.objects.raw("""
+                SELECT tf.*
+                    FROM "ISS_thread" AS thread
+                    JOIN "ISS_threadflag" AS tf ON
+                        tf.thread_id = thread.id
+                        AND tf.poster_id = %s
+                WHERE thread.id = ANY(%s)
+            """, (ppk, [tf._thread.pk for tf in page]))
+            fd = dict([(flag.thread_id, flag) for flag in flags])
+            for tf in page:
+                if tf._thread.pk in fd:
+                    tf._thread._flag_cache[ppk] = fd[tf._thread.pk]
 
     ctx = {
         'rel_page': page,
@@ -353,21 +434,6 @@ class MarkSubsriptionsRead(utils.MethodSplitView):
             .filter(subscribed=True)
             .update(last_read_date=timezone.now()))
         return HttpResponseRedirect(reverse('usercp'))
-
-@login_required
-def user_list(request):
-    posters = Poster.objects.all().order_by('username')
-    posters_per_page = 20
-    pagniator = Paginator(posters, posters_per_page)
-
-    page = utils.page_by_request(posters, posters_per_page)
-
-    ctx = {
-        'rel_page': page,
-        'posters': page
-    }
-
-    return render(request, 'user_list.html', ctx)
 
 def search(request):
     q = request.GET.get('q', None)
@@ -659,21 +725,21 @@ class LoginUser(utils.MethodSplitView):
         ctx = {'form': form}
         return render(request, 'login.html', ctx)
 
+    @RateLimitedAccess.rate_limit('login', 10, datetime.timedelta(hours=1))
     def POST(self, request):
         logout(request)
-        if request.POST:
-            form = forms.ISSAuthenticationForm(autofocus=True,
-                                               data=request.POST,
-                                               request=request)
+        form = forms.ISSAuthenticationForm(autofocus=True,
+                                           data=request.POST,
+                                           request=request)
 
-            if form.is_valid():
-                login(request, form.user_cache)
-                next_url = request.POST.get('next', '/')
-                return HttpResponseRedirect(next_url)
+        if form.is_valid():
+            login(request, form.user_cache)
+            next_url = request.POST.get('next', '/')
+            return HttpResponseRedirect(next_url)
 
-            else:
-                ctx = {'form': form}
-                return render(request, 'login.html', ctx)
+        else:
+            ctx = {'form': form}
+            return render(request, 'login.html', ctx)
 
 class LogoutUser(utils.MethodSplitView):
     def POST(self, request):
@@ -875,10 +941,13 @@ class ReportPost(utils.MethodSplitView):
         form = forms.ReportPostForm(request.POST)
 
         if form.is_valid():
+            max_subject_len = (PrivateMessage._meta
+                .get_field('subject')
+                .max_length)
             subject = '%s has reported a post by %s' % (
-                request.user.username,
-                form.cleaned_data['post'].author.username)
-
+                truncatechars(request.user.username, 75),
+                truncatechars(form.cleaned_data['post'].author.username, 75),
+            )
             content = render_to_string('pmt/report_post.bbc', form.cleaned_data,
                                        request=request)
 
@@ -936,3 +1005,4 @@ class BanPoster(utils.MethodSplitView):
             }
 
             return render(request, 'ban_poster.html', ctx)
+

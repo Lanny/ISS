@@ -12,7 +12,24 @@ Oldschool Forum Software. Design tenets are:
 
 # Setting it up
 
-You'll need pip and npm installed to grab dependencies, both should be available through your OS's package manager.
+Using a virutal env is encouraged for your sanity but entirely optional.
+
+You'll need pip, node/npm, and postgres installed. On debian based distros you can do:
+
+```
+$ sudo apt-get install python-pip postgresql npm
+```
+
+IDE entirely optional:
+```
+$ sudo snap install pycharm-community --classic
+```
+
+Alternately (preferred):
+
+```
+$ notepad.exe
+```
 
 Start by cloning the project. Copy the `test_settings.py` file into the ISS app directory and rename it `settings.py`. This defines a test forum and uses the postgres driver. ~~If you'd like to use a different DB edit the file
 appropriately~~ the search functionality depends on postgres' text search and indexing behavior in a non-driver-portable way. You could probably use another DB with some minor fiddling with the source but only postgres is being tested against.
@@ -23,9 +40,15 @@ Next install serverside dependencies from the top level of the project:
 $ pip install -r requirements.txt
 ```
 
-Using a virutal env is encouraged for your sanity but entirely optional.
+If you are just developing, use this as a reference for creating the DB:
+```
+$ sudo -u postgres psql
+# create database iss_db;
+# create user iss_user with password 'iss_pass';
+# grant all privileges on database iss_db to iss_user;
+```
 
-Next run the migrations to init the DB:
+Next run the migrations to init the DB (Don't forget to fill in the DB details in settings.py):
 
 ```
 $ ./manage.py migrate
@@ -48,17 +71,11 @@ Password (again):
 Superuser created successfully.
 ```
 
-Install the frontend dependencies:
+Install the frontend dependencies and build the frontend assets:
 
 ```
 $ cd ISS/static-src
 $ npm install
-```
-
-And build the frontend assets:
-
-```
-$ cd ISS/static-src
 $ gulp generate
 ```
 
@@ -72,6 +89,9 @@ $ ./manage.py runserver
 
 If you want rotating banners drop them in `ISS/static/banners` and restart the server. You can make up some test data using thing admin interface (url `/admin/`)
 
+# Development Tips
+- When `DEBUG` is true in settings.py, you can use ctrl+P on any page to cycle through the available themes.
+
 # Configuration
 Every ISS instance must define a `FORUM_CONFIG` setting. Default values exist
 for every key so it may be empty. Here is a list of the recognized properties
@@ -81,6 +101,8 @@ and what each does:
 | -- | -- | -- |
 | forum_name | The name of the site as presented to users. Used in a couple of places, notably breadcrumbs and page titles. | 'INTERNATIONAL SPACE STATION' |
 | forum_domain | Domain used in composing absolute urls (only used in emails) | 'yourdomain.com' |
+| default_protocol | Protocol used in composing absolute urls (only used in emails) | 'http' |
+| email_host_blacklist | List of email hosts users are not allowed to register new accounts with | [] |
 | banner_dir | A path, relative to the static dir (in the src tree) that contains an arbitrary number of forum banners in jpg, gif, or png format. One of the files from this dir will be randomly selected for the page banner on each page load. | 'banners' |
 | min_post_chars | The minimum length, in characters, of a post. | 1
 | max_post_chars | The maximum length of a post, in characters. Defaults to the number of characters in the first chapter of Dune | 19476 |
