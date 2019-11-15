@@ -6,7 +6,31 @@
   }
 }
 
+
 .user-index {
+  .find-user {
+    margin-bottom: @content_margin_bottom;
+
+    form {
+      .standard-form();
+
+      fieldset {
+        padding-top: 10px;
+        display: flex;
+
+        input[type="text"] {
+          flex: 1;
+        }
+
+        input[type="submit"] {
+          .small-btn();
+          .primary();
+          margin: 0 0 0 5px;
+        }
+      }
+    }
+  }
+
   .sort-and-pages {
     display: flex;
     margin-bottom: @content_margin_bottom;

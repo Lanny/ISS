@@ -12,6 +12,23 @@
 {% block content %}
   <div class="members user-index">
 
+    <div class="find-user">
+
+      <form class="find-user-input">
+        <h2>
+          <label for="username">Find User:</label>
+        </h2>
+        <fieldset>
+          <input
+            id="username"
+            name="username"
+            type="text"
+          />
+          <input type="submit" value="Find" />
+        </fieldset>
+      </form>
+    </div>
+
     <div class="sort-and-pages">
       <div>
         <form method="GET" action="{% url 'members' %}" id="sort-form">
