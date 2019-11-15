@@ -11,6 +11,10 @@
   .find-user {
     margin-bottom: @content_margin_bottom;
 
+    form[method="POST"] {
+      overflow: visible;
+    }
+
     form {
       .standard-form();
 
@@ -18,7 +22,7 @@
         padding-top: 10px;
         display: flex;
 
-        input[type="text"] {
+        input[type="text"], .auto-suggest-wrapper {
           flex: 1;
         }
 

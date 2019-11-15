@@ -23,6 +23,9 @@
             id="username"
             name="username"
             type="text"
+            data-auto-suggest="true"
+            data-auto-suggest-endpoint="{% url 'api-user-serach' %}"
+            data-auto-suggest-delimiter=";"
           />
           <input type="submit" value="Find" />
         </fieldset>
@@ -49,4 +52,8 @@
     {% include "page_list.html" with page=posters %}
 
   </div>
+{% endblock %}
+
+{% block js %}
+  {% include "require.html" with bootstrap="auto-suggest-bootstrap" %}
 {% endblock %}
