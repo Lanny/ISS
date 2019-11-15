@@ -413,6 +413,22 @@ class UserIndex(utils.MethodSplitView):
 
         return render(request, 'user_index.html', ctx)
 
+class FindUser(utils.MethodSplitView):
+    def POST(self, request):
+        username = request.POST.get('username', '')
+        norm_username = Poster.normalize_username(username)
+
+        try:
+            poster = Poster.objects.get(normalized_username=norm_username)
+            return HttpResponseRedirect(poster.get_url())
+        except Poster.DoesNotExist:
+            return render(request, 'generic_message.html', {
+                'page_title': 'Poster Not Found',
+                'heading': 'Poster Not Found',
+                'message': 'No poster found with the username %s.' % username
+            })
+
+
 def view_generated_invite(request):
     reg_code = get_object_or_404(RegistrationCode, code=request.GET.get('code'))
     ctx = { 'reg_code': reg_code }

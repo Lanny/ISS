@@ -13,12 +13,12 @@
   <div class="members user-index">
 
     <div class="find-user">
-
-      <form class="find-user-input">
+      <form action="{% url 'find-user' %}" method="POST">
         <h2>
           <label for="username">Find User:</label>
         </h2>
         <fieldset>
+          {% csrf_token %}
           <input
             id="username"
             name="username"
