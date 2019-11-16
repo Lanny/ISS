@@ -424,7 +424,7 @@ _supported_tags = {
 def build_parser(tags, escape_html=True, **kwargs):
     opts = {
         'replace_cosmetic': False,
-        'max_tag_depth': 10
+        'max_tag_depth': 6
     }
     opts.update(kwargs)
     parser = PreprocessingParser(escape_html=escape_html, **opts)
