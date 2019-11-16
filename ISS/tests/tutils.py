@@ -2,6 +2,7 @@ import random
 from datetime import timedelta
 
 from django.conf import settings
+from django.core.cache import cache
 from django.test import TestCase
 from django.utils import timezone
 
@@ -135,6 +136,7 @@ class ForumConfigTestCase(TestCase):
         #    utils.get_config()[key] = cls.forum_config[key]
 
     def setUp(self):
+        cache.clear()
         self.setUp2()
 
     def tearDown(self):

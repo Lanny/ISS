@@ -754,7 +754,8 @@ class GenerateInviteCodeTestCase(tutils.ForumConfigTestCase):
         'enable_invites': True
     }
 
-    def setUp2(self):
+    def setUp(self):
+        super(GenerateInviteCodeTestCase, self).setUp()
         self.don = tutils.create_user()
         self.scrub = tutils.create_user()
 

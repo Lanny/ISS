@@ -4,7 +4,6 @@ from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import AnonymousUser
 from django.db import models
-from django.dispatch import receiver
 
 from ISS import utils
 
@@ -211,6 +210,3 @@ class AccessControlList(models.Model):
     def __unicode__(self):
         return self.name
 
-@receiver(models.signals.post_save, sender=AccessControlList)
-def bust_acl_cache(sender, instance, created, **kwargs):
-    cache.delete(AccessControlList._get_cache_key(instance.name))

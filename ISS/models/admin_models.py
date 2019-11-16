@@ -6,7 +6,6 @@ from datetime import timedelta
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.dispatch import receiver
 from django.utils import timezone
 
 class StaticPage(models.Model):
@@ -83,10 +82,3 @@ class IPBan(models.Model):
     given = models.DateTimeField(auto_now_add=True)
     memo = models.TextField(blank=True, default='')
 
-@receiver(models.signals.pre_save, sender=FilterWord)
-def invalidate_filter_cache(sender, instance, **kwargs):
-    cache.delete('active_filters')
-
-@receiver(models.signals.post_save, sender=Ban)
-def invalidate_user_title_cache(sender, instance, *args, **kwargs):
-    instance.subject.invalidate_user_title_cache()

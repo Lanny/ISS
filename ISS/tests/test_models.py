@@ -263,8 +263,9 @@ class SubscriptionTestCase(TestCase):
 
         self.assertEqual(self.thread.get_jump_post(self.tu_1).pk, first_post.pk)
 
-class ACLTestCase(TestCase):
+class ACLTestCase(tutils.ForumConfigTestCase):
     def setUp(self):
+        super(ACLTestCase, self).setUp()
         self.tu_1 = tutils.create_user()
         self.tu_2 = tutils.create_user()
         self.tu_3 = tutils.create_user()
@@ -320,3 +321,24 @@ class ACLTestCase(TestCase):
 
         self.assertTrue(invite_acl.is_poster_authorized(self.tu_1))
         self.assertFalse(invite_acl.is_poster_authorized(self.tu_2))
+
+    def test_acl_users_cache_busting(self):
+        acl = AccessControlList.get_acl('UPERM_ACL')
+        self.assertFalse(acl.is_poster_authorized(self.tu_1))
+
+        acl.white_posters.add(self.tu_1)
+        acl = AccessControlList.get_acl('UPERM_ACL')
+        self.assertTrue(acl.is_poster_authorized(self.tu_1))
+
+    def test_acl_groups_cache_busting(self):
+        acl = AccessControlList.get_acl('UPERM_ACL')
+        self.assertFalse(acl.is_poster_authorized(self.tu_1))
+
+        new_group = AccessControlGroup(name="NEW_GROUP")
+        new_group.save()
+        new_group.members.add(self.tu_1)
+        acl.white_groups.add(new_group)
+
+        acl = AccessControlList.get_acl('UPERM_ACL')
+        self.assertTrue(acl.is_poster_authorized(self.tu_1))
+
