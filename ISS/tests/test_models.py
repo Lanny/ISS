@@ -342,3 +342,11 @@ class ACLTestCase(tutils.ForumConfigTestCase):
         acl = AccessControlList.get_acl('UPERM_ACL')
         self.assertTrue(acl.is_poster_authorized(self.tu_1))
 
+    def test_acl_users_cache_busting_negative(self):
+        acl = AccessControlList.get_acl('UPERM_ACL')
+        acl.white_posters.add(self.tu_1)
+        self.assertTrue(acl.is_poster_authorized(self.tu_1))
+
+        acl.white_posters.remove(self.tu_1)
+        acl = AccessControlList.get_acl('UPERM_ACL')
+        self.assertFalse(acl.is_poster_authorized(self.tu_1))

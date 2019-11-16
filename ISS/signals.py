@@ -68,3 +68,44 @@ signals.m2m_changed.connect(bust_acl_cache, AccessControlList.black_posters.thro
 signals.m2m_changed.connect(bust_acl_cache, AccessControlList.white_groups.through)
 signals.m2m_changed.connect(bust_acl_cache, AccessControlList.black_groups.through)
 
+def _bust_acl_for_posters(acl, posters):
+    keys = [acl._get_poster_cross_cache_key(poster) for poster in posters]
+    cache.delete_many(keys)
+
+def bust_acl_user_list_cache(sender, model, instance, **kwargs):
+    """
+    The white or black list for a given ACL has changed, bust all the
+    ACL x Poster cache entries for all the posters who entered or left one of
+    the groups.
+    """
+    posters = model.objects.filter(pk__in=kwargs['pk_set'])
+    _bust_acl_for_posters(instance, posters)
+
+signals.m2m_changed.connect(bust_acl_user_list_cache, AccessControlList.white_posters.through)
+signals.m2m_changed.connect(bust_acl_user_list_cache, AccessControlList.black_posters.through)
+
+def bust_acl_group_membership_cache(sender, model, instance, **kwargs):
+    """
+    Posters have entered or left an ACG. For each ACL tied to the ACG, bust
+    the ACL x Poster cache entries for the Posters who changed membership in
+    the ACG.
+    """
+    posters = model.objects.filter(pk__in=kwargs['pk_set'])
+    acg = instance
+
+    for acl in acg.blacklisted_acls.all() | acg.whitelisted_acls.all():
+        _bust_acl_for_posters(acl, posters)
+
+signals.m2m_changed.connect(bust_acl_group_membership_cache, AccessControlGroup.members.through)
+
+def bust_acl_group_list_cache(sender, model, instance, **kwargs):
+    acgs = model.objects.filter(pk__in=kwargs['pk_set'])
+    posters = Poster.objects.none()
+
+    for acg in acgs:
+        posters = posters | acg.members.all()
+
+    _bust_acl_for_posters(instance, posters)
+
+signals.m2m_changed.connect(bust_acl_group_list_cache, AccessControlList.white_groups.through)
+signals.m2m_changed.connect(bust_acl_group_list_cache, AccessControlList.black_groups.through)

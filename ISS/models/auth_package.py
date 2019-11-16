@@ -147,7 +147,14 @@ class AccessControlList(models.Model):
                                           blank=True,
                                           related_name='blacklisted_acls')
 
-    def is_poster_authorized(self, poster):
+    @classmethod
+    def _get_cache_key(cls, name):
+        return 'auth:acl:name:%s' % name
+
+    def _get_poster_cross_cache_key(self, poster):
+        return 'auth:acl:name:%s:x:poster:%s' % (self.name, poster.pk)
+
+    def _uncached_is_poster_authorized(self, poster):
         if isinstance(poster, AnonymousUser):
             return self.allow_by_default
 
@@ -167,9 +174,10 @@ class AccessControlList(models.Model):
 
         return self.allow_by_default
 
-    @classmethod
-    def _get_cache_key(cls, name):
-        return 'auth:acl:name:%s' % name
+    def is_poster_authorized(self, poster):
+        cache_key = self._get_poster_cross_cache_key(poster)
+        getter = lambda: self._uncached_is_poster_authorized(poster)
+        return cache.get_or_set(cache_key, getter, 60*60*24)
 
     @classmethod
     def get_acl(cls, name):
