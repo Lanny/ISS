@@ -20,16 +20,19 @@
 
       fieldset {
         padding-top: 10px;
-        display: flex;
 
-        input[type="text"], .auto-suggest-wrapper {
-          flex: 1;
-        }
+        .input-wrapper {
+          display: flex;
 
-        input[type="submit"] {
-          .small-btn();
-          .primary();
-          margin: 0 0 0 5px;
+          input[type="text"], .auto-suggest-wrapper {
+            flex: 1;
+          }
+
+          input[type="submit"] {
+            .small-btn();
+            .primary();
+            margin: 0 0 0 5px;
+          }
         }
       }
     }
