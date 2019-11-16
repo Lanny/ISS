@@ -1,8 +1,10 @@
 import json
 
-from django.db import models
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import AnonymousUser
+from django.db import models
+from django.dispatch import receiver
 
 from ISS import utils
 
@@ -167,7 +169,17 @@ class AccessControlList(models.Model):
         return self.allow_by_default
 
     @classmethod
+    def _get_cache_key(cls, name):
+        return 'auth:acl:name:%s' % name
+
+    @classmethod
     def get_acl(cls, name):
+        cache_key = cls._get_cache_key(name)
+        cached_value = cache.get(cache_key)
+
+        if cached_value:
+            return cached_value
+
         zero_or_one_qs = list(cls.objects.filter(name=name))
         acl = None
 
@@ -191,8 +203,14 @@ class AccessControlList(models.Model):
         else:
             acl = zero_or_one_qs[0]
 
+        if not cached_value:
+            cache.set(cache_key, acl, 60*60*24)
+
         return acl
 
     def __unicode__(self):
         return self.name
 
+@receiver(models.signals.post_save, sender=AccessControlList)
+def bust_acl_cache(sender, instance, created, **kwargs):
+    cache.delete(AccessControlList._get_cache_key(instance.name))
