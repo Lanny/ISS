@@ -62,7 +62,7 @@ def _embed_youtube(url):
 
 def _embed_bitchute(url):
     path = url.path
-    match = re.match('/video/([--_0-9a-zA-Z]+)/?', path)
+    match = re.match('/video/([-_0-9a-zA-Z]+)/?', path)
 
     if not match:
         raise EmbeddingNotSupportedException('Bad video ID.')
@@ -97,6 +97,11 @@ def _video_markup_for_url(urlstr):
     a page. If the link it malformed or to an unknown video hosting service
     throws EmbeddingNotSupportedException.
     """
+    if not _is_http_url(urlstr):
+        raise EmbeddingNotSupportedException(
+            'Only HTTP/HTTPS urls are embeddable'
+        )
+
     try :
         url = urlparse.urlparse(urlstr)
     except ValueError:

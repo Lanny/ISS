@@ -67,11 +67,11 @@ class ConfigurationManager(Singleton):
         'enable_registration': True,
         'enable_invites': False,
         'invite_expiration_time': datetime.timedelta(days=14),
-        'themes': (
-            ('&T', '&T'),
-            ('bibliotek', 'Bibliotek'),
-            ('amoled', 'AMOLED')
-        ),
+        'themes': {
+            '&T': {'name': '&T', 'color': '#D5DEE5'},
+            'bibliotek': {'name': 'Bibliotek', 'color': '#FFFFFF'},
+            'amoled': {'name': 'AMOLED', 'color': '#000000'},
+        },
         'default_theme': '&T',
         'hot_topics_count': 5,
         'hot_topics_recent_span': datetime.timedelta(days=3),

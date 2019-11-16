@@ -27,6 +27,11 @@
     {% endif %}
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="theme-color" content="{% get_theme_color request.user %}">
+    {% comment %}
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    {% endcomment %}
     <link rel="stylesheet" id="theme-sheet" href="{% get_theme request.user %}">
     {% block css %} {% endblock %}
 

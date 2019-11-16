@@ -1,6 +1,6 @@
 var gulp = require('gulp');
 var flatten = require('gulp-flatten');
-var less = require('gulp-sources-less');
+var less = require('gulp-less');
 var sourcemaps = require('gulp-sourcemaps');
 var path = require('path');
 var argv = require('yargs').argv;
@@ -49,7 +49,7 @@ gulp.task('smilies', function() {
     .pipe(gulp.dest(gifDir));
 });
 
-gulp.task('less', ['icons'], function() {
+gulp.task('less', gulp.series('icons', function() {
   var lessStream = less({
       paths: [ path.join(__dirname, 'less') ]
     }).on('error', function(err) {
@@ -59,16 +59,16 @@ gulp.task('less', ['icons'], function() {
 
   var stream = gulp.src('./src/themes/*.less');
 
-  stream = argv.optimize ? stream : stream.pipe(sourcemaps.init());
+  stream = argv.optimizeAssets ? stream : stream.pipe(sourcemaps.init());
   stream = stream.pipe(lessStream);
-  stream = argv.optimize ? stream : stream.pipe(sourcemaps.write());
+  stream = argv.optimizeAssets ? stream : stream.pipe(sourcemaps.write());
   stream = stream.pipe(flatten());
   stream = stream.pipe(autoprefixer());
-  stream = argv.optimize ? stream.pipe(minifyCSS()) : stream;
+  stream = argv.optimizeAssets ? stream.pipe(minifyCSS()) : stream;
   stream = stream.pipe(gulp.dest(cssDir));
 
   return stream;
-});
+}));
 
 gulp.task('javascript', function() {
   return gulp.src('./src/**/*.js')
@@ -76,7 +76,7 @@ gulp.task('javascript', function() {
     .pipe(gulp.dest(jsDir));
 });
 
-gulp.task('optimize-js', ['javascript'], function() {
+gulp.task('optimize-js', gulp.series('javascript', function() {
   var optPaths = optimizeModules.map(function(moduleName) {
     return path.join(jsDir, moduleName);
   });
@@ -87,9 +87,9 @@ gulp.task('optimize-js', ['javascript'], function() {
     .pipe(requirejsOptimize({ optimize: 'none' }))
     .pipe(flatten())
     .pipe(gulp.dest('../static/js'));
-});
+}));
 
-gulp.task('generate-extensions', [], function() {
+gulp.task('generate-extensions', function(done) {
   for (var i=0; i<ISSConfig.extensions.length; i++) {
     var ext = ISSConfig.extensions[i],
       extConfig = ISSConfig.extension_config[ext];
@@ -99,15 +99,19 @@ gulp.task('generate-extensions', [], function() {
       execSync('npm run-script build', {cwd: extConfig.gulp_dir});
     }
   }
+
+  done();
 });
 
 var generateTasks = ['less', 'smilies', 'generate-extensions'];
-generateTasks.push(argv.optimize ? 'optimize-js' : 'javascript');
-gulp.task('generate', generateTasks);
+generateTasks.push(argv.optimizeAssets ? 'optimize-js' : 'javascript');
+gulp.task('generate', gulp.parallel(generateTasks));
 
-gulp.task('watch', ['generate'], function() {
-  gulp.watch([ './src/assets/svg/*.svg' ], ['icons']);
-  gulp.watch([ './src/assets/gif/*' ], ['smilies']);
-  gulp.watch([ './src/**/*.less' ], ['less']);
-  gulp.watch([ './src/**/*.js' ], ['javascript']);
-});
+gulp.task('watch', gulp.series('generate', function() {
+  return Promise.all([
+    gulp.watch([ './src/assets/svg/*.svg' ], gulp.series('icons')),
+    gulp.watch([ './src/assets/gif/*' ], gulp.series('smilies')),
+    gulp.watch([ './src/**/*.less', '!./src/base/icons.less' ], gulp.series('less')),
+    gulp.watch([ './src/**/*.js' ], gulp.series('javascript')),
+  ]);
+}));

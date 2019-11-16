@@ -14,6 +14,8 @@ admin.site.register(PostSnapshot)
 class BanInline(admin.TabularInline):
     model = Ban
     fk_name = 'subject'
+    fields = ('given_by', 'reason', 'end_date',)
+    readonly_fields = ('given_by',)
     extra = 0
 
 @admin.register(Poster)

@@ -12,22 +12,39 @@
 {% block content %}
   <div class="members user-index">
 
-    <div class="thread">
-      <div class="actions-and-pages">
-        <div>
-          <form method="GET" action="{% url 'members' %}" id="post-actions">
-            <div class="form-wrapper">
-              <select name="sortby" id="id_action">
-                <option value="id">Sort by ID</option>
-                <option value="username">Sort by Username</option>
-                <option value="post_count">Sort by Post Count</option>
-              </select>
-            </div>
-            <input type="submit" value="Go" />
-          </form>
-        </div>
-            {% include "page_list.html" with page=posters %}
+    <div class="find-user">
+      <form action="{% url 'find-user' %}" method="POST">
+        <h2>
+          <label for="username">Find User:</label>
+        </h2>
+        <fieldset>
+          {% csrf_token %}
+          <input
+            id="username"
+            name="username"
+            type="text"
+            data-auto-suggest="true"
+            data-auto-suggest-endpoint="{% url 'api-user-serach' %}"
+            data-auto-suggest-delimiter=";"
+          />
+          <input type="submit" value="Find" />
+        </fieldset>
+      </form>
+    </div>
+
+    <div class="sort-and-pages">
+      <div>
+        <form method="GET" action="{% url 'members' %}" id="sort-form">
+          <select name="sortby" id="id_action">
+            <option value="id">Sort by ID</option>
+            <option value="username">Sort by Username</option>
+            <option value="post_count">Sort by Post Count</option>
+          </select>
+          <input type="submit" value="Go" />
+        </form>
       </div>
+
+      {% include "page_list.html" with page=posters %}
     </div>
 
     {% include 'user_list.html' %}
@@ -35,4 +52,8 @@
     {% include "page_list.html" with page=posters %}
 
   </div>
+{% endblock %}
+
+{% block js %}
+  {% include "require.html" with bootstrap="auto-suggest-bootstrap" %}
 {% endblock %}

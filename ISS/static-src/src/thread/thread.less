@@ -24,25 +24,7 @@
     }
 
     #post-actions {
-      display: flex;
-      align-items: stretch;
-
-      @media (min-width: @breakpoint) {
-        select {
-          margin-right: 5px;
-        }
-      }
-
-      input[type="submit"] {
-        .small-btn();
-        .primary();
-        height: 30px;
-      }
-
-      select {
-        flex: 1;
-        height: 30px;
-      }
+      .action-select();
     }
     
   }
