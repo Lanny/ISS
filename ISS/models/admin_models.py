@@ -39,8 +39,8 @@ class FilterWord(models.Model):
     @classmethod
     def do_all_replacements(cls, text):
         filters = cache.get('active_filters')
-        if not filters:
-            filters = cls.objects.filter(active=True)
+        if filters == None:
+            filters = list(cls.objects.filter(active=True))
             cache.set('active_filters', filters)
 
         for f in filters:
