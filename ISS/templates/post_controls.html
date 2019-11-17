@@ -8,7 +8,7 @@
       Quote
     </a>
 
-    {% if user.pk != post.author.pk and user.post_set.count >= config.initial_account_period_total %}
+    {% if user.pk != post.author.pk and user_post_count >= config.initial_account_period_total %}
       {% if user.pk in post.get_thanker_pks %}
         <form action="{% url 'unthank-post' post.pk %}" method="POST"
               class="thank-action-form">
@@ -25,7 +25,7 @@
     {% endif %}
 
 
-    {% if post|poster_can_edit:user %}
+    {% if can_edit %}
       <a class="edit-post" href="{% url 'edit-post' post.pk %}">
         Edit
       </a>

@@ -56,6 +56,32 @@ def pgp_block(pgp_key, js_enabled=True):
 
     return safestring.mark_safe(markup)
 
+@register.inclusion_tag('post_controls.html', takes_context=True)
+def post_controls(context):
+    if '_iss_template_cache' not in context:
+        context['_iss_template_cache'] = {}
+
+    tcache = context['_iss_template_cache'] 
+    user = context['user']
+    post = context['post']
+
+    if 'user_post_count' not in tcache:
+        tcache['user_post_count'] = user.post_set.count()
+
+    if 'user_is_banned' not in tcache:
+        tcache['user_is_banned'] = user.is_banned()
+
+    return {
+        'user': user,
+        'post': context['post'],
+        'user_post_count': tcache['user_post_count'] ,
+        'can_edit': post.can_be_edited_by(
+            user,
+            is_banned=tcache['user_is_banned']
+        ),
+    }
+
+
 @register.filter(name='word_filter')
 def word_filter(value):
     return FilterWord.do_all_replacements(value)
@@ -68,10 +94,6 @@ def get_item(dictionary, key):
 def check_acl(poster, acl_name):
     acl = AccessControlList.get_acl(acl_name)
     return acl.is_poster_authorized(poster)
-
-@register.filter
-def poster_can_edit(post, poster):
-    return post.can_be_edited_by(poster)
 
 @register.filter(expects_localtime=True, is_safe=False)
 def present_dt(dt):

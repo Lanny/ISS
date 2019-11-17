@@ -507,8 +507,18 @@ class Post(models.Model):
     def get_thanker_pks(self):
         return {t.thanker_id for t in self.thanks_set.all()}
 
-    def can_be_edited_by(self, poster):
-        if poster.is_banned():
+    def can_be_edited_by(self, poster, is_banned=None):
+        """
+        Returns true if the poster can edit this post. Banned users can not
+        edit posts. Figuring out if a user is banned requires querying the DB,
+        it can become costly to do this over and over in contexts like post
+        lists, so if the caller knows the poster's banned status then they can
+        pass that and we'll skip this check.
+        """
+        if is_banned == None:
+            is_banned = poster.is_banned()
+
+        if is_banned:
             return False
 
         if poster == self.author:

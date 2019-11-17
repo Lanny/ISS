@@ -6,5 +6,5 @@ class ISSConfig(AppConfig):
     verbose_name = 'ISS'
 
     def ready(self):
-        cache.clear()
+        #cache.clear()
         import ISS.signals
