@@ -82,7 +82,10 @@ def thread_index(request, forum_id):
 
 def thread(request, thread_id):
     thread = get_object_or_404(Thread, pk=thread_id)
-    posts = thread.post_set.order_by('created').select_related('author')
+    posts = (thread.post_set
+        .order_by('created')
+        .select_related('author')
+        .prefetch_related('thanks_set'))
     page = utils.get_posts_page(posts, request)
     reply_form = _get_new_post_form(request)(author=request.user,
                                              initial={ 'thread': thread })
