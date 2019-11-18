@@ -52,7 +52,7 @@ def unfuck_percent_encoded_utf8(fucked_unicode_str):
         return str(fucked_unicode_str)
 
 RANGE_WIDTH = 3
-@register.assignment_tag
+@register.simple_tag
 def nice_page_set(page):
     pages = []
     pages.extend(list(range(1, RANGE_WIDTH+1)))

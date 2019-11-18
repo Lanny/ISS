@@ -12,7 +12,7 @@ from ISS.models import FilterWord, AccessControlList
 
 register = template.Library()
 
-@register.assignment_tag
+@register.simple_tag
 def test_link(test, user):
     if test == 'always':
         return True
