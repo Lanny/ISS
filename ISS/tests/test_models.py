@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.test import SimpleTestCase
 from ISS.models import *
 
-import tutils
+from . import tutils
 
 class PosterTestCase(tutils.ForumConfigTestCase):
     forum_config = {
@@ -182,22 +182,22 @@ class PosterUsernameNormalizationTestCase(SimpleTestCase):
                 Poster.normalize_username(username_two))
 
     def test_capitalization(self):
-        self.assertNormEqual(u'Lanny', u'lanny')
+        self.assertNormEqual('Lanny', 'lanny')
 
     def test_spaces(self):
-        self.assertNormEqual(u'Don Knuth', u'Don Knuth')
+        self.assertNormEqual('Don Knuth', 'Don Knuth')
 
     def test_mixed_white_space(self):
-        self.assertNormEqual(u'Don Knuth', u'D on\tKnuth\n\n')
+        self.assertNormEqual('Don Knuth', 'D on\tKnuth\n\n')
 
     def test_mixed_white_space_and_caps(self):
-        self.assertNormEqual(u'Don Knuth', u'd On\tknuTh\n\n')
+        self.assertNormEqual('Don Knuth', 'd On\tknuTh\n\n')
 
     def test_homoglyph_attack(self):
-        self.assertNormEqual(u'\u216Canny', u'Lanny')
+        self.assertNormEqual('\u216Canny', 'Lanny')
 
     def test_case_sensitive_homoglyphs(self):
-        self.assertNormEqual(u'Willard Quine', u'willard quine')
+        self.assertNormEqual('Willard Quine', 'willard quine')
 
 class SubscriptionTestCase(TestCase):
     def setUp(self):

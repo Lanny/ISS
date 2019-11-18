@@ -21,7 +21,7 @@ class RegistrationCode(models.Model):
     generated_on = models.DateTimeField(default=timezone.now)
     generated_by = models.ForeignKey('ISS.Poster',
                                      related_name='reg_codes_generated',
-                                     null=False)
+                                     on_delete=models.CASCADE)
 
     used_on = models.DateTimeField(null=True, default=None)
     used_by = models.OneToOneField('ISS.Poster',

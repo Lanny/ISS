@@ -19,7 +19,7 @@ class HomoglyphNormalizer(Singleton):
 
     @classmethod
     def _decode_seq(cls, s):
-        return u''.join(
+        return ''.join(
             [cls._decode_hex_repr(point) for point in s.strip().split(' ')]
         )
 
@@ -51,7 +51,7 @@ class HomoglyphNormalizer(Singleton):
                 confusable = self._decode_seq(confusable_seq)
                 target = self._decode_seq(target_seq)
 
-                if self._norm_graph.has_key(confusable):
+                if confusable in self._norm_graph:
                     f.close()
                     raise ValueError('One confusable codepoint has multiple '
                                      'normalization targets.')
@@ -59,7 +59,7 @@ class HomoglyphNormalizer(Singleton):
                 self._norm_graph[confusable] = target
 
     def _norm_codepoint(self, code_point):
-        if self._norm_graph.has_key(code_point):
+        if code_point in self._norm_graph:
             return self._norm_graph[code_point]
         else:
             return code_point
@@ -68,12 +68,12 @@ class HomoglyphNormalizer(Singleton):
         """
         Normalize a unicode string.
         """
-        if not isinstance(unicode_str, unicode):
-            unicode_str = unicode(unicode_str)
+        if not isinstance(unicode_str, str):
+            unicode_str = str(unicode_str)
 
         normalized = []
         for code_point in unicode_str:
             normalized.append(self._norm_codepoint(code_point.lower()))
             normalized.append(self._norm_codepoint(code_point.upper()))
 
-        return u''.join(normalized)
+        return ''.join(normalized)

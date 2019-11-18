@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 import random
 from datetime import timedelta
 
@@ -9,7 +9,7 @@ from django.template.loader import render_to_string
 
 from ISS import models as iss_models
 from ISS import utils as iss_utils 
-from apps import TabooConfig
+from .apps import TabooConfig
 
 EXT = TabooConfig.name
 
@@ -31,9 +31,16 @@ HAVING MAX(post.created) > (NOW() - INTERVAL %s);
 """
 
 class TabooProfile(models.Model):
-    poster = models.OneToOneField(iss_models.Poster, related_name='taboo_profile')
-    mark = models.ForeignKey(iss_models.Poster, null=True,
-                             related_name='marked_by')
+    poster = models.OneToOneField(
+        iss_models.Poster,
+        related_name='taboo_profile',
+        on_delete=models.CASCADE)
+
+    mark = models.ForeignKey(
+        iss_models.Poster,
+        null=True,
+        related_name='marked_by',
+        on_delete=models.CASCADE)
     phrase = models.CharField(max_length=1024)
     active = models.BooleanField(default=True)
     last_registration = models.DateTimeField(default=timezone.now)
@@ -122,20 +129,28 @@ class TabooViolationRecord(models.Model):
     created = models.DateTimeField(default=timezone.now)
     phrase = models.CharField(max_length=1024)
 
-    poster = models.ForeignKey(iss_models.Poster, related_name='taboo_successes')
-    mark = models.ForeignKey(iss_models.Poster, related_name='taboo_failures')
-    violating_post = models.ForeignKey(iss_models.Post, null=True,
-                                       on_delete=models.SET_NULL)
+    poster = models.ForeignKey(
+        iss_models.Poster,
+        related_name='taboo_successes',
+        on_delete=models.CASCADE)
+    mark = models.ForeignKey(
+        iss_models.Poster,
+        related_name='taboo_failures',
+        on_delete=models.CASCADE)
+    violating_post = models.ForeignKey(
+        iss_models.Post,
+        null=True,
+        on_delete=models.SET_NULL)
 
     titles_rectified = models.BooleanField(default=False)
     victor_former_title = models.CharField(
-            max_length=256,
-            default=None,
-            null=True)
+        max_length=256,
+        default=None,
+        null=True)
     loser_former_title = models.CharField(
-            max_length=256,
-            default=None,
-            null=True)
+        max_length=256,
+        default=None,
+        null=True)
 
     @transaction.atomic
     def rectify_usertitles(self):

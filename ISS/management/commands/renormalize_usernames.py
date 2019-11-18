@@ -34,16 +34,16 @@ class Command(BaseCommand):
                        'who should remain able to log in.')
 
                 for idx, dupe in enumerate(dupes):
-                    print '%d. "%s" (posts: %d, pk: %d)' % (
+                    print('%d. "%s" (posts: %d, pk: %d)' % (
                             idx+1,
                             repr(dupe.username),
                             dupe.post_set.count(),
-                            dupe.pk)
+                            dupe.pk))
 
                 i = None
                 while type(i) != int or i > len(dupes) or i < 1:
                     try:
-                        i = int(raw_input('>'))
+                        i = int(input('>'))
                     except ValueError:
                         pass
 
@@ -52,11 +52,11 @@ class Command(BaseCommand):
                     if idx != i-1:
                         dupe.normalized_username = normed + str(idx)
                         dupe.save()
-                        print Poster.objects.get(pk=dupe.pk).normalized_username
+                        print(Poster.objects.get(pk=dupe.pk).normalized_username)
 
                 true_user = dupes[i-1]
                 true_user.normalized_username = normed
                 true_user.save()
 
-        print 'Done.'
+        print('Done.')
 

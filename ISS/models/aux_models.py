@@ -4,15 +4,15 @@ from django.utils import timezone
 from django import forms
 
 from ISS import utils
-from core_models import Forum, Poster, Thread
-from admin_models import IPBan
+from .core_models import Forum, Poster, Thread
+from .admin_models import IPBan
 
 class LatestThreadsForumPreference(models.Model):
     class Meta:
         unique_together = ('poster', 'forum')
 
-    poster = models.ForeignKey(Poster, null=False)
-    forum = models.ForeignKey(Forum, null=False)
+    poster = models.ForeignKey(Poster, on_delete=models.CASCADE)
+    forum = models.ForeignKey(Forum, on_delete=models.CASCADE)
 
     include = models.BooleanField(null=False)
 
@@ -40,7 +40,7 @@ class LatestThreadsForumPreference(models.Model):
 
         if poster:
             poster_prefs = cls.get_poster_preferences(poster)
-            for fpk, include in poster_prefs.items():
+            for fpk, include in list(poster_prefs.items()):
                 effective_prefs[fpk] = include
 
         for fpk in trash_forums:
@@ -49,7 +49,7 @@ class LatestThreadsForumPreference(models.Model):
         return effective_prefs
 
     def __unicode__(self):
-        return u'%s to %s' % (self.poster, self.forum)
+        return '%s to %s' % (self.poster, self.forum)
 
 class RateLimitedAccess(models.Model):
     limit_key = models.CharField(max_length=1024)

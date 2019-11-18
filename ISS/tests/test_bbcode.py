@@ -2,7 +2,7 @@
 
 from ISS.iss_bbcode import build_parser
 
-import tutils
+from . import tutils
 
 class BBCodeTestCase(tutils.ForumConfigTestCase):
     def test_valid_bitchute_embed(self):

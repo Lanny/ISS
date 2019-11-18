@@ -49,7 +49,7 @@ def create_posts(user, count, bulk=False):
                 thread=random.choice(Thread.objects.all()),
                 content='postum ipsum',
                 posted_from='8.8.8.8')
-            for _ in xrange(count)]
+            for _ in range(count)]
 
     if bulk:
         Post.objects.bulk_create(posts)
@@ -62,7 +62,7 @@ def create_user(thread_count=0, post_count=0, username=None, acgs=()):
     global THREADS_CREATED
 
     USERS_CREATED += 1
-    username = username or (u'TEST_USER-%d' % USERS_CREATED)
+    username = username or ('TEST_USER-%d' % USERS_CREATED)
     user = Poster(username=username)
     user.save()
 

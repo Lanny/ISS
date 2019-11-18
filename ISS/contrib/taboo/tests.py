@@ -7,7 +7,7 @@ from ISS import utils as iss_utils
 from ISS import models as iss_models
 from ISS.tests import tutils
 from ISS.contrib.taboo.models import *
-from apps import TabooConfig
+from .apps import TabooConfig
 
 EXT = TabooConfig.name
 

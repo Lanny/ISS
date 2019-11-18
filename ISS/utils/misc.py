@@ -15,7 +15,7 @@ def rmerge(*args, **kwargs):
     if len(args) < 1:
         raise TypeError('rmerge() takes at least one argument (0 given)')
 
-    arg_types = map(type, args)
+    arg_types = list(map(type, args))
     ret_type = arg_types[0]
     homogenous = all([t == ret_type for t in arg_types])
     is_list = issubclass(ret_type, list)
@@ -33,7 +33,7 @@ def rmerge(*args, **kwargs):
         elif seq_mode == 'merge':
             retlen = max([len(s) for s in args])
             merged = []
-            for pos_set in itertools.izip_longest(*args):
+            for pos_set in itertools.zip_longest(*args):
                 pos_set = [x for x in pos_set if x != None]
                 pos = rmerge(*pos_set, seq_mode=seq_mode)
                 merged.append(pos)

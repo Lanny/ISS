@@ -309,7 +309,7 @@ def latest_threads(request):
                 request.user if request.user.is_authenticated() else None))
 
     excluded_forums = [
-        fpk for fpk, include in effective_prefs.items() if not include]
+        fpk for fpk, include in list(effective_prefs.items()) if not include]
 
     threads = (Thread.objects.all()
         .filter(~Q(forum_id__in=excluded_forums))
@@ -378,7 +378,7 @@ class UpdateLatestThreadsPreferences(utils.MethodSplitView):
             new_prefs = form.get_effective_preferences()
             diff_keys = []
 
-            for fpk, new_pref in new_prefs.items():
+            for fpk, new_pref in list(new_prefs.items()):
                 if new_pref != old_prefs[fpk]:
                     diff_keys.append(fpk)
 

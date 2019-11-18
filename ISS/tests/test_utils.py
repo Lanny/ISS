@@ -5,7 +5,7 @@ from datetime import timedelta
 from django.test import TestCase
 
 from ISS import utils
-import tutils
+from . import tutils
 
 SIGNED_MESSAGE = """
 -----BEGIN PGP SIGNED MESSAGE-----

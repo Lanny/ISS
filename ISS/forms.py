@@ -1,8 +1,8 @@
 import re
 import json
 import pytz
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import email_normalize
 
 from django import forms
@@ -15,9 +15,9 @@ from PIL import Image
 
 from tripphrase import tripphrase
 
-import utils
-from models import *
-from models.core_models import THEME_CHOICES
+from . import utils
+from .models import *
+from .models.core_models import THEME_CHOICES
 
 class DurationField(forms.Field):
     def clean(self, value):
@@ -32,7 +32,7 @@ class BBCodeField(forms.CharField):
     def clean(self, value):
         value = super(BBCodeField, self).clean(value)
 
-        if not isinstance(value, basestring):
+        if not isinstance(value, str):
             # Probably none, field might be optional, in any case there's no
             # use trying to parse this thing.
             return value
@@ -407,7 +407,7 @@ class LatestThreadsPreferencesForm(forms.Form):
             fpk = self._get_fpk(field_name)
             try:
                 forum = Forum.objects.get(pk=fpk, is_trash=False)
-            except Forum.DoesNotExist, e:
+            except Forum.DoesNotExist as e:
                 raise ValidationError(
                     'Invalid fourm ID: %r' % fpk,
                     code='DUPE')
@@ -432,7 +432,7 @@ class ISSAuthenticationForm(AuthenticationForm):
 
         try:
             user = Poster.objects.get(normalized_username=normalized)
-        except Poster.DoesNotExist, e:
+        except Poster.DoesNotExist as e:
             return username
         else:
             return user.username

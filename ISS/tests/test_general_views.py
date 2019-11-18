@@ -12,7 +12,7 @@ from django.utils import timezone
 
 from ISS.models import *
 from ISS import utils
-import tutils
+from . import tutils
 
 class GeneralViewTestCase(tutils.ForumConfigTestCase):
     forum_config = {'captcha_period': 0}
@@ -792,7 +792,7 @@ class GenerateInviteCodeTestCase(tutils.ForumConfigTestCase):
  
 class LoginTestCase(TestCase):
     def setUp(self):
-        self.password = u'私わ大津展之です'
+        self.password = '私わ大津展之です'
         self.path = reverse('login')
 
         self.otsu = tutils.create_user()
@@ -921,7 +921,7 @@ class ReportPostTestCase(tutils.ForumConfigTestCase):
         pm_count = PrivateMessage.objects.count()
 
         max_len = Poster._meta.get_field('username').max_length
-        username = u'I\'m a pretty princess'
+        username = 'I\'m a pretty princess'
         username = username + ('!' * (max_len - len(username)))
 
         fin = tutils.create_user(post_count=1, username=username)
