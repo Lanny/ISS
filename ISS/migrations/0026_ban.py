@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('end_date', models.DateTimeField()),
                 ('reason', models.CharField(max_length=1024)),
-                ('subject', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('subject', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
     ]

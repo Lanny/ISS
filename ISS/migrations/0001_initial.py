@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('given', models.DateTimeField(auto_now_add=True)),
-                ('post', models.ForeignKey(to='ISS.Post')),
+                ('post', models.ForeignKey(to='ISS.Post', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
                 ('last_update', models.DateTimeField(auto_now_add=True)),
                 ('title', models.TextField()),
                 ('log', models.TextField(blank=True)),
-                ('forum', models.ForeignKey(to='ISS.Forum')),
+                ('forum', models.ForeignKey(to='ISS.Forum', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -69,27 +69,27 @@ class Migration(migrations.Migration):
                 'abstract': False,
             },
             managers=[
-                (b'objects', django.contrib.auth.models.UserManager()),
+                ('objects', django.contrib.auth.models.UserManager()),
             ],
         ),
         migrations.AddField(
             model_name='thanks',
             name='thankee',
-            field=models.ForeignKey(related_name='thanks_received', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='thanks_received', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='thanks',
             name='thanker',
-            field=models.ForeignKey(related_name='thanks_given', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='thanks_given', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='post',
             name='author',
-            field=models.ForeignKey(to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='post',
             name='thread',
-            field=models.ForeignKey(to='ISS.Thread'),
+            field=models.ForeignKey(to='ISS.Thread', on_delete=models.CASCADE),
         ),
     ]

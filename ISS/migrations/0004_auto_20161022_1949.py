@@ -18,9 +18,9 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('last_read_date', models.DateTimeField(null=True)),
                 ('subscribed', models.BooleanField(default=False)),
-                ('last_read_post', models.ForeignKey(to='ISS.Post', null=True)),
-                ('poster', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
-                ('thread', models.ForeignKey(to='ISS.Thread')),
+                ('last_read_post', models.ForeignKey(to='ISS.Post', null=True, on_delete=models.CASCADE)),
+                ('poster', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('thread', models.ForeignKey(to='ISS.Thread', on_delete=models.CASCADE)),
             ],
         ),
         migrations.AlterUniqueTogether(

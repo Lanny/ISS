@@ -43,12 +43,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='forumflag',
             name='forum',
-            field=models.ForeignKey(to='ISS.Forum'),
+            field=models.ForeignKey(to='ISS.Forum', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='forumflag',
             name='poster',
-            field=models.ForeignKey(to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='forumflag',
