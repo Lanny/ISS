@@ -83,7 +83,7 @@ def reverse_absolute(*args, **kwargs):
             reverse(*args, **kwargs))
 
 def get_posts_per_page(poster):
-    if poster.is_authenticated():
+    if poster.is_authenticated:
         return poster.posts_per_page
     else:
         return get_config('posts_per_thread_page')
@@ -203,7 +203,7 @@ class ForumFascet(object):
         prop = getattr(self._forum, field)
 
         if field in ('is_unread',):
-            if not self._request.user.is_authenticated():
+            if not self._request.user.is_authenticated:
                 return True
 
             return prop(self._request.user)
@@ -319,7 +319,7 @@ GENERIC_CAPTCHA_LABEL = 'Captcha (required for your first %d posts)' % (
 )
 
 def conditionally_captchatize(request, Form):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return Form
 
     post_count = request.user.post_set.count()

@@ -38,7 +38,7 @@ def forum_index(request):
     for forum in forums:
         forum.post_count = forums_post_map[forum.pk]
 
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         d = dict([(f.pk, f) for f in forums])
         flags = ForumFlag.objects.filter(poster=request.user, forum__in=forums)
 
@@ -75,7 +75,7 @@ def thread_index(request, forum_id):
         'can_start_thread': forum.create_thread_pack.check_request(request)
     }
 
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         forum.mark_read(request.user)
 
     return render(request, 'thread_index.html', ctx)
@@ -101,7 +101,7 @@ def thread(request, thread_id):
     response = render(request, 'thread.html', ctx)
 
     # Update thread flag
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         thread.mark_read(request.user, page[-1])
 
         if request.user.auto_subscribe == 2:
@@ -306,7 +306,7 @@ def posts_thanked(request, user_id):
 def latest_threads(request):
     effective_prefs = (LatestThreadsForumPreference
             .get_effective_preferences(
-                request.user if request.user.is_authenticated() else None))
+                request.user if request.user.is_authenticated else None))
 
     excluded_forums = [
         fpk for fpk, include in list(effective_prefs.items()) if not include]
@@ -338,7 +338,7 @@ def latest_threads(request):
             tf._thread.post_count = counts[tf._thread.pk]
 
 
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             ppk = request.user.pk
             flags = ThreadFlag.objects.raw("""
                 SELECT tf.*
@@ -698,7 +698,7 @@ class EditPost(utils.MethodSplitView):
         return HttpResponseRedirect(post.get_url())
 
 def assume_identity(request, user_id):
-    if not request.user.is_authenticated() or not request.user.is_admin:
+    if not request.user.is_authenticated or not request.user.is_admin:
         raise PermissionDenied()
 
     if not request.method == 'POST':

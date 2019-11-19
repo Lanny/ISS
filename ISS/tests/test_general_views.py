@@ -544,7 +544,7 @@ class RegistrationTestCase(AbstractRegistrationTestCase):
             login_path, { 'username': username, 'password': password })
         user = auth.get_user(client)
 
-        self.assertFalse(user.is_authenticated())
+        self.assertFalse(user.is_authenticated)
 
     def test_email_verification_invalid_code(self):
         path = reverse('verify-email')
@@ -823,7 +823,7 @@ class LoginTestCase(TestCase):
 
         user = auth.get_user(self.otsu_client)
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(user.is_authenticated())
+        self.assertFalse(user.is_authenticated)
 
 class UserCPTestCase(tutils.ForumConfigTestCase):
     forum_config = {'captcha_period': 0}

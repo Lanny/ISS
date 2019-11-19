@@ -28,7 +28,7 @@ class IPBanMiddleware(BaseMiddleware):
 
 class TimezoneMiddleware(BaseMiddleware):
     def __call__(self, request):
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             timezone.activate(pytz.timezone(request.user.timezone))
         else:
             timezone.activate('UTC')
