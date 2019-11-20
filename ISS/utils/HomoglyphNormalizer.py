@@ -14,13 +14,9 @@ class HomoglyphNormalizer(Singleton):
     """
 
     @classmethod
-    def _decode_hex_repr(cls, s):
-        return ('\\U%08x' % int(s, 16)).decode('unicode-escape')
-
-    @classmethod
     def _decode_seq(cls, s):
         return ''.join(
-            [cls._decode_hex_repr(point) for point in s.strip().split(' ')]
+            [chr(int(point, 16)) for point in s.strip().split(' ')]
         )
 
     @classmethod

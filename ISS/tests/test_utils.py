@@ -113,6 +113,26 @@ class UtilsTestCase(tutils.ForumConfigTestCase):
         self.assertEqual(depgpd.strip(), 'The mathematician in question '
                 'had received just a bit more admiration than that.')
 
+class HomoglyphNormalizerTestCase(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.normalizer = utils.HomoglyphNormalizer()
+
+    def test_lannys_username_still_works(self):
+        self.assertEqual(self.normalizer.normalize('Lanny'), 'lLaAnNnNyY')
+
+    def test_equality_under_normalization(self):
+        cases = (
+            ('don knuth', 'Don Knuth'),
+            ('Don Knuth', 'don knuth'),
+            ('Lanny', 'L\u0430nny'),
+        )
+
+        for str1, str2 in cases:
+            self.assertEqual(
+                self.normalizer.normalize(str1),
+                self.normalizer.normalize(str2))
+
 class PureUtilsTestCase(TestCase):
     rmerge_cases = (
         (((1,2,3), (0,0)), 'replace', (0,0)),
