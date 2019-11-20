@@ -138,7 +138,8 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
         response = self.scrub_client.get(path)
         found_trash_rule = False
         
-        for row in response.content.split('\n'):
+        rows = response.content.decode("utf-8").split('\n')
+        for row in rows:
             if row[0] == '#':
                 continue
 
