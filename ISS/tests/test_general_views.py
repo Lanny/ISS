@@ -257,7 +257,7 @@ class ThanksViewTestCase(TestCase):
         self.assertEqual(self.thankee.thanks_received.count(), 0)
 
     def test_noobs_cant_thanksforce(self):
-        resp = self.noob_thanker_client.post(self.url)
+        resp = self.noob_thanker_client.post(self.url, {})
         self.assertEqual(self.thankee.thanks_received.count(), 0)
 
 class PostFloodControlTestCase(tutils.ForumConfigTestCase):
