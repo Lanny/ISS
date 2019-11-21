@@ -57,6 +57,20 @@ def create_posts(user, count, bulk=False):
         for post in posts:
             post.save()
 
+def create_thread(author, forum, title):
+    thread = Thread.objects.create(
+        title=title,
+        forum=forum,
+        author=author)
+
+    op = Post.objects.create(
+        author=author,
+        thread=thread,
+        content='opsum ipsum',
+        posted_from='8.8.8.4')
+
+    return thread
+
 def create_user(thread_count=0, post_count=0, username=None, acgs=()): 
     global USERS_CREATED
     global THREADS_CREATED
@@ -73,18 +87,8 @@ def create_user(thread_count=0, post_count=0, username=None, acgs=()):
         THREADS_CREATED += 1
         destination_forum = random.choice(Forum.objects.all())
 
-        thread = Thread(
-            title='TEST_THREAD-%d' % THREADS_CREATED,
-            forum=destination_forum,
-            author=user)
-        thread.save()
-
-        op = Post(
-            author=user,
-            thread=thread,
-            content='opsum ipsum',
-            posted_from='8.8.8.4')
-        op.save()
+        title = 'TEST_THREAD-%d' % THREADS_CREATED,
+        create_thread(user, destination_forum, title) 
 
     create_posts(user, post_count)
 

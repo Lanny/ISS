@@ -80,6 +80,42 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(tfc+1, ThreadFlag.objects.all().count())
 
+    def test_authd_latest_threads(self):
+        alan = tutils.create_user()
+        alan_client = Client()
+        alan_client.force_login(alan)
+        sports = Forum.objects.create(
+            name='sports forum',
+            category=Category.objects.get(name='general')
+        )
+        intellectualism = Forum.objects.create(
+            name='4 intellectuals only',
+            category=Category.objects.get(name='general')
+        )
+        LatestThreadsForumPreference.objects.create(
+            poster=alan,
+            forum=sports,
+            include=False
+        )
+        t1 = tutils.create_thread(
+            self.scrub,
+            sports,
+            'baseball is better than hockey (you\'re batty)'
+        )
+        t2 = tutils.create_thread(
+            self.scrub,
+            intellectualism,
+            'have you read your SICP today?'
+        )
+
+        path = reverse('latest-threads')
+        response = alan_client.get(path)
+
+        self.assertEqual(response.status_code, 200)
+        threads = set([tf._thread.pk for tf in response.context['threads']])
+        self.assertFalse(t1.pk in threads)
+        self.assertTrue(t2.pk in threads)
+
     def test_threads_by_user(self):
         path = reverse('threads-by-user', kwargs={'user_id': self.scrub.pk})
         response = self.scrub_client.get(path)
