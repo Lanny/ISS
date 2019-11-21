@@ -27,7 +27,6 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
         self.scrub_client = Client()
         self.scrub_client.force_login(self.scrub)
 
-
     def test_authed_users_can_access_index(self):
         path = reverse('forum-index')
         response = self.scrub_client.get(path)
@@ -44,6 +43,42 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
         response = self.scrub_client.get(path)
         self.assertEqual(len(response.context['categories']), 2)
         self.assertTrue(isinstance(response.context['forums_by_category'], dict))
+
+    def test_forum_page(self):
+        forum = Forum.objects.create(
+            name='The Heap',
+            description='The maximally garbage posts are on top'
+        )
+        t1 = Thread.objects.create(
+            title='old but stickied thread',
+            forum=forum,
+            stickied=True,
+            author=self.scrub)
+        t2 = Thread.objects.create(
+            title='hot new thread',
+            forum=forum,
+            author=self.scrub)
+
+        path = reverse('thread-index', kwargs={'forum_id': forum.pk})
+        response = self.scrub_client.get(path)
+        self.assertEqual(response.context['threads'][0]._thread, t1)
+
+    def test_unauthed_view_thread(self):
+        anon_client = Client()
+        tfc = ThreadFlag.objects.all().count()
+
+        path = reverse('thread', args=(Thread.objects.all()[0].pk,))
+        response = anon_client.get(path)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(tfc, ThreadFlag.objects.all().count())
+
+    def test_authed_view_thread(self):
+        tfc = ThreadFlag.objects.all().count()
+
+        path = reverse('thread', args=(Thread.objects.all()[0].pk,))
+        response = self.scrub_client.get(path)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(tfc+1, ThreadFlag.objects.all().count())
 
     def test_threads_by_user(self):
         path = reverse('threads-by-user', kwargs={'user_id': self.scrub.pk})
