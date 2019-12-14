@@ -64,7 +64,10 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     recovery_code = models.CharField(max_length=256, null=True, blank=True,
                                      default=None)
     recovery_expiration = models.DateTimeField(default=timezone.now)
-    email_verification_code = models.UUIDField(default=uuid.uuid4)
+    email_verification_code = models.UUIDField(
+        default=uuid.uuid4,
+        null=True,
+        blank=True)
     avatar = models.ImageField(upload_to='avatars', null=True)
 
     posts_per_page = models.PositiveSmallIntegerField(default=20)
