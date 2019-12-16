@@ -679,7 +679,7 @@ class PrivateMessage(models.Model):
 
     @classmethod
     def send_pm(cls, sender, receivers, subject, content, chain=None):
-        chain_id = chain_id if chain else uuid.uuid4()
+        chain_id = chain if chain else uuid.uuid4()
         sent_copies = []
         kept_copies = []
 
@@ -694,7 +694,7 @@ class PrivateMessage(models.Model):
             }
 
             # Receiver's copy
-            pm = PrivateMessage(**opts) 
+            pm = PrivateMessage(**opts)
             pm.save()
             sent_copies.append(pm)
 
@@ -706,4 +706,3 @@ class PrivateMessage(models.Model):
                 kept_copies.append(pm)
 
         return (sent_copies, kept_copies)
-

@@ -690,7 +690,7 @@ class EmailNormalizationTestCase(AbstractRegistrationTestCase):
         self._register(username="I.N.", email= "isaac.newton@damnthespam.com")
         self.assertEqual(Poster.objects.count(), user_count)
 
-    def test_diff_addres(self):
+    def test_diff_address(self):
         self._register(username="CM1", email= "Colin.Maclaurin@gov.scot")
         user_count = Poster.objects.count()
         self._register(username="CM2", email= "Maclaurin.Colin@gov.scot")

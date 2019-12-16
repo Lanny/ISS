@@ -7,7 +7,9 @@ from django.test import TestCase
 from django.utils import timezone
 
 from ISS import utils
-from ISS.models import *
+from ISS.models import Category, Forum, Ban, Post, Thread, Poster, \
+    PrivateMessage, AccessControlGroup
+
 
 def create_std_forums():
     general_cat = Category(name='general')
@@ -24,8 +26,10 @@ def create_std_forums():
                              category=trash_cat)
     trash_forum.save()
 
+
 USERS_CREATED = 0
 THREADS_CREATED = 0
+
 
 def create_post(user, thread, save=True):
     post = Post(
@@ -39,6 +43,7 @@ def create_post(user, thread, save=True):
 
     return post
 
+
 def create_posts(user, count, bulk=False):
     """
     Create `count` posts belonging to `user`. Skips signal triggering if `bulk`
@@ -49,7 +54,7 @@ def create_posts(user, count, bulk=False):
                 thread=random.choice(Thread.objects.all()),
                 content='postum ipsum',
                 posted_from='8.8.8.8')
-            for _ in range(count)]
+             for _ in range(count)]
 
     if bulk:
         Post.objects.bulk_create(posts)
@@ -57,13 +62,14 @@ def create_posts(user, count, bulk=False):
         for post in posts:
             post.save()
 
+
 def create_thread(author, forum, title):
     thread = Thread.objects.create(
         title=title,
         forum=forum,
         author=author)
 
-    op = Post.objects.create(
+    Post.objects.create(
         author=author,
         thread=thread,
         content='opsum ipsum',
@@ -71,7 +77,12 @@ def create_thread(author, forum, title):
 
     return thread
 
-def create_user(thread_count=0, post_count=0, username=None, acgs=()): 
+
+def send_pm(author, to, subject='lorem', body='ipsum'):
+    return PrivateMessage.send_pm(author, to, subject, body)
+
+
+def create_user(thread_count=0, post_count=0, username=None, acgs=()):
     global USERS_CREATED
     global THREADS_CREATED
 
@@ -88,16 +99,17 @@ def create_user(thread_count=0, post_count=0, username=None, acgs=()):
         destination_forum = random.choice(Forum.objects.all())
 
         title = 'TEST_THREAD-%d' % THREADS_CREATED,
-        create_thread(user, destination_forum, title) 
+        create_thread(user, destination_forum, title)
 
     create_posts(user, post_count)
 
     return user
 
+
 def ban_user(user, duration='1m', reason='test ban', start_expired=False):
     start_date = timezone.now()
 
-    if duration != None:
+    if duration is not None:
         duration = utils.parse_duration(duration)
         if start_expired:
             start_date -= duration + timedelta(seconds=1)
@@ -107,8 +119,7 @@ def ban_user(user, duration='1m', reason='test ban', start_expired=False):
             'It makes no sense to have an infinte duration ban but also '
             'start expired.')
     else:
-        end_date=None
-
+        end_date = None
 
     ban = Ban(
         subject=user,
@@ -120,8 +131,10 @@ def ban_user(user, duration='1m', reason='test ban', start_expired=False):
     ban.save()
     return ban
 
+
 def refresh_model(model):
     return type(model).objects.get(pk=model.pk)
+
 
 class ForumConfigTestCase(TestCase):
     _stored_values = {}
@@ -134,10 +147,6 @@ class ForumConfigTestCase(TestCase):
         cm = utils.ConfigurationManager.get_instance()
         config = utils.rmerge(settings.FORUM_CONFIG, cls.forum_config)
         cm.reinit(config)
-
-        #for key in cls.forum_config:
-        #    cls._stored_values[key] = utils.get_config()[key]
-        #    utils.get_config()[key] = cls.forum_config[key]
 
     def setUp(self):
         cache.clear()
