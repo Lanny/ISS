@@ -1,9 +1,17 @@
 # -*- coding: utf-8 -*-
+import re
 
 import ISS.iss_bbcode
 from ISS.iss_bbcode import build_parser
 
 from . import tutils
+
+def slw(s):
+    """
+    Strip leading whitespace.
+    """
+    return re.sub(s, r'^ +', '')
+
 
 class VideoTestCase(tutils.ForumConfigTestCase):
     def test_valid_bitchute_embed(self):
@@ -62,5 +70,5 @@ class QuoteTestCase(tutils.ForumConfigTestCase):
         parser = build_parser(('QUOTE',))
         bbc = '[quote author="D-Dawg"]Dogs and philosophers to the most good and receive the least praise[/quote]'
         actual = parser.format(bbc)
-        expected = '<blockquote>\nOriginally posted by D-Dawg\nfoo bar</blockquote>'
-        self.assertEqual(expected, actual)
+        expected = '<blockquote>\n<small class="attribution">Originally posted by D-Dawg</small>\nfoo bar\n</blockquote>'
+        self.assertEqual(slw(expected), slw(actual))
