@@ -337,6 +337,7 @@ class VerifyEmail(utils.MethodSplitView):
             return self._error_out(request)
 
         poster.is_active = True
+        poster.email_verification_code = None
         poster.save()
 
         message = ('You\'ve successfully verified your account, welcome to '
