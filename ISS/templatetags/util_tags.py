@@ -83,6 +83,7 @@ def post_controls(context):
     return {
         'user': user,
         'post': context['post'],
+        'config': context['config'],
         'user_post_count': tcache['user_post_count'],
         'can_edit': post.can_be_edited_by(
             user,
