@@ -2,8 +2,9 @@ import itertools
 
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.contrib import auth
-from django.shortcuts import render
 from django.http import JsonResponse
+from django.shortcuts import render
+from django.template.loader import render_to_string
 
 def rmerge(*args, **kwargs):
     seq_mode = kwargs.get('seq_mode', 'replace')
@@ -57,7 +58,7 @@ def render_mixed_mode(request, templates, additional={}):
     data = {}
 
     for key_name, template, ctx in templates:
-        markup = render(request, template, ctx).content
+        markup = render_to_string(template, request=request, context=ctx)
         data[key_name] = markup
 
     data.update(additional)
