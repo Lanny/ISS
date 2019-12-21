@@ -31,7 +31,7 @@ var ISSConfig = JSON.parse(
              }));
 
 gulp.task('clean', function() {
-  return gulp.src([ gifDir, cssDir, jsDir ])
+  return gulp.src([ gifDir, cssDir, jsDir ], { allowEmpty: true })
     .pipe(clean({read: false, force: true}));
 });
  
