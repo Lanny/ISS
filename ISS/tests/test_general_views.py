@@ -12,7 +12,7 @@ from django.utils import timezone
 
 from ISS.models import *
 from ISS import utils
-import tutils
+from . import tutils
 
 class GeneralViewTestCase(tutils.ForumConfigTestCase):
     forum_config = {'captcha_period': 0}
@@ -26,7 +26,6 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
 
         self.scrub_client = Client()
         self.scrub_client.force_login(self.scrub)
-
 
     def test_authed_users_can_access_index(self):
         path = reverse('forum-index')
@@ -44,6 +43,78 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
         response = self.scrub_client.get(path)
         self.assertEqual(len(response.context['categories']), 2)
         self.assertTrue(isinstance(response.context['forums_by_category'], dict))
+
+    def test_forum_page(self):
+        forum = Forum.objects.create(
+            name='The Heap',
+            description='The maximally garbage posts are on top'
+        )
+        t1 = Thread.objects.create(
+            title='old but stickied thread',
+            forum=forum,
+            stickied=True,
+            author=self.scrub)
+        t2 = Thread.objects.create(
+            title='hot new thread',
+            forum=forum,
+            author=self.scrub)
+
+        path = reverse('thread-index', kwargs={'forum_id': forum.pk})
+        response = self.scrub_client.get(path)
+        self.assertEqual(response.context['threads'][0]._thread, t1)
+
+    def test_unauthed_view_thread(self):
+        anon_client = Client()
+        tfc = ThreadFlag.objects.all().count()
+
+        path = reverse('thread', args=(Thread.objects.all()[0].pk,))
+        response = anon_client.get(path)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(tfc, ThreadFlag.objects.all().count())
+
+    def test_authed_view_thread(self):
+        tfc = ThreadFlag.objects.all().count()
+
+        path = reverse('thread', args=(Thread.objects.all()[0].pk,))
+        response = self.scrub_client.get(path)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(tfc+1, ThreadFlag.objects.all().count())
+
+    def test_authd_latest_threads(self):
+        alan = tutils.create_user()
+        alan_client = Client()
+        alan_client.force_login(alan)
+        sports = Forum.objects.create(
+            name='sports forum',
+            category=Category.objects.get(name='general')
+        )
+        intellectualism = Forum.objects.create(
+            name='4 intellectuals only',
+            category=Category.objects.get(name='general')
+        )
+        LatestThreadsForumPreference.objects.create(
+            poster=alan,
+            forum=sports,
+            include=False
+        )
+        t1 = tutils.create_thread(
+            self.scrub,
+            sports,
+            'baseball is better than hockey (you\'re batty)'
+        )
+        t2 = tutils.create_thread(
+            self.scrub,
+            intellectualism,
+            'have you read your SICP today?'
+        )
+
+        path = reverse('latest-threads')
+        response = alan_client.get(path)
+
+        self.assertEqual(response.status_code, 200)
+        threads = set([tf._thread.pk for tf in response.context['threads']])
+        self.assertFalse(t1.pk in threads)
+        self.assertTrue(t2.pk in threads)
 
     def test_threads_by_user(self):
         path = reverse('threads-by-user', kwargs={'user_id': self.scrub.pk})
@@ -138,7 +209,8 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
         response = self.scrub_client.get(path)
         found_trash_rule = False
         
-        for row in response.content.split('\n'):
+        rows = response.content.decode("utf-8").split('\n')
+        for row in rows:
             if row[0] == '#':
                 continue
 
@@ -257,7 +329,7 @@ class ThanksViewTestCase(TestCase):
         self.assertEqual(self.thankee.thanks_received.count(), 0)
 
     def test_noobs_cant_thanksforce(self):
-        resp = self.noob_thanker_client.post(self.url)
+        resp = self.noob_thanker_client.post(self.url, {})
         self.assertEqual(self.thankee.thanks_received.count(), 0)
 
 class PostFloodControlTestCase(tutils.ForumConfigTestCase):
@@ -544,7 +616,7 @@ class RegistrationTestCase(AbstractRegistrationTestCase):
             login_path, { 'username': username, 'password': password })
         user = auth.get_user(client)
 
-        self.assertFalse(user.is_authenticated())
+        self.assertFalse(user.is_authenticated)
 
     def test_email_verification_invalid_code(self):
         path = reverse('verify-email')
@@ -618,7 +690,7 @@ class EmailNormalizationTestCase(AbstractRegistrationTestCase):
         self._register(username="I.N.", email= "isaac.newton@damnthespam.com")
         self.assertEqual(Poster.objects.count(), user_count)
 
-    def test_diff_addres(self):
+    def test_diff_address(self):
         self._register(username="CM1", email= "Colin.Maclaurin@gov.scot")
         user_count = Poster.objects.count()
         self._register(username="CM2", email= "Maclaurin.Colin@gov.scot")
@@ -792,7 +864,7 @@ class GenerateInviteCodeTestCase(tutils.ForumConfigTestCase):
  
 class LoginTestCase(TestCase):
     def setUp(self):
-        self.password = u'私わ大津展之です'
+        self.password = '私わ大津展之です'
         self.path = reverse('login')
 
         self.otsu = tutils.create_user()
@@ -823,7 +895,7 @@ class LoginTestCase(TestCase):
 
         user = auth.get_user(self.otsu_client)
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(user.is_authenticated())
+        self.assertFalse(user.is_authenticated)
 
 class UserCPTestCase(tutils.ForumConfigTestCase):
     forum_config = {'captcha_period': 0}
@@ -921,7 +993,7 @@ class ReportPostTestCase(tutils.ForumConfigTestCase):
         pm_count = PrivateMessage.objects.count()
 
         max_len = Poster._meta.get_field('username').max_length
-        username = u'I\'m a pretty princess'
+        username = 'I\'m a pretty princess'
         username = username + ('!' * (max_len - len(username)))
 
         fin = tutils.create_user(post_count=1, username=username)

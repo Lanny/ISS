@@ -88,5 +88,5 @@ class LatestThreadsForumPreferenceAdmin(admin.ModelAdmin):
     list_display = ('name', 'poster', 'forum', 'include')
 
     def name(self, obj):
-        return unicode(obj)
+        return str(obj)
 

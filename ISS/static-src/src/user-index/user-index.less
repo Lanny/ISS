@@ -6,7 +6,6 @@
   }
 }
 
-
 .user-index {
   .find-user {
     margin-bottom: @content_margin_bottom;
@@ -24,14 +23,19 @@
         .input-wrapper {
           display: flex;
 
-          input[type="text"], .auto-suggest-wrapper {
+          & > input[type="text"], .auto-suggest-wrapper {
             flex: 1;
+          }
+
+          input[type="text"] {
+            height: 100%;
           }
 
           input[type="submit"] {
             .small-btn();
             .primary();
             margin: 0 0 0 5px;
+            width: auto;
           }
         }
       }

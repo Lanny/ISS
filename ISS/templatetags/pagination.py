@@ -1,5 +1,5 @@
-import urlparse
-import urllib
+import urllib.parse
+import urllib.request, urllib.parse, urllib.error
 
 from django import template
 
@@ -46,19 +46,19 @@ def unfuck_percent_encoded_utf8(fucked_unicode_str):
     #
     # This is probably pretty slow but I'm fairly confident it's correct.
 
-    if isinstance(fucked_unicode_str, unicode):
+    if isinstance(fucked_unicode_str, str):
         return ''.join([(chr(ord(c)) if ord(c) < 256 else c.encode('utf-8')) for c in fucked_unicode_str])
     else:
         return str(fucked_unicode_str)
 
 RANGE_WIDTH = 3
-@register.assignment_tag
+@register.simple_tag
 def nice_page_set(page):
     pages = []
-    pages.extend(range(1, RANGE_WIDTH+1))
-    pages.extend(range(page.paginator.num_pages-RANGE_WIDTH,
-                       page.paginator.num_pages+1))
-    pages.extend(range(page.number-RANGE_WIDTH, page.number+RANGE_WIDTH))
+    pages.extend(list(range(1, RANGE_WIDTH+1)))
+    pages.extend(list(range(page.paginator.num_pages-RANGE_WIDTH,
+                       page.paginator.num_pages+1)))
+    pages.extend(list(range(page.number-RANGE_WIDTH, page.number+RANGE_WIDTH)))
 
     pages = [n for n in pages if n <= page.paginator.num_pages and n > 0]
     pages = list(set(pages))
@@ -75,19 +75,19 @@ def nice_page_set(page):
 
 @register.filter
 def mixin_page_param(base_url, page_number):
-    parsed_url = urlparse.urlparse(base_url)
-    query = urlparse.parse_qs(parsed_url.query)
+    parsed_url = urllib.parse.urlparse(base_url)
+    query = urllib.parse.parse_qs(parsed_url.query)
     query['p'] = [page_number]
 
     one_pairs = []
-    for key, values in query.items():
+    for key, values in list(query.items()):
         for value in values:
             one_pairs.append((
                 unfuck_percent_encoded_utf8(key),
                 unfuck_percent_encoded_utf8(value)))
 
-    qs = urllib.urlencode(one_pairs)
+    qs = urllib.parse.urlencode(one_pairs)
     url_dict = parsed_url._asdict()
     url_dict['query'] = qs
     
-    return urlparse.urlunparse(urlparse.ParseResult(**url_dict))
+    return urllib.parse.urlunparse(urllib.parse.ParseResult(**url_dict))

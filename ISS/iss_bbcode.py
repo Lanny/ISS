@@ -1,11 +1,12 @@
 import bbcode
-import urlparse
+import urllib.parse
 import re
-import utils
+from . import utils
 import random
 
 from django.utils import html
 from django.urls import reverse, NoReverseMatch
+from functools import reduce
 
 shortcode_pat = None
 shortcode_map = None
@@ -48,7 +49,7 @@ def _is_http_url(url):
     return prot in ('http', 'https')
 
 def _embed_youtube(url):
-    query = urlparse.parse_qs(url.query, keep_blank_values=False)
+    query = urllib.parse.parse_qs(url.query, keep_blank_values=False)
 
     if 'v' not in query:
         raise EmbeddingNotSupportedException('No video ID provided.')
@@ -70,7 +71,7 @@ def _embed_bitchute(url):
     return _bc_embed_pattern % match.group(1)
 
 def _embed_youtube_shortcode(url):
-    query = urlparse.parse_qs(url.query, keep_blank_values=False)
+    query = urllib.parse.parse_qs(url.query, keep_blank_values=False)
     stripped_path = url.path[1:]
     t = query.get('t', ['0'])[0]
 
@@ -87,7 +88,7 @@ def _embed_youtube_shortcode(url):
     return _yt_embed_pattern % (stripped_path, t)
 
 def _embed_html5_video(url):
-    url_str = urlparse.urlunparse(url)
+    url_str = urllib.parse.urlunparse(url)
     template = '<video controls loop muted class="video-embed" src="%s"></video>' 
     return template % url_str
 
@@ -103,7 +104,7 @@ def _video_markup_for_url(urlstr):
         )
 
     try :
-        url = urlparse.urlparse(urlstr)
+        url = urllib.parse.urlparse(urlstr)
     except ValueError:
         # Apparently urlparse can throw exceptions. That probably shouldn't
         # have been surprising.
@@ -296,7 +297,7 @@ def _add_shortcode_preprocessor(parser):
 
     if not shortcode_pat:
         scp = []
-        for name, _ in shortcode_map.items():
+        for name, _ in list(shortcode_map.items()):
             scp.append(name)
 
         shortcode_pat = re.compile(':(%s):' % '|'.join(scp), flags=re.IGNORECASE)

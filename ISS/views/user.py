@@ -325,6 +325,11 @@ class VerifyEmail(utils.MethodSplitView):
 
         try :
             poster = Poster.objects.get(email_verification_code=code)
+
+            # System users can not verify accounts
+            if poster.email == 'not.a.email.address@nowhere.space':
+                return self._error_out(request)
+
         except Poster.DoesNotExist:
             return self._error_out(request)
 

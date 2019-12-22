@@ -5,7 +5,7 @@ from django.utils import timezone
 
 from ISS.models import *
 from ISS.management.commands.check_db import Command as CheckDBCommand
-import tutils
+from . import tutils
 
 class CheckDBTestCase(TestCase):
     def setUp(self):

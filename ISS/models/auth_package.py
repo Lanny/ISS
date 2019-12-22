@@ -58,7 +58,7 @@ class AuthPackage(models.Model):
         max_length=256,
         null=False,
         default='PERMISSIVE',
-        choices=[(name, name) for name in PACKAGE_MAP.keys()])
+        choices=[(name, name) for name in list(PACKAGE_MAP.keys())])
 
     logic_config = models.TextField(blank=True)
 
@@ -80,8 +80,8 @@ class AuthPackage(models.Model):
         if not self.check_request(request):
             raise PermissionDenied('Not authorized.')
 
-    def __unicode__(self):
-        return u'%s (%d)' % (self.logic_package, self.pk)
+    def __str__(self):
+        return '%s (%d)' % (self.logic_package, self.pk)
 
 class AccessControlGroup(models.Model):
     base_groups = (
@@ -100,7 +100,7 @@ class AccessControlGroup(models.Model):
         acg = None
 
         if not zero_or_one_qs:
-            acg_descs = filter(lambda desc: desc[0] == name, cls.base_groups)
+            acg_descs = [desc for desc in cls.base_groups if desc[0] == name]
             if acg_descs:
                 (name,) = acg_descs[0]
                 acg = cls(name=name)
@@ -120,7 +120,7 @@ class AccessControlGroup(models.Model):
             .filter(pk=poster.pk)
             .count())
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class AccessControlList(models.Model):
@@ -191,7 +191,7 @@ class AccessControlList(models.Model):
         acl = None
 
         if not zero_or_one_qs:
-            acl_descs = filter(lambda desc: desc[0] == name, cls.base_acls)
+            acl_descs = [desc for desc in cls.base_acls if desc[0] == name]
             if acl_descs:
                 # ACL doesn't exist in the DB but it is in the base_acls list,
                 # so we'll create it.
@@ -215,6 +215,6 @@ class AccessControlList(models.Model):
 
         return acl
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 

@@ -163,8 +163,8 @@ class Command(BaseCommand):
             try:
                 post_id = post_pk_map[thanks['contentid']]
             except KeyError:
-                print ('Error migrating thanks: post %d was not found'
-                       % thanks['contentid'])
+                print(('Error migrating thanks: post %d was not found'
+                       % thanks['contentid']))
             else:
                 new_thanks = Thanks(
                     thanker_id=user_pk_map[thanks['userid']],
@@ -173,7 +173,7 @@ class Command(BaseCommand):
 
                 try:
                     new_thanks.save()
-                except IntegrityError, e:
+                except IntegrityError as e:
                     import pdb; pdb.set_trace()
 
         return
@@ -187,24 +187,24 @@ class Command(BaseCommand):
                                       database=db_name)
         cursor = cnx.cursor(dictionary=True, buffered=True)
 
-        print 'Migrating users...'
+        print('Migrating users...')
         user_pk_map = self.mig_users(cnx, cursor)
 
-        print 'Done.\nMigrating forums...'
+        print('Done.\nMigrating forums...')
         forum_pk_map = self.mig_forums(cnx, cursor)
 
-        print 'Done.\nMigrating threads...'
+        print('Done.\nMigrating threads...')
         thread_pk_map, op_pk_map = self.mig_threads(cnx, cursor, forum_pk_map,
                                                     user_pk_map)
 
-        print 'Done.\nMigrating posts...'
+        print('Done.\nMigrating posts...')
         post_pk_map = self.mig_posts(cnx, cursor, thread_pk_map, user_pk_map)
 
         if mig_thanks:
-            print 'Done.\nMigrating thanks...'
+            print('Done.\nMigrating thanks...')
             post_pk_map.update(op_pk_map)
             self.mig_thanks(cnx, cursor, user_pk_map, post_pk_map)
 
-        print 'Done.'
+        print('Done.')
         
         cnx.close()

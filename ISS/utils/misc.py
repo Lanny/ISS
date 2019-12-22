@@ -2,8 +2,9 @@ import itertools
 
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.contrib import auth
-from django.shortcuts import render
 from django.http import JsonResponse
+from django.shortcuts import render
+from django.template.loader import render_to_string
 
 def rmerge(*args, **kwargs):
     seq_mode = kwargs.get('seq_mode', 'replace')
@@ -15,7 +16,7 @@ def rmerge(*args, **kwargs):
     if len(args) < 1:
         raise TypeError('rmerge() takes at least one argument (0 given)')
 
-    arg_types = map(type, args)
+    arg_types = list(map(type, args))
     ret_type = arg_types[0]
     homogenous = all([t == ret_type for t in arg_types])
     is_list = issubclass(ret_type, list)
@@ -33,7 +34,7 @@ def rmerge(*args, **kwargs):
         elif seq_mode == 'merge':
             retlen = max([len(s) for s in args])
             merged = []
-            for pos_set in itertools.izip_longest(*args):
+            for pos_set in itertools.zip_longest(*args):
                 pos_set = [x for x in pos_set if x != None]
                 pos = rmerge(*pos_set, seq_mode=seq_mode)
                 merged.append(pos)
@@ -57,7 +58,7 @@ def render_mixed_mode(request, templates, additional={}):
     data = {}
 
     for key_name, template, ctx in templates:
-        markup = render(request, template, ctx).content
+        markup = render_to_string(template, request=request, context=ctx)
         data[key_name] = markup
 
     data.update(additional)

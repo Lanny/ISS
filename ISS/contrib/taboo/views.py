@@ -6,8 +6,8 @@ from django.shortcuts import render, get_object_or_404
 
 from ISS import models as iss_models
 from ISS.utils import MethodSplitView
-from models import *
-from apps import TabooConfig
+from .models import *
+from .apps import TabooConfig
 
 EXT = TabooConfig.name
 

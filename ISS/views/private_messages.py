@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
@@ -8,12 +8,13 @@ from django.shortcuts import render, get_object_or_404
 from ISS import utils, forms
 from ISS.models import *
 
+
 @login_required
 def inbox(request):
     messages = (request.user
-            .privatemessage_set
-            .filter(receiver=request.user)
-            .order_by('-created'))
+        .privatemessage_set
+        .filter(receiver=request.user)
+        .order_by('-created'))
 
     items_per_page = utils.get_config('general_items_per_page')
     paginator = Paginator(messages, items_per_page)
@@ -34,12 +35,13 @@ def inbox(request):
 
     return render(request, 'private_messages/pm_list.html', ctx)
 
+
 @login_required
 def sent(request):
     messages = (request.user
-            .privatemessage_set
-            .filter(sender=request.user)
-            .order_by('-created'))
+        .privatemessage_set
+        .filter(sender=request.user)
+        .order_by('-created'))
 
     items_per_page = utils.get_config('general_items_per_page')
     paginator = Paginator(messages, items_per_page)

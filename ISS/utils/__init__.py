@@ -1,5 +1,4 @@
-import urlparse
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import re
 import os
 import datetime
@@ -12,7 +11,7 @@ import random
 from lxml import etree
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator, Page
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
@@ -84,7 +83,7 @@ def reverse_absolute(*args, **kwargs):
             reverse(*args, **kwargs))
 
 def get_posts_per_page(poster):
-    if poster.is_authenticated():
+    if poster.is_authenticated:
         return poster.posts_per_page
     else:
         return get_config('posts_per_thread_page')
@@ -109,10 +108,10 @@ def get_posts_page(qs, request):
     return page
 
 def bandcamp_markup_for_url(urlstr):
-    url = urlparse.urlparse(urlstr)
+    url = urllib.urlparse(urlstr)
 
     parser = etree.HTMLParser(no_network=False)
-    req = urllib2.urlopen(urlstr)
+    req = urllib.request.urlopen(urlstr)
     tree = etree.parse(req, parser)
     embed_meta = tree.xpath('//meta[@property="og:video:secure_url"]')
     embed_url = embed_meta[0].get('content')
@@ -204,7 +203,7 @@ class ForumFascet(object):
         prop = getattr(self._forum, field)
 
         if field in ('is_unread',):
-            if not self._request.user.is_authenticated():
+            if not self._request.user.is_authenticated:
                 return True
 
             return prop(self._request.user)
@@ -224,7 +223,7 @@ class MappingPaginator(Paginator):
         self._map_function = f
 
     def _get_page(self, object_list, number, paginator):
-        object_list = map(self._map_function, object_list)
+        object_list = list(map(self._map_function, object_list))
 
         return Page(object_list, number, paginator)
 
@@ -234,7 +233,7 @@ def parse_duration(time_str):
         return
 
     seconds = 0
-    for (name, comp) in parts.groupdict().items():
+    for (name, comp) in list(parts.groupdict().items()):
         if comp:
             seconds += int(comp) * SECONDS_IN[name]
 
@@ -320,7 +319,7 @@ GENERIC_CAPTCHA_LABEL = 'Captcha (required for your first %d posts)' % (
 )
 
 def conditionally_captchatize(request, Form):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return Form
 
     post_count = request.user.post_set.count()

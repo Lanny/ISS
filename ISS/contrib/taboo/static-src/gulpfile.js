@@ -10,7 +10,7 @@ var staticDir = '../static',
   cssDir = path.join(staticDir, 'taboo/css');
 
 gulp.task('clean', function() {
-  return gulp.src([ cssDir ])
+  return gulp.src([ cssDir ], { allowEmpty: true })
     .pipe(clean({read: false, force: true}));
 });
  
