@@ -80,7 +80,7 @@ class AuthPackage(models.Model):
         if not self.check_request(request):
             raise PermissionDenied('Not authorized.')
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s (%d)' % (self.logic_package, self.pk)
 
 class AccessControlGroup(models.Model):
@@ -120,7 +120,7 @@ class AccessControlGroup(models.Model):
             .filter(pk=poster.pk)
             .count())
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class AccessControlList(models.Model):
@@ -215,6 +215,6 @@ class AccessControlList(models.Model):
 
         return acl
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 

@@ -13,7 +13,7 @@ class StaticPage(models.Model):
     page_title = models.CharField(max_length=1024)
     content = models.TextField()
 
-    def __unicode__(self):
+    def __str__(self):
         return 'StaticPage: %s' % self.page_id
 
 class FilterWord(models.Model):
@@ -79,7 +79,7 @@ class Ban(models.Model):
 
         return max(self.end_date - timezone.now(), timedelta(seconds=0))
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Ban on %s for reason: %s' % (
             self.subject.username, self.reason)
 

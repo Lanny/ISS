@@ -31,6 +31,6 @@ class RegistrationCode(models.Model):
     def get_reg_url(self):
         return reverse('register-with-code') + '?code=%s' % self.code
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s Registration Code' % (
             'Used' if self.used_by != None else 'Unused')

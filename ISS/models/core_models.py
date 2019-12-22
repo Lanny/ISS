@@ -296,7 +296,7 @@ class Category(models.Model):
     name = models.CharField(max_length=256)
     priority = models.IntegerField(default=0, null=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 def default_auth_pack():
@@ -365,7 +365,7 @@ class Forum(models.Model):
     def get_url(self):
         return reverse('thread-index', kwargs={'forum_id': self.pk})
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class Thread(models.Model):
@@ -490,7 +490,7 @@ class Thread(models.Model):
     def update_subscriptions_on_post_deletion(self, post):
         pass
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
 class Post(models.Model):
@@ -677,7 +677,7 @@ class PrivateMessage(models.Model):
         if commit:
             self.save()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.subject
 
     @classmethod
