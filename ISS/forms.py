@@ -13,7 +13,7 @@ from django.urls import reverse
 from django.utils import timezone, safestring
 from PIL import Image
 
-from tripphrase import tripphrase
+from tripphrase.tripphrase import tripphrase
 
 from . import utils
 from .models import *
