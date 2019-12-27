@@ -1,7 +1,7 @@
 # DEVNOTES
 
 ## Code Layout
-
+There are to main parts to the ISS code, the frontend and the backend. The backend consists of the typical Django components, views, models, form etc. The fontend is a gulp pipeline that produces static assets for the site. It lives under the `ISS/static-src` directory. It outputs into the static directory which the backend either serves directly in development mode or processes to be served by something like nginx in production.
 
 ## Setting it up
 
