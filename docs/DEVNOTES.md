@@ -1,7 +1,7 @@
 # DEVNOTES
 
 ## Code Layout
-There are to main parts to the ISS code, the frontend and the backend. The backend consists of the typical Django components, views, models, form etc. The fontend is a gulp pipeline that produces static assets for the site. It lives under the `ISS/static-src` directory. It outputs into the static directory which the backend either serves directly in development mode or processes to be served by something like nginx in production.
+There are two main parts to the ISS code, the frontend and the backend. The backend consists of the typical Django components, views, models, form etc. The fontend is a gulp pipeline that produces static assets for the site. It lives under the `ISS/static-src` directory. It outputs into the static directory which the backend either serves directly in development mode or processes to be served by something like nginx in production.
 
 ## Setting it up
 
@@ -11,7 +11,7 @@ The easiest way to get a development environment up and running is to use the do
 docker-compose up --build
 ```
 
-The docker containers use a hefty amount of storage and come with some startup overhead. This is usually not a big deal, but if you'd like to run ISS without dockerization see the [legacy setup instructions](../blob/master/docs/SETUP_LEGACY.md).
+The docker containers use a hefty amount of storage and come with some startup overhead. This is usually not a big deal, but if you'd like to run ISS without dockerization see the [legacy setup instructions](../docs/SETUP_LEGACY.md).
 
 ### Creating an admin
 You can simply:
