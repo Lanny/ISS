@@ -202,7 +202,7 @@ class ThreadActions(utils.MethodSplitView):
         for post in posts:
             content = render_to_string(
                 'pmt/off_topic_post.bbc',
-                { 'post': post.content })
+                { 'post': post })
 
             iss_models.PrivateMessage.send_pm(
                 iss_models.Poster.get_or_create_system_user(),

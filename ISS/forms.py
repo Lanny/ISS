@@ -328,10 +328,10 @@ class ThreadActionForm(forms.Form):
     def _get_action_field(cls):
         actions_choices = [('edit-thread', 'Edit Thread'),
                    ('delete-posts', 'Delete Posts'),
+                   ('off-topic-posts', 'Delete Posts as Off Topic'),
                    ('sticky-thread', 'Sticky Thread'),
                    ('lock-thread', 'Lock Thread'),
-                   ('trash-thread', 'Trash Thread'),
-                   ('off-topic-posts', 'Off-Topic Posts')]
+                   ('trash-thread', 'Trash Thread')]
         actions_choices.sort()
         moveto_choices = []
 
