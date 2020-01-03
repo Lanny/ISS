@@ -1,5 +1,7 @@
+{% autoescape off %}
 The following post in the thread [url="{{ post.thread.get_url }}"]{{ post.thread.title }}[/url] been deleted as off-topic:
 
 {{ post.quote_content }}
 
 Continuing to make off-topic posts may lead to a ban.
+{% endautoescape %}
