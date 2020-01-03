@@ -7,10 +7,13 @@
 
       $('body').on('click', '.quote', function(e) {
         e.preventDefault();
-
+        var button = $(e.currentTarget)
         var setFocus = !e.shiftKey;
         var quoteFetchUrl = $(e.target).attr('data-bbc-url'),
           editor = $('.quick-reply').data('editor');
+
+        if (button.is('[disabled]')) return;
+        button.prop('disabled', 'true')
 
         $.getJSON(quoteFetchUrl)
           .done(function(data) {

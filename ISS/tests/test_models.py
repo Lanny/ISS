@@ -178,8 +178,8 @@ class PostTestCase(tutils.ForumConfigTestCase):
 class PosterUsernameNormalizationTestCase(SimpleTestCase):
     def assertNormEqual(self, username_one, username_two):
         return self.assertEqual(
-                Poster.normalize_username(username_one),
-                Poster.normalize_username(username_two))
+                Poster.iss_normalize_username(username_one),
+                Poster.iss_normalize_username(username_two))
 
     def test_capitalization(self):
         self.assertNormEqual('Lanny', 'lanny')

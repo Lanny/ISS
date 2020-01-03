@@ -39,7 +39,7 @@ def update_forum_last_update(sender, instance, created, **kwargs):
 @receiver(signals.pre_save, sender=Poster)
 def set_normalized_username(sender, instance, **kwargs):
     if not instance.normalized_username:
-        instance.normalized_username = Poster.normalize_username(instance.username)
+        instance.normalized_username = Poster.iss_normalize_username(instance.username)
 
 @receiver(signals.pre_save, sender=Poster)
 def set_normalized_email(sender, instance, **kwargs):

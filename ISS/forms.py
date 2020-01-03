@@ -65,7 +65,7 @@ class PosterSelectField(forms.CharField):
         for username in value.split(','):
             if not username: continue
 
-            norm = Poster.normalize_username(username)
+            norm = Poster.iss_normalize_username(username)
 
             try:
                 user = Poster.objects.get(normalized_username=norm)
@@ -428,7 +428,7 @@ class ISSAuthenticationForm(AuthenticationForm):
         (or rather normalized image of their username) exists.
         """
         username = self.cleaned_data['username']
-        normalized = Poster.normalize_username(username)
+        normalized = Poster.iss_normalize_username(username)
 
         try:
             user = Poster.objects.get(normalized_username=normalized)
@@ -447,10 +447,10 @@ class RegistrationForm(UserCreationForm):
 
     def clean_username(self):
         username = self.cleaned_data['username']
-        norm_username = Poster.normalize_username(username)
+        norm_username = Poster.iss_normalize_username(username)
         forbidden_names = {
-            Poster.normalize_username(utils.get_config('junk_user_username')),
-            Poster.normalize_username(utils.get_config('system_user_username'))
+            Poster.iss_normalize_username(utils.get_config('junk_user_username')),
+            Poster.iss_normalize_username(utils.get_config('system_user_username'))
         }
 
         if norm_username in forbidden_names:
@@ -527,7 +527,7 @@ class InitiatePasswordRecoveryForm(forms.Form):
         ret = super(InitiatePasswordRecoveryForm, self).clean(*args, **kwargs)
 
         username = self.cleaned_data.get('username', None)
-        normalized = Poster.normalize_username(username)
+        normalized = Poster.iss_normalize_username(username)
         posters = Poster.objects.filter(normalized_username=normalized)
 
         if posters.count() != 1:

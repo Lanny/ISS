@@ -120,11 +120,6 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def can_post(self):
         return self.is_active
 
-    def clean(self):
-        # Django decided to declare their own normalize_username and this calls
-        # into that so we'll just skip this step all together.
-        pass
-
     def invalidate_user_title_cache(self):
         cache_key = self._user_title_cache_key % self.pk
         cache.delete(cache_key)
@@ -261,7 +256,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     @classmethod
     def _get_or_create_user(cls, username):
         username = str(username)
-        norm_username = cls.normalize_username(username)
+        norm_username = cls.iss_normalize_username(username)
 
         try:
             user = cls.objects.get(normalized_username=norm_username)
@@ -280,11 +275,16 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         return user
 
     @classmethod
-    def normalize_username(cls, username):
+    def iss_normalize_username(cls, username):
         norm = HomoglyphNormalizer.normalize_homoglyphs(username)
         norm = re.sub('\s', '', norm)
 
         return norm
+
+    @classmethod
+    def normalize_username(cls, username):
+        # We have our own username normalization, so we disable django's
+        return username
 
     def embed_images(self):
         return self.allow_image_embed

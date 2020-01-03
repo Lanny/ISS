@@ -128,7 +128,7 @@ class InitiatePasswordRecovery(utils.MethodSplitView):
         form = forms.InitiatePasswordRecoveryForm(request.POST)
 
         if form.is_valid():
-            normalized = Poster.normalize_username(
+            normalized = Poster.iss_normalize_username(
                 form.cleaned_data['username'])
             user = Poster.objects.get(normalized_username=normalized)
             user.recovery_code = str(uuid.uuid4())
@@ -422,7 +422,7 @@ class UserIndex(utils.MethodSplitView):
 class FindUser(utils.MethodSplitView):
     def POST(self, request):
         username = request.POST.get('username', '')
-        norm_username = Poster.normalize_username(username)
+        norm_username = Poster.iss_normalize_username(username)
 
         try:
             poster = Poster.objects.get(normalized_username=norm_username)
@@ -442,7 +442,7 @@ def view_generated_invite(request):
 
 def user_fuzzy_search(request):
     query = request.GET.get('q', '')
-    nquery = Poster.normalize_username(query)
+    nquery = Poster.iss_normalize_username(query)
     matches = (Poster.objects
         .filter(normalized_username__contains=nquery, is_active=True)
         .annotate(post_count=Count('post'))
