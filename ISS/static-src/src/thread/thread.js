@@ -12,8 +12,8 @@
         var quoteFetchUrl = $(e.target).attr('data-bbc-url'),
           editor = $('.quick-reply').data('editor');
 
-        if (button.is('[disabled]')) return;
-        button.prop('disabled', 'true')
+        if (button.is('[aria-disabled="true"]')) return;
+        button.attr('aria-disabled', 'true')
 
         $.getJSON(quoteFetchUrl)
           .done(function(data) {
@@ -21,6 +21,9 @@
           })
           .fail(function(data) {
             alert('Failed to fetch quote.');
+          })
+          .always(function() {
+            button.attr('aria-disabled', 'false')
           });
       });
 
