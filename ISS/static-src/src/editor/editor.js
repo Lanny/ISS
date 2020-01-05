@@ -86,13 +86,20 @@
         this._edButtonContainer = $('<div class="editor-buttons">');
 
         for (var i=0; i<wrapOperations.length; i++) {
-          var button = $('<button>')
-            .addClass('wrap-operation')
-            .addClass(wrapOperations[i].buttonClass)
-            .attr('title', wrapOperations[i].name)
-            .attr('tabindex', -1)
-            .data('wrapOp', wrapOperations[i])
-            .appendTo(this._edButtonContainer);
+          var op = wrapOperations[i],
+            titleText = op.name +
+              ' (ctrl+' +
+              (op.useAlt ? 'alt+' : '') +
+              String.fromCharCode(op.hotKeyCode) +
+              ')';
+
+          $('<button>')
+              .addClass('wrap-operation')
+              .addClass(op.buttonClass)
+              .attr('title', titleText)
+              .attr('tabindex', -1)
+              .data('wrapOp', op)
+              .appendTo(this._edButtonContainer);
         }
 
         this._ta.before(this._edButtonContainer);
