@@ -3,9 +3,8 @@
 import datetime
 import json
 
-from django.conf import settings
 from django.core import mail
-from django.contrib.auth import authenticate, get_user
+from django.contrib.auth import authenticate
 from django.test import TestCase, Client
 from django.urls import reverse, resolve
 from django.utils import timezone
@@ -13,6 +12,7 @@ from django.utils import timezone
 from ISS.models import *
 from ISS import utils
 from . import tutils
+
 
 class GeneralViewTestCase(tutils.ForumConfigTestCase):
     forum_config = {'captcha_period': 0}
@@ -126,6 +126,28 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
         path = reverse('user-profile', kwargs={'user_id': self.scrub.pk})
         response = self.scrub_client.get(path)
         self.assertEqual(response.status_code, 200)
+
+    def test_get_new_post_page(self):
+        thread = Thread.objects.all()[0]
+        path = reverse('new-reply', kwargs={'thread_id': thread.pk})
+        response = self.scrub_client.get(path)
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_new_post_page_anon(self):
+        thread = Thread.objects.all()[0]
+        path = reverse('new-reply', kwargs={'thread_id': thread.pk})
+        anon_client = Client()
+        response = anon_client.get(path)
+        self.assertEqual(response.status_code, 302)
+
+    def test_get_quote(self):
+        post = Post.objects.all()[0]
+        path = reverse('get-quote', kwargs={'post_id': post.pk})
+        response = self.scrub_client.get(path)
+        payload = json.loads(response.content)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('content' in payload)
 
     def test_new_post(self):
         thread = Thread.objects.all()[0]
@@ -668,6 +690,9 @@ class EmailNormalizationTestCase(AbstractRegistrationTestCase):
         self.client = Client()
         self.path = reverse('register')
 
+    def _mock_send_mail(self, *args, **kwargs):
+        return
+
     def test_identical_address(self):
         email = "Colin.Maclaurin@gov.scot"
         self._register(username="CM1", email=email)
@@ -689,6 +714,7 @@ class EmailNormalizationTestCase(AbstractRegistrationTestCase):
         user_count = Poster.objects.count()
         self._register(username="I.N.", email= "isaac.newton@damnthespam.com")
         self.assertEqual(Poster.objects.count(), user_count)
+
 
     def test_diff_address(self):
         self._register(username="CM1", email= "Colin.Maclaurin@gov.scot")
