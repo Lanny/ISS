@@ -4,11 +4,12 @@ import datetime
 import json
 
 from django.core import mail
-from django.contrib.auth import authenticate
 from django.test import TestCase, Client
 from django.urls import reverse, resolve
 from django.utils import timezone
 
+from ISS.models import (Category, Forum, LatestThreadsForumPreference, Thread,
+                        ThreadFlag, Post, Poster, StaticPage, AuthPackage)
 from ISS.models import *
 from ISS import utils
 from . import tutils
@@ -62,6 +63,7 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
         path = reverse('thread-index', kwargs={'forum_id': forum.pk})
         response = self.scrub_client.get(path)
         self.assertEqual(response.context['threads'][0]._thread, t1)
+        self.assertEqual(response.context['threads'][1]._thread, t2)
 
     def test_unauthed_view_thread(self):
         anon_client = Client()
@@ -153,7 +155,7 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
         thread = Thread.objects.all()[0]
         path = reverse('new-reply', kwargs={'thread_id': thread.pk})
         post_count = self.scrub.get_post_count()
-        response = self.scrub_client.post(path, {
+        self.scrub_client.post(path, {
             'content': 'P = NP?',
             'thread': thread.pk
         })
@@ -163,7 +165,7 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
         thread = Thread.objects.all()[0]
         path = reverse('new-reply', kwargs={'thread_id': thread.pk})
         post_count = self.scrub.get_post_count()
-        response = self.scrub_client.post(path, {
+        self.scrub_client.post(path, {
             'content': 'P = NP?' * 3000,
             'thread': thread.pk
         })
@@ -202,6 +204,19 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
                                               thread=thread)
         self.assertTrue(subscription.subscribed)
 
+    def test_subscribe_on_view(self):
+        self.scrub.auto_subscribe = 2
+        self.scrub.save()
+
+        okasaki = tutils.create_user(thread_count=1, post_count=1)
+        thread = Thread.objects.get(author=okasaki)
+
+        path = reverse('thread', args=(thread.pk,))
+        response = self.scrub_client.get(path)
+
+        subscription = ThreadFlag.objects.get(poster=self.scrub, thread=thread)
+        self.assertTrue(subscription.subscribed)
+
     def test_static_page_valid(self):
         StaticPage.objects.create(
                 page_id='cryptonomicon',
@@ -230,7 +245,7 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
         path = reverse('robots')
         response = self.scrub_client.get(path)
         found_trash_rule = False
-        
+
         rows = response.content.decode("utf-8").split('\n')
         for row in rows:
             if row[0] == '#':
@@ -244,6 +259,7 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
             found_trash_rule = found_trash_rule or rh == forum_url
 
         self.assertTrue(found_trash_rule)
+
 
 class EditPostTestCase(tutils.ForumConfigTestCase):
     forum_config = {
@@ -311,13 +327,14 @@ class EditPostTestCase(tutils.ForumConfigTestCase):
 
         old_content = self.scrub.post_set.all()[0].content
 
-        resp = self._attempt_edit(
+        self._attempt_edit(
             'use shellcode to reticulate splines',
             spec_client)
 
         new_content = self.scrub.post_set.all()[0].content
 
         self.assertEqual(old_content, new_content)
+
 
 class ThanksViewTestCase(TestCase):
     def setUp(self):
@@ -335,7 +352,6 @@ class ThanksViewTestCase(TestCase):
         self.noob_thanker_client = Client()
         self.noob_thanker_client.force_login(self.noob_thanker)
 
-
         self.thankee_client = Client()
         self.thankee_client.force_login(self.thankee)
 
@@ -343,16 +359,17 @@ class ThanksViewTestCase(TestCase):
                            args=(self.thankee.post_set.all()[0].pk,))
 
     def test_happy_path(self):
-        resp = self.thanker_client.post(self.url)
+        self.thanker_client.post(self.url)
         self.assertEqual(self.thankee.thanks_received.count(), 1)
 
     def test_can_not_thank_set(self):
-        resp = self.thankee_client.post(self.url)
+        self.thankee_client.post(self.url)
         self.assertEqual(self.thankee.thanks_received.count(), 0)
 
     def test_noobs_cant_thanksforce(self):
-        resp = self.noob_thanker_client.post(self.url, {})
+        self.noob_thanker_client.post(self.url, {})
         self.assertEqual(self.thankee.thanks_received.count(), 0)
+
 
 class PostFloodControlTestCase(tutils.ForumConfigTestCase):
     forum_config = {
@@ -372,7 +389,7 @@ class PostFloodControlTestCase(tutils.ForumConfigTestCase):
     def _attempt_new_post(self):
         prior_count = self.scrub.post_set.count()
 
-        response = self.scrub_client.post(self.path, {
+        self.scrub_client.post(self.path, {
             'content': 'foobar!',
             'thread': self.thread.pk
         })
@@ -403,6 +420,7 @@ class PostFloodControlTestCase(tutils.ForumConfigTestCase):
         tutils.create_posts(self.scrub, count + 1, bulk=True)
 
         self.assertEqual(self._attempt_new_post(), 1)
+
 
 class ThreadActionTestCase(TestCase):
     def setUp(self):
@@ -438,6 +456,7 @@ class ThreadActionTestCase(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(self.thread.post_set.count(), 8)
+
 
 class AdminThreadCreationForum(TestCase):
     def setUp(self):
@@ -484,12 +503,13 @@ class AdminThreadCreationForum(TestCase):
         })
         self.assertEqual(response.status_code, 403)
 
+
 class PasswordResetTestCase(TestCase):
     def setUp(self):
         self.franz = tutils.create_user()
         self.franz.email = 'J.K@bank.gov'
         self.franz.save()
-        
+
         self.franz_client = Client()
         self.franz_client.force_login(self.franz)
 
@@ -503,7 +523,7 @@ class PasswordResetTestCase(TestCase):
         self.franz = Poster.objects.get(pk=self.franz.pk)
 
     def _set_recovery_code(self):
-        response = self.franz_client.post(self.issue_path, {
+        self.franz_client.post(self.issue_path, {
             'username': self.franz.username
         })
 
@@ -515,7 +535,7 @@ class PasswordResetTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_invalid_email_addr(self):
-        response = self.franz_client.post(self.issue_path, {
+        self.franz_client.post(self.issue_path, {
             'username': 'notarealusername'
         })
         self._update_franz()
@@ -559,11 +579,10 @@ class PasswordResetTestCase(TestCase):
         self.assertNotEqual(new_pass, old_pass)
         self.assertEqual(self.franz.recovery_code, None)
 
-
     def test_invalid_recovery_post(self):
         self._set_recovery_code()
         self._update_franz()
-        response = self.franz_client.post(
+        self.franz_client.post(
             self.reset_path,
             {
                 'password': 'justice',
@@ -588,6 +607,7 @@ class PasswordResetTestCase(TestCase):
             })
         self.assertEqual(response.status_code, 404)
 
+
 class AbstractRegistrationTestCase(tutils.ForumConfigTestCase):
     def _register(self,
                   username="Leslie Lamport",
@@ -604,6 +624,7 @@ class AbstractRegistrationTestCase(tutils.ForumConfigTestCase):
 
         return response
 
+
 class RegistrationTestCase(AbstractRegistrationTestCase):
     forum_config = {
         'recaptcha_settings': None,
@@ -617,28 +638,25 @@ class RegistrationTestCase(AbstractRegistrationTestCase):
 
     def test_happy_path(self):
         initial_user_count = Poster.objects.count()
-        response = self._register() 
+        self._register()
         self.assertEqual(Poster.objects.count(), initial_user_count + 1)
 
     def test_poster_starts_inavtive(self):
-        username =  'Leslie Lamport'
-        response = self._register() 
+        username = 'Leslie Lamport'
+        self._register()
         leslie = Poster.objects.get(username=username)
         self.assertFalse(leslie.is_active)
 
     def test_poster_cant_login(self):
         username = 'Leslie Lamport'
         password = 'BD08081890'
-        response = self._register(username=username, password=password) 
-        leslie = Poster.objects.get(username=username)
+        self._register(username=username, password=password)
 
-        login_path  = reverse('login')
+        login_path = reverse('login')
         client = Client()
-        response = client.post(
-            login_path, { 'username': username, 'password': password })
-        user = auth.get_user(client)
+        client.post(login_path, {'username': username, 'password': password})
 
-        self.assertFalse(user.is_authenticated)
+        self.assertTrue('_auth_user_id' not in client.session)
 
     def test_email_verification_invalid_code(self):
         path = reverse('verify-email')
