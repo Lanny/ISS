@@ -9,7 +9,8 @@ from django.urls import reverse, resolve
 from django.utils import timezone
 
 from ISS.models import (Category, Forum, LatestThreadsForumPreference, Thread,
-                        ThreadFlag, Post, Poster, StaticPage, AuthPackage)
+                        ThreadFlag, Post, Poster, StaticPage, AuthPackage,
+                        PrivateMessage)
 from ISS.models import *
 from ISS import utils
 from . import tutils
@@ -456,6 +457,22 @@ class ThreadActionTestCase(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(self.thread.post_set.count(), 8)
+
+    def test_delete_as_off_topic(self):
+        old_pm_count = PrivateMessage.objects.all().count()
+
+        path = reverse('thread-action', kwargs={'thread_id': self.thread.pk})
+        posts_to_delete = self.thread.post_set.order_by('-created')[5:7]
+
+        response = self.admin_client.post(path, {
+            'action': 'off-topic-posts',
+            'post': [p.pk for p in posts_to_delete]
+        })
+
+        self.assertEqual(response.status_code, 302)
+        new_pm_count = PrivateMessage.objects.all().count()
+        # two PM rows generated per post deleted out outboxing.
+        self.assertEqual(new_pm_count - old_pm_count, 4)
 
 
 class AdminThreadCreationForum(TestCase):
