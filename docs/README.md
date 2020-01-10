@@ -1,5 +1,6 @@
 # ISS
 [![Build Status](https://travis-ci.org/Lanny/ISS.svg?branch=master)](https://travis-ci.org/Lanny/ISS)
+[![Coverage Status](https://coveralls.io/repos/github/Lanny/ISS/badge.svg?branch=master)](https://coveralls.io/github/Lanny/ISS?branch=master)
 
 ISS is a modern BBS spiritually descended from software of the golden age of webforums, most notably vB3 and UBB. Design tenets are:
 
