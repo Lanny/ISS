@@ -216,7 +216,21 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
         response = self.scrub_client.get(path)
 
         subscription = ThreadFlag.objects.get(poster=self.scrub, thread=thread)
+
+        self.assertEqual(response.status_code, 200)
         self.assertTrue(subscription.subscribed)
+
+    def test_unsubscribe(self):
+        thread = Thread.objects.all()[0]
+        thread.subscribe(self.scrub)
+
+        path = reverse('unsubscribe', kwargs={'thread_id': thread.pk})
+        response = self.scrub_client.post(path, {})
+
+        flag = ThreadFlag.objects.get(poster=self.scrub, thread=thread)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(flag.subscribed)
 
     def test_static_page_valid(self):
         StaticPage.objects.create(
