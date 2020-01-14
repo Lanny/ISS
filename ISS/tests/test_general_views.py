@@ -4,6 +4,7 @@ import datetime
 import json
 
 from django.core import mail
+from django.contrib import auth
 from django.test import TestCase, Client
 from django.urls import reverse, resolve
 from django.utils import timezone
@@ -936,7 +937,7 @@ class GenerateInviteCodeTestCase(tutils.ForumConfigTestCase):
         self.assertEqual(reg_code.used_by, None)
         self.assertEqual(reg_code.used_on, None)
 
- 
+
 class LoginTestCase(TestCase):
     def setUp(self):
         self.password = '私わ大津展之です'
@@ -947,6 +948,10 @@ class LoginTestCase(TestCase):
         self.otsu.save()
 
         self.otsu_client = Client()
+
+    def test_get_page(self):
+        response = self.otsu_client.get(self.path)
+        self.assertEqual(response.status_code, 200)
 
     def test_correct_unicode_password(self):
         response = self.otsu_client.post(
@@ -959,7 +964,7 @@ class LoginTestCase(TestCase):
         user = auth.get_user(self.otsu_client)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(user.pk, self.otsu.pk)
-        
+
     def test_incorrect_unicode_password_success(self):
         response = self.otsu_client.post(
             self.path,
