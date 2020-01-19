@@ -20,6 +20,8 @@ from ISS import utils, forms, iss_bbcode
 from ISS.models import *
 from ISS import models as iss_models
 from ISS.hooks import HookManager
+from ISS.models.aux_models import MembersOnlySection
+
 
 def _get_new_post_form(request):
     return utils.conditionally_captchatize(request, forms.NewPostForm)
@@ -89,6 +91,9 @@ def thread(request, thread_id):
     page = utils.get_posts_page(posts, request)
     reply_form = _get_new_post_form(request)(author=request.user,
                                              initial={ 'thread': thread })
+
+    if thread.forum.member_view_only and not request.user.is_authenticated:
+        raise PermissionDenied('You can\'t quote that!')
 
     ctx = {
         'rel_page': page,
@@ -360,6 +365,11 @@ def latest_threads(request):
 
     return render(request, 'latest_threads.html', ctx)
 
+def members_only_forum(request):
+    members_only = (MembersOnlySection
+            .get_members_only_forums())
+
+    return members_only
 
 class UpdateLatestThreadsPreferences(utils.MethodSplitView):
     require_login = True

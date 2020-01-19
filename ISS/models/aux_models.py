@@ -1,5 +1,6 @@
 from django.core.exceptions import PermissionDenied
 from django.db import models
+from django.http import HttpResponseBadRequest
 from django.utils import timezone
 from django import forms
 
@@ -35,7 +36,7 @@ class LatestThreadsForumPreference(models.Model):
         trash_forums = []
 
         for forum in Forum.objects.all():
-            effective_prefs[forum.pk] = forum.include_in_lastest_threads 
+            effective_prefs[forum.pk] = forum.include_in_lastest_threads
             if forum.is_trash: trash_forums.append(forum.pk)
 
         if poster:
@@ -50,6 +51,19 @@ class LatestThreadsForumPreference(models.Model):
 
     def __str__(self):
         return '%s to %s' % (self.poster, self.forum)
+
+class MembersOnlySection(models.Model):
+
+    forum = models.ForeignKey(Forum, on_delete=models.CASCADE)
+
+    @classmethod
+    def get_members_only_forums(cls):
+        members_only = {}
+
+        for forum in Forum.objects.all():
+            members_only[forum.pk] = forum.member_view_only
+
+        return members_only
 
 class RateLimitedAccess(models.Model):
     limit_key = models.CharField(max_length=1024)

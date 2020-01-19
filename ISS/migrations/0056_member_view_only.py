@@ -19,9 +19,9 @@ class Migration(migrations.Migration):
             name='member_view_only',
             field=models.BooleanField(default=False),
         ),
-        migrations.AlterField(
-            model_name='forum',
-            name='priority',
-            field=models.IntegerField(default=0),
-        ),
+        migrations.AddField(
+            model_name='membersonlysection',
+            name='forum',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='ISS.Forum'),
+        )
     ]
