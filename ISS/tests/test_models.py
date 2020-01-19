@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.test import SimpleTestCase
 from ISS.models import *
 
-import tutils
+from . import tutils
 
 class PosterTestCase(tutils.ForumConfigTestCase):
     forum_config = {
@@ -178,26 +178,26 @@ class PostTestCase(tutils.ForumConfigTestCase):
 class PosterUsernameNormalizationTestCase(SimpleTestCase):
     def assertNormEqual(self, username_one, username_two):
         return self.assertEqual(
-                Poster.normalize_username(username_one),
-                Poster.normalize_username(username_two))
+                Poster.iss_normalize_username(username_one),
+                Poster.iss_normalize_username(username_two))
 
     def test_capitalization(self):
-        self.assertNormEqual(u'Lanny', u'lanny')
+        self.assertNormEqual('Lanny', 'lanny')
 
     def test_spaces(self):
-        self.assertNormEqual(u'Don Knuth', u'Don Knuth')
+        self.assertNormEqual('Don Knuth', 'Don Knuth')
 
     def test_mixed_white_space(self):
-        self.assertNormEqual(u'Don Knuth', u'D on\tKnuth\n\n')
+        self.assertNormEqual('Don Knuth', 'D on\tKnuth\n\n')
 
     def test_mixed_white_space_and_caps(self):
-        self.assertNormEqual(u'Don Knuth', u'd On\tknuTh\n\n')
+        self.assertNormEqual('Don Knuth', 'd On\tknuTh\n\n')
 
     def test_homoglyph_attack(self):
-        self.assertNormEqual(u'\u216Canny', u'Lanny')
+        self.assertNormEqual('\u216Canny', 'Lanny')
 
     def test_case_sensitive_homoglyphs(self):
-        self.assertNormEqual(u'Willard Quine', u'willard quine')
+        self.assertNormEqual('Willard Quine', 'willard quine')
 
 class SubscriptionTestCase(TestCase):
     def setUp(self):
@@ -263,8 +263,9 @@ class SubscriptionTestCase(TestCase):
 
         self.assertEqual(self.thread.get_jump_post(self.tu_1).pk, first_post.pk)
 
-class ACLTestCase(TestCase):
+class ACLTestCase(tutils.ForumConfigTestCase):
     def setUp(self):
+        super(ACLTestCase, self).setUp()
         self.tu_1 = tutils.create_user()
         self.tu_2 = tutils.create_user()
         self.tu_3 = tutils.create_user()
@@ -320,3 +321,32 @@ class ACLTestCase(TestCase):
 
         self.assertTrue(invite_acl.is_poster_authorized(self.tu_1))
         self.assertFalse(invite_acl.is_poster_authorized(self.tu_2))
+
+    def test_acl_users_cache_busting(self):
+        acl = AccessControlList.get_acl('UPERM_ACL')
+        self.assertFalse(acl.is_poster_authorized(self.tu_1))
+
+        acl.white_posters.add(self.tu_1)
+        acl = AccessControlList.get_acl('UPERM_ACL')
+        self.assertTrue(acl.is_poster_authorized(self.tu_1))
+
+    def test_acl_groups_cache_busting(self):
+        acl = AccessControlList.get_acl('UPERM_ACL')
+        self.assertFalse(acl.is_poster_authorized(self.tu_1))
+
+        new_group = AccessControlGroup(name="NEW_GROUP")
+        new_group.save()
+        new_group.members.add(self.tu_1)
+        acl.white_groups.add(new_group)
+
+        acl = AccessControlList.get_acl('UPERM_ACL')
+        self.assertTrue(acl.is_poster_authorized(self.tu_1))
+
+    def test_acl_users_cache_busting_negative(self):
+        acl = AccessControlList.get_acl('UPERM_ACL')
+        acl.white_posters.add(self.tu_1)
+        self.assertTrue(acl.is_poster_authorized(self.tu_1))
+
+        acl.white_posters.remove(self.tu_1)
+        acl = AccessControlList.get_acl('UPERM_ACL')
+        self.assertFalse(acl.is_poster_authorized(self.tu_1))

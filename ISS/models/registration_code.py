@@ -21,7 +21,7 @@ class RegistrationCode(models.Model):
     generated_on = models.DateTimeField(default=timezone.now)
     generated_by = models.ForeignKey('ISS.Poster',
                                      related_name='reg_codes_generated',
-                                     null=False)
+                                     on_delete=models.CASCADE)
 
     used_on = models.DateTimeField(null=True, default=None)
     used_by = models.OneToOneField('ISS.Poster',
@@ -31,6 +31,6 @@ class RegistrationCode(models.Model):
     def get_reg_url(self):
         return reverse('register-with-code') + '?code=%s' % self.code
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s Registration Code' % (
             'Used' if self.used_by != None else 'Unused')

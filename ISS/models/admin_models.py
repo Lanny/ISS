@@ -4,9 +4,8 @@ import pytz
 from datetime import timedelta
 
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
-from django.dispatch import receiver
 from django.utils import timezone
 
 class StaticPage(models.Model):
@@ -14,8 +13,8 @@ class StaticPage(models.Model):
     page_title = models.CharField(max_length=1024)
     content = models.TextField()
 
-    def __unicode__(self):
-        return u'StaticPage: %s' % self.page_id
+    def __str__(self):
+        return 'StaticPage: %s' % self.page_id
 
 class FilterWord(models.Model):
     pattern = models.CharField(max_length=1024)
@@ -39,8 +38,8 @@ class FilterWord(models.Model):
     @classmethod
     def do_all_replacements(cls, text):
         filters = cache.get('active_filters')
-        if not filters:
-            filters = cls.objects.filter(active=True)
+        if filters == None:
+            filters = list(cls.objects.filter(active=True))
             cache.set('active_filters', filters)
 
         for f in filters:
@@ -49,8 +48,15 @@ class FilterWord(models.Model):
         return text
 
 class Ban(models.Model):
-    subject = models.ForeignKey('Poster', related_name="bans")
-    given_by = models.ForeignKey('Poster', null=True, related_name="bans_given")
+    subject = models.ForeignKey(
+            'Poster',
+            related_name="bans",
+            on_delete=models.CASCADE)
+    given_by = models.ForeignKey(
+            'Poster',
+            null=True,
+            related_name="bans_given",
+            on_delete=models.CASCADE)
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=True)
     reason = models.CharField(max_length=1024)
@@ -73,8 +79,8 @@ class Ban(models.Model):
 
         return max(self.end_date - timezone.now(), timedelta(seconds=0))
 
-    def __unicode__(self):
-        return u'Ban on %s for reason: %s' % (
+    def __str__(self):
+        return 'Ban on %s for reason: %s' % (
             self.subject.username, self.reason)
 
 class IPBan(models.Model):
@@ -83,10 +89,3 @@ class IPBan(models.Model):
     given = models.DateTimeField(auto_now_add=True)
     memo = models.TextField(blank=True, default='')
 
-@receiver(models.signals.pre_save, sender=FilterWord)
-def invalidate_filter_cache(sender, instance, **kwargs):
-    cache.delete('active_filters')
-
-@receiver(models.signals.post_save, sender=Ban)
-def invalidate_user_title_cache(sender, instance, *args, **kwargs):
-    instance.subject.invalidate_user_title_cache()

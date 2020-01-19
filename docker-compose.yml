@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=iss
+      - POSTGRES_USER=iss_user
+      - POSTGRES_PASSWORD=this0is0a0super0secret0password69
+  static:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile-static
+    command: npm run watch -- --outDir=/out --extDir=/ext
+    volumes:
+      - ./ISS/contrib:/ext
+      - ./ISS/static-src:/code
+      - ./ISS/static:/out
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile-web
+    environment:
+      - DJANGO_SETTINGS_MODULE=ISS.docker_settings
+      - DJANGO_DEBUG=TRUE
+    command: ./manage.py mig_and_run
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - static

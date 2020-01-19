@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import models, migrations
 import django.utils.timezone
@@ -22,8 +22,8 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(default=django.utils.timezone.now)),
                 ('subject', models.CharField(max_length=256)),
                 ('content', models.TextField()),
-                ('receiver', models.ForeignKey(related_name='pms_received', to=settings.AUTH_USER_MODEL)),
-                ('sender', models.ForeignKey(related_name='pms_sent', to=settings.AUTH_USER_MODEL)),
+                ('receiver', models.ForeignKey(related_name='pms_received', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('sender', models.ForeignKey(related_name='pms_sent', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
     ]

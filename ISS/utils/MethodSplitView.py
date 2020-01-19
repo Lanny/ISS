@@ -36,7 +36,7 @@ class MethodSplitView(object):
                 return HttpResponseForbidden('You must be staff to do this.')
 
         if getattr(self, 'unbanned_required', False):
-            if not request.user.is_authenticated() :
+            if not request.user.is_authenticated:
                 return HttpResponseForbidden(
                     'You must be authenticated to take this action.')
 

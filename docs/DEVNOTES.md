@@ -1,110 +1,37 @@
-# ISS
-[![Build Status](https://travis-ci.org/RyanJenkins/ISS.svg?branch=master)](https://travis-ci.org/RyanJenkins/ISS)
+# DEVNOTES
 
-Oldschool Forum Software. Design tenets are:
+## Code Layout
+There are two main parts to the ISS code, the frontend and the backend. The backend consists of the typical Django components, views, models, form etc. The fontend is a gulp pipeline that produces static assets for the site. It lives under the `ISS/static-src` directory. It outputs into the static directory which the backend either serves directly in development mode or processes to be served by something like nginx in production.
 
-- Should be at least somewhat usable on a potato using an EDGE connection
-- Performance and correctness over feature richness
-- Javascript should be optional, UI shouldn't second guess user agents
-- Responsive pages
-- Should be able to withstand the spamocalypse 
-- Development using notepad is highly encouraged
+## Setting it up
 
-# Setting it up
-
-Using a virutal env is encouraged for your sanity but entirely optional.
-
-You'll need pip, node/npm, and postgres installed. On debian based distros you can do:
+The easiest way to get a development environment up and running is to use the dockerized environment. This removes much of the headache of figuring out dependencies, configuration, and OS specific oddities. To get started make sure you have docker and docker-compose installed (Docker Desktop is the usual way to get these on dev machines) and simply:
 
 ```
-$ sudo apt-get install python-pip postgresql npm
+docker-compose up --build
 ```
 
-IDE entirely optional:
-```
-$ sudo snap install pycharm-community --classic
-```
+The docker containers use a hefty amount of storage and come with some startup overhead. This is usually not a big deal, but if you'd like to run ISS without dockerization see the [legacy setup instructions](../docs/SETUP_LEGACY.md).
 
-Alternately (preferred):
+### Creating an admin
+You can simply:
 
 ```
-$ notepad.exe
+docker exec -it iss_web_1 ./manage.py createsuperuser
 ```
 
-Start by cloning the project. Copy the `test_settings.py` file into the ISS app directory and rename it `settings.py`. This defines a test forum and uses the postgres driver. ~~If you'd like to use a different DB edit the file
-appropriately~~ the search functionality depends on postgres' text search and indexing behavior in a non-driver-portable way. You could probably use another DB with some minor fiddling with the source but only postgres is being tested against.
-
-Next install serverside dependencies from the top level of the project:
+In general, any time you might want to run a management command or do some operation in the webserver environment, it will look like:
 
 ```
-$ pip install -r requirements.txt
+docker exec -it iss_web_1 <your command here>
 ```
 
-If you are just developing, use this as a reference for creating the DB:
-```
-$ sudo -u postgres psql
-# create database iss_db;
-# create user iss_user with password 'iss_pass';
-# grant all privileges on database iss_db to iss_user;
-```
+Note that the container must be up in order for this to work.
 
-Next run the migrations to init the DB (Don't forget to fill in the DB details in settings.py):
+## Development Tips
+- When debug mode is on, you can use ctrl+P on any page to cycle through the available themes without reloading a page.
 
-```
-$ ./manage.py migrate
-```
-
-We also use a DB cache so you need to create that table separately:
-
-```
-$ ./manage.py createcachetable
-```
-
-The default settings also specify a `default` cache as a LocMemCache. If you're running in a production environment you're encouraged to use Redis or memcahced as these will be significantly more performant if you're running multiple WS instances. After setting up caches you can create yourself an account:
-
-```
-$ ./manage.py createsuperuser
-Username: Lanny
-Email: l@l.lol
-Password: 
-Password (again): 
-Superuser created successfully.
-```
-
-Install the frontend dependencies and build the frontend assets:
-
-```
-$ cd ISS/static-src
-$ npm install
-$ gulp generate
-```
-
-The `gulp watch` task is also defined for file watching/rebuilding.
-
-Once all that's done you can start up the dev server and start making changes:
-
-```
-$ ./manage.py runserver
-```
-
-If you want rotating banners drop them in `ISS/static/banners` and restart the server. You can make up some test data using thing admin interface (url `/admin/`)
-
-# Development Tips
-- When `DEBUG` is true in settings.py, you can use ctrl+P on any page to cycle through the available themes.
-
-# Production Notes
-- As with any Django project *be sure `DEBUG` in settings.py is false*
-  - Also be sure to your `SECRET_KEY` is not in any repo (e.g. copied out of test_settings.py)
-- Set up redis or memcachd for the default cache
-- Set up the email settings (see https://docs.djangoproject.com/en/2.2/topics/email/)
-- You want to run nginx in front of ISS, Python should not be serving static assets
-- To produce production ready statics:
-  - Build the assets using `gulp generate --optimizeAssets` (from the static-src directory)
-  - Set `STATIC_ROOT` to point to some writable directory to hold generated statics
-  - Run `./manage.py collectstatic` to schlep files over to `STATIC_ROOT`
-
-
-# Configuration
+## Configuration
 Every ISS instance must define a `FORUM_CONFIG` setting. Default values exist
 for every key so it may be empty. Here is a list of the recognized properties
 and what each does:

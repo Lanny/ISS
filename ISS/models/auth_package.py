@@ -1,8 +1,9 @@
 import json
 
-from django.db import models
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import AnonymousUser
+from django.db import models
 
 from ISS import utils
 
@@ -57,7 +58,7 @@ class AuthPackage(models.Model):
         max_length=256,
         null=False,
         default='PERMISSIVE',
-        choices=[(name, name) for name in PACKAGE_MAP.keys()])
+        choices=[(name, name) for name in list(PACKAGE_MAP.keys())])
 
     logic_config = models.TextField(blank=True)
 
@@ -79,8 +80,8 @@ class AuthPackage(models.Model):
         if not self.check_request(request):
             raise PermissionDenied('Not authorized.')
 
-    def __unicode__(self):
-        return u'%s (%d)' % (self.logic_package, self.pk)
+    def __str__(self):
+        return '%s (%d)' % (self.logic_package, self.pk)
 
 class AccessControlGroup(models.Model):
     base_groups = (
@@ -99,7 +100,7 @@ class AccessControlGroup(models.Model):
         acg = None
 
         if not zero_or_one_qs:
-            acg_descs = filter(lambda desc: desc[0] == name, cls.base_groups)
+            acg_descs = [desc for desc in cls.base_groups if desc[0] == name]
             if acg_descs:
                 (name,) = acg_descs[0]
                 acg = cls(name=name)
@@ -119,7 +120,7 @@ class AccessControlGroup(models.Model):
             .filter(pk=poster.pk)
             .count())
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class AccessControlList(models.Model):
@@ -146,7 +147,14 @@ class AccessControlList(models.Model):
                                           blank=True,
                                           related_name='blacklisted_acls')
 
-    def is_poster_authorized(self, poster):
+    @classmethod
+    def _get_cache_key(cls, name):
+        return 'auth:acl:name:%s' % name
+
+    def _get_poster_cross_cache_key(self, poster):
+        return 'auth:acl:name:%s:x:poster:%s' % (self.name, poster.pk)
+
+    def _uncached_is_poster_authorized(self, poster):
         if isinstance(poster, AnonymousUser):
             return self.allow_by_default
 
@@ -166,13 +174,24 @@ class AccessControlList(models.Model):
 
         return self.allow_by_default
 
+    def is_poster_authorized(self, poster):
+        cache_key = self._get_poster_cross_cache_key(poster)
+        getter = lambda: self._uncached_is_poster_authorized(poster)
+        return cache.get_or_set(cache_key, getter, 60*60*24)
+
     @classmethod
     def get_acl(cls, name):
+        cache_key = cls._get_cache_key(name)
+        cached_value = cache.get(cache_key)
+
+        if cached_value:
+            return cached_value
+
         zero_or_one_qs = list(cls.objects.filter(name=name))
         acl = None
 
         if not zero_or_one_qs:
-            acl_descs = filter(lambda desc: desc[0] == name, cls.base_acls)
+            acl_descs = [desc for desc in cls.base_acls if desc[0] == name]
             if acl_descs:
                 # ACL doesn't exist in the DB but it is in the base_acls list,
                 # so we'll create it.
@@ -191,8 +210,11 @@ class AccessControlList(models.Model):
         else:
             acl = zero_or_one_qs[0]
 
+        if not cached_value:
+            cache.set(cache_key, acl, 60*60*24)
+
         return acl
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 

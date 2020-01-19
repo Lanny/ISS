@@ -1,3 +1,4 @@
+{% autoescape off %}
 [b]Abuse Report[/b]                                                             
 [i]generated at {% now "DATETIME_FORMAT" %}[/i]                                 
                                                                                 
@@ -10,3 +11,4 @@ in the thread [url={{ post.thread.get_url }}]{{ post.thread.title }}[/url] for t
 {{ explanation }}
                                                                                 
 Please review the report and take appropriate action.           
+{% endautoescape %}

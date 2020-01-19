@@ -18,7 +18,7 @@ class Command(BaseCommand):
 
     def handle(self, **kwargs):
         for poster in Poster.objects.all().iterator():
-            normed = Poster.normalize_username(poster.username)
+            normed = Poster.iss_normalize_username(poster.username)
             poster.normalized_username = normed
             poster.save()
 
@@ -27,23 +27,23 @@ class Command(BaseCommand):
             if poster.pk in encountered_pks:
                 continue
 
-            normed = Poster.normalize_username(poster.username)
+            normed = Poster.iss_normalize_username(poster.username)
             dupes = Poster.objects.filter(normalized_username=normed)
             if len(dupes) > 1:
                 print ('Duplicate normalized username found. Select the user '
                        'who should remain able to log in.')
 
                 for idx, dupe in enumerate(dupes):
-                    print '%d. "%s" (posts: %d, pk: %d)' % (
+                    print('%d. "%s" (posts: %d, pk: %d)' % (
                             idx+1,
                             repr(dupe.username),
                             dupe.post_set.count(),
-                            dupe.pk)
+                            dupe.pk))
 
                 i = None
                 while type(i) != int or i > len(dupes) or i < 1:
                     try:
-                        i = int(raw_input('>'))
+                        i = int(input('>'))
                     except ValueError:
                         pass
 
@@ -52,11 +52,11 @@ class Command(BaseCommand):
                     if idx != i-1:
                         dupe.normalized_username = normed + str(idx)
                         dupe.save()
-                        print Poster.objects.get(pk=dupe.pk).normalized_username
+                        print(Poster.objects.get(pk=dupe.pk).normalized_username)
 
                 true_user = dupes[i-1]
                 true_user.normalized_username = normed
                 true_user.save()
 
-        print 'Done.'
+        print('Done.')
 

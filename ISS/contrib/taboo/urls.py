@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-import views
+from . import views
 
 urlpatterns = [
     url(r'^status$', views.Status.as_view(), name='taboo-status'),

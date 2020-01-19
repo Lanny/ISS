@@ -1,8 +1,8 @@
 import re
 import json
 import pytz
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import email_normalize
 
 from django import forms
@@ -13,11 +13,11 @@ from django.urls import reverse
 from django.utils import timezone, safestring
 from PIL import Image
 
-from tripphrase import tripphrase
+from tripphrase.tripphrase import tripphrase
 
-import utils
-from models import *
-from models.core_models import THEME_CHOICES
+from . import utils
+from .models import *
+from .models.core_models import THEME_CHOICES
 
 class DurationField(forms.Field):
     def clean(self, value):
@@ -32,7 +32,7 @@ class BBCodeField(forms.CharField):
     def clean(self, value):
         value = super(BBCodeField, self).clean(value)
 
-        if not isinstance(value, basestring):
+        if not isinstance(value, str):
             # Probably none, field might be optional, in any case there's no
             # use trying to parse this thing.
             return value
@@ -65,7 +65,7 @@ class PosterSelectField(forms.CharField):
         for username in value.split(','):
             if not username: continue
 
-            norm = Poster.normalize_username(username)
+            norm = Poster.iss_normalize_username(username)
 
             try:
                 user = Poster.objects.get(normalized_username=norm)
@@ -328,10 +328,10 @@ class ThreadActionForm(forms.Form):
     def _get_action_field(cls):
         actions_choices = [('edit-thread', 'Edit Thread'),
                    ('delete-posts', 'Delete Posts'),
+                   ('off-topic-posts', 'Delete Posts as Off Topic'),
                    ('sticky-thread', 'Sticky Thread'),
                    ('lock-thread', 'Lock Thread'),
-                   ('trash-thread', 'Trash Thread'),
-                   ('off-topic-posts', 'Off-Topic Posts')]
+                   ('trash-thread', 'Trash Thread')]
         actions_choices.sort()
         moveto_choices = []
 
@@ -407,7 +407,7 @@ class LatestThreadsPreferencesForm(forms.Form):
             fpk = self._get_fpk(field_name)
             try:
                 forum = Forum.objects.get(pk=fpk, is_trash=False)
-            except Forum.DoesNotExist, e:
+            except Forum.DoesNotExist as e:
                 raise ValidationError(
                     'Invalid fourm ID: %r' % fpk,
                     code='DUPE')
@@ -428,11 +428,11 @@ class ISSAuthenticationForm(AuthenticationForm):
         (or rather normalized image of their username) exists.
         """
         username = self.cleaned_data['username']
-        normalized = Poster.normalize_username(username)
+        normalized = Poster.iss_normalize_username(username)
 
         try:
             user = Poster.objects.get(normalized_username=normalized)
-        except Poster.DoesNotExist, e:
+        except Poster.DoesNotExist as e:
             return username
         else:
             return user.username
@@ -447,10 +447,10 @@ class RegistrationForm(UserCreationForm):
 
     def clean_username(self):
         username = self.cleaned_data['username']
-        norm_username = Poster.normalize_username(username)
+        norm_username = Poster.iss_normalize_username(username)
         forbidden_names = {
-            Poster.normalize_username(utils.get_config('junk_user_username')),
-            Poster.normalize_username(utils.get_config('system_user_username'))
+            Poster.iss_normalize_username(utils.get_config('junk_user_username')),
+            Poster.iss_normalize_username(utils.get_config('system_user_username'))
         }
 
         if norm_username in forbidden_names:
@@ -527,7 +527,7 @@ class InitiatePasswordRecoveryForm(forms.Form):
         ret = super(InitiatePasswordRecoveryForm, self).clean(*args, **kwargs)
 
         username = self.cleaned_data.get('username', None)
-        normalized = Poster.normalize_username(username)
+        normalized = Poster.iss_normalize_username(username)
         posters = Poster.objects.filter(normalized_username=normalized)
 
         if posters.count() != 1:

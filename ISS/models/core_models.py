@@ -4,24 +4,23 @@ import pytz
 
 from django.contrib import auth
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models, IntegrityError, transaction
 from django.db.models import Q
-from django.dispatch import receiver
 from django.utils import timezone
 
 import email_normalize
 
 from ISS import utils
 from ISS.utils import HomoglyphNormalizer
-from auth_package import AuthPackage, AccessControlList
-from admin_models import Ban
+from .auth_package import AuthPackage, AccessControlList
+from .admin_models import Ban
 
 min_time = timezone.make_aware(timezone.datetime.min,
                                timezone.get_default_timezone())
 
 THEME_CHOICES = tuple(
-    [(k, v['name']) for k,v in utils.get_config('themes').items()]
+    [(k, v['name']) for k,v in list(utils.get_config('themes').items())]
 )
 
 @models.fields.Field.register_lookup
@@ -65,7 +64,10 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     recovery_code = models.CharField(max_length=256, null=True, blank=True,
                                      default=None)
     recovery_expiration = models.DateTimeField(default=timezone.now)
-    email_verification_code = models.UUIDField(default=uuid.uuid4)
+    email_verification_code = models.UUIDField(
+        default=uuid.uuid4,
+        null=True,
+        blank=True)
     avatar = models.ImageField(upload_to='avatars', null=True)
 
     posts_per_page = models.PositiveSmallIntegerField(default=20)
@@ -117,11 +119,6 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     def can_post(self):
         return self.is_active
-
-    def clean(self):
-        # Django decided to declare their own normalize_username and this calls
-        # into that so we'll just skip this step all together.
-        pass
 
     def invalidate_user_title_cache(self):
         cache_key = self._user_title_cache_key % self.pk
@@ -258,8 +255,8 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     @classmethod
     def _get_or_create_user(cls, username):
-        username = unicode(username)
-        norm_username = cls.normalize_username(username)
+        username = str(username)
+        norm_username = cls.iss_normalize_username(username)
 
         try:
             user = cls.objects.get(normalized_username=norm_username)
@@ -278,11 +275,16 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         return user
 
     @classmethod
-    def normalize_username(cls, username):
+    def iss_normalize_username(cls, username):
         norm = HomoglyphNormalizer.normalize_homoglyphs(username)
         norm = re.sub('\s', '', norm)
 
         return norm
+
+    @classmethod
+    def normalize_username(cls, username):
+        # We have our own username normalization, so we disable django's
+        return username
 
     def embed_images(self):
         return self.allow_image_embed
@@ -294,14 +296,18 @@ class Category(models.Model):
     name = models.CharField(max_length=256)
     priority = models.IntegerField(default=0, null=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 def default_auth_pack():
     return AuthPackage.objects.create().pk
 
 class Forum(models.Model):
-    category = models.ForeignKey(Category, null=True, default=None)
+    category = models.ForeignKey(
+            Category,
+            null=True,
+            default=None,
+            on_delete=models.CASCADE)
     name = models.TextField()
     description = models.TextField()
     priority = models.IntegerField(default=0, null=False)
@@ -312,12 +318,14 @@ class Forum(models.Model):
     create_thread_pack = models.ForeignKey(
         AuthPackage,
         related_name='thread_creation_pack',
-        default=default_auth_pack)
+        default=default_auth_pack,
+        on_delete=models.CASCADE)
 
     create_post_pack = models.ForeignKey(
         AuthPackage,
         related_name='post_creation_pack',
-        default=default_auth_pack)
+        default=default_auth_pack,
+        on_delete=models.CASCADE)
 
     _flag_cache = None
 
@@ -357,7 +365,7 @@ class Forum(models.Model):
     def get_url(self):
         return reverse('thread-index', kwargs={'forum_id': self.pk})
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class Thread(models.Model):
@@ -366,8 +374,8 @@ class Thread(models.Model):
     locked = models.BooleanField(default=False)
     stickied = models.BooleanField(default=False)
 
-    forum = models.ForeignKey(Forum)
-    author = models.ForeignKey(Poster)
+    forum = models.ForeignKey(Forum, on_delete=models.CASCADE)
+    author = models.ForeignKey(Poster, on_delete=models.CASCADE)
     title = models.TextField()
     log = models.TextField(blank=True)
 
@@ -409,7 +417,7 @@ class Thread(models.Model):
         Returns the last undread post for a user IF the user has a living
         flag against this thread. Otherwise none.
         """
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             return None
 
         preceeding_date = self._get_flag(user, False).last_read_date
@@ -440,7 +448,7 @@ class Thread(models.Model):
         return self._flag_cache[user.pk]
 
     def has_unread_posts(self, user):
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             return True
 
         flag = self._get_flag(user, False)
@@ -482,15 +490,15 @@ class Thread(models.Model):
     def update_subscriptions_on_post_deletion(self, post):
         pass
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
 class Post(models.Model):
     created = models.DateTimeField(default=timezone.now)
 
-    thread = models.ForeignKey(Thread)
+    thread = models.ForeignKey(Thread, on_delete=models.CASCADE)
+    author = models.ForeignKey(Poster, on_delete=models.CASCADE)
     content = models.TextField()
-    author = models.ForeignKey(Poster)
     has_been_edited = models.BooleanField(default=False)
 
     posted_from = models.GenericIPAddressField(null=True)
@@ -508,8 +516,18 @@ class Post(models.Model):
     def get_thanker_pks(self):
         return {t.thanker_id for t in self.thanks_set.all()}
 
-    def can_be_edited_by(self, poster):
-        if poster.is_banned():
+    def can_be_edited_by(self, poster, is_banned=None):
+        """
+        Returns true if the poster can edit this post. Banned users can not
+        edit posts. Figuring out if a user is banned requires querying the DB,
+        it can become costly to do this over and over in contexts like post
+        lists, so if the caller knows the poster's banned status then they can
+        pass that and we'll skip this check.
+        """
+        if is_banned == None:
+            is_banned = poster.is_banned()
+
+        if is_banned:
             return False
 
         if poster == self.author:
@@ -582,11 +600,11 @@ class Post(models.Model):
 
 class PostSnapshot(models.Model):
     time = models.DateTimeField(default=timezone.now)
-    post = models.ForeignKey(Post)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
     content = models.TextField()
 
     # Who made the edit trigging the creation of this snapshot?
-    obsolesced_by = models.ForeignKey(Poster)
+    obsolesced_by = models.ForeignKey(Poster, on_delete=models.CASCADE)
     obsolescing_ip = models.GenericIPAddressField(null=True)
 
 
@@ -596,16 +614,22 @@ class Thanks(models.Model):
 
     given = models.DateTimeField(auto_now_add=True)
 
-    thanker = models.ForeignKey(Poster, related_name='thanks_given')
-    thankee = models.ForeignKey(Poster, related_name='thanks_received')
-    post = models.ForeignKey(Post)
+    thanker = models.ForeignKey(
+            Poster,
+            related_name='thanks_given',
+            on_delete=models.CASCADE)
+    thankee = models.ForeignKey(
+            Poster,
+            related_name='thanks_received',
+            on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
 class ThreadFlag(models.Model):
     class Meta:
         unique_together = ('thread', 'poster')
 
-    thread = models.ForeignKey(Thread)
-    poster = models.ForeignKey(Poster)
+    thread = models.ForeignKey(Thread, on_delete=models.CASCADE)
+    poster = models.ForeignKey(Poster, on_delete=models.CASCADE)
 
     last_read_post = models.ForeignKey(Post,
                                        null=True,
@@ -617,8 +641,8 @@ class ForumFlag(models.Model):
     class Meta:
         unique_together = ('forum', 'poster')
 
-    forum = models.ForeignKey(Forum)
-    poster = models.ForeignKey(Poster)
+    forum = models.ForeignKey(Forum, on_delete=models.CASCADE)
+    poster = models.ForeignKey(Poster, on_delete=models.CASCADE)
 
     last_read_date = models.DateTimeField(null=True)
 
@@ -626,9 +650,15 @@ class PrivateMessage(models.Model):
     chain = models.UUIDField(default=uuid.uuid4, editable=False)
     created = models.DateTimeField(default=timezone.now)
 
-    sender = models.ForeignKey(Poster, related_name='pms_sent')
-    receiver = models.ForeignKey(Poster, related_name='pms_received')
-    inbox = models.ForeignKey(Poster)
+    sender = models.ForeignKey(
+            Poster,
+            related_name='pms_sent',
+            on_delete=models.CASCADE)
+    receiver = models.ForeignKey(
+            Poster,
+            related_name='pms_received',
+            on_delete=models.CASCADE)
+    inbox = models.ForeignKey(Poster, on_delete=models.CASCADE)
 
     subject = models.CharField(max_length=256)
     content = models.TextField()
@@ -647,12 +677,12 @@ class PrivateMessage(models.Model):
         if commit:
             self.save()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.subject
 
     @classmethod
     def send_pm(cls, sender, receivers, subject, content, chain=None):
-        chain_id = chain_id if chain else uuid.uuid4()
+        chain_id = chain if chain else uuid.uuid4()
         sent_copies = []
         kept_copies = []
 
@@ -667,7 +697,7 @@ class PrivateMessage(models.Model):
             }
 
             # Receiver's copy
-            pm = PrivateMessage(**opts) 
+            pm = PrivateMessage(**opts)
             pm.save()
             sent_copies.append(pm)
 
@@ -679,50 +709,3 @@ class PrivateMessage(models.Model):
                 kept_copies.append(pm)
 
         return (sent_copies, kept_copies)
-
-@receiver(models.signals.post_save, sender=Post)
-def update_thread_last_update_on_insert(sender, instance, created, **kwargs):
-    if not created:
-        # Edits don't bump threads.
-        return
-
-    thread = instance.thread
-
-    if thread.last_update < instance.created:
-        thread.last_update = instance.created
-        thread.save()
-
-@receiver(models.signals.post_delete, sender=Post)
-def update_thread_last_update_on_delete(sender, instance, **kwargs):
-    thread = instance.thread
-    posts = thread.get_posts_in_thread_order(reverse=True)
-
-    if posts.count() > 0:
-        instance = posts[0]
-        thread.last_update = instance.created
-        thread.save()
-
-@receiver(models.signals.post_save, sender=Thread)
-def update_forum_last_update(sender, instance, created, **kwargs):
-    thread = instance
-    forum = thread.forum
-
-    if forum.last_update < thread.last_update:
-        forum.last_update = thread.last_update
-        forum.save()
-
-@receiver(models.signals.pre_save, sender=Poster)
-def set_normalized_username(sender, instance, **kwargs):
-    if not instance.normalized_username:
-        instance.normalized_username = Poster.normalize_username(instance.username)
-
-@receiver(models.signals.pre_save, sender=Poster)
-def set_normalized_email(sender, instance, **kwargs):
-    if instance.email:
-        instance.normalized_email = email_normalize.normalize(instance.email)
-
-@receiver(models.signals.pre_save, sender=Thanks)
-def reject_auto_erotic_athanksication(sender, instance, **kwargs):
-    if instance.thanker.pk == instance.thankee.pk:
-        raise IntegrityError('A user may not thank themselves')
-

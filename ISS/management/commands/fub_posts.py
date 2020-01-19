@@ -18,7 +18,7 @@ class Command(BaseCommand):
         posters = Poster.objects.filter(is_active=True)
         threads = Thread.objects.filter(locked=False)
 
-        for _ in xrange(kwargs.get('n', 0)):
+        for _ in range(kwargs.get('n', 0)):
             poster = random.choice(posters)
             thread = random.choice(threads)
 

@@ -135,7 +135,7 @@ class ConfigurationManager(Singleton):
         """
         Exists only for purposes of testing. Never use this in actual code.
         """
-        if isinstance(keys, basestring):
+        if isinstance(keys, str):
             key_path = (key_path,)
 
         target = self._config

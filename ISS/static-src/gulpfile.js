@@ -12,7 +12,8 @@ var clean = require('gulp-clean');
 var autoprefixer = require('gulp-autoprefixer');
 var execSync = require('child_process').execSync;
 
-var staticDir = '../static',
+var staticDir = argv.outDir || '../static',
+  extDir = argv.extDir || '../contrib',
   jsDir = path.join(staticDir, '/js'),
   cssDir = path.join(staticDir, '/css'),
   gifDir = path.join(staticDir, '/img/gif'),
@@ -23,15 +24,14 @@ var staticDir = '../static',
     'base.js'
   ];
 
-var ISSConfig = JSON.parse(
-    execSync('python manage.py dump_iss_config',
-             {
-               cwd: '../..',
-               encoding: 'UTF-8'
-             }));
+var extensions = {
+  'ISS.contrib.taboo': {
+    'gulp_dir': extDir + '/taboo/static-src'
+  }
+}
 
 gulp.task('clean', function() {
-  return gulp.src([ gifDir, cssDir, jsDir ])
+  return gulp.src([ gifDir, cssDir, jsDir ], { allowEmpty: true })
     .pipe(clean({read: false, force: true}));
 });
  
@@ -90,13 +90,12 @@ gulp.task('optimize-js', gulp.series('javascript', function() {
 }));
 
 gulp.task('generate-extensions', function(done) {
-  for (var i=0; i<ISSConfig.extensions.length; i++) {
-    var ext = ISSConfig.extensions[i],
-      extConfig = ISSConfig.extension_config[ext];
+  for (var ext in extensions) {
+    var extConfig = extensions[ext];
 
     if ('gulp_dir' in extConfig) {
       execSync('npm install', {cwd: extConfig.gulp_dir});
-      execSync('npm run-script build', {cwd: extConfig.gulp_dir});
+      execSync('npm run build', {cwd: extConfig.gulp_dir});
     }
   }
 

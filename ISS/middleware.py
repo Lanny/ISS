@@ -28,7 +28,7 @@ class IPBanMiddleware(BaseMiddleware):
 
 class TimezoneMiddleware(BaseMiddleware):
     def __call__(self, request):
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             timezone.activate(pytz.timezone(request.user.timezone))
         else:
             timezone.activate('UTC')
@@ -44,6 +44,12 @@ class PMAdminMiddleware(BaseMiddleware):
             # No need to report 404s
             return None
 
+        formatted = traceback.format_exception(
+            type(exception),
+            exception,
+            exception.__traceback__
+        )
+
         message = '''
             Encountered exception when processing request.
             Request Path: %s
@@ -53,10 +59,11 @@ class PMAdminMiddleware(BaseMiddleware):
             Stack Trace:
             [code]%s[/code]
         ''' % (
-                request.path,
-                request.method,
-                request.user,
-                traceback.format_exc(exception))
+            request.path,
+            request.method,
+            request.user,
+            ''.join(formatted)
+        )
 
         PrivateMessage.send_pm(
             Poster.get_or_create_system_user(),

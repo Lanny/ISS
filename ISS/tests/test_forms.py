@@ -3,7 +3,7 @@
 from ISS.forms import *
 from ISS.models import *
 
-import tutils
+from . import tutils
 
 class FormsTestCase(tutils.ForumConfigTestCase):
     forum_config = {'captcha_period': 0}

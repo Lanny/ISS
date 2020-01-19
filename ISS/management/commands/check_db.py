@@ -13,9 +13,9 @@ class Command(BaseCommand):
         valid = self.do_checks(noisy=True)
 
         if valid:
-            print 'All checks passed!'
+            print('All checks passed!')
         else:
-            print 'One or more DB integrity issues detected.'
+            print('One or more DB integrity issues detected.')
 
     def do_checks(self, noisy=False):
         all_good = True
@@ -31,10 +31,10 @@ class Command(BaseCommand):
                 valid = False
 
                 if noisy:
-                    print '\n\n' + '=' * 30 + ' ERROR ' + '=' * 30
-                    print ('Thread with id %d has author %r, but first post '
+                    print('\n\n' + '=' * 30 + ' ERROR ' + '=' * 30)
+                    print(('Thread with id %d has author %r, but first post '
                            'was made by %r.\n\n') % (thread.id,
                                                      first_post_author,
-                                                     thread.author)
+                                                     thread.author))
 
         return valid

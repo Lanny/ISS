@@ -19,15 +19,17 @@
         </h2>
         <fieldset>
           {% csrf_token %}
-          <input
-            id="username"
-            name="username"
-            type="text"
-            data-auto-suggest="true"
-            data-auto-suggest-endpoint="{% url 'api-user-serach' %}"
-            data-auto-suggest-delimiter=";"
-          />
-          <input type="submit" value="Find" />
+          <div class="input-wrapper">
+            <input
+              id="username"
+              name="username"
+              type="text"
+              data-auto-suggest="true"
+              data-auto-suggest-endpoint="{% url 'api-user-serach' %}"
+              data-auto-suggest-delimiter=";"
+            />
+            <input type="submit" value="Find" />
+          </div>
         </fieldset>
       </form>
     </div>

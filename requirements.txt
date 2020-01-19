@@ -1,17 +1,16 @@
-Django==1.11.23
+Django==2.2.8
 pytz==2016.7
 Pillow==6.2.0
-psycopg2==2.7.3.2
-lxml==4.1.1
-tripphrase==0.4
-django-recaptcha==1.3.1
-django-houston==0.1.0
+psycopg2==2.8.4
+lxml==4.4.1
+tripphrase==0.5
+django-houston==0.3.0
 email-normalize==0.2.1
-git+https://github.com/RyanJenkins/django-recaptcha2.git
-git+https://github.com/RyanJenkins/bbcode.git@7dadc5e1f2b8cfe9008477f767e3feddf5dad93a
+bbcode==1.0.33
+django-recaptcha2==1.4.1
 
 # Dev dependencies
-django-debug-toolbar==1.6
+django-debug-toolbar==2.1
 
 # Regardless of the forum db, this is required for migrations. Can be removed
 # if you are not migrating from a vB forum.
