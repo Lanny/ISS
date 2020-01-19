@@ -52,19 +52,6 @@ class LatestThreadsForumPreference(models.Model):
     def __str__(self):
         return '%s to %s' % (self.poster, self.forum)
 
-class MembersOnlySection(models.Model):
-
-    forum = models.ForeignKey(Forum, on_delete=models.CASCADE)
-
-    @classmethod
-    def get_members_only_forums(cls):
-        members_only = {}
-
-        for forum in Forum.objects.all():
-            members_only[forum.pk] = forum.member_view_only
-
-        return members_only
-
 class RateLimitedAccess(models.Model):
     limit_key = models.CharField(max_length=1024)
     address = models.GenericIPAddressField()

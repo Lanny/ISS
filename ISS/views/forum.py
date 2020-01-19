@@ -20,7 +20,6 @@ from ISS import utils, forms, iss_bbcode
 from ISS.models import *
 from ISS import models as iss_models
 from ISS.hooks import HookManager
-from ISS.models.aux_models import MembersOnlySection
 
 
 def _get_new_post_form(request):
@@ -77,8 +76,8 @@ def thread_index(request, forum_id):
         'can_start_thread': forum.create_thread_pack.check_request(request)
     }
 
-    if request.user.is_authenticated:
-        forum.mark_read(request.user)
+    #if request.user.is_authenticated:
+    #    forum.mark_read(request.user)
 
     return render(request, 'thread_index.html', ctx)
 
@@ -364,12 +363,6 @@ def latest_threads(request):
     }
 
     return render(request, 'latest_threads.html', ctx)
-
-def members_only_forum(request):
-    members_only = (MembersOnlySection
-            .get_members_only_forums())
-
-    return members_only
 
 class UpdateLatestThreadsPreferences(utils.MethodSplitView):
     require_login = True
