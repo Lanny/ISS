@@ -10,32 +10,18 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ISS', '0043_auto_20180408_2104'),
+        ('ISS', '0055_auto_20191214_0554'),
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='LatestThreadsForumPreference',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('include', models.BooleanField()),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-            ],
-        ),
         migrations.AddField(
             model_name='forum',
-            name='include_in_lastest_threads',
-            field=models.BooleanField(default=True),
+            name='member_view_only',
+            field=models.BooleanField(default=False),
         ),
-        migrations.AddField(
-            model_name='latestthreadsforumpreference',
-            name='forum',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='ISS.Forum'),
-        ),
-        migrations.AddField(
-            model_name='latestthreadsforumpreference',
-            name='poster',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+        migrations.AlterField(
+            model_name='forum',
+            name='priority',
+            field=models.IntegerField(default=0),
         ),
     ]
