@@ -5,7 +5,7 @@ Using a virutal env is encouraged for your sanity but entirely optional.
 You'll need pip, node/npm, and postgres installed. On debian based distros you can do:
 
 ```
-$ sudo apt-get install python-pip postgresql npm
+$ sudo apt-get install python3-pip libpq-dev postgresql npm gulp
 ```
 
 IDE entirely optional:
@@ -26,7 +26,7 @@ appropriately~~ the search functionality depends on postgres' text search and in
 Next install serverside dependencies from the top level of the project:
 
 ```
-$ pip install -r requirements.txt
+$ pip3 install -r requirements.txt
 ```
 
 If you are just developing, use this as a reference for creating the DB:
@@ -40,19 +40,19 @@ $ sudo -u postgres psql
 Next run the migrations to init the DB (Don't forget to fill in the DB details in settings.py):
 
 ```
-$ ./manage.py migrate
+$ python3 ./manage.py migrate
 ```
 
 We also use a DB cache so you need to create that table separately:
 
 ```
-$ ./manage.py createcachetable
+$ python3 ./manage.py createcachetable
 ```
 
 The default settings also specify a `default` cache as a LocMemCache. If you're running in a production environment you're encouraged to use Redis or memcahced as these will be significantly more performant if you're running multiple WS instances. After setting up caches you can create yourself an account:
 
 ```
-$ ./manage.py createsuperuser
+$ python3 ./manage.py createsuperuser
 Username: Lanny
 Email: l@l.lol
 Password: 
@@ -65,6 +65,7 @@ Install the frontend dependencies and build the frontend assets:
 ```
 $ cd ISS/static-src
 $ npm install
+$ sudo npm i -g gulp-cli
 $ gulp generate
 ```
 
@@ -73,7 +74,7 @@ The `gulp watch` task is also defined for file watching/rebuilding.
 Once all that's done you can start up the dev server and start making changes:
 
 ```
-$ ./manage.py runserver
+$ python3 ./manage.py runserver
 ```
 
 If you want rotating banners drop them in `ISS/static/banners` and restart the server. You can make up some test data using thing admin interface (url `/admin/`)
