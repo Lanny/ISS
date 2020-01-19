@@ -93,7 +93,7 @@ def thread(request, thread_id):
                                              initial={ 'thread': thread })
 
     if thread.forum.member_view_only and not request.user.is_authenticated:
-        raise PermissionDenied('You can\'t quote that!')
+        return render(request, 'members_only.html')
 
     ctx = {
         'rel_page': page,
