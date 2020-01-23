@@ -191,6 +191,10 @@ urlpatterns = [
         views.private_messages.PrivateMessageActions.as_view(),
         name='pms-action'),
 
+    url(r'^thread/(?P<thread_id>\d+)/create-poll$',
+        views.polls.CreatePoll.as_view(),
+        name='create-poll'),
+
     url(r'^api/users/search$',
         views.user.user_fuzzy_search,
         name='api-user-serach'),
