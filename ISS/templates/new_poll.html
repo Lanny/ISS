@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block page_name %}
+  New Poll -
+{% endblock %}
+
+{% block breadcrumb %}
+  &gt; <a href="{{ thread.forum.get_url }}">{{ thread.forum.name }}</a>
+  &gt; <a href="{{ thread.get_url }}">{{ thread.title }}</a>
+  &gt; <a href="">New Poll</a>
+{% endblock %}
+
+{% block content %}
+  <div class="new-poll">
+    <form method="POST" action="">
+      <h1>
+        Add New Poll to 
+        <a href="{{ thread.get_url }}">{{ thread.title }}</a>
+      </h1>
+      <fieldset>
+        {% csrf_token %}
+
+        {% for field in form %}
+          {% if not field.is_hidden %}
+            <p id="{{ field.auto_id }}-wrapper">
+              {{ field.label_tag }}
+              {{ field }}
+            </p>
+          {% endif %}
+        {% endfor %}
+
+        <input type="submit"
+               value="Submit" />
+      </fieldset>
+     </form>
+   </div>
+{% endblock %}

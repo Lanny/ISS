@@ -34,13 +34,14 @@
 
       &.current-page {
         position: relative;
-        border: 1px solid @bg_primary;
 
         a {
           font-weight: bold;
         }
 
         @media(min-width: @breakpoint) {
+          border: 1px solid @bg_primary;
+
           &:before {
             border-style: solid;
             border-color: transparent transparent @bg_primary transparent;

@@ -232,6 +232,29 @@ class NewThreadForm(InitialPeriodLimitingForm, PostDuplicationPreventionForm):
 
         return self.thread
 
+
+class NewPollForm(forms.Form):
+    error_css_class = 'in-error'
+
+    thread = forms.ModelChoiceField(queryset=Thread.objects.all(),
+                                    widget=forms.HiddenInput())
+    vote_type = forms.ChoiceField(label='Voting Type',
+                                  choices=Poll.VOTE_TYPE_CHOICES,
+                                  required=True)
+    question = forms.CharField(label='Poll Question',
+                               max_length=1024,
+                               required=True)
+
+
+    def __init__(self, *args, num_options=7, **kwargs):
+        super(NewPollForm, self).__init__(*args, **kwargs)
+
+        for i in range(num_options):
+            self.fields['option-%d' % i] = forms.CharField(
+                label='Option %d' % (i+1),
+                max_length=1024,
+                required=False)
+
 class NewPostForm(InitialPeriodLimitingForm, PostDuplicationPreventionForm):
     error_css_class = 'in-error'
     post_min_len = utils.get_config('min_post_chars')
