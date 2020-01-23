@@ -23,7 +23,7 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=ISS.docker_settings
       - DJANGO_DEBUG=TRUE
-    command: ./manage.py mig_and_run
+    command: sh /code/mig-and-run.sh
     volumes:
       - .:/code
     ports:
