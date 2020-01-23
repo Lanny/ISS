@@ -76,13 +76,15 @@ def thread_index(request, forum_id):
         'can_start_thread': forum.create_thread_pack.check_request(request)
     }
 
-    #if request.user.is_authenticated:
-    #    forum.mark_read(request.user)
+    if request.user.is_authenticated:
+        forum.mark_read(request.user)
 
     return render(request, 'thread_index.html', ctx)
 
 def thread(request, thread_id):
     thread = get_object_or_404(Thread, pk=thread_id)
+    if thread.forum.member_view_only and not request.user.is_authenticated:
+        return render(request, 'members_only.html')
     posts = (thread.post_set
         .order_by('created')
         .select_related('author')
@@ -90,9 +92,6 @@ def thread(request, thread_id):
     page = utils.get_posts_page(posts, request)
     reply_form = _get_new_post_form(request)(author=request.user,
                                              initial={ 'thread': thread })
-
-    if thread.forum.member_view_only and not request.user.is_authenticated:
-        return render(request, 'members_only.html')
 
     ctx = {
         'rel_page': page,

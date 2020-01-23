@@ -40,10 +40,17 @@
             </div>
           </td>
           <td>
+            {% if forum.member_view_only %}
+            <a class="forum-name"
+               href="{% url 'thread-index' forum.pk %}">
+              Private: {{ forum.name }}
+            </a>
+            {% else %}
             <a class="forum-name"
                href="{% url 'thread-index' forum.pk %}">
               {{ forum.name }}
             </a>
+            {% endif %}
             <span class="forum-description">{{ forum.description }}</span>
           </td>
           <td>{{ forum.get_thread_count|intcomma }}</td>
