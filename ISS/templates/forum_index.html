@@ -40,15 +40,19 @@
             </div>
           </td>
           <td>
-            {% if forum.member_view_only %}
+            {% if forum.member_view_only and user.is_authenticated %}
             <a class="forum-name"
                href="{% url 'thread-index' forum.pk %}">
-              Private: {{ forum.name }}
+               {{ forum.name }}
             </a>
-            {% else %}
+            {% elif forum.member_view_only and not user.is_authenticated %}
+            <a>
+               Register to view:
+            </a>
+            {% elif not forum.member_view_only %}
             <a class="forum-name"
                href="{% url 'thread-index' forum.pk %}">
-              {{ forum.name }}
+               {{ forum.name }}
             </a>
             {% endif %}
             <span class="forum-description">{{ forum.description }}</span>
