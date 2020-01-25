@@ -52,7 +52,7 @@ class MethodSplitView(object):
         check_result = self.pre_method_check(request, *args, **kwargs)
 
         if isinstance(check_result, HttpResponse):
-            return response_maybe
+            return check_result
 
         if isinstance(check_result, dict):
             kwargs.update(check_result)
