@@ -245,15 +245,37 @@ class NewPollForm(forms.Form):
                                max_length=1024,
                                required=True)
 
+    def _opts(self):
+        return (
+            ('option-%d' % i, 'Option %d' % (i+1))
+            for i in range(self.num_options)
+        )
+
+    def get_cleaned_options(self):
+        return (
+            self.cleaned_data[name]
+            for name, _ in self._opts()
+            if self.cleaned_data[name]
+        )
 
     def __init__(self, *args, num_options=7, **kwargs):
         super(NewPollForm, self).__init__(*args, **kwargs)
+        self.num_options = num_options
 
-        for i in range(num_options):
-            self.fields['option-%d' % i] = forms.CharField(
-                label='Option %d' % (i+1),
+        for name, label in self._opts():
+            self.fields[name] = forms.CharField(
+                label=label,
                 max_length=1024,
                 required=False)
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if len(list(self.get_cleaned_options())) < 2:
+            raise forms.ValidationError('A poll must have at least two options')
+
+        return cleaned_data
+
 
 class NewPostForm(InitialPeriodLimitingForm, PostDuplicationPreventionForm):
     error_css_class = 'in-error'
