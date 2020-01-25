@@ -4,7 +4,7 @@ from django.urls import reverse
 from ISS.models import Thread, Forum, Poll
 from . import tutils
 
-class PollsTestCase(tutils.ForumConfigTestCase):
+class PollsCreationTestCase(tutils.ForumConfigTestCase):
     forum_config = {'captcha_period': 0}
 
     def setUp(self):
@@ -24,7 +24,38 @@ class PollsTestCase(tutils.ForumConfigTestCase):
         self.lefkowitz_client = Client()
         self.lefkowitz_client.force_login(self.lefkowitz)
 
+    def test_non_authors_cant_view_poll_add_view(self):
+        path = reverse('create-poll', kwargs={'thread_id': self.thread.id})
+        response = self.lefkowitz_client.get(path)
+        self.assertEqual(response.status_code, 403)
+
     def test_non_authors_cant_add_polls(self):
         path = reverse('create-poll', kwargs={'thread_id': self.thread.id})
         response = self.lefkowitz_client.post(path, {})
+        self.assertEqual(response.status_code, 403)
+
+    def test_authors_can_view_poll_add_view(self):
+        path = reverse('create-poll', kwargs={'thread_id': self.thread.id})
+        response = self.dahl_client.get(path)
+        self.assertEqual(response.status_code, 200)
+
+    def test_authors_can_add_polls(self):
+        path = reverse('create-poll', kwargs={'thread_id': self.thread.id})
+        response = self.dahl_client.post(path, {
+            'vote_type': '0',
+            'question': 'Was EPOLL a good idea?',
+            'options-3': 'Yes'
+            'options-5': 'No'
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertIsNotNone(self.thread.poll)
+        self.assertIsEqual(self.thread.poll.polloption_set.all().count(), 2)
+
+    def test_authors_cant_add_multiple_polls(self):
+        path = reverse('create-poll', kwargs={'thread_id': self.thread.id})
+        response = self.dahl_client.get(path)
+        self.assertEqual(response.status_code, 403)
+
+        path = reverse('create-poll', kwargs={'thread_id': self.thread.id})
+        response = self.dahl_client.post(path, {})
         self.assertEqual(response.status_code, 403)
