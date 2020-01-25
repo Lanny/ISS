@@ -1,7 +1,7 @@
 from django.test import Client
 from django.urls import reverse
 
-from ISS.models import Thread, Forum, Poll
+from ISS.models import Thread, Forum, Poll, PollOption
 from . import tutils
 
 class PollsCreationTestCase(tutils.ForumConfigTestCase):
@@ -89,3 +89,95 @@ class PollsCreationTestCase(tutils.ForumConfigTestCase):
 
         response = self._create_poll()
         self.assertEqual(response.status_code, 403)
+
+class PollsVotingTestCase(tutils.ForumConfigTestCase):
+    forum_config = {'captcha_period': 0}
+
+    def setUp(self):
+        tutils.create_std_forums()
+
+        self.dahl = tutils.create_user()
+        self.lefkowitz = tutils.create_user()
+
+        # Single-vote
+        self.sv_thread = tutils.create_thread(
+            author=self.dahl,
+            title='a thread with a poll',
+            forum=Forum.objects.all()[0]
+        )
+
+        self.sv_poll = Poll.objects.create(
+            thread=self.sv_thread,
+            vote_type=Poll.SINGLE_CHOICE,
+            question='Was EPOLL as good idea?'
+        )
+
+        self.yes_opt = PollOption.objects.create(
+            poll=self.sv_poll,
+            answer='Yes'
+        )
+        self.no_opt = PollOption.objects.create(
+            poll=self.sv_poll,
+            answer='No'
+        )
+
+
+        # Multi-vote
+        self.mv_thread = tutils.create_thread(
+            author=self.dahl,
+            title='a thread with a poll',
+            forum=Forum.objects.all()[0]
+        )
+
+        self.mv_poll = Poll.objects.create(
+            thread=self.mv_thread,
+            vote_type=Poll.MULTIPLE_CHOICE,
+            question='Which languages are garbage?'
+        )
+
+        self.py_opt = PollOption.objects.create(
+            poll=self.mv_poll,
+            answer='Python'
+        )
+        self.perl_opt = PollOption.objects.create(
+            poll=self.mv_poll,
+            answer='Perl'
+        )
+        self.js_opt = PollOption.objects.create(
+            poll=self.mv_poll,
+            answer='Javascript'
+        )
+
+        self.dahl_client = Client()
+        self.dahl_client.force_login(self.dahl)
+
+        self.lefkowitz_client = Client()
+        self.lefkowitz_client.force_login(self.lefkowitz)
+
+    def _cast_single_vote(self, client, opt):
+        path = reverse('single-vote-on-poll', kwargs={'poll_id': self.poll.pk})
+        return client.post(path, {'option': opt.pk})
+
+    def test_poster_can_single_vote(self):
+        pass
+
+    def test_poster_can_multi_vote(self):
+        pass
+
+    def test_anon_poster_cant_vote(self):
+        pass
+
+    def test_banned_poster_cant_vote(self):
+        pass
+
+    def test_inactive_poster_cant_vote(self):
+        pass
+
+    def test_poster_cant_double_vote(self):
+        pass
+
+    def test_poster_cant_empty_vote(self):
+        pass
+
+    def test_vote_distribution(self):
+        pass
