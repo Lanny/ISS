@@ -10,6 +10,8 @@ admin.site.register(Thanks)
 admin.site.register(AuthPackage)
 admin.site.register(RegistrationCode)
 admin.site.register(PostSnapshot)
+admin.site.register(Poll)
+admin.site.register(PollOption)
 
 class BanInline(admin.TabularInline):
     model = Ban
@@ -90,3 +92,9 @@ class LatestThreadsForumPreferenceAdmin(admin.ModelAdmin):
     def name(self, obj):
         return str(obj)
 
+@admin.register(PollVote)
+class PollVoteModel(admin.ModelAdmin):
+    list_display = ('voter', 'poll_option', 'poll',)
+
+    def poll(self, obj):
+        return obj.poll_option.poll
