@@ -13,6 +13,7 @@ import email_normalize
 
 from ISS import utils
 from ISS.utils import HomoglyphNormalizer
+from .polls import Poll
 from .auth_package import AuthPackage, AccessControlList
 from .admin_models import Ban
 
