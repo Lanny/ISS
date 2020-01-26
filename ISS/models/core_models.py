@@ -434,6 +434,12 @@ class Thread(models.Model):
     def can_reply(self):
         return not self.locked
 
+    def get_poll(self):
+        try:
+            return self.poll
+        except Poll.DoesNotExist:
+            return None
+
     def _get_flag(self, user, save=True):
         if not (user.pk in self._flag_cache):
             flag, created = ThreadFlag.objects.get_or_create(

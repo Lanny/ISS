@@ -17,11 +17,7 @@ class CreatePoll(utils.MethodSplitView):
         if thread.author != request.user:
             raise PermissionDenied('Only thread authors can create polls')
 
-        try:
-            poll = thread.poll
-        except Poll.DoesNotExist:
-            pass
-        else:
+        if thread.get_poll():
             raise PermissionDenied('Thread already has a poll')
 
         return {'thread': thread}

@@ -84,6 +84,20 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(tfc+1, ThreadFlag.objects.all().count())
 
+    def test_view_thread_with_poll(self):
+        thread = Thread.objects.all()[0]
+        poll = Poll.objects.create(
+            thread=thread,
+            question='Why is a duck?',
+            vote_type=Poll.SINGLE_CHOICE
+        )
+        PollOption.objects.create(poll=poll, answer='Mu')
+        PollOption.objects.create(poll=poll, answer='Because')
+
+        path = reverse('thread', args=(thread.pk,))
+        response = self.scrub_client.get(path)
+        self.assertEqual(response.status_code, 200)
+
     def test_authd_latest_threads(self):
         alan = tutils.create_user()
         alan_client = Client()
