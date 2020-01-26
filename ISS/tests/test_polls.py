@@ -161,6 +161,13 @@ class PollVotingTestCase(tutils.ForumConfigTestCase):
         )
         return client.post(path, {'response': opt.pk})
 
+    def _cast_multiple_vote(self, client, opts):
+        path = reverse(
+            'vote-on-poll',
+            kwargs={'poll_id': self.mv_poll.pk}
+        )
+        return client.post(path, {'response': [opt.pk for opt in opts]})
+
     def test_poster_can_single_vote(self):
         response = self._cast_single_vote(self.dahl_client, self.yes_opt)
 

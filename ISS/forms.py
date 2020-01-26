@@ -284,18 +284,34 @@ class CastVoteForm(forms.Form):
         super(CastVoteForm, self).__init__(*args, **kwargs)
 
         if self.poll.vote_type == Poll.SINGLE_CHOICE:
-            choices = [
-                (opt.pk, opt.answer) for opt in self.poll.polloption_set.all()
-            ]
-
-            self.fields['response'] = forms.ChoiceField(
+            self.fields['response'] = forms.ModelChoiceField(
                 label='Response',
-                choices=choices,
+                queryset=self.poll.polloption_set.all(),
                 widget=forms.RadioSelect)
+        elif self.poll.vote_type == Poll.MULTIPLE_CHOICE:
+            self.fields['response'] = forms.ModelMultipleChoiceField(
+                label='Response',
+                queryset=self.poll.polloption_set.all(),
+                widget=forms.CheckboxSelectMultiple)
+        else:
+            raise Exception('Not implemented')
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if len(cleaned_data['response']) < 1:
+            raise forms.ValidationError('Can not cast empty vote')
+
+        return cleaned_data
+
+    def get_cleaned_options(self):
+        if self.poll.vote_type == Poll.SINGLE_CHOICE:
+            return [self.cleaned_data['response']]
+        elif self.poll.vote_type == Poll.MULTIPLE_CHOICE:
+            return self.cleaned_data['response']
         else:
             raise Exception('Not implemented')
         
-
 
 class NewPostForm(InitialPeriodLimitingForm, PostDuplicationPreventionForm):
     error_css_class = 'in-error'

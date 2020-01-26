@@ -67,20 +67,12 @@ class CastVote(utils.MethodSplitView):
         if poll.poster_has_voted(request.user):
             raise PermissionDenied('Already voted')
 
-        if poll.vote_type == Poll.SINGLE_CHOICE:
-            form = forms.CastVoteForm(request.POST, poll=poll)
+        form = forms.CastVoteForm(request.POST, poll=poll)
 
-            if form.is_valid():
-                option = get_object_or_404(
-                    PollOption,
-                    pk=form.cleaned_data['response'],
-                    poll=poll
-                )
-
+        if form.is_valid():
+            for option in form.get_cleaned_options():
                 PollVote.objects.create(poll_option=option, voter=request.user)
-                return HttpResponseRedirect(poll.thread.get_url())
-            else:
-                raise PermissionDenied('Invalid vote form')
 
+            return HttpResponseRedirect(poll.thread.get_url())
         else:
-            raise Exception('Not implemented')
+            raise PermissionDenied('Invalid vote form')

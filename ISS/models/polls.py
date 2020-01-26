@@ -41,6 +41,9 @@ class PollOption(models.Model):
     poll = models.ForeignKey(Poll, null=False, on_delete=models.CASCADE)
     answer = models.CharField(max_length=1024)
 
+    def __str__(self):
+        return self.answer
+
 
 class PollVote(models.Model):
     class Meta:
