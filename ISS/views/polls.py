@@ -7,6 +7,7 @@ from ISS import utils, forms
 from ISS.models import Thread, Poll, PollOption, PollVote
 
 class CreatePoll(utils.MethodSplitView):
+    error_css_class = 'in-error'
     active_required = True
     unbanned_required = True
 

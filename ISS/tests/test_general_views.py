@@ -185,7 +185,35 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
                 'forum': forum.pk
             })
 
-        self.assertEqual(response.status_code, 302)
+        thread = Thread.objects.order_by('-created')[0]
+        self.assertRedirects(
+            response,
+            thread.get_url(),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True)
+
+    def test_new_thread_with_poll(self):
+        forum = Forum.objects.all()[0]
+        path = reverse('new-thread', kwargs={'forum_id': forum.pk})
+
+        response = self.scrub_client.post(
+            path,
+            {
+                'title': 'SAT is a lie',
+                'content': 'NP erect lol',
+                'forum': forum.pk,
+                'add_poll': 'true'
+            })
+
+        thread = Thread.objects.order_by('-created')[0]
+
+        self.assertRedirects(
+            response,
+            reverse('create-poll', kwargs={'thread_id': thread.pk}),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True)
 
     def test_new_thread_generates_subscription(self):
         forum = Forum.objects.all()[0]

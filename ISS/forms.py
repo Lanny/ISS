@@ -204,6 +204,8 @@ class NewThreadForm(InitialPeriodLimitingForm, PostDuplicationPreventionForm):
                            min_length=post_min_len,
                            max_length=post_max_len,
                            widget=forms.Textarea())
+
+    add_poll = forms.BooleanField(label='Add poll?', required=False)
     forum = forms.ModelChoiceField(queryset=Forum.objects.all(),
                                    widget=forms.HiddenInput())
 

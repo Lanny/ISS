@@ -526,7 +526,13 @@ class NewThread(utils.MethodSplitView):
             if request.user.auto_subscribe >= 1:
                 thread.subscribe(request.user)
 
-            return HttpResponseRedirect(thread.get_url())
+
+            if form.cleaned_data['add_poll']:
+                return HttpResponseRedirect(
+                    reverse('create-poll', kwargs={'thread_id': thread.pk})
+                )
+            else:
+                return HttpResponseRedirect(thread.get_url())
 
         else:
             ctx = {
