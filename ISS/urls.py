@@ -194,6 +194,9 @@ urlpatterns = [
     url(r'^thread/(?P<thread_id>\d+)/create-poll$',
         views.polls.CreatePoll.as_view(),
         name='create-poll'),
+    url(r'^polls/(?P<poll_id>\d+)/vote$',
+        views.polls.CastVote.as_view(),
+        name='vote-on-poll'),
 
     url(r'^api/users/search$',
         views.user.user_fuzzy_search,

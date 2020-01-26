@@ -1,10 +1,10 @@
 from django.test import Client
 from django.urls import reverse
 
-from ISS.models import Thread, Forum, Poll, PollOption
+from ISS.models import Thread, Forum, Ban, Poll, PollOption, PollVote
 from . import tutils
 
-class PollsCreationTestCase(tutils.ForumConfigTestCase):
+class PollCreationTestCase(tutils.ForumConfigTestCase):
     forum_config = {'captcha_period': 0}
 
     def setUp(self):
@@ -90,7 +90,7 @@ class PollsCreationTestCase(tutils.ForumConfigTestCase):
         response = self._create_poll()
         self.assertEqual(response.status_code, 403)
 
-class PollsVotingTestCase(tutils.ForumConfigTestCase):
+class PollVotingTestCase(tutils.ForumConfigTestCase):
     forum_config = {'captcha_period': 0}
 
     def setUp(self):
@@ -155,29 +155,74 @@ class PollsVotingTestCase(tutils.ForumConfigTestCase):
         self.lefkowitz_client.force_login(self.lefkowitz)
 
     def _cast_single_vote(self, client, opt):
-        path = reverse('single-vote-on-poll', kwargs={'poll_id': self.poll.pk})
-        return client.post(path, {'option': opt.pk})
+        path = reverse(
+            'vote-on-poll',
+            kwargs={'poll_id': self.sv_poll.pk}
+        )
+        return client.post(path, {'response': opt.pk})
 
     def test_poster_can_single_vote(self):
-        pass
+        response = self._cast_single_vote(self.dahl_client, self.yes_opt)
+
+        self.assertRedirects(
+            response,
+            self.sv_thread.get_url(),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True)
+
+        self.assertEqual(
+                PollVote.objects
+                    .filter(voter=self.dahl, poll_option=self.yes_opt)
+                    .count(),
+                1)
 
     def test_poster_can_multi_vote(self):
         pass
 
     def test_anon_poster_cant_vote(self):
-        pass
+        client = Client()
+        response = self._cast_single_vote(client, self.yes_opt)
+        self.assertEqual(PollVote.objects.all().count(), 0)
 
     def test_banned_poster_cant_vote(self):
-        pass
+        Ban.objects.create(
+            subject=self.dahl,
+            given_by=self.lefkowitz,
+            reason='JS a shit')
+
+        response = self._cast_single_vote(self.dahl_client, self.yes_opt)
+        self.assertEqual(response.status_code, 403)
 
     def test_inactive_poster_cant_vote(self):
-        pass
+        self.dahl.is_active = False
+        self.dahl.save()
+        self._cast_single_vote(self.dahl_client, self.yes_opt)
+        self.assertEqual(PollVote.objects.all().count(), 0)
 
     def test_poster_cant_double_vote(self):
-        pass
+        self._cast_single_vote(self.dahl_client, self.yes_opt)
+        self._cast_single_vote(self.dahl_client, self.yes_opt)
+        self.assertEqual(PollVote.objects.all().count(), 1)
 
     def test_poster_cant_empty_vote(self):
-        pass
+        path = reverse(
+            'vote-on-poll',
+            kwargs={'poll_id': self.sv_poll.pk}
+        )
+        self.dahl_client.post(path, {})
+        self.assertEqual(PollVote.objects.all().count(), 0)
 
-    def test_vote_distribution(self):
-        pass
+    def test_sv_vote_distribution(self):
+        dist = self.sv_poll.get_vote_distribution()
+
+        self.assertEqual(dist[self.yes_opt], 0)
+        self.assertEqual(dist[self.no_opt], 0)
+
+        self._cast_single_vote(self.dahl_client, self.yes_opt)
+        self._cast_single_vote(self.lefkowitz_client, self.yes_opt)
+
+        dist = self.sv_poll.get_vote_distribution()
+
+        self.assertEqual(dist[self.yes_opt], 2)
+        self.assertEqual(dist[self.no_opt], 0)

@@ -4,24 +4,24 @@ from django.http import HttpResponseRedirect
 from django.db import transaction
 
 from ISS import utils, forms
-from ISS.models import Thread, Poll, PollOption
+from ISS.models import Thread, Poll, PollOption, PollVote
 
 class CreatePoll(utils.MethodSplitView):
     active_required = True
+    unbanned_required = True
 
     def pre_method_check(self, request, thread_id):
         thread = get_object_or_404(Thread, pk=thread_id)
 
         if thread.author != request.user:
-            raise PermissionDenied()
+            raise PermissionDenied('Only thread authors can create polls')
 
         try:
             poll = thread.poll
         except Poll.DoesNotExist:
             pass
         else:
-            # Thread already has a poll, this request is in error
-            raise PermissionDenied()
+            raise PermissionDenied('Thread already has a poll')
 
         return {'thread': thread}
 
@@ -57,3 +57,37 @@ class CreatePoll(utils.MethodSplitView):
                 'thread': thread,
                 'form': form
             })
+
+class CastVote(utils.MethodSplitView):
+    require_login = True
+    active_required = True
+    unbanned_required = True
+
+    @transaction.atomic
+    def POST(self, request, poll_id):
+        poll = get_object_or_404(Poll, pk=poll_id)
+
+        vote_count = (PollVote.objects
+            .filter(voter=request.user, poll_option__poll=poll)
+            .count())
+
+        if vote_count > 0:
+            raise PermissionDenied('Already voted')
+
+        if poll.vote_type == Poll.SINGLE_CHOICE:
+            form = forms.CastVoteForm(request.POST, poll=poll)
+
+            if form.is_valid():
+                option = get_object_or_404(
+                    PollOption,
+                    pk=form.cleaned_data['response'],
+                    poll=poll
+                )
+
+                PollVote.objects.create(poll_option=option, voter=request.user)
+                return HttpResponseRedirect(poll.thread.get_url())
+            else:
+                raise PermissionDenied('Invalid vote form')
+
+        else:
+            raise Exception('Not implemented')

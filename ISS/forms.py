@@ -276,6 +276,24 @@ class NewPollForm(forms.Form):
 
         return cleaned_data
 
+class CastVoteForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.poll = kwargs.pop('poll')
+        super(CastVoteForm, self).__init__(*args, **kwargs)
+
+        if self.poll.vote_type == Poll.SINGLE_CHOICE:
+            choices = [
+                (opt.pk, opt.answer) for opt in self.poll.polloption_set.all()
+            ]
+
+            self.fields['response'] = forms.ChoiceField(
+                label='Response',
+                choices=choices,
+                widget=forms.RadioSelect)
+        else:
+            raise Exception('Not implemented')
+        
+
 
 class NewPostForm(InitialPeriodLimitingForm, PostDuplicationPreventionForm):
     error_css_class = 'in-error'
