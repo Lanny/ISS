@@ -1,0 +1,24 @@
+@import "../base/config.less";
+
+.poll {
+  .generic-section();
+  margin-bottom: @content_margin_bottom;
+
+  .poll-question {
+    font-style: oblique;
+  }
+
+  & > ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+
+    .vote-bar {
+      height: 20px;
+      border-radius: 4px;
+      background-color: red;
+
+      min-width: 1%;
+    }
+  }
+}

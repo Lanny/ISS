@@ -98,6 +98,11 @@ def thread(request, thread_id):
         'thread_action_form': forms.ThreadActionForm()
     }
 
+    if (thread.get_poll()
+            and request.user.is_authenticated
+            and not thread.poll.poster_has_voted(request.user)):
+        ctx['cast_vote_form'] = forms.CastVoteForm(poll=thread.poll)
+
     response = render(request, 'thread.html', ctx)
 
     # Update thread flag

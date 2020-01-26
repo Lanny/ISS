@@ -64,11 +64,7 @@ class CastVote(utils.MethodSplitView):
     def POST(self, request, poll_id):
         poll = get_object_or_404(Poll, pk=poll_id)
 
-        vote_count = (PollVote.objects
-            .filter(voter=request.user, poll_option__poll=poll)
-            .count())
-
-        if vote_count > 0:
+        if poll.poster_has_voted(request.user):
             raise PermissionDenied('Already voted')
 
         if poll.vote_type == Poll.SINGLE_CHOICE:

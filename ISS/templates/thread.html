@@ -32,6 +32,32 @@
     </div>
 
 
+    {% if thread.poll %}
+      <div class="poll">
+        <span>
+          Poll:
+          <span class="poll-question">{{ thread.poll.question }}</span>
+        </span>
+        <ul>
+          {% for opt, perc in thread.poll.get_vote_distribution_percentages.items %}
+            <li class="option">
+              <span class="option-label">
+                {{ opt.answer }}
+              </span>
+              <div class="vote-bar" style="width: {{ perc }}%" />
+            </li>
+        {% endfor %}
+      {% if cast_vote_form %}
+        <form method="POST" action="{% url 'vote-on-poll' thread.poll.pk %}">
+          {% csrf_token %}
+          {{ cast_vote_form }}
+
+          <input type="submit" value="Vote" />
+        </form>
+      {% endif %}
+      </div>
+    {% endif %}
+
     <div class="thread-content">
       <h1>{{ thread.title|word_filter }}</h1>
 
