@@ -286,6 +286,7 @@ class CastVoteForm(forms.Form):
         if self.poll.vote_type == Poll.SINGLE_CHOICE:
             self.fields['response'] = forms.ModelChoiceField(
                 label='Response',
+                empty_label=None,
                 queryset=self.poll.polloption_set.all(),
                 widget=forms.RadioSelect)
         elif self.poll.vote_type == Poll.MULTIPLE_CHOICE:
@@ -299,7 +300,8 @@ class CastVoteForm(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
 
-        if len(cleaned_data['response']) < 1:
+        if (self.poll.vote_type == Poll.MULTIPLE_CHOICE
+                and len(cleaned_data['response']) < 1):
             raise forms.ValidationError('Can not cast empty vote')
 
         return cleaned_data

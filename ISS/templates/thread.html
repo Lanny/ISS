@@ -39,36 +39,39 @@
           <span class="poll-question">{{ thread.poll.question }}</span>
         </h3>
 
-        <ul>
-          {% for opt, perc in thread.poll.get_vote_distribution_percentages.items %}
-            <li class="option">
-              <span class="option-label">
-                {{ opt.answer }}
-              </span>
-              <div class="vote-bar-container">
-                <div class="vote-bar" style="width: {{ perc }}%">
-                  {% if perc > 0.8 %}
-                    <span class="vote-val inner">
+        <div class="poll-content">
+          <ul>
+            {% for opt, perc in thread.poll.get_vote_distribution_percentages.items %}
+              <li class="option">
+                <span class="option-label">
+                  {{ opt.answer }}
+                </span>
+                <div class="vote-bar-container">
+                  <div class="vote-bar" style="width: {{ perc }}%">
+                    {% if perc > 20 %}
+                      <span class="vote-val inner">
+                        {{ perc|floatformat }}%
+                      </span>
+                    {% endif %}
+                  </div>
+                  {% if perc <= 20 %}
+                    <span class="vote-val outer">
                       {{ perc|floatformat }}%
                     </span>
                   {% endif %}
                 </div>
-                {% if perc <= 0.8 %}
-                  <span class="vote-val outer">
-                    {{ perc|floatformat }}%
-                  </span>
-                {% endif %}
-              </div>
-            </li>
-        {% endfor %}
-      {% if cast_vote_form %}
-        <form method="POST" action="{% url 'vote-on-poll' thread.poll.pk %}">
-          {% csrf_token %}
-          {{ cast_vote_form }}
+              </li>
+          {% endfor %}
+        </ul>
+        {% if cast_vote_form %}
+          <form method="POST" action="{% url 'vote-on-poll' thread.poll.pk %}">
+            {% csrf_token %}
+            {{ cast_vote_form.as_p }}
 
-          <input type="submit" value="Vote" />
-        </form>
-      {% endif %}
+            <input type="submit" value="Vote" />
+          </form>
+        {% endif %}
+        </div>
       </div>
     {% endif %}
 

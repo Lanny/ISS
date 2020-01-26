@@ -185,7 +185,13 @@ class PollVotingTestCase(tutils.ForumConfigTestCase):
                 1)
 
     def test_poster_can_multi_vote(self):
-        pass
+        self._cast_multiple_vote(self.dahl_client, [self.py_opt, self.js_opt])
+        self.assertEqual(PollVote.objects.all().count(), 2)
+
+    def test_poster_can_double_multi_vote(self):
+        self._cast_multiple_vote(self.dahl_client, [self.py_opt, self.js_opt])
+        self._cast_multiple_vote(self.dahl_client, [self.perl_opt])
+        self.assertEqual(PollVote.objects.all().count(), 2)
 
     def test_anon_poster_cant_vote(self):
         client = Client()

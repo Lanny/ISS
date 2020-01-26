@@ -242,19 +242,23 @@
     }
 
     [type="submit"] {
-      .btn();
-
-      float: right;
-      margin-top: 20px;
-      margin-right: 5px;
-
-      @media (max-width: @breakpoint) {
-        width: 100%;
-        float: none;
-        display: block;
-        text-align: center;
-      }
+      .submit-btn();
     }
+  }
+}
+
+.submit-btn {
+  .btn();
+
+  float: right;
+  margin-top: 20px;
+  margin-right: 5px;
+
+  @media (max-width: @breakpoint) {
+    width: 100%;
+    float: none;
+    display: block;
+    text-align: center;
   }
 }
 
