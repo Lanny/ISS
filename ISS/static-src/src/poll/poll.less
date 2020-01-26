@@ -1,24 +1,52 @@
 @import "../base/config.less";
 
 .poll {
-  .generic-section();
   margin-bottom: @content_margin_bottom;
+  .rounded();
+  background-color: @bg_dark;
 
-  .poll-question {
-    font-style: oblique;
+  .poll-prompt {
+    .title-box();
+
+    .poll-question {
+      font-style: oblique;
+    }
   }
 
   & > ul {
-    padding: 0;
-    margin: 0;
     list-style: none;
+    margin: 0;
+    padding: @std_lr_padding;
 
-    .vote-bar {
-      height: 20px;
-      border-radius: 4px;
-      background-color: red;
+    li {
+      padding-bottom: 8px;
 
-      min-width: 1%;
+      .vote-bar-container {
+        width: 100%;
+        display: flex;
+        align-items: center;
+
+        .vote-bar {
+          .vote-bar-style();
+          display: inline-block;
+          height: 20px;
+          min-width: 1%;
+          text-align: right;
+        }
+
+        .vote-val {
+          .vote-val-style();
+
+          &.inner {
+            vertical-align: middle;
+            padding-right: 5px;
+          }
+
+          &.outer {
+            padding-left: 5px;
+          }
+        }
+      }
     }
   }
 }

@@ -34,17 +34,31 @@
 
     {% if thread.poll %}
       <div class="poll">
-        <span>
+        <h3 class="poll-prompt">
           Poll:
           <span class="poll-question">{{ thread.poll.question }}</span>
-        </span>
+        </h3>
+
         <ul>
           {% for opt, perc in thread.poll.get_vote_distribution_percentages.items %}
             <li class="option">
               <span class="option-label">
                 {{ opt.answer }}
               </span>
-              <div class="vote-bar" style="width: {{ perc }}%" />
+              <div class="vote-bar-container">
+                <div class="vote-bar" style="width: {{ perc }}%">
+                  {% if perc > 0.8 %}
+                    <span class="vote-val inner">
+                      {{ perc|floatformat }}%
+                    </span>
+                  {% endif %}
+                </div>
+                {% if perc <= 0.8 %}
+                  <span class="vote-val outer">
+                    {{ perc|floatformat }}%
+                  </span>
+                {% endif %}
+              </div>
             </li>
         {% endfor %}
       {% if cast_vote_form %}
