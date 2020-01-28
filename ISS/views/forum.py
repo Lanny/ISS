@@ -316,8 +316,14 @@ def thanked_posts(request, user_id):
 
 def posts_thanked(request, user_id):
     poster = get_object_or_404(Poster, pk=user_id)
-    posts = (Post.objects.filter(thanks__thanker__id=user_id)
-        .order_by('-created'))
+    excluded_threads = []
+    for thread in Thread.objects.all():
+        if thread.forum.member_view_only and not request.user.is_authenticated:
+            excluded_threads.append(thread)
+    posts = (Post.objects
+             .filter(thanks__thanker__id=user_id)
+             .filter(~Q(thread_id__in=excluded_threads))
+             .order_by('-created'))
 
     page = utils.get_posts_page(posts, request)
 
