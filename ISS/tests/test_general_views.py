@@ -84,6 +84,20 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(tfc+1, ThreadFlag.objects.all().count())
 
+    def test_view_thread_with_poll(self):
+        thread = Thread.objects.all()[0]
+        poll = Poll.objects.create(
+            thread=thread,
+            question='Why is a duck?',
+            vote_type=Poll.SINGLE_CHOICE
+        )
+        PollOption.objects.create(poll=poll, answer='Mu')
+        PollOption.objects.create(poll=poll, answer='Because')
+
+        path = reverse('thread', args=(thread.pk,))
+        response = self.scrub_client.get(path)
+        self.assertEqual(response.status_code, 200)
+
     def test_authd_latest_threads(self):
         alan = tutils.create_user()
         alan_client = Client()
@@ -185,7 +199,35 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
                 'forum': forum.pk
             })
 
-        self.assertEqual(response.status_code, 302)
+        thread = Thread.objects.order_by('-created')[0]
+        self.assertRedirects(
+            response,
+            thread.get_url(),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True)
+
+    def test_new_thread_with_poll(self):
+        forum = Forum.objects.all()[0]
+        path = reverse('new-thread', kwargs={'forum_id': forum.pk})
+
+        response = self.scrub_client.post(
+            path,
+            {
+                'title': 'SAT is a lie',
+                'content': 'NP erect lol',
+                'forum': forum.pk,
+                'add_poll': 'true'
+            })
+
+        thread = Thread.objects.order_by('-created')[0]
+
+        self.assertRedirects(
+            response,
+            reverse('create-poll', kwargs={'thread_id': thread.pk}),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True)
 
     def test_new_thread_generates_subscription(self):
         forum = Forum.objects.all()[0]

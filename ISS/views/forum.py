@@ -105,6 +105,11 @@ def thread(request, thread_id):
         'thread_action_form': forms.ThreadActionForm()
     }
 
+    if (thread.get_poll()
+            and request.user.is_authenticated
+            and not thread.poll.poster_has_voted(request.user)):
+        ctx['cast_vote_form'] = forms.CastVoteForm(poll=thread.poll)
+
     response = render(request, 'thread.html', ctx)
 
     # Update thread flag
@@ -563,7 +568,13 @@ class NewThread(utils.MethodSplitView):
             if request.user.auto_subscribe >= 1:
                 thread.subscribe(request.user)
 
-            return HttpResponseRedirect(thread.get_url())
+
+            if form.cleaned_data['add_poll']:
+                return HttpResponseRedirect(
+                    reverse('create-poll', kwargs={'thread_id': thread.pk})
+                )
+            else:
+                return HttpResponseRedirect(thread.get_url())
 
         else:
             ctx = {

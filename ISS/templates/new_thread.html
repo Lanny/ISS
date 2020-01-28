@@ -18,7 +18,7 @@
       </h1>
       <fieldset>
         {% csrf_token %}
-        {{ form }}
+        {{ form.as_p }}
         <input type="submit"
                value="Submit" />
         <input class="preview-post-action"

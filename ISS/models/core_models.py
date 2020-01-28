@@ -13,6 +13,7 @@ import email_normalize
 
 from ISS import utils
 from ISS.utils import HomoglyphNormalizer
+from .polls import Poll
 from .auth_package import AuthPackage, AccessControlList
 from .admin_models import Ban
 
@@ -434,6 +435,12 @@ class Thread(models.Model):
 
     def can_reply(self):
         return not self.locked
+
+    def get_poll(self):
+        try:
+            return self.poll
+        except Poll.DoesNotExist:
+            return None
 
     def _get_flag(self, user, save=True):
         if not (user.pk in self._flag_cache):
