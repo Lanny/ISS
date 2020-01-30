@@ -1,5 +1,6 @@
 from django.core.exceptions import PermissionDenied
 from django.db import models
+from django.http import HttpResponseBadRequest
 from django.utils import timezone
 from django import forms
 
@@ -35,7 +36,7 @@ class LatestThreadsForumPreference(models.Model):
         trash_forums = []
 
         for forum in Forum.objects.all():
-            effective_prefs[forum.pk] = forum.include_in_lastest_threads 
+            effective_prefs[forum.pk] = forum.include_in_lastest_threads
             if forum.is_trash: trash_forums.append(forum.pk)
 
         if poster:

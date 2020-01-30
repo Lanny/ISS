@@ -315,6 +315,7 @@ class Forum(models.Model):
     last_update = models.DateTimeField(default=timezone.now)
     is_trash = models.BooleanField(default=False)
     include_in_lastest_threads = models.BooleanField(default=True, null=False)
+    member_view_only = models.BooleanField(default=False)
 
     create_thread_pack = models.ForeignKey(
         AuthPackage,

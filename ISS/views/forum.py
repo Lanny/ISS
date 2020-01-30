@@ -21,6 +21,7 @@ from ISS.models import *
 from ISS import models as iss_models
 from ISS.hooks import HookManager
 
+
 def _get_new_post_form(request):
     return utils.conditionally_captchatize(request, forms.NewPostForm)
 
@@ -60,6 +61,10 @@ def forum_index(request):
 @cache_control(no_cache=True, max_age=0, must_revalidate=True, no_store=True)
 def thread_index(request, forum_id):
     forum = get_object_or_404(Forum, pk=forum_id)
+
+    if forum.member_view_only and not request.user.is_authenticated:
+        return render(request, '403.html')
+
     threads = forum.thread_set.order_by('-stickied', '-last_update')
     threads_per_page = utils.get_config('threads_per_forum_page')
     paginator = utils.MappingPaginator(threads, threads_per_page)
@@ -82,6 +87,8 @@ def thread_index(request, forum_id):
 
 def thread(request, thread_id):
     thread = get_object_or_404(Thread, pk=thread_id)
+    if thread.forum.member_view_only and not request.user.is_authenticated:
+        return render(request, '403.html')
     posts = (thread.post_set
         .order_by('created')
         .select_related('author')
@@ -242,7 +249,12 @@ def redirect_to_post(request, post_id):
 
 def threads_by_user(request, user_id):
     poster = get_object_or_404(Poster, pk=user_id)
-    threads = Thread.objects.filter(author=poster).order_by('-created')
+
+    if request.user.is_authenticated:
+        threads = Thread.objects.filter(author=poster).order_by('-created')
+    else:
+        threads = Thread.objects.filter(author=poster).exclude(thread__forum__member_view_only=True).order_by('-created')
+
     threads_per_page = utils.get_config('general_items_per_page')
     paginator = Paginator(threads, threads_per_page)
 
@@ -258,9 +270,17 @@ def threads_by_user(request, user_id):
 
 def posts_by_user(request, user_id):
     poster = get_object_or_404(Poster, pk=user_id)
-    posts = (poster.post_set
-        .order_by('-created')
-        .select_related('thread'))
+
+    if request.user.is_authenticated:
+        posts = (poster.post_set
+                .order_by('-created')
+                .select_related('thread'))
+    else:
+        posts = (poster.post_set
+                 .exclude(thread__forum__member_view_only=True)
+                 .order_by('-created')
+                 .select_related('thread'))
+
     posts_per_page = utils.get_config('general_items_per_page')
     paginator = Paginator(posts, posts_per_page)
 
@@ -276,10 +296,18 @@ def posts_by_user(request, user_id):
 
 def thanked_posts(request, user_id):
     poster = get_object_or_404(Poster, pk=user_id)
-    posts = (poster.post_set
-        .filter(thanks__isnull=False)
-        .annotate(Max('thanks__given'))
-        .order_by('-thanks__given__max'))
+
+    if request.user.is_authenticated:
+        posts = (poster.post_set
+            .filter(thanks__isnull=False)
+            .annotate(Max('thanks__given'))
+            .order_by('-thanks__given__max'))
+    else:
+        posts = (poster.post_set
+                 .filter(thanks__isnull=False)
+                 .exclude(thread__forum__member_view_only=True)
+                 .annotate(Max('thanks__given'))
+                 .order_by('-thanks__given__max'))
 
     page = utils.get_posts_page(posts, request)
 
@@ -293,8 +321,16 @@ def thanked_posts(request, user_id):
 
 def posts_thanked(request, user_id):
     poster = get_object_or_404(Poster, pk=user_id)
-    posts = (Post.objects.filter(thanks__thanker__id=user_id)
-        .order_by('-created'))
+
+    if request.user.is_authenticated:
+        posts = (Post.objects
+                 .filter(thanks__thanker__id=user_id)
+                 .order_by('-created'))
+    else:
+        posts = (Post.objects
+                 .filter(thanks__thanker__id=user_id)
+                 .exclude(thread__forum__member_view_only=True)
+                 .order_by('-created'))
 
     page = utils.get_posts_page(posts, request)
 
@@ -316,10 +352,17 @@ def latest_threads(request):
     excluded_forums = [
         fpk for fpk, include in list(effective_prefs.items()) if not include]
 
-    threads = (Thread.objects.all()
-        .filter(~Q(forum_id__in=excluded_forums))
-        .order_by('-last_update')
-        .select_related('author'))
+    if request.user.is_authenticated:
+        threads = (Thread.objects.all()
+            .filter(~Q(forum_id__in=excluded_forums))
+            .order_by('-last_update')
+            .select_related('author'))
+    else:
+        threads = (Thread.objects.all()
+                   .filter(~Q(forum_id__in=excluded_forums))
+                   .exclude(forum__member_view_only=True)
+                   .order_by('-last_update')
+                   .select_related('author'))
 
     threads_per_page = utils.get_config('threads_per_forum_page')
     paginator = utils.MappingPaginator(threads, threads_per_page)
@@ -364,7 +407,6 @@ def latest_threads(request):
     }
 
     return render(request, 'latest_threads.html', ctx)
-
 
 class UpdateLatestThreadsPreferences(utils.MethodSplitView):
     require_login = True
