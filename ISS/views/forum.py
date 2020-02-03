@@ -341,10 +341,10 @@ def latest_threads(request):
     excluded_forums = [
         fpk for fpk, include in list(effective_prefs.items()) if not include]
 
-        threads = (Thread.objects.all()
-            .filter(~Q(forum_id__in=excluded_forums))
-            .order_by('-last_update')
-            .select_related('author'))
+    threads = (Thread.objects.all()
+        .filter(~Q(forum_id__in=excluded_forums))
+        .order_by('-last_update')
+        .select_related('author'))
 
     if not request.user.is_authenticated:
         threads = threads.exclude(forum__member_view_only=True)
