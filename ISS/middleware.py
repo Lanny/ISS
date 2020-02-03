@@ -40,7 +40,7 @@ class PMAdminMiddleware(BaseMiddleware):
         if settings.DEBUG:
             return None
         
-        if isinstance(exception, Http404):
+        if isinstance(exception, (Http404, PermissionDenied)):
             # No need to report 404s
             return None
 
