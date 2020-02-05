@@ -140,6 +140,13 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context['threads']), 5)
 
+    def test_threads_by_user_anon(self):
+        anon_client = Client()
+        path = reverse('threads-by-user', kwargs={'user_id': self.scrub.pk})
+        response = anon_client.get(path)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['threads']), 5)
+
     def test_user_profile_doesnt_error(self):
         path = reverse('user-profile', kwargs={'user_id': self.scrub.pk})
         response = self.scrub_client.get(path)

@@ -253,7 +253,7 @@ def threads_by_user(request, user_id):
 
     threads = Thread.objects.filter(author=poster).order_by('-created')
     if not request.user.is_authenticated:
-        threads = threads.exclude(thread__forum__member_view_only=True)
+        threads = threads.exclude(forum__member_view_only=True)
 
     threads_per_page = utils.get_config('general_items_per_page')
     paginator = Paginator(threads, threads_per_page)
