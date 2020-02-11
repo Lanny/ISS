@@ -85,7 +85,7 @@ def thread_index(request, forum_id):
 
     return render(request, 'thread_index.html', ctx)
 
-def thread(request, thread_id):
+def thread(request, thread_id, poll_vote_form=None):
     thread = get_object_or_404(Thread, pk=thread_id)
     if thread.forum.member_view_only and not request.user.is_authenticated:
         raise PermissionDenied('Must sign in.')
@@ -106,7 +106,9 @@ def thread(request, thread_id):
         'thread_action_form': forms.ThreadActionForm()
     }
 
-    if (thread.get_poll()
+    if poll_vote_form:
+        ctx['cast_vote_form'] = poll_vote_form
+    elif (thread.get_poll()
             and request.user.is_authenticated
             and not thread.poll.poster_has_voted(request.user)):
         ctx['cast_vote_form'] = forms.CastVoteForm(poll=thread.poll)

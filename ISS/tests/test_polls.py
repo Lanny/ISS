@@ -218,13 +218,23 @@ class PollVotingTestCase(tutils.ForumConfigTestCase):
         self._cast_single_vote(self.dahl_client, self.yes_opt)
         self.assertEqual(PollVote.objects.all().count(), 1)
 
-    def test_poster_cant_empty_vote(self):
+    def test_poster_cant_empty_vote_sv(self):
         path = reverse(
             'vote-on-poll',
             kwargs={'poll_id': self.sv_poll.pk}
         )
-        self.dahl_client.post(path, {})
+        response = self.dahl_client.post(path, {})
         self.assertEqual(PollVote.objects.all().count(), 0)
+        self.assertEqual(response.status_code, 200)
+
+    def test_poster_cant_empty_vote_mv(self):
+        path = reverse(
+            'vote-on-poll',
+            kwargs={'poll_id': self.mv_poll.pk}
+        )
+        response = self.dahl_client.post(path, {})
+        self.assertEqual(PollVote.objects.all().count(), 0)
+        self.assertEqual(response.status_code, 200)
 
     def test_sv_vote_distribution(self):
         dist = self.sv_poll.get_vote_distribution()
