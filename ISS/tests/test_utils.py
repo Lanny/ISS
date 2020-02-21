@@ -126,6 +126,7 @@ class HomoglyphNormalizerTestCase(TestCase):
             ('don knuth', 'Don Knuth'),
             ('Don Knuth', 'don knuth'),
             ('Lanny', 'L\u0430nny'),
+            ('Lanny', 'L\xadanny')
         )
 
         for str1, str2 in cases:

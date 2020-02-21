@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from django.db import transaction
 
 from ISS import utils, forms
+from ISS.views.forum import thread
 from ISS.models import Thread, Poll, PollOption, PollVote
 
 class CreatePoll(utils.MethodSplitView):
@@ -75,4 +76,5 @@ class CastVote(utils.MethodSplitView):
 
             return HttpResponseRedirect(poll.thread.get_url())
         else:
-            raise PermissionDenied('Invalid vote form')
+            return thread(request, poll.thread_id, poll_vote_form=form)
+            #raise PermissionDenied('Invalid vote form')

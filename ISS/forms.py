@@ -301,7 +301,7 @@ class CastVoteForm(forms.Form):
         cleaned_data = super().clean()
 
         if (self.poll.vote_type == Poll.MULTIPLE_CHOICE
-                and len(cleaned_data['response']) < 1):
+                and len(cleaned_data.get('response', [])) < 1):
             raise forms.ValidationError('Can not cast empty vote')
 
         return cleaned_data
