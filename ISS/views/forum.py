@@ -110,7 +110,8 @@ def thread(request, thread_id, poll_vote_form=None):
         ctx['cast_vote_form'] = poll_vote_form
     elif (thread.get_poll()
             and request.user.is_authenticated
-            and not thread.poll.poster_has_voted(request.user)):
+            and not thread.poll.poster_has_voted(request.user)
+            and not thread.locked):
         ctx['cast_vote_form'] = forms.CastVoteForm(poll=thread.poll)
 
     response = render(request, 'thread.html', ctx)
