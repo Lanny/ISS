@@ -1027,7 +1027,7 @@ class LoginTestCase(TestCase):
         self.assertFalse(user.is_authenticated)
 
     def test_poster_can_logout(self):
-        logout_path = reverse('out')
+        logout_path = reverse('logout')
 
         client = Client()
         client.force_login(self.otsu)
