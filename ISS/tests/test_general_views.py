@@ -977,6 +977,17 @@ class LoginTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(user.is_authenticated)
 
+    def test_poster_can_logout(self):
+        logout_path = reverse('out')
+
+        client = Client()
+        client.force_login(self.otsu)
+
+        client.post(logout_path, {})
+
+        self.assertTrue('_auth_user_id' not in client.session)
+
+
 class UserCPTestCase(tutils.ForumConfigTestCase):
     forum_config = {'captcha_period': 0}
 
