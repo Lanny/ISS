@@ -1,16 +1,18 @@
 from collections import defaultdict
 import datetime
 
-from django.contrib.auth import login, logout, authenticate, _get_backends
-from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction, connection
 from django.db.models import Count, Max, F, Q
-from django.http import (HttpResponseRedirect, HttpResponseBadRequest,
-    JsonResponse, HttpResponseForbidden, HttpResponse)
+from django.http import (
+    HttpResponseRedirect,
+    HttpResponseBadRequest,
+    JsonResponse,
+    HttpResponseForbidden
+)
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.template.defaultfilters import truncatechars
@@ -19,7 +21,6 @@ from django.views.decorators.cache import cache_control, cache_page
 from ISS import utils, forms, iss_bbcode
 from ISS.models import *
 from ISS import models as iss_models
-from ISS.hooks import HookManager
 
 
 def _get_new_post_form(request):
@@ -108,10 +109,9 @@ def thread(request, thread_id, poll_vote_form=None):
 
     if poll_vote_form:
         ctx['cast_vote_form'] = poll_vote_form
-    elif (thread.get_poll()
-            and request.user.is_authenticated
-            and not thread.poll.poster_has_voted(request.user)
-            and not thread.locked):
+    elif (request.user.is_authenticated
+            and thread.get_poll()
+            and thread.get_poll().poster_can_vote(request.user))
         ctx['cast_vote_form'] = forms.CastVoteForm(poll=thread.poll)
 
     response = render(request, 'thread.html', ctx)

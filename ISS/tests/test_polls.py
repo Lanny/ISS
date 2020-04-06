@@ -218,6 +218,13 @@ class PollVotingTestCase(tutils.ForumConfigTestCase):
         self._cast_single_vote(self.dahl_client, self.yes_opt)
         self.assertEqual(PollVote.objects.all().count(), 1)
 
+    def test_poster_cant_vote_in_locked_thread(self):
+        self.sv_thread.locked = True
+        self.sv_thread.save()
+
+        self._cast_single_vote(self.dahl_client, self.yes_opt)
+        self.assertEqual(PollVote.objects.all().count(), 0)
+
     def test_poster_cant_empty_vote_sv(self):
         path = reverse(
             'vote-on-poll',

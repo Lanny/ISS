@@ -7,6 +7,7 @@ from ISS import utils, forms
 from ISS.views.forum import thread
 from ISS.models import Thread, Poll, PollOption, PollVote
 
+
 class CreatePoll(utils.MethodSplitView):
     error_css_class = 'in-error'
     active_required = True
@@ -56,6 +57,7 @@ class CreatePoll(utils.MethodSplitView):
                 'form': form
             })
 
+
 class CastVote(utils.MethodSplitView):
     require_login = True
     active_required = True
@@ -65,8 +67,8 @@ class CastVote(utils.MethodSplitView):
     def POST(self, request, poll_id):
         poll = get_object_or_404(Poll, pk=poll_id)
 
-        if poll.poster_has_voted(request.user):
-            raise PermissionDenied('Already voted')
+        if not poll.poster_can_vote(request.user):
+            raise PermissionDenied('Can not vote.')
 
         form = forms.CastVoteForm(request.POST, poll=poll)
 
@@ -77,4 +79,3 @@ class CastVote(utils.MethodSplitView):
             return HttpResponseRedirect(poll.thread.get_url())
         else:
             return thread(request, poll.thread_id, poll_vote_form=form)
-            #raise PermissionDenied('Invalid vote form')
