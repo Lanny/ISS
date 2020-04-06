@@ -18,6 +18,8 @@
           <img src="{% static 'img/pin_new.gif' %}" alt="Unread pin" />
         {% elif thread.locked %}
           <img src="{% static 'img/lock_new.gif' %}" alt="Unread lock" />
+        {% elif thread.poll %}
+          <img src="{% static 'img/poll_new.gif' %}" alt="Unread poll" />
         {% else %}
           <img src="{% static 'img/forum_new.gif' %}" alt="Unread posts" />
         {% endif %}
@@ -26,6 +28,8 @@
           <img src="{% static 'img/pin_old.gif' %}" alt="No new pin" />
         {% elif thread.locked %}
           <img src="{% static 'img/lock_old.gif' %}" alt="No new lock" />
+        {% elif thread.poll %}
+          <img src="{% static 'img/poll_old.gif' %}" alt="No new poll" />
         {% else %}
           <img src="{% static 'img/forum_old.gif' %}" alt="No new posts" />
         {% endif %}

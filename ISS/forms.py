@@ -204,6 +204,8 @@ class NewThreadForm(InitialPeriodLimitingForm, PostDuplicationPreventionForm):
                            min_length=post_min_len,
                            max_length=post_max_len,
                            widget=forms.Textarea())
+
+    add_poll = forms.BooleanField(label='Add poll?', required=False)
     forum = forms.ModelChoiceField(queryset=Forum.objects.all(),
                                    widget=forms.HiddenInput())
 
@@ -231,6 +233,87 @@ class NewThreadForm(InitialPeriodLimitingForm, PostDuplicationPreventionForm):
         self.post.save()
 
         return self.thread
+
+
+class NewPollForm(forms.Form):
+    error_css_class = 'in-error'
+
+    thread = forms.ModelChoiceField(queryset=Thread.objects.all(),
+                                    widget=forms.HiddenInput())
+    vote_type = forms.ChoiceField(label='Voting Type',
+                                  choices=Poll.VOTE_TYPE_CHOICES,
+                                  required=True)
+    question = forms.CharField(label='Poll Question',
+                               max_length=1024,
+                               required=True)
+
+    def _opts(self):
+        return (
+            ('option-%d' % i, 'Option %d' % (i+1))
+            for i in range(self.num_options)
+        )
+
+    def get_cleaned_options(self):
+        return (
+            self.cleaned_data[name]
+            for name, _ in self._opts()
+            if self.cleaned_data[name]
+        )
+
+    def __init__(self, *args, num_options=7, **kwargs):
+        super(NewPollForm, self).__init__(*args, **kwargs)
+        self.num_options = num_options
+
+        for name, label in self._opts():
+            self.fields[name] = forms.CharField(
+                label=label,
+                max_length=1024,
+                required=False)
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if len(list(self.get_cleaned_options())) < 2:
+            raise forms.ValidationError('A poll must have at least two options')
+
+        return cleaned_data
+
+class CastVoteForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.poll = kwargs.pop('poll')
+        super(CastVoteForm, self).__init__(*args, **kwargs)
+
+        if self.poll.vote_type == Poll.SINGLE_CHOICE:
+            self.fields['response'] = forms.ModelChoiceField(
+                label='Response',
+                empty_label=None,
+                queryset=self.poll.polloption_set.all(),
+                widget=forms.RadioSelect)
+        elif self.poll.vote_type == Poll.MULTIPLE_CHOICE:
+            self.fields['response'] = forms.ModelMultipleChoiceField(
+                label='Response',
+                queryset=self.poll.polloption_set.all(),
+                widget=forms.CheckboxSelectMultiple)
+        else:
+            raise Exception('Not implemented')
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if (self.poll.vote_type == Poll.MULTIPLE_CHOICE
+                and len(cleaned_data.get('response', [])) < 1):
+            raise forms.ValidationError('Can not cast empty vote')
+
+        return cleaned_data
+
+    def get_cleaned_options(self):
+        if self.poll.vote_type == Poll.SINGLE_CHOICE:
+            return [self.cleaned_data['response']]
+        elif self.poll.vote_type == Poll.MULTIPLE_CHOICE:
+            return self.cleaned_data['response']
+        else:
+            raise Exception('Not implemented')
+        
 
 class NewPostForm(InitialPeriodLimitingForm, PostDuplicationPreventionForm):
     error_css_class = 'in-error'

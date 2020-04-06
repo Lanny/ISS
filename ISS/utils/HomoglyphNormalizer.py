@@ -1,4 +1,5 @@
 import os
+import unicodedata
 
 from .Singleton import Singleton
 
@@ -69,7 +70,8 @@ class HomoglyphNormalizer(Singleton):
 
         normalized = []
         for code_point in unicode_str:
-            normalized.append(self._norm_codepoint(code_point.lower()))
-            normalized.append(self._norm_codepoint(code_point.upper()))
+            if not unicodedata.category(code_point).startswith('C'):
+                normalized.append(self._norm_codepoint(code_point.lower()))
+                normalized.append(self._norm_codepoint(code_point.upper()))
 
         return ''.join(normalized)

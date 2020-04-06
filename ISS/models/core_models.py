@@ -13,6 +13,7 @@ import email_normalize
 
 from ISS import utils
 from ISS.utils import HomoglyphNormalizer
+from .polls import Poll
 from .auth_package import AuthPackage, AccessControlList
 from .admin_models import Ban
 
@@ -314,6 +315,7 @@ class Forum(models.Model):
     last_update = models.DateTimeField(default=timezone.now)
     is_trash = models.BooleanField(default=False)
     include_in_lastest_threads = models.BooleanField(default=True, null=False)
+    member_view_only = models.BooleanField(default=False)
 
     create_thread_pack = models.ForeignKey(
         AuthPackage,
@@ -433,6 +435,12 @@ class Thread(models.Model):
 
     def can_reply(self):
         return not self.locked
+
+    def get_poll(self):
+        try:
+            return self.poll
+        except Poll.DoesNotExist:
+            return None
 
     def _get_flag(self, user, save=True):
         if not (user.pk in self._flag_cache):

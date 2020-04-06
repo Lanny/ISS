@@ -40,10 +40,16 @@
             </div>
           </td>
           <td>
-            <a class="forum-name"
-               href="{% url 'thread-index' forum.pk %}">
-              {{ forum.name }}
-            </a>
+            {% if forum.member_view_only and not user.is_authenticated %}
+              <div>
+                <strong>Register to view:</strong> {{ forum.name }}
+              </div>
+            {% else %}
+              <a class="forum-name"
+                 href="{% url 'thread-index' forum.pk %}">
+                 {{ forum.name }}
+              </a>
+            {% endif %}
             <span class="forum-description">{{ forum.description }}</span>
           </td>
           <td>{{ forum.get_thread_count|intcomma }}</td>

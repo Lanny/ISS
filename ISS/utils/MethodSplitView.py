@@ -49,10 +49,13 @@ class MethodSplitView(object):
             return HttpResponseBadRequest('Request method %s not supported'
                                           % request.method)
         
-        response_maybe = self.pre_method_check(request, *args, **kwargs)
+        check_result = self.pre_method_check(request, *args, **kwargs)
 
-        if isinstance(response_maybe, HttpResponse):
-            return response_maybe
+        if isinstance(check_result, HttpResponse):
+            return check_result
+
+        if isinstance(check_result, dict):
+            kwargs.update(check_result)
 
         return meth(request, *args, **kwargs)
 

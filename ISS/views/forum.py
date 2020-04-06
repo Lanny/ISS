@@ -21,6 +21,7 @@ from ISS.models import *
 from ISS import models as iss_models
 from ISS.hooks import HookManager
 
+
 def _get_new_post_form(request):
     return utils.conditionally_captchatize(request, forms.NewPostForm)
 
@@ -60,6 +61,10 @@ def forum_index(request):
 @cache_control(no_cache=True, max_age=0, must_revalidate=True, no_store=True)
 def thread_index(request, forum_id):
     forum = get_object_or_404(Forum, pk=forum_id)
+
+    if not request.user.is_authenticated and forum.member_view_only:
+        raise PermissionDenied('Must sign in.')
+
     threads = forum.thread_set.order_by('-stickied', '-last_update')
     threads_per_page = utils.get_config('threads_per_forum_page')
     paginator = utils.MappingPaginator(threads, threads_per_page)
@@ -80,8 +85,11 @@ def thread_index(request, forum_id):
 
     return render(request, 'thread_index.html', ctx)
 
-def thread(request, thread_id):
+def thread(request, thread_id, poll_vote_form=None):
     thread = get_object_or_404(Thread, pk=thread_id)
+    if thread.forum.member_view_only and not request.user.is_authenticated:
+        raise PermissionDenied('Must sign in.')
+
     posts = (thread.post_set
         .order_by('created')
         .select_related('author')
@@ -97,6 +105,13 @@ def thread(request, thread_id):
         'reply_form': reply_form,
         'thread_action_form': forms.ThreadActionForm()
     }
+
+    if poll_vote_form:
+        ctx['cast_vote_form'] = poll_vote_form
+    elif (thread.get_poll()
+            and request.user.is_authenticated
+            and not thread.poll.poster_has_voted(request.user)):
+        ctx['cast_vote_form'] = forms.CastVoteForm(poll=thread.poll)
 
     response = render(request, 'thread.html', ctx)
 
@@ -237,7 +252,11 @@ def redirect_to_post(request, post_id):
 
 def threads_by_user(request, user_id):
     poster = get_object_or_404(Poster, pk=user_id)
+
     threads = Thread.objects.filter(author=poster).order_by('-created')
+    if not request.user.is_authenticated:
+        threads = threads.exclude(forum__member_view_only=True)
+
     threads_per_page = utils.get_config('general_items_per_page')
     paginator = Paginator(threads, threads_per_page)
 
@@ -253,9 +272,13 @@ def threads_by_user(request, user_id):
 
 def posts_by_user(request, user_id):
     poster = get_object_or_404(Poster, pk=user_id)
+
     posts = (poster.post_set
-        .order_by('-created')
-        .select_related('thread'))
+            .order_by('-created')
+            .select_related('thread'))
+    if not request.user.is_authenticated:
+        posts = posts.exclude(thread__forum__member_view_only=True)
+
     posts_per_page = utils.get_config('general_items_per_page')
     paginator = Paginator(posts, posts_per_page)
 
@@ -271,10 +294,14 @@ def posts_by_user(request, user_id):
 
 def thanked_posts(request, user_id):
     poster = get_object_or_404(Poster, pk=user_id)
+
     posts = (poster.post_set
         .filter(thanks__isnull=False)
         .annotate(Max('thanks__given'))
         .order_by('-thanks__given__max'))
+
+    if not request.user.is_authenticated:
+        posts = posts.exclude(thread__forum__member_view_only=True)
 
     page = utils.get_posts_page(posts, request)
 
@@ -288,8 +315,13 @@ def thanked_posts(request, user_id):
 
 def posts_thanked(request, user_id):
     poster = get_object_or_404(Poster, pk=user_id)
-    posts = (Post.objects.filter(thanks__thanker__id=user_id)
-        .order_by('-created'))
+
+    posts = (Post.objects
+             .filter(thanks__thanker__id=user_id)
+             .order_by('-created'))
+
+    if not request.user.is_authenticated:
+        posts = posts.exclude(thread__forum__member_view_only=True)
 
     page = utils.get_posts_page(posts, request)
 
@@ -315,6 +347,9 @@ def latest_threads(request):
         .filter(~Q(forum_id__in=excluded_forums))
         .order_by('-last_update')
         .select_related('author'))
+
+    if not request.user.is_authenticated:
+        threads = threads.exclude(forum__member_view_only=True)
 
     threads_per_page = utils.get_config('threads_per_forum_page')
     paginator = utils.MappingPaginator(threads, threads_per_page)
@@ -359,7 +394,6 @@ def latest_threads(request):
     }
 
     return render(request, 'latest_threads.html', ctx)
-
 
 class UpdateLatestThreadsPreferences(utils.MethodSplitView):
     require_login = True
@@ -526,7 +560,13 @@ class NewThread(utils.MethodSplitView):
             if request.user.auto_subscribe >= 1:
                 thread.subscribe(request.user)
 
-            return HttpResponseRedirect(thread.get_url())
+
+            if form.cleaned_data['add_poll']:
+                return HttpResponseRedirect(
+                    reverse('create-poll', kwargs={'thread_id': thread.pk})
+                )
+            else:
+                return HttpResponseRedirect(thread.get_url())
 
         else:
             ctx = {
