@@ -404,6 +404,10 @@ class UserIndex(utils.MethodSplitView):
             posters = Poster.objects.all().order_by('username')
         elif sortBy == 'id':
             posters = Poster.objects.all().order_by('id')
+        elif sortBy == 'taboo_successes':
+            posters = (Poster.objects
+                       .annotate(taboo_count=Count('taboo_successes'))
+                       .order_by('-taboo_count'))
         else:
             raise PermissionDenied('Invalid sortby value')
 
