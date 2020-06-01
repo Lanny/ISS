@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Poll(models.Model):
     SINGLE_CHOICE = 0
     MULTIPLE_CHOICE = 1
@@ -16,6 +17,10 @@ class Poll(models.Model):
         default=SINGLE_CHOICE,
         blank=False,
         null=False)
+
+    def poster_can_vote(self, poster):
+        return (not self.poster_has_voted(poster)
+                and not self.thread.locked)
 
     def poster_has_voted(self, poster):
         return bool(PollVote.objects

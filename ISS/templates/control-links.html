@@ -6,7 +6,11 @@
     {% test_link test user as test_passed %}
     {% if test_passed %}
       <li>
-        {% if link_type == 'RLINK' %}
+        {% if link_type == 'SLINK' %}
+        <a href="{{ pat }}">
+            {{ name }}
+          </a>
+        {% elif link_type == 'RLINK' %}
           <a href="{% url_apply pat extra %}">
             {{ name }}
           </a>
