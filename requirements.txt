@@ -19,3 +19,6 @@ mysql-connector==2.2.9
 # Recommended WS requirement, you can swap these out for gunicorn or whatever
 # to cool kids are using these days
 uWSGI==2.0.19.1
+
+# Heroku django extension
+django-heroku==0.3.1
