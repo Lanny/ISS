@@ -1,7 +1,7 @@
 import os
-import django_heroku
+import dj_database_url
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -38,7 +38,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'ISS.middleware.TimezoneMiddleware',
     'ISS.middleware.PMAdminMiddleware',
-    'ISS.middleware.IPBanMiddleware'
+    'ISS.middleware.IPBanMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'ISS.urls'
@@ -65,23 +66,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ISS.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-
 DATABASES = {
-    'default': {
-        'ENGINE':   'django.db.backends.postgresql_psycopg2',
-        'NAME':     'travisdb',
-        'USER':     'postgres',
-        'PASSWORD': '',
-        'HOST':     'localhost',
-        'PORT':     '',
-    }
+    'default': dj_database_url.config(conn_max_age=600, ssl_require=True),
 }
-
-# Internationalization
-# https://docs.djangoproject.com/en/1.8/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -94,10 +81,8 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.8/howto/static-files/
-
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, '.staticroot')
 
 AUTH_USER_MODEL = 'ISS.Poster'
 FORUM_CONFIG = {
@@ -148,5 +133,3 @@ MEDIA_ROOT = '/media'
 MEDIA_URL = '/media/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
-
-django_heroku.settings(locals())
