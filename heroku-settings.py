@@ -11,6 +11,11 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
+print(os.environ)
+if 'ALLOWED_HOST' in os.environ:
+    ALLOWED_HOSTS.append(os.environ['ALLOWED_HOST'])
+print(ALLOWED_HOSTS)
+
 # Application definition
 
 INSTALLED_APPS = (
