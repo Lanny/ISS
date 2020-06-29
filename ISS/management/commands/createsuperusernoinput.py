@@ -20,6 +20,9 @@ class Command(BaseCommand):
             raise CommandError("All args required.")
 
         poster = Poster(
+            is_staff=True,
+            is_admin=True,
+            is_superuser=True,
             username=username,
             email=email)
         poster.set_password(password)
