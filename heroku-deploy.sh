@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x 
-
 function heroku_set_config {
   echo "Setting $1=$2"
   heroku config:set "$1=$2"

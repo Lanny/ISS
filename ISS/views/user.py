@@ -276,7 +276,7 @@ class RegisterUser(utils.MethodSplitView):
                     if require_email_verification:
                         self._send_verificaiton_email(poster)
                     else:
-                        poster.is_active = False
+                        poster.is_active = True
                         poster.save()
 
             except SMTPRecipientsRefused:
