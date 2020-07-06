@@ -65,6 +65,7 @@ class ConfigurationManager(Singleton):
         'initial_account_period_limit': 20,
         'captcha_period': 0,
         'enable_registration': True,
+        'require_email_verification': True,
         'enable_invites': False,
         'invite_expiration_time': datetime.timedelta(days=14),
         'themes': {

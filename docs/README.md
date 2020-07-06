@@ -29,6 +29,12 @@ Technologically we provably had everything we needed to create a sufficient piec
 
 The strengths of vB3 are what ISS attempts to reproduce and preserve. What ISS offers on top of this a clean modern codebase, more reasonable database design, support for useragents that don't have JS execution, or with JS disabled, and generally better client-side performance through more sane/modern resource usage, caching, and delivery strategies.
 
+# Run your own ISS instance
+
+The easiest way to get started with ISS is to deploy it to heroku with the `heroku_deploy.sh` script in this repository. Heroku has a free tier that you can run ISS on at no cost, and you can pay for more resources as your forum grows. See the [ISS Heroku Docs](../docs/HEROKU.md) for more info.
+
+ISS can also run on a dedicated server or VPS. The setup is more involved and generally requires some familiarity with server provisioning, but is likely the most cost effective route for heavily trafficked forums. See [DEVNOTES](../docs/DEVNOTES.md) for some pointers.
+
 # How you can help
 
 One of the biggest things you can do to help is to use ISS. More users means more eyes on the software, helping to flush out bugs and guide development by understanding what is needed from users.

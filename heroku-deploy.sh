@@ -12,6 +12,11 @@ function heroku_set_config {
   fi
 }
 
+function iss_set_config {
+  heroku_set_config "ISS_CONF__$1" $2
+  heroku ps:restart web
+}
+
 function gen_secret_key {
   local schars='abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
   local key=''
@@ -92,7 +97,8 @@ function run_management_command {
 function sub_help {
   echo "Usage: $ProgName <subcommand> [options]\n"
   echo "Subcommands:"
-  echo "    setup    Create a new Heroku app and superuser"
+  echo "    setup           Create a new Heroku app and superuser"
+  echo "    iss_set_config  Set a forum config value"
   echo ""
 }
 
@@ -170,6 +176,10 @@ function sub_setup {
     echo "Failed to create superuser. That's bad!"
     exit 1
   fi
+}
+
+function sub_iss_set_config {
+  iss_set_config $1 $2
 }
 
 ProgName=$(basename $0)
