@@ -147,6 +147,8 @@ function sub_setup {
   heroku_set_config "DJANGO_SETTINGS_MODULE" "heroku-settings"
   heroku_set_config "SECRET_KEY" "$(gen_secret_key)"
 
+  iss_set_config require_email_verification False
+
   echo "Deploying current branch to Heroku"
   git_branch="$(git rev-parse --abbrev-ref HEAD)"
   git push heroku "$git_branch:master" --force
