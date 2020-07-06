@@ -10,6 +10,19 @@ function heroku_set_config {
   fi
 }
 
+function gen_secret_key {
+  local schars='abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+  local key=''
+  local idx=0
+
+  for i in {1..50}
+  do
+    idx=$(($RANDOM % 50))
+    key="$key${schars:$idx:1}"
+  done
+  echo "$key"
+}
+
 echo "Looking for Heroku CLI tools..."
 which heroku
 
@@ -100,6 +113,7 @@ echo "Found DB URL to be $db_url"
 echo "Setting instance env vars..."
 heroku_set_config "ALLOWED_HOST" $app_domain
 heroku_set_config "DJANGO_SETTINGS_MODULE" "heroku-settings"
+heroku_set_config "SECRET_KEY" "$(gen_secret_key)"
 
 echo "Deploying current branch to Heroku"
 git_branch="$(git rev-parse --abbrev-ref HEAD)"

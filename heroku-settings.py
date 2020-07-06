@@ -4,8 +4,7 @@ import dj_database_url
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '%ve+iy6_#4jxw7n#(&n1yyqbr*%!(9v=634@u_u!a*03j3bca5'
+SECRET_KEY = os.environ['SECRET_KEY']
 
 DEBUG = False
 
