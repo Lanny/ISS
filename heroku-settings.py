@@ -86,6 +86,13 @@ FORUM_CONFIG = {
     'extensions': []
 }
 
+for var_name in os.environ:
+    if not var_name.startswith('ISS_CONF__'):
+        continue
+
+    _, config_name = var_name.split('__', 1)
+    FORUM_CONFIG[config_name] = eval(os.environ[var_name])
+
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'ISS.auth.backends.vB5_legacy'
