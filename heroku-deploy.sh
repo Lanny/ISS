@@ -130,8 +130,9 @@ function sub_setup {
   heroku buildpacks:set heroku/python
   heroku buildpacks:add --index 1 heroku/nodejs
 
-  echo "Adding postgres addon..."
+  echo "Adding postgres and mailgun addons..."
   heroku addons:create heroku-postgresql:hobby-dev
+  heroku addons:create mailgun:starter
 
   db_url="$(get_config DATABASE_URL)"
 

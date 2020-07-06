@@ -8,12 +8,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
-if 'ALLOWED_HOST' in os.environ:
-    ALLOWED_HOSTS.append(os.environ['ALLOWED_HOST'])
-
-# Application definition
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', os.environ['ALLOWED_HOST']]
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -134,4 +129,8 @@ LOGGING = {
 MEDIA_ROOT = '/media'
 MEDIA_URL = '/media/'
 
-EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+EMAIL_HOST = os.environ['MAILGUN_SMTP_SERVER']
+EMAIL_PORT = os.environ['MAILGUN_SMTP_PORT']
+EMAIL_HOST_USER = os.environ['MAILGUN_SMTP_LOGIN']
+EMAIL_HOST_PASSWORD = os.environ['MAILGUN_SMTP_PASSWORD']
+EMAIL_USE_TLS = True
