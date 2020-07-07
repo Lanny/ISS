@@ -51,7 +51,7 @@ ISS has a number of configuration settings you can adjust to your liking. The fi
 $ ./heroku-deploy.sh iss_set_config forum_name "\"Lannys Fresh Forum\""
 ```
 
-Note the `\"`s around the value name. ISS config settings are python expressions, so strings need to be wrapped in quotes. While this can be a bit cumbersome for strings, it allows you to use richer python data types in your settings, e.g.:
+Note the `\"`s around the value. ISS config settings are python expressions, so strings need to be wrapped in quotes. While this can be a bit cumbersome for strings, it allows you to use richer python data types in your settings, e.g.:
 
 ```
 $ ./heroku-deploy.sh iss_set_config invite_expiration_time "datetime.timedelta(days=7)"
