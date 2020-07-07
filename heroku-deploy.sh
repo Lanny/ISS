@@ -11,7 +11,7 @@ function heroku_set_config {
 }
 
 function iss_set_config {
-  heroku_set_config "ISS_CONF__$1" $2
+  heroku_set_config "ISS_CONF__$1" "$2"
   heroku ps:restart web
 }
 
@@ -148,6 +148,7 @@ function sub_setup {
   heroku_set_config "SECRET_KEY" "$(gen_secret_key)"
 
   iss_set_config require_email_verification False
+  iss_set_config forum_domain "\"$app_domain\""
 
   echo "Deploying current branch to Heroku"
   git_branch="$(git rev-parse --abbrev-ref HEAD)"
@@ -179,7 +180,7 @@ function sub_setup {
 }
 
 function sub_iss_set_config {
-  iss_set_config $1 $2
+  iss_set_config "$1" "$2"
 }
 
 ProgName=$(basename $0)
@@ -191,7 +192,7 @@ case $subcommand in
         ;;
     *)
         shift
-        sub_${subcommand} $@
+        sub_${subcommand} "$@"
         if [ $? = 127 ]; then
             echo "Error: '$subcommand' is not a known subcommand." >&2
             echo "       Run '$ProgName --help' for a list of known subcommands." >&2

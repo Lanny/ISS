@@ -74,9 +74,6 @@ class ConfigurationManager(Singleton):
             'amoled': {'name': 'AMOLED', 'color': '#000000'},
         },
         'default_theme': '&T',
-        'hot_topics_count': 5,
-        'hot_topics_recent_span': datetime.timedelta(days=3),
-        'hot_topics_cache_time': datetime.timedelta(minutes=30)
     }
 
     def reinit(self, overrides):
