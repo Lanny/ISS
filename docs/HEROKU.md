@@ -1,8 +1,8 @@
 # Setting up ISS on Heroku
 
-Heroku is the quickest way to get an ISS instance up and running, and it's free! This doc will walk you through the process of setting up ISS on Heroku and some of the first step you'll want to take as a new admin. The deploy script is written in bash and assumes you have git and standard POSIX utils installed, it should run on OSX and any normal desktop flavor of linux. You may be able to run it on windows with bash, but you'll have to install the Heroku CLI yourself from [here](https://devcenter.heroku.com/articles/heroku-cli).
+Heroku is the quickest way to get an ISS instance up and running, and it's free! This doc will walk you through the process of setting up ISS on Heroku and some of the first steps you'll want to take as a new admin. The deploy script is written in bash and assumes you have git and standard POSIX utils installed, it should run on OSX and any normal desktop flavor of linux. You may be able to run it on windows with bash, but you'll have to install the Heroku CLI yourself from [here](https://devcenter.heroku.com/articles/heroku-cli).
 
-Before you begin, you'll to sign up for a heroku account (free tier works find) which you can do [here](https://signup.heroku.com/). Also ensure git is installed, a tutorial for installing it if you don't already have it can be found [here](https://www.atlassian.com/git/tutorials/install-git).
+Before you begin, you'll to sign up for a heroku account (free tier works fine) which you can do [here](https://signup.heroku.com/). Also ensure git is installed, a tutorial for installing it if you don't already have it can be found [here](https://www.atlassian.com/git/tutorials/install-git).
 
 ## Setup
 
