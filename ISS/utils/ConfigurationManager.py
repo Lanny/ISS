@@ -65,6 +65,7 @@ class ConfigurationManager(Singleton):
         'initial_account_period_limit': 20,
         'captcha_period': 0,
         'enable_registration': True,
+        'require_email_verification': True,
         'enable_invites': False,
         'invite_expiration_time': datetime.timedelta(days=14),
         'themes': {
@@ -73,9 +74,6 @@ class ConfigurationManager(Singleton):
             'amoled': {'name': 'AMOLED', 'color': '#000000'},
         },
         'default_theme': '&T',
-        'hot_topics_count': 5,
-        'hot_topics_recent_span': datetime.timedelta(days=3),
-        'hot_topics_cache_time': datetime.timedelta(minutes=30)
     }
 
     def reinit(self, overrides):

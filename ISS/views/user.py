@@ -267,12 +267,17 @@ class RegisterUser(utils.MethodSplitView):
 
     def POST(self, request):
         form = forms.RegistrationForm(request.POST)
+        require_email_verification = utils.get_config('require_email_verification')
 
         if form.is_valid():
             try:
                 with transaction.atomic():
                     poster = self._create_poster(form)
-                    self._send_verificaiton_email(poster)
+                    if require_email_verification:
+                        self._send_verificaiton_email(poster)
+                    else:
+                        poster.is_active = True
+                        poster.save()
 
             except SMTPRecipientsRefused:
                 error = ValidationError(
@@ -284,14 +289,17 @@ class RegisterUser(utils.MethodSplitView):
 
             forum_name = utils.get_config('forum_name')
             email_address = poster.email
-            message = (
-                'Thank you for registering with %s. You\'ll need to verify '
-                'your email address before logging in. We\'ve send an email '
-                'to %s. Please check that address and follow the instructions '
-                'in the email. Note that it may take a few minutes for the '
-                'email to arrive. If you don\'t receive an email check your '
-                'spam folder.'
-            ) % (forum_name, email_address)
+            if require_email_verification:
+                message = (
+                    'Thank you for registering with %s. You\'ll need to verify '
+                    'your email address before logging in. We\'ve send an email '
+                    'to %s. Please check that address and follow the instructions '
+                    'in the email. Note that it may take a few minutes for the '
+                    'email to arrive. If you don\'t receive an email check your '
+                    'spam folder.'
+                ) % (forum_name, email_address)
+            else:
+                message = 'Thank you for registering with %s.' % forum_name
 
             return render(request, 'generic_message.html', {
                 'page_title': 'Regristration Successful',
