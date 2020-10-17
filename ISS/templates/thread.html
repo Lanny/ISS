@@ -44,7 +44,7 @@
             {% for opt, perc in thread.poll.get_vote_distribution_percentages.items %}
               <li class="option">
                 <span class="option-label">
-                  {{ opt.answer }}
+                  {{ opt }}
                 </span>
                 <div class="vote-bar-container">
                   <div class="vote-bar" style="width: {{ perc }}%">
@@ -61,6 +61,12 @@
                   {% endif %}
                 </div>
               </li>
+              {% for vote in opt.votes.all %}
+                {{vote.voter}}
+                {% if not forloop.last %}
+                  ,
+                {% endif %}
+              {% endfor %}
           {% endfor %}
         </ul>
         {% if cast_vote_form %}
