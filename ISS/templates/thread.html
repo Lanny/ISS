@@ -60,13 +60,16 @@
                     </span>
                   {% endif %}
                 </div>
+
+                <ul class="voter-list">
+                  {% for vote in opt.votes.all %}
+                    <li>
+                      <a href="{{ vote.voter.get_url }}">{{ vote.voter.username }}</a>
+                      {% if not forloop.last %},{% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
               </li>
-              {% for vote in opt.votes.all %}
-                {{vote.voter}}
-                {% if not forloop.last %}
-                  ,
-                {% endif %}
-              {% endfor %}
           {% endfor %}
         </ul>
         {% if cast_vote_form %}
