@@ -1,5 +1,7 @@
 
 import random
+import requests
+import html
 from datetime import timedelta
 
 from django.db import models, transaction
@@ -71,9 +73,26 @@ class TabooProfile(models.Model):
 
         return candidates
 
+    def _get_taboo_phrase(self):
+        API_Key = iss_utils.get_ext_config(EXT, 'wordnik_API_key')
+
+        if API_Key == 'null':
+            return random.choice(iss_utils.get_ext_config(EXT, 'phrases'))
+
+        for x in range(5):
+            # minDictionaryCount at 50 seems to bring a pretty good word list, going higher results in more 404s
+            url = 'https://api.wordnik.com/v4/words.json/randomWord?hasDictionaryDef=true&' \
+                  'includePartOfSpeech=noun%2Cverb&minDictionaryCount=50&minLength=3&api_key=' \
+                  + API_Key
+
+            response = requests.get(url)
+            if response.status_code == 200:
+                return html.escape(response.json()['word'])
+
+        return random.choice(iss_utils.get_ext_config(EXT, 'phrases'))
+
     def choose_mark_and_phrase(self):
-        self.phrase = random.choice(
-                iss_utils.get_ext_config(EXT, 'phrases'))
+        self.phrase = self._get_taboo_phrase()
         candidates = self._get_candidate_marks()
         ccount = len(candidates)
 
