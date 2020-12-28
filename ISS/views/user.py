@@ -128,12 +128,12 @@ class InitiatePasswordRecovery(utils.MethodSplitView):
         form = forms.InitiatePasswordRecoveryForm(request.POST)
 
         if form.is_valid():
-            normalized = Poster.iss_normalize_username(
-                form.cleaned_data['username'])
-            user = Poster.objects.get(normalized_username=normalized)
+            user = (Poster
+                .objects.filter(normalized_email=form.cleaned_data['email'])
+                .first())
+
             user.recovery_code = str(uuid.uuid4())
-            user.recovery_expiration = (
-                timezone.now() + timedelta(days=1))
+            user.recovery_expiration = timezone.now() + timedelta(days=1)
             user.save()
 
             forum_name = utils.get_config('forum_name')
