@@ -891,8 +891,7 @@ class SpamCanUser(utils.MethodSplitView):
 
             threads.update(forum=form.cleaned_data['target_forum'])
 
-            for vote in votes:
-                vote.delete()
+            votes.delete()
 
             if move_posts.count():
                 new_thread = Thread(
