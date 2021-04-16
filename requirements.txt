@@ -11,7 +11,7 @@ django-recaptcha2==1.4.1
 requests==2.22.0
 
 # Dev dependencies
-django-debug-toolbar==2.1
+django-debug-toolbar==2.2.1
 
 # Regardless of the forum db, this is required for migrations. Can be removed
 # if you are not migrating from a vB forum.
