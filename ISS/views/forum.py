@@ -843,8 +843,11 @@ class SpamCanUser(utils.MethodSplitView):
 
     def _get_threads(self, poster):
         threads = poster.thread_set.all()
-
         return threads
+
+    def _get_votes(self, poster):
+        votes = PollVote.objects.filter(voter=poster)
+        return votes
 
     def GET(self, request, poster_id):
         poster = get_object_or_404(Poster, pk=poster_id)
@@ -870,6 +873,7 @@ class SpamCanUser(utils.MethodSplitView):
     def POST(self, request, poster_id):
         poster = get_object_or_404(Poster, pk=poster_id)
         threads = self._get_threads(poster)
+        votes = self._get_votes(poster)
         form = forms.SpamCanUserForm(request.POST)
 
         if form.is_valid():
@@ -886,6 +890,8 @@ class SpamCanUser(utils.MethodSplitView):
             poster.save()
 
             threads.update(forum=form.cleaned_data['target_forum'])
+
+            votes.delete()
 
             if move_posts.count():
                 new_thread = Thread(
