@@ -605,7 +605,7 @@ class PasswordResetTestCase(TestCase):
 
     def _set_recovery_code(self):
         self.franz_client.post(self.issue_path, {
-            'username': self.franz.username
+            'email': self.franz.email
         })
 
     def test_recovery_code_is_initially_null(self):
@@ -617,7 +617,7 @@ class PasswordResetTestCase(TestCase):
 
     def test_invalid_email_addr(self):
         self.franz_client.post(self.issue_path, {
-            'username': 'notarealusername'
+            'email': 'fake.address@mail.com'
         })
         self._update_franz()
         self.assertEqual(self.franz.recovery_code, None)

@@ -1,4 +1,5 @@
 import urllib.request, urllib.error, urllib.parse
+import ssl
 import re
 import os
 import datetime
@@ -108,10 +109,15 @@ def get_posts_page(qs, request):
     return page
 
 def bandcamp_markup_for_url(urlstr):
-    url = urllib.urlparse(urlstr)
+    url = urllib.parse.urlparse(urlstr)
 
     parser = etree.HTMLParser(no_network=False)
-    req = urllib.request.urlopen(urlstr)
+
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+
+    req = urllib.request.urlopen(urlstr, context=ctx)
     tree = etree.parse(req, parser)
     embed_meta = tree.xpath('//meta[@property="og:video:secure_url"]')
     embed_url = embed_meta[0].get('content')

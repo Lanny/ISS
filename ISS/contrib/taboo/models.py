@@ -2,6 +2,7 @@
 import random
 import requests
 import html
+import logging
 from datetime import timedelta
 
 from django.db import models, transaction
@@ -74,20 +75,33 @@ class TabooProfile(models.Model):
         return candidates
 
     def _get_taboo_phrase(self):
-        API_Key = iss_utils.get_ext_config(EXT, 'wordnik_API_key')
+        api_key = iss_utils.get_ext_config(EXT, 'wordnik_API_key')
 
-        if API_Key == 'null':
-            return random.choice(iss_utils.get_ext_config(EXT, 'phrases'))
+        if api_key:
+            for _ in range(3):
+                # minDictionaryCount at 50 seems to bring a pretty good word
+                # list, going higher results in more 404s
+                try:
+                    response = requests.get(
+                        'https://api.wordnik.com/v4/words.json/randomWord',
+                        params={
+                            'hasDictionaryDef': 'true',
+                            'includePartOfSpeech': 'noun,verb',
+                            'minDictionaryCount': '50',
+                            'minLength': '3',
+                            'api_key': api_key,
+                        },
+                        timeout=3.0
+                    )
+                    if response.status_code == 200:
+                        return html.escape(response.json()['word'])
+                except Exception:
+                    pass
 
-        for x in range(5):
-            # minDictionaryCount at 50 seems to bring a pretty good word list, going higher results in more 404s
-            url = 'https://api.wordnik.com/v4/words.json/randomWord?hasDictionaryDef=true&' \
-                  'includePartOfSpeech=noun%2Cverb&minDictionaryCount=50&minLength=3&api_key=' \
-                  + API_Key
-
-            response = requests.get(url)
-            if response.status_code == 200:
-                return html.escape(response.json()['word'])
+            logging.warning(
+                '`wornik_API_key` provided, but unable to get a successful '
+                'response after three attempted'
+            )
 
         return random.choice(iss_utils.get_ext_config(EXT, 'phrases'))
 

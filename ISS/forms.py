@@ -604,17 +604,20 @@ class InviteRegistrationFrom(RegistrationForm):
         return poster
 
 class InitiatePasswordRecoveryForm(forms.Form):
-    username = forms.CharField(label='Username', max_length=1024, required=True)
+    email = forms.CharField(label='Email Address', max_length=1024, required=True)
+
+    def clean_email(self, *args, **kwargs):
+        email = self.cleaned_data.get('email')
+        return email_normalize.normalize(email)
 
     def clean(self, *args, **kwargs):
         ret = super(InitiatePasswordRecoveryForm, self).clean(*args, **kwargs)
 
-        username = self.cleaned_data.get('username', None)
-        normalized = Poster.iss_normalize_username(username)
-        posters = Poster.objects.filter(normalized_username=normalized)
+        address = self.cleaned_data.get('email')
+        posters = Poster.objects.filter(normalized_email=address)
 
-        if posters.count() != 1:
-            raise ValidationError('No user with that username exists.',
+        if not posters.first():
+            raise ValidationError('No user with that email address exists.',
                                   code='UNKNOWN_EMAIL_ADDR')
 
         return ret

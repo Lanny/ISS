@@ -130,7 +130,7 @@ def _add_img_tag(parser):
 
         return (
             '<a class="img-embed" href="%s">'
-                '<img src="%s">'
+                '<img src="%s" referrerpolicy="no-referrer">'
             '</a>'
         ) % (value, value)
 
