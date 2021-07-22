@@ -79,6 +79,12 @@ class PosterSelectField(forms.CharField):
             else:
                 posters.append(user)
 
+        for poster in posters:
+            if posters.count(poster) > 1:
+                raise ValidationError(
+                    'Duplicate users found.',
+                    code='DUPLICATE_USERS')
+
         if unfound:
             raise ValidationError(unfound)
         else:
