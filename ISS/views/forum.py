@@ -444,7 +444,8 @@ def usercp(request):
     threads = (Thread.objects.all()
         .filter(
             threadflag__poster_id=request.user.id,
-            threadflag__subscribed=True)
+            threadflag__subscribed=True,
+            last_update__gt=F('threadflag__last_read_date'))
         .order_by('-last_update'))
 
     threads_per_page = utils.get_config('threads_per_forum_page')
