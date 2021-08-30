@@ -241,7 +241,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         PrivateMessage.objects.filter(receiver=self).delete()
         PrivateMessage.objects.filter(sender=self).delete()
 
-        PollVote.objects.filter(voter=self).update(voter=other)
+        PollVote.objects.filter(voter=self).delete()
 
         for thanks in self.thanks_given.all():
             try:
