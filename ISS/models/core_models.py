@@ -228,16 +228,21 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         
         Thread.objects.filter(author=self).update(author=other)
 
-        Post.objects.filter(author=self).update(posted_from='127.0.0.1')
-        Post.objects.filter(author=self).update(author=other)
+        Post.objects.filter(author=self).update(
+            posted_from='127.0.0.1',
+            author=other
+        )
 
-        PostSnapshot.objects.filter(obsolesced_by=self).update(obsolescing_ip='127.0.0.1')
-        PostSnapshot.objects.filter(obsolesced_by=self).update(obsolesced_by=other)
+        PostSnapshot.objects.filter(obsolesced_by=self).update(
+            obsolescing_ip='127.0.0.1',
+            obsolesced_by=other
+        )
 
         for post in Post.objects.all():
             post.content = post.content.replace("author=\"" + self.username + "\"", "author=\"" + str(other) + "\"")
             post.save()
 
+        PrivateMessage.objects.filter(inbox=self).delete()
         PrivateMessage.objects.filter(receiver=self).delete()
         PrivateMessage.objects.filter(sender=self).delete()
 
