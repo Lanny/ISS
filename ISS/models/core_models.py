@@ -243,8 +243,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
             post.save()
 
         PrivateMessage.objects.filter(inbox=self).delete()
-        PrivateMessage.objects.filter(receiver=self).delete()
-        PrivateMessage.objects.filter(sender=self).delete()
+        PrivateMessage.objects.filter(sender=self).update(sender=other)
 
         PollVote.objects.filter(voter=self).delete()
 
