@@ -64,6 +64,7 @@
                 <ul class="voter-list">
                   {% for vote in opt.votes.all %}
                     <li>
+                      Votes: {{ opt.votes.count }} -
                       <a href="{{ vote.voter.get_url }}">{{ vote.voter.username }}</a>
                       {% if not forloop.last %},{% endif %}
                     </li>

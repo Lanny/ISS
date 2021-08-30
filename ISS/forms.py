@@ -62,7 +62,7 @@ class PosterSelectField(forms.CharField):
         posters = []
         unfound = []
 
-        for username in value.split(','):
+        for username in value.split('; '):
             if not username: continue
 
             norm = Poster.iss_normalize_username(username)
@@ -79,6 +79,12 @@ class PosterSelectField(forms.CharField):
             else:
                 posters.append(user)
 
+        for poster in posters:
+            if posters.count(poster) > 1:
+                raise ValidationError(
+                    'Duplicate users found.',
+                    code='DUPLICATE_USERS')
+
         if unfound:
             raise ValidationError(unfound)
         else:
@@ -88,7 +94,7 @@ class PosterSelectField(forms.CharField):
         attrs = super(PosterSelectField, self).widget_attrs(widget)
 
         attrs['data-auto-suggest'] = 'true'
-        attrs['data-auto-suggest-delimiter'] = ','
+        attrs['data-auto-suggest-delimiter'] = '; '
 
         return attrs
 
@@ -537,6 +543,10 @@ class RegistrationForm(UserCreationForm):
         }
 
         if norm_username in forbidden_names:
+            raise ValidationError('You may not register that username.',
+                                  code='FORBIDDEN_USERNAME')
+
+        if ";" in norm_username:
             raise ValidationError('You may not register that username.',
                                   code='FORBIDDEN_USERNAME')
 

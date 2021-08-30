@@ -14,6 +14,7 @@ import email_normalize
 from ISS import utils
 from ISS.utils import HomoglyphNormalizer
 from .polls import Poll
+from .polls import PollVote
 from .auth_package import AuthPackage, AccessControlList
 from .admin_models import Ban
 
@@ -221,12 +222,30 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     @transaction.atomic
     def merge_into(self, other):
         """
-        Reassigns all the records that tie to this user to another one and
+        Reassigns all (<-- lies) the records that tie to this user to another one and
         disables this user afterwards.
         """
         
         Thread.objects.filter(author=self).update(author=other)
-        Post.objects.filter(author=self).update(author=other)
+
+        Post.objects.filter(author=self).update(
+            posted_from='127.0.0.1',
+            author=other
+        )
+
+        PostSnapshot.objects.filter(obsolesced_by=self).update(
+            obsolescing_ip='127.0.0.1',
+            obsolesced_by=other
+        )
+
+        for post in Post.objects.all():
+            post.content = post.content.replace("author=\"" + self.username + "\"", "author=\"" + str(other) + "\"")
+            post.save()
+
+        PrivateMessage.objects.filter(inbox=self).delete()
+        PrivateMessage.objects.filter(sender=self).update(sender=other)
+
+        PollVote.objects.filter(voter=self).delete()
 
         for thanks in self.thanks_given.all():
             try:
