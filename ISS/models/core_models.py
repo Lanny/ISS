@@ -9,8 +9,6 @@ from django.db import models, IntegrityError, transaction
 from django.db.models import Q
 from django.utils import timezone
 
-import email_normalize
-
 from ISS import utils
 from ISS.utils import HomoglyphNormalizer
 from .polls import Poll

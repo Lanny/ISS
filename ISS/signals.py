@@ -2,8 +2,15 @@ from django.core.cache import cache
 from django.db import models
 from django.db.models import signals
 from django.dispatch import receiver
+from asgiref.sync import async_to_sync
+from email_normalize import Normalizer
 
 from ISS.models import *
+
+@async_to_sync
+async def normalize_email(email):
+    normalizer = Normalizer()
+    return await normalizer.normalize(email)
 
 @receiver(signals.post_save, sender=Post)
 def update_thread_last_update_on_insert(sender, instance, created, **kwargs):
@@ -44,7 +51,7 @@ def set_normalized_username(sender, instance, **kwargs):
 @receiver(signals.pre_save, sender=Poster)
 def set_normalized_email(sender, instance, **kwargs):
     if instance.email:
-        instance.normalized_email = email_normalize.normalize(instance.email)
+        instance.normalized_email = normalize_email(instance.email)
 
 @receiver(signals.pre_save, sender=Thanks)
 def reject_auto_erotic_athanksication(sender, instance, **kwargs):
