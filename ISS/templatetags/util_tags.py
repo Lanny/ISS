@@ -5,7 +5,7 @@ from django.template import defaultfilters
 from django.urls import reverse
 from django.utils import html
 from django.utils import safestring
-from django.contrib.staticfiles.templatetags import staticfiles
+from django.templatetags.static import static
 
 from ISS import utils
 from ISS.models import FilterWord, AccessControlList
@@ -42,7 +42,7 @@ def _get_theme(user):
 
 @register.simple_tag(name='get_theme')
 def get_theme(user):
-    return staticfiles.static("css/%s.css" % _get_theme(user))
+    return static("css/%s.css" % _get_theme(user))
 
 
 @register.simple_tag(name='get_theme_color')

@@ -11,7 +11,6 @@ from ISS.sitemaps import iss_sitemaps
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^houston/', include('Houston.urls')),
 
     url(r'^humans.txt$', views.misc.humans, name='humans'),
     url(r'^robots.txt$', views.misc.robots, name='robots'),

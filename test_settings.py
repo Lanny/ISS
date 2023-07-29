@@ -39,7 +39,6 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'django.contrib.sitemaps',
     'snowpenguin.django.recaptcha2',
-    'Houston',
     'ISS',
     'ISS.contrib.taboo'
 )

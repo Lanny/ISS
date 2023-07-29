@@ -96,4 +96,4 @@ db.sqlite3
 fabfile.py
 media/
 startup.py
-package-lock.json
+.pg/

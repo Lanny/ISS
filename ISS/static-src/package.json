@@ -1,5 +1,5 @@
 {
-  "name": "iss-frontend",
+  "name": "iss-static",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -37,5 +37,8 @@
     "last 3 version",
     "> 1%",
     "not dead"
+  ],
+  "files": [
+    "dist/**/*"
   ]
 }

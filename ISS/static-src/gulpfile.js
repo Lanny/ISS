@@ -102,7 +102,7 @@ gulp.task('generate-extensions', function(done) {
   done();
 });
 
-var generateTasks = ['less', 'smilies', 'generate-extensions'];
+var generateTasks = ['less', 'smilies', /*'generate-extensions'*/];
 generateTasks.push(argv.optimizeAssets ? 'optimize-js' : 'javascript');
 gulp.task('generate', gulp.parallel(generateTasks));
 
