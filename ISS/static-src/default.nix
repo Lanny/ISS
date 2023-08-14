@@ -5,6 +5,4 @@ buildNpmPackage rec {
   src = ./.;
 
   npmDepsHash = "sha256-cgBQReGimtqMEyu+xNshFBcmgBdu63FgCyET/unNXNY=";
-
-  npmBuildFlags = "--out-dir=\"./dist\"";
 }

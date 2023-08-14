@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node_modules/gulp-cli/bin/gulp.js clean && node_modules/gulp-cli/bin/gulp.js generate --optimizeAssets",
+    "build": "node_modules/gulp-cli/bin/gulp.js generate --optimizeAssets --out-dir=./dist",
     "watch": "node_modules/gulp-cli/bin/gulp.js watch"
   },
   "repository": {
