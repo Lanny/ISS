@@ -1,0 +1,41 @@
+@ARCH: "term";
+
+@body_font_family: "Tahoma", sans-serif;
+@body_font_size: 14px;
+@body_bg_color: #272E33;
+@rounding_factor: 0;
+@minor_rounding_factor: 0;
+
+.index-table() {
+  td:not(:last-child) {
+    border-right: none;
+  }
+}
+
+.link-style() {
+  color: @link_color;
+  font-weight: normal;
+  text-decoration: underline;
+}
+
+.input-style() {
+  background-color: @body_bg_color;
+  color: @body_font_color;
+}
+
+._theme_button() {
+  border-radius: 0px;
+  background-color: @bg_light;
+  color: @fg;
+  border: 1px solid @seperator_color_major;
+  padding: 10px 20px;
+  text-decoration: none;
+
+  &[aria-disabled], &[disabled] {
+    border-style: dashed;
+  }
+}
+
+.vote-bar-style() {
+  border: 1px solid @seperator_color_major;
+}

@@ -8,7 +8,9 @@
   .post {
     @media (min-width: @breakpoint) {
       &:not(:first-child) {
-        margin-top: 10px;
+        & when not (@ARCH = 'term') {
+          margin-top: 10px;
+        }
       }
 
       &:last-child {
@@ -23,7 +25,7 @@
       padding: 5px;
       font-size: 10px;
 
-      & when (@ARCH = 'web2.0') {
+      & when (@ARCH = 'web2.0'), (@ARCH = 'term') {
         .primary();
       }
 
@@ -94,6 +96,10 @@
           border-top: 1px solid @seperator_color;
           padding-top: 20px;
           padding-bottom: 10px;
+        }
+
+        & when (@ARCH = "term") {
+          padding: 1rem 0;
         }
       }
 

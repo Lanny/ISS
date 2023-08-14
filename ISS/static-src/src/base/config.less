@@ -112,7 +112,7 @@
   border-bottom: 1px solid @seperator_color_major;
   padding: 5px @std_lr_padding;
 
-  & when (@ARCH = 'web2.0') {
+  & when (@ARCH = 'web2.0'), (@ARCH = 'term') {
     .primary;
     font-size: 12px;
     font-weight: bold;
@@ -186,6 +186,10 @@
 
   & when (@ARCH = "library") {
     background-color: @body_bg_color;
+  }
+
+  & when (@ARCH = "term") {
+    background-color: @bg_dark;
   }
 
   padding-bottom: 10px;
@@ -289,7 +293,16 @@
   }
 }
 
+//filter: brightness(0.7) sepia(1) hue-rotate(354deg) saturate(0.5);
+//.filter-clorize(@brightness, @hue, @saturation) {
+//  filter: brightness(@brightness) sepia(1) hue-rotate(@hue-rotate) saturate(@saturation);
+//}
+
+.colorize-btn() {
+}
+
 .icn-btn-scaleable(@size, @padding: 3px) {
+  .colorize-btn();
   display: inline-block;
   background-color: @bg_primary;
   border: 1px solid @white;
@@ -306,6 +319,7 @@
 }
 
 .icn-btn() {
+  .colorize-btn();
   display: inline-block;
   width: 16px;
   height: 16px;
