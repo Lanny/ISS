@@ -11,11 +11,27 @@ authors = [
 description = "Oldschool forum software"
 readme = "docs/README.md"
 requires-python = ">=3.7"
+dependencies = [
+  "django",
+  "pytz",
+  "pillow",
+  "psycopg2",
+  "lxml",
+  "requests",
+  "django-debug-toolbar",
+  "django-recaptcha2",
+  "email-normalize",
+  "bbcode",
+  "tripphrase",
+]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Operating System :: OS Independent",
 ]
+
+[project.scripts]
+manage = "ISS.manage:main"
 
 [project.urls]
 "Homepage" = "https://github.com/Lanny/ISS"

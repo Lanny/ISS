@@ -28,11 +28,7 @@ pkgs.python3Packages.buildPythonPackage {
   ];
 
   preBuild = ''
-    rm -rf ./src/ISS/static;
-    cp -r ${issStatic}/lib/node_modules/iss-static/dist ./src/ISS/static;
-  '';
-
-  postInstall = ''
-    cp ./manage.py $out/manage.py;
+    rm -rf ./src/ISS/static
+    cp -r ${issStatic}/lib/node_modules/iss-static/dist ./src/ISS/static
   '';
 }

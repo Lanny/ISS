@@ -2,7 +2,7 @@
 import os
 import sys
 
-if __name__ == "__main__":
+def main():
     settings_file_path = os.environ.get("ISS_SETTINGS_FILE")
 
     if not settings_file_path:
@@ -17,3 +17,6 @@ if __name__ == "__main__":
     from django.core.management import execute_from_command_line
 
     execute_from_command_line(sys.argv)
+
+if __name__ == "__main__":
+    main()
