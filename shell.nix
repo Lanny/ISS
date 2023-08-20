@@ -7,6 +7,7 @@ pkgs.stdenv.mkDerivation {
   buildInputs = [
     pkgs.nodejs-18_x
     (pkgs.python3.withPackages( ps: with ps; [
+      build
       django
       pytz
       pillow

@@ -31,9 +31,7 @@ The strengths of vB3 are what ISS attempts to reproduce and preserve. What ISS o
 
 # Run your own ISS instance
 
-The easiest way to get started with ISS is to deploy it to heroku with the `heroku_deploy.sh` script in this repository. Heroku has a free tier that you can run ISS on at no cost, and you can pay for more resources as your forum grows. See the [ISS Heroku Docs](../docs/HEROKU.md) for more info.
-
-ISS can also run on a dedicated server or VPS. The setup is more involved and generally requires some familiarity with server provisioning, but is likely the most cost effective route for heavily trafficked forums. See [DEVNOTES](../docs/DEVNOTES.md) for some pointers.
+ISS can be run on a dedicated server or VPS. The setup is more involved and generally requires some familiarity with server provisioning, but is likely the most cost effective route for heavily trafficked forums. See [DEVNOTES](../docs/DEVNOTES.md) for some pointers.
 
 # How you can help
 
