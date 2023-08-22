@@ -4,12 +4,17 @@ import re
 import random
 
 from django.contrib.auth.models import AnonymousUser
+from django.conf import settings
 
 from ISS.forms import ISSAuthenticationForm
 from ISS import utils
 
-banners = os.listdir(os.path.join('ISS/static', utils.get_config('banner_dir')))
-banners = [x for x in banners if re.match(r'.*\.(gif|png|jpg)', x)]
+banners = []
+try:
+    banners = os.listdir(os.path.join(settings.STATIC_ROOT, utils.get_config('banner_dir')))
+    banners = [x for x in banners if re.match(r'.*\.(gif|png|jpg)', x)]
+except err:
+    pass
 
 def banner(request):
     if not banners:
