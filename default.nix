@@ -15,6 +15,7 @@ pkgs.python3Packages.buildPythonPackage {
 
   propagatedBuildInputs = with pkgs.python3Packages; [
     django
+    django-redis
     pytz
     pillow
     psycopg2
