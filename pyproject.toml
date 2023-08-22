@@ -47,3 +47,4 @@ namespaces = true
 [tool.setuptools.package-data]
 "ISS.static" = ["**/*"]
 "ISS.support" = ["*"]
+"ISS.templates" = ["**/*.bbc", "**/*.txt", "**/*.html"]
