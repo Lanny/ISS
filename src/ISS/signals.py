@@ -10,7 +10,8 @@ from ISS.models import *
 @async_to_sync
 async def normalize_email(email):
     normalizer = Normalizer()
-    return await normalizer.normalize(email)
+    result = await normalizer.normalize(email)
+    return result.normalized_address
 
 @receiver(signals.post_save, sender=Post)
 def update_thread_last_update_on_insert(sender, instance, created, **kwargs):
