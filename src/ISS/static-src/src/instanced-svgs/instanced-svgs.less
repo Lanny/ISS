@@ -1,20 +1,21 @@
 .svg-inst {
-  &.read-status {
-    .primary {
-      stroke-width: 0.03;
-      stroke: black;
-      fill: red;
-    }
+  .primary {
+    stroke-width: 0.03;
+    stroke: black;
+    fill: @alert_red;
+  }
 
+  &.read {
+    .primary {
+      fill: grey;
+    }
+  }
+
+  &.read-status {
     .specular {
       fill: white;
       stroke-width: 0;
     }
 
-    &.read {
-      .primary {
-        fill: grey;
-      }
-    }
   }
 }

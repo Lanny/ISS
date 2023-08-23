@@ -30,6 +30,10 @@
         a, input[type="submit"] { 
           .link-style();
 
+          & when (@ARCH = "term") {
+            text-decoration: none;
+          }
+
           display: flex;         
           align-items: center;
           padding: 7px 20px;
@@ -62,6 +66,11 @@
           font-weight: normal;
           padding: 3px 5px;
           border: 1px solid @white;
+          text-decoration: none;
+
+          & when (@ARCH = "term") {
+            border: 1px solid @seperator_color_major;
+          }
         }
       }
     }

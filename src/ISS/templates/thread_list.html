@@ -2,6 +2,13 @@
 {% load humanize %}
 {% load static %} 
 
+{% include "instanced_svgs/read_status_read.svg" %}
+{% include "instanced_svgs/read_status_unread.svg" %}
+{% include "instanced_svgs/lock_read.svg" %}
+{% include "instanced_svgs/lock_unread.svg" %}
+{% include "instanced_svgs/poll_read.svg" %}
+{% include "instanced_svgs/poll_unread.svg" %}
+
 <table class="threads">
   <tr>
     <th>New</th>
@@ -14,24 +21,62 @@
     <td>
       <div class="read-status">
       {% if thread.has_unread_posts %}
-        {% if thread.stickied %}
-          <img src="{% static 'img/pin_new.gif' %}" alt="Unread pin" />
-        {% elif thread.locked %}
-          <img src="{% static 'img/lock_new.gif' %}" alt="Unread lock" />
+        {% if thread.locked %}
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 1 1"
+            alt="Unread locked thread"
+          >
+            {% include "instanced_svgs/include.svg" with ref="lock_unread" %}
+          </svg>
         {% elif thread.poll %}
-          <img src="{% static 'img/poll_new.gif' %}" alt="Unread poll" />
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 1 1"
+            alt="Unread poll"
+          >
+            {% include "instanced_svgs/include.svg" with ref="poll_unread" %}
+          </svg>
         {% else %}
-          <img src="{% static 'img/forum_new.gif' %}" alt="Unread posts" />
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 1 1"
+            alt="Unread thread"
+          >
+            {% include "instanced_svgs/include.svg" with ref="read_status_unread" %}
+          </svg>
         {% endif %}
       {% else %}
-        {% if thread.stickied %}
-          <img src="{% static 'img/pin_old.gif' %}" alt="No new pin" />
-        {% elif thread.locked %}
-          <img src="{% static 'img/lock_old.gif' %}" alt="No new lock" />
+        {% if thread.locked %}
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 1 1"
+            alt="Read locked thread"
+          >
+            {% include "instanced_svgs/include.svg" with ref="lock_read" %}
+          </svg>
         {% elif thread.poll %}
-          <img src="{% static 'img/poll_old.gif' %}" alt="No new poll" />
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 1 1"
+            alt="Read poll"
+          >
+            {% include "instanced_svgs/include.svg" with ref="poll_read" %}
+          </svg>
         {% else %}
-          <img src="{% static 'img/forum_old.gif' %}" alt="No new posts" />
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 1 1"
+            alt="Read thread"
+          >
+            {% include "instanced_svgs/include.svg" with ref="read_status_read" %}
+          </svg>
         {% endif %}
       {% endif %}
       </div>

@@ -15,14 +15,20 @@
     margin: 0;
 
     li {
-      display: inline-block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background-color: @bg_light;
       float: left;
       min-width: 20px;
       padding: 2px;
       text-align: center;
-      border: 1px solid @white;
       height: 21px;
+      border: 1px solid @white;
+
+      & when (@ARCH = "term") {
+        border: none;
+      }
 
       &:not(:last-child) {
         border-right: 0;
@@ -30,6 +36,9 @@
       
       &.arrow {
         .primary();
+        i {
+          .colorize-btn();
+        }
       }
 
       &.current-page {
