@@ -10,6 +10,8 @@
 
 {% block content %}
   <section class="forum-index">
+    {% include "instanced_svgs/read_status_read.svg" %}
+    {% include "instanced_svgs/read_status_unread.svg" %}
     <table >
       <tbody>
         <tr>
@@ -32,11 +34,25 @@
         <tr>
           <td>
             <div class="read-status">
-            {% if forum.is_unread %}
-              <img src="{% static 'img/forum_new.gif' %}" alt="Unread posts" />
-            {% else %}
-              <img src="{% static 'img/forum_old.gif' %}" alt="No new posts" />
-            {% endif %}
+              {% if forum.is_unread %}
+                <svg
+                  width="17"
+                  height="17"
+                  viewBox="0 0 1 1"
+                  alt="Unread posts"
+                >
+                  {% include "instanced_svgs/include.svg" with ref="read_status_unread" %}
+                </svg>
+              {% else %}
+                <svg
+                  width="17"
+                  height="17"
+                  viewBox="0 0 1 1"
+                  alt="No new posts"
+                >
+                  {% include "instanced_svgs/include.svg" with ref="read_status_read" %}
+                </svg>
+              {% endif %}
             </div>
           </td>
           <td>

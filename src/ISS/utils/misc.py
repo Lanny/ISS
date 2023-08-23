@@ -5,6 +5,14 @@ from django.contrib import auth
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
+from asgiref.sync import async_to_sync
+from email_normalize import Normalizer
+
+@async_to_sync
+async def normalize_email(email):
+    normalizer = Normalizer()
+    result = await normalizer.normalize(email)
+    return result.normalized_address
 
 def rmerge(*args, **kwargs):
     seq_mode = kwargs.get('seq_mode', 'replace')
@@ -80,4 +88,5 @@ __all__ = [
     'rmerge',
     'render_mixed_mode',
     'get_ban_403_response',
+    'normalize_email',
 ]

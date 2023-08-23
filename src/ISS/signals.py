@@ -2,16 +2,10 @@ from django.core.cache import cache
 from django.db import models
 from django.db.models import signals
 from django.dispatch import receiver
-from asgiref.sync import async_to_sync
-from email_normalize import Normalizer
 
+from ISS.utils import normalize_email
 from ISS.models import *
 
-@async_to_sync
-async def normalize_email(email):
-    normalizer = Normalizer()
-    result = await normalizer.normalize(email)
-    return result.normalized_address
 
 @receiver(signals.post_save, sender=Post)
 def update_thread_last_update_on_insert(sender, instance, created, **kwargs):

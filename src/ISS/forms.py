@@ -3,7 +3,6 @@ import json
 import pytz
 import urllib.request, urllib.parse, urllib.error
 import urllib.request, urllib.error, urllib.parse
-import email_normalize
 
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -552,7 +551,7 @@ class RegistrationForm(UserCreationForm):
 
     def clean_email(self, *args, **kwargs):
         address = self.cleaned_data['email']
-        norm_addr = email_normalize.normalize(address)
+        norm_addr = utils.normalize_email(address)
         _, domain = norm_addr.rsplit('@', 1)
 
         if domain in utils.get_config('email_host_blacklist'):
@@ -608,7 +607,7 @@ class InitiatePasswordRecoveryForm(forms.Form):
 
     def clean_email(self, *args, **kwargs):
         email = self.cleaned_data.get('email')
-        return email_normalize.normalize(email)
+        return utils.normalize_email(email)
 
     def clean(self, *args, **kwargs):
         ret = super(InitiatePasswordRecoveryForm, self).clean(*args, **kwargs)

@@ -13,7 +13,7 @@ banners = []
 try:
     banners = os.listdir(os.path.join(settings.STATIC_ROOT, utils.get_config('banner_dir')))
     banners = [x for x in banners if re.match(r'.*\.(gif|png|jpg)', x)]
-except err:
+except Exception:
     pass
 
 def banner(request):
