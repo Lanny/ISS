@@ -15,10 +15,10 @@ pkgs.stdenv.mkDerivation {
       lxml
       requests
       django-debug-toolbar
-      (pkgs.callPackage ./django-recaptcha2 {})
-      (pkgs.callPackage ./email-normalize {})
-      (pkgs.callPackage ./bbcode {})
-      (pkgs.callPackage ./tripphrase {})
+      (pkgs.callPackage ./nix-deps/django-recaptcha2 {})
+      (pkgs.callPackage ./nix-deps/email-normalize {})
+      (pkgs.callPackage ./nix-deps/bbcode {})
+      (pkgs.callPackage ./nix-deps/tripphrase {})
     ]))
   ];
 
