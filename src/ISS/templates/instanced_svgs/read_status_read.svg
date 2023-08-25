@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" style="display: none;">
   <g id="read_status_read" class="svg-inst read-status read">
-    <circle class="primary" cx="0.5" cy="0.5" r="0.5" />
+    <circle class="primary" cx="0.5" cy="0.5" r="0.4" />
     <circle class="specular" cx="0.33" cy="0.33" r="0.1" />
   </g>
 </svg>
