@@ -29,6 +29,6 @@ pkgs.python3Packages.buildPythonPackage {
   ];
 
   preBuild = ''
-    cp -r ${issStatic}/lib/node_modules/iss-static/dist/* ./src/ISS/static
+    cp -r --remove-destination ${issStatic}/lib/node_modules/iss-static/dist/* ./src/ISS/static
   '';
 }
