@@ -159,11 +159,19 @@
     padding: 0.75rem;
   }
 
-  & when (@ARCH = "web2.0") {
+  & when (@ARCH = "web2.0"), (@ARCH = 'term') {
     th {
       .primary;
-      &:not(:last-child) {
+
+      &:not(:last-child) when (@ARCH = "web2.0") {
         border-right: 1px solid @white;
+      }
+      & when(@ARCH = 'term') {
+        border-bottom: 1px solid @seperator_color;
+
+        &:not(:last-child) {
+          border-right: 1px solid @seperator_color_major;
+        }
       }
     }
   }
