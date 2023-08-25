@@ -11,7 +11,6 @@
       <th class="name-cell">Username</th>
       <th class="join-date">Join Date</th>
       <th class="post-count">Posts</th>
-      <th class="taboo-victories">Taboo Victories</th>
       {% if user.is_authenticated and user.is_admin %}
       <th class="spam-cell">SPAM</th>
       {% endif %}
@@ -40,11 +39,6 @@
       <td class="post-count">
         <a href="{% url 'posts-by-user' poster.pk %}">
           {{ poster.post_set.count|intcomma }}
-        </a>
-      </td>
-      <td class="taboo-victories">
-        <a href="{% url 'taboo-status' %}">
-          {{ poster.taboo_successes.count|intcomma }}
         </a>
       </td>
       {% if user.is_authenticated and user.is_admin %}
