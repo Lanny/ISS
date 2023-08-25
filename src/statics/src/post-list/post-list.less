@@ -137,7 +137,9 @@
       }
 
       @media (min-width: @breakpoint) {
-        margin-top: 5px;
+        & when not (@ARCH = 'term') {
+          margin-top: 5px;
+        }
       }
 
       .thanker-caption {
