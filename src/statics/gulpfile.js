@@ -12,8 +12,8 @@ var clean = require('gulp-clean');
 var autoprefixer = require('gulp-autoprefixer');
 var execSync = require('child_process').execSync;
 
-var staticDir = argv.outDir || '../static',
-  extDir = argv.extDir || '../contrib',
+var staticDir = argv.outDir || '../ISS/static',
+  extDir = argv.extDir || '../ISS/ISS/contrib',
   jsDir = path.join(staticDir, '/js'),
   cssDir = path.join(staticDir, '/css'),
   gifDir = path.join(staticDir, '/img/gif'),
@@ -84,7 +84,7 @@ gulp.task('optimize-js', gulp.series('javascript', function() {
   return gulp.src(optPaths)
     .pipe(requirejsOptimize({ paths: { 'jquery': 'empty:' } }))
     .pipe(flatten())
-    .pipe(gulp.dest('../static/js'));
+    .pipe(gulp.dest(jsDir));
 }));
 
 gulp.task('generate-extensions', function(done) {

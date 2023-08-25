@@ -1,6 +1,6 @@
 let 
   pkgs = import <nixpkgs> {};
-  issStatic = (pkgs.callPackage ./src/ISS/static-src {});
+  issStatic = (pkgs.callPackage ./src/statics {});
 in
 pkgs.python3Packages.buildPythonPackage {
   name = "ISS";
