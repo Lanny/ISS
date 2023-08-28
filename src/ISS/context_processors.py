@@ -12,7 +12,7 @@ from ISS import utils
 banners = []
 try:
     banners = os.listdir(os.path.join(settings.STATIC_ROOT, utils.get_config('banner_dir')))
-    banners = [x for x in banners if re.match(r'.*\.(gif|png|jpg)', x)]
+    banners = [x for x in banners if re.match(r'[^.]*\.(gif|png|jpg)', x)]
 except Exception:
     pass
 
