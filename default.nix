@@ -1,34 +1,42 @@
+{
+  python3Packages,
+  callPackage,
+  extraPythonPackages ? [],
+  bannerDir ? null,
+}:
 let 
-  pkgs = import <nixpkgs> {};
-  issStatic = (pkgs.callPackage ./src/statics {});
+  issStatic = (callPackage ./src/statics {});
 in
-pkgs.python3Packages.buildPythonPackage {
+python3Packages.buildPythonPackage {
   name = "ISS";
   src = ./.;
   format = "pyproject";
 
-  nativeBuildInputs = with pkgs.python3Packages; [
+  nativeBuildInputs = with python3Packages; [
     build
     setuptools
     issStatic
   ];
 
-  propagatedBuildInputs = with pkgs.python3Packages; [
+  propagatedBuildInputs = with python3Packages; [
     django
-    django-redis
     pytz
     pillow
     psycopg2
     lxml
     requests
-    django-debug-toolbar
     (pkgs.callPackage ./nix-deps/django-recaptcha2 {})
     (pkgs.callPackage ./nix-deps/email-normalize {})
     (pkgs.callPackage ./nix-deps/bbcode {})
     (pkgs.callPackage ./nix-deps/tripphrase {})
-  ];
+  ] ++ extraPythonPackages;
 
   preBuild = ''
+    declare BANNER_DIR="${if isNull bannerDir then "" else bannerDir}"
+    if [ -n $BANNER_DIR ]; then
+      mkdir -p ./src/ISS/static/banners
+      cp -r $BANNER_DIR ./src/ISS/static/banners
+    fi
     cp -r --remove-destination ${issStatic}/lib/node_modules/iss-static/dist/* ./src/ISS/static
   '';
 }
