@@ -35,7 +35,7 @@ python3Packages.buildPythonPackage {
     declare BANNER_DIR="${if isNull bannerDir then "" else bannerDir}"
     if [ -n $BANNER_DIR ]; then
       mkdir -p ./src/ISS/static/banners
-      cp -r $BANNER_DIR ./src/ISS/static/banners
+      cp -r $BANNER_DIR/* ./src/ISS/static/banners
     fi
     cp -r --remove-destination ${issStatic}/lib/node_modules/iss-static/dist/* ./src/ISS/static
   '';
