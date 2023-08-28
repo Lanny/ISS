@@ -107,17 +107,17 @@
       .post-controls {
         overflow: hidden;
         border-top: 1px solid @seperator_color;
-        padding-top: 5px;
+        padding-top: 10px;
         margin-top: 5px;
 
         .control-buttons {
           .-display-flex();
           .-flex-direction(row-reverse);
+          gap: 5px;
 
           .quote, .thank-action, .edit-post, .report  {
             .small-btn();
             align-self: flex-start;
-            margin: 0 3px;
           }
         }
 

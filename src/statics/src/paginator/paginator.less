@@ -24,14 +24,18 @@
       padding: 2px;
       text-align: center;
       height: 21px;
-      border: 1px solid @white;
+      border: 1px solid @seperator_color_major;
+      box-sizing: content-box;
 
-      & when (@ARCH = "term") {
-        border: none;
-      }
 
       &:not(:last-child) {
         border-right: 0;
+      }
+
+      @media(max-width: @breakpoint) {
+        &:first-child {
+          border-left: 0;
+        }
       }
       
       &.arrow {
