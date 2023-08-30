@@ -153,10 +153,10 @@ urlpatterns = [
         views.forum.get_bc_embed_code,
         name='embed-bandcamp'),
 
-    url(r'^admin/user/(?P<user_id>\d+)/assume-identity$',
+    url(r'^iss-admin/user/(?P<user_id>\d+)/assume-identity$',
         views.forum.assume_identity,
         name='assume-identity'),
-    url(r'^admin/user/(?P<poster_id>\d+)/spam-can$',
+    url(r'^iss-admin/user/(?P<poster_id>\d+)/spam-can$',
         views.forum.SpamCanUser.as_view(),
         name='spam-can-user'),
 

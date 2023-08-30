@@ -52,6 +52,7 @@ pkgs.stdenv.mkDerivation {
   shellHook = ''
     echo "Using ${pkgs.postgresql_15.name}."
 
+    export ISS_SETTINGS_FILE=$(pwd)/settings.py
     # Setup: other env variables
     export PGHOST="$PGDATA"
 
