@@ -1,6 +1,8 @@
 import os
 import re
 
+import ISS
+
 class GlobShortcodeRegistrar(object):
     _directory = None
 
@@ -11,7 +13,11 @@ class GlobShortcodeRegistrar(object):
         sc_map = {}
 
         try:
-            files = os.listdir(os.path.join('ISS/static', self._directory))
+            files = os.listdir(os.path.join(
+                os.path.dirname(os.path.realpath(ISS.__file__)),
+                'static',
+                self._directory
+            ))
         except OSError:
             files = []
 
