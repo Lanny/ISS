@@ -6,6 +6,7 @@ pkgs.stdenv.mkDerivation {
   name = "ISS";
   buildInputs = [
     pkgs.nodejs-18_x
+    pkgs.Fabric
     (pkgs.python3.withPackages( ps: with ps; [
       build
       django

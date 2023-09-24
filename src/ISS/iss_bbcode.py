@@ -38,7 +38,7 @@ class PreprocessingParser(bbcode.Parser):
 
 _yt_embed_pattern = ('<iframe width="640" height="480" class="yt-embed" '
     'src="https://www.youtube.com/embed/%s?start=%s" frameborder="0" '
-    'allowfullscreen></iframe>')
+    'allowfullscreen referrerpolicy="origin"></iframe>')
 
 _bc_embed_pattern = ('<iframe width="640" height="480" class="yt-embed" '
     'src="https://www.bitchute.com/embed/%s" frameborder="0" '
