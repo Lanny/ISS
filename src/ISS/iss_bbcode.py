@@ -233,10 +233,11 @@ def _add_video_tag(parser):
         try:
             return _video_markup_for_url(value)
         except EmbeddingNotSupportedException:
-            return '[video]%s[/video]' % value
+            return '[video]%s[/video]' % html.escape(value)
     
     parser.add_formatter('video', render_video, render_embedded=False,
-                         replace_cosmetic=False, replace_links=False)
+                         replace_cosmetic=False, replace_links=False,
+                         escape_html=False)
 
     return parser
 
