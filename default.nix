@@ -33,7 +33,7 @@ python3Packages.buildPythonPackage {
 
   preBuild = ''
     declare BANNER_DIR="${if isNull bannerDir then "" else bannerDir}"
-    if [ -n $BANNER_DIR ]; then
+    if [ -n "$BANNER_DIR" ]; then
       mkdir -p ./src/ISS/static/banners
       cp -r $BANNER_DIR/* ./src/ISS/static/banners
     fi

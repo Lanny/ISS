@@ -7,27 +7,17 @@ services:
       - POSTGRES_DB=iss
       - POSTGRES_USER=iss_user
       - POSTGRES_PASSWORD=this0is0a0super0secret0password69
-  static:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile-static
-    command: npm run watch -- --outDir=/out --extDir=/ext
-    volumes:
-      - ./ISS/contrib:/ext
-      - ./ISS/static-src:/code
-      - ./ISS/static:/out
   web:
     build:
       context: .
-      dockerfile: docker/Dockerfile-web
     environment:
-      - DJANGO_SETTINGS_MODULE=ISS.docker_settings
+      - ISS_SETTINGS_FILE=/opt/ISS/config/settings
       - DJANGO_DEBUG=TRUE
-    command: sh /code/mig-and-run.sh
+    command: sh /opt/ISS/config/mig-and-run.sh
     volumes:
-      - .:/code
+      - ./docker-config:/opt/ISS/config
+      - ./docker-config/banners:/opt/ISS/src/ISS/static/banners
     ports:
       - "8000:8000"
     depends_on:
       - db
-      - static

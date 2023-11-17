@@ -201,8 +201,11 @@ for ext in utils.get_config('extensions'):
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
-    import debug_toolbar
+    try:
+        import debug_toolbar
 
-    urlpatterns += [
-        path('__debug__/', include(debug_toolbar.urls)),
-    ]
+        urlpatterns += [
+            path('__debug__/', include(debug_toolbar.urls)),
+        ]
+    except:
+        print('Unable to import debug_toolbar but settings.DEBUG was true!')
