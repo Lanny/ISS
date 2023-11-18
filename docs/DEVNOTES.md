@@ -1,7 +1,7 @@
 # DEVNOTES
 
 ## Code Layout
-There are two main parts to the ISS code, the frontend and the backend. The backend consists of the typical Django components, views, models, form etc. The fontend is a gulp pipeline that produces static assets for the site. It lives under the `ISS/static-src` directory. It outputs into the static directory which the backend either serves directly in development mode or processes to be served by something like nginx in production.
+There are two main parts to the ISS code, the frontend and the backend. The backend consists of the typical Django components, views, models, form etc. The fontend is a gulp pipeline that produces static assets for the site. It lives under the `src/statcs` directory. It outputs into the static directory which the backend either serves directly in development mode or processes to be served by something like nginx in production.
 
 ## Setting it up
 
@@ -32,9 +32,9 @@ Note that the container must be up in order for this to work.
 - When debug mode is on, you can use ctrl+P on any page to cycle through the available themes without reloading a page.
 
 ## Configuration
-Every ISS instance must define a `FORUM_CONFIG` setting. Default values exist
-for every key so it may be empty. Here is a list of the recognized properties
-and what each does:
+Every ISS instance must define a `FORUM_CONFIG` setting. Default values exist for every key so it may be empty. When running via docker compose, your settings file is `docker-config/settings.py`. In that file you can find both your `FORUM_CONFIG` definition which controls the behavior of ISS itself, and general django config which you can use to configure general behavior of the application server (e.g. upload storage configuration). Note that configuring the latter is somewhat more advanced/delicate than the former, generally you'll want to leave the general Django config alone unless you're sure you know what you're doing.
+
+Here is a list of the recognized properties and what each does:
 
 | Option | Description| Default |
 | -- | -- | -- |
