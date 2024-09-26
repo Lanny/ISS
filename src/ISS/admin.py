@@ -98,3 +98,7 @@ class PollVoteModel(admin.ModelAdmin):
 
     def poll(self, obj):
         return obj.poll_option.poll
+
+@admin.register(Banner)
+class BannerAdmin(admin.ModelAdmin):
+    list_display = ('is_enabled', 'image')

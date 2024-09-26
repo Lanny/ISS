@@ -96,3 +96,7 @@ class RateLimitedAccess(models.Model):
 
             return wrapped_view
         return decorator
+
+class Banner(models.Model):
+    is_enabled = models.BooleanField(default=True)
+    image = models.ImageField(upload_to='banners', null=False)

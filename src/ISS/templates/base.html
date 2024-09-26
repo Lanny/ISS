@@ -51,12 +51,14 @@
   </head>
   <body>
     <div class="page-content">
-      <a href="/" id='top-banner'>
-        <div class="peekaboo-container">
-          <img src="{% static "img/peekaboo.png" %}" class="peekaboo" >
-        </div>
-        <img src="{% static banner %}" class="banner" >
-      </a>
+      {% if banner %}
+        <a href="/" id='top-banner'>
+          <div class="peekaboo-container">
+            <img src="{% static "img/peekaboo.png" %}" class="peekaboo" >
+          </div>
+          <img src="{{ banner.image.url }}" class="banner" >
+        </a>
+      {% endif %}
 
       <div class="user-controls">
         <h3>User Controls</h3>
