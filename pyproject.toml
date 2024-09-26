@@ -18,7 +18,7 @@ dependencies = [
   "psycopg2",
   "lxml",
   "requests",
-  "django-recaptcha2",
+  "django-recaptcha",
   "email-normalize",
   "bbcode",
   "tripphrase",

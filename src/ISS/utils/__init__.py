@@ -20,7 +20,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse, \
     HttpResponseForbidden
 from django.utils import html
 from django.shortcuts import render
-from snowpenguin.django.recaptcha2.fields import ReCaptchaField
+from django_recaptcha.fields import ReCaptchaField
 
 from ISS.models import *
 from ISS import iss_bbcode
@@ -306,13 +306,11 @@ class TolerantJSONEncoder(json.JSONEncoder):
             return None
 
 def captchatize_form(form, label="Captcha"):
-    _config = get_config('recaptcha_settings')
+    has_recaptcha_config = getattr(settings, 'RECAPTCHA_PUBLIC_KEY', None)
 
-    if _config:
+    if has_recaptcha_config:
         class NewForm(form):
-            captcha = ReCaptchaField(label=label,
-                                     public_key=_config[0],
-                                     private_key=_config[1])
+            captcha = ReCaptchaField(label=label)
 
         return NewForm
 

@@ -38,7 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'django.contrib.sitemaps',
-    'snowpenguin.django.recaptcha2',
+    'django_recaptcha',
     'ISS',
     'ISS.contrib.taboo'
 )
@@ -143,3 +143,5 @@ MEDIA_ROOT = '/media'
 MEDIA_URL = '/media/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+
+SILENCED_SYSTEM_CHECKS = ['django_recaptcha.recaptcha_test_key_error']
