@@ -73,6 +73,7 @@ class ConfigurationManager(Singleton):
             'bibliotek': {'name': 'Bibliotek', 'color': '#FFFFFF'},
             'amoled': {'name': 'AMOLED', 'color': '#000000'},
             'everforest-dark-hard': {'name': 'Everforest', 'color': '#272e33'},
+            'watermelon-dark': {'name': 'Watermelon Dark', 'color': '#e48c85'},
         },
         'default_theme': '&T',
     }
