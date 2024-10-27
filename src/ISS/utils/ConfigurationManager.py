@@ -73,6 +73,7 @@ class ConfigurationManager(Singleton):
             'bibliotek': {'name': 'Bibliotek', 'color': '#FFFFFF'},
             'amoled': {'name': 'AMOLED', 'color': '#000000'},
             'everforest-dark-hard': {'name': 'Everforest', 'color': '#272e33'},
+            'halloween-2024': {'name': 'Halloween 2024', 'color': '#ff7b00'},
             'watermelon-dark': {'name': 'Watermelon Dark', 'color': '#e48c85'},
             'watermelon-leet': {'name': 'Watermelon Leet', 'color': '#85e48c'},
         },
