@@ -74,6 +74,7 @@ class ConfigurationManager(Singleton):
             'amoled': {'name': 'AMOLED', 'color': '#000000'},
             'everforest-dark-hard': {'name': 'Everforest', 'color': '#272e33'},
             'watermelon-dark': {'name': 'Watermelon Dark', 'color': '#e48c85'},
+            'watermelon-leet': {'name': 'Watermelon Leet', 'color': '#85e48c'},
         },
         'default_theme': '&T',
     }
