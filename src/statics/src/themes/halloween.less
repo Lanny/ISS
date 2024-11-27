@@ -1,0 +1,26 @@
+@import "../combined/combined.less";
+@import "../theme-archetypes/term.less";
+
+@THEME: "halloween-2024";
+
+@bg_ultra_dark: #000000;		
+@fg_ultra_dark: #000000;		 
+@body_bg_color: #000000;		  
+@body_font_color: #FCCD67;		// main text
+@bg_dark: #2A2A2A;				// main thread panel
+@bg_light: #2F2F2F;				// thread read icon/poster (left/right)
+@fg: #56D465;					// misc text (author on threads list)
+@fg_alt: #000000;				// misc text (thread headers)
+@bg_primary: #FF7B00;			// top headers (controls, nav)
+@bg_primary_disabled: @bg_light;
+@fg_disabled: #61146F;
+@link_color: #FF7B00;			// obvious
+@fg_low_contrast: #FCCD67;		// username on threads list
+@alert_red: #E67E80;
+@seperator_color: #61146F;
+@seperator_color_major: #61146F;
+@white: #FFFFFF;
+
+.colorize-btn() {
+  filter: brightness(0.7) sepia(1) hue-rotate(354deg) saturate(0.5);
+}

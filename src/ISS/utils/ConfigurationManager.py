@@ -73,6 +73,9 @@ class ConfigurationManager(Singleton):
             'bibliotek': {'name': 'Bibliotek', 'color': '#FFFFFF'},
             'amoled': {'name': 'AMOLED', 'color': '#000000'},
             'everforest-dark-hard': {'name': 'Everforest', 'color': '#272e33'},
+            'watermelon-dark': {'name': 'Watermelon Dark', 'color': '#e48c85'},
+            'halloween': {'name': 'Haloween 2024', 'color': '#FF7B00'},
+            'turkey-tina': {'name': 'Turkey Tina', 'color': '#EAAC64'},
         },
         'default_theme': '&T',
     }
