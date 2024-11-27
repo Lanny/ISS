@@ -14,6 +14,7 @@ services:
       target: statics
     command: npm run watch -- --out-dir=./dist
     volumes:
+      - ./src/statics/src:/static-builder/src
       - ./src/ISS/static:/static-builder/dist
 
   web:
@@ -27,7 +28,7 @@ services:
     volumes:
       - ./docker-config:/opt/ISS/config
       - ./docker-config/banners:/opt/ISS/src/ISS/static/banners
-      - ./src/ISS/static:/opt/ISS/src/ISS/static
+      - ./src/ISS:/opt/ISS/src/ISS
     ports:
       - "8000:8000"
     depends_on:
