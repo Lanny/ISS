@@ -6,7 +6,7 @@
 
 input, select, textarea {
   color: @body_font_color;
-  background: @bg_light;
+  .bg-light();
 }
 
 input[type="submit"] {
@@ -89,7 +89,7 @@ a {
 
 .breadcrumb {
   .region(0,0,0,@content_margin_bottom);
-  background-color: @bg_dark;
+  .bg-dark();
 
   h3 {
     .title-box();
@@ -102,7 +102,7 @@ a {
 }
 
 blockquote {
-  background-color: @bg_light;
+  .bg-light();
   border: 1px solid @seperator_color;
   padding: 0.625rem 1.25rem;
   margin: 1.125rem 0.625rem 0.25rem 0.625rem;
@@ -170,7 +170,7 @@ footer {
 }
 
 .pretty-pre() {
-  background-color: @bg_light;
+  .bg-light();
   border: 1px solid @seperator_color;
   padding: 1em 1.5em;
   border-radius: 3px;
@@ -256,7 +256,7 @@ footer {
 
 .generic-section {
   .rounded();
-  background-color: @bg_dark;
+  .bg-dark();
   padding: @std_lr_padding;
 
   input[type="submit"] {
@@ -311,7 +311,7 @@ a.bbcode-ref-link {
 
 .page-message {
   .-display-flex();
-  background-color: @bg_light;
+  .bg-light();
   margin-bottom: @content_margin_bottom;
   
   .icon-container {

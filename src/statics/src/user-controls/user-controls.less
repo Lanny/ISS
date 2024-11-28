@@ -2,7 +2,7 @@
 
 .user-controls {
   .region(0,0,0,@content_margin_bottom);
-  background-color: @bg_dark;
+  .bg-dark();
 
   h3 {
     .title-box();
@@ -34,17 +34,18 @@
             text-decoration: none;
           }
 
+          .bg-dark();
+
           display: flex;         
           align-items: center;
           padding: 7px 20px;
           border: none;
-          background-color: @bg_dark;
           cursor: pointer;
           height: 100%;
           font-size: @body_font_size;
 
           &:hover {
-            background-color: @bg_light;
+            .bg-light();
           }
 
           & when (@THEME = "web-2.0") {
