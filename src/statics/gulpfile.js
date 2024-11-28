@@ -13,10 +13,10 @@ var autoprefixer = require('gulp-autoprefixer');
 var execSync = require('child_process').execSync;
 
 var staticDir = argv.outDir || '../ISS/static',
-  extDir = argv.extDir || '../ISS/ISS/contrib',
   jsDir = path.join(staticDir, '/js'),
   cssDir = path.join(staticDir, '/css'),
   gifDir = path.join(staticDir, '/img/gif'),
+  jpgDir = path.join(staticDir, '/img/jpg'),
   optimizeModules = [
     'thread.js',
     'editor-bootstrap.js',
@@ -24,14 +24,8 @@ var staticDir = argv.outDir || '../ISS/static',
     'base.js'
   ];
 
-var extensions = {
-  'ISS.contrib.taboo': {
-    'gulp_dir': extDir + '/taboo/static-src'
-  }
-}
-
 gulp.task('clean', function() {
-  return gulp.src([ gifDir, cssDir, jsDir ], { allowEmpty: true })
+  return gulp.src([ gifDir, cssDir, jsDir, jpgDir ], { allowEmpty: true })
     .pipe(clean({read: false, force: true}));
 });
  
@@ -47,6 +41,11 @@ gulp.task('icons', function() {
 gulp.task('smilies', function() {
   return gulp.src('src/assets/gif/*')
     .pipe(gulp.dest(gifDir));
+});
+
+gulp.task('jpgs', function() {
+  return gulp.src('src/assets/jpg/*')
+    .pipe(gulp.dest(jpgDir));
 });
 
 gulp.task('less', gulp.series('icons', function() {
@@ -87,20 +86,7 @@ gulp.task('optimize-js', gulp.series('javascript', function() {
     .pipe(gulp.dest(jsDir));
 }));
 
-gulp.task('generate-extensions', function(done) {
-  for (var ext in extensions) {
-    var extConfig = extensions[ext];
-
-    if ('gulp_dir' in extConfig) {
-      execSync('npm install', {cwd: extConfig.gulp_dir});
-      execSync('npm run build', {cwd: extConfig.gulp_dir});
-    }
-  }
-
-  done();
-});
-
-var generateTasks = ['less', 'smilies', /*'generate-extensions'*/];
+var generateTasks = ['less', 'smilies', 'jpgs'];
 generateTasks.push(argv.optimizeAssets ? 'optimize-js' : 'javascript');
 gulp.task('generate', gulp.parallel(generateTasks));
 
@@ -108,6 +94,7 @@ gulp.task('watch', gulp.series('generate', function() {
   return Promise.all([
     gulp.watch([ './src/assets/svg/*.svg' ], gulp.series('icons')),
     gulp.watch([ './src/assets/gif/*' ], gulp.series('smilies')),
+    gulp.watch([ './src/assets/jpg/*' ], gulp.series('jpgs')),
     gulp.watch([ './src/**/*.less', '!./src/base/icons.less' ], gulp.series('less')),
     gulp.watch([ './src/**/*.js' ], gulp.series('javascript')),
   ]);

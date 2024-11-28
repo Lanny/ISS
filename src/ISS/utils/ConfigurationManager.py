@@ -76,6 +76,7 @@ class ConfigurationManager(Singleton):
             'watermelon-dark': {'name': 'Watermelon Dark', 'color': '#e48c85'},
             'halloween': {'name': 'Haloween 2024', 'color': '#FF7B00'},
             'turkey-tina': {'name': 'Turkey Tina', 'color': '#EAAC64'},
+            'frotse': {'name': 'Frotse', 'color': '#AEC3A4'},
         },
         'default_theme': '&T',
     }

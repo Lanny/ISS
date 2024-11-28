@@ -69,7 +69,7 @@
     }
 
     .user-block {
-      background-color: @bg_light;
+      .bg-light();
       overflow: hidden;
 
       .author-name {
@@ -86,7 +86,7 @@
     }
 
     .post-block {
-      background-color: @bg_dark;
+      .bg-dark();
 
       .post-body {
         word-wrap: break-word;
@@ -130,7 +130,7 @@
     }
 
     .thanker-block {
-      background-color: @bg_dark;
+      .bg-dark();
 
       & when (@THEME = "bibliotek") {
         margin: 0 20px;
