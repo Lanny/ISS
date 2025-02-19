@@ -5,7 +5,7 @@ from ISS.models import *
 
 from . import tutils
 
-class FormsTestCase(tutils.ForumConfigTestCase):
+class DedupeFormsTestCase(tutils.ForumConfigTestCase):
     forum_config = {'captcha_period': 0}
 
     def setUp(self):
@@ -40,3 +40,41 @@ class FormsTestCase(tutils.ForumConfigTestCase):
 
         form = NewThreadForm(thread_data, author=self.tony)
         self.assertFalse(form.is_valid())
+
+class RegistrationFormTestCase(tutils.ForumConfigTestCase):
+
+    def test_valid_registration(self):
+        form = RegistrationForm({
+            'username': 'Jimmy',
+            'email': 'jimmy@lannysport.net',
+            'password1': 'p4ssw0rd',
+            'password2': 'p4ssw0rd'
+        })
+        self.assertTrue(form.is_valid())
+
+    def test_forbidden_name(self):
+        form = RegistrationForm({
+            'username': 'Wintermute',
+            'email': 'wm@lannysport.net',
+            'password1': 'p4ssw0rd',
+            'password2': 'p4ssw0rd'
+        })
+        self.assertFalse(form.is_valid())
+
+        errors = form.errors.as_data() 
+        self.assertEqual(errors.keys(), {'username'})
+        self.assertEqual(errors['username'][0].code, 'FORBIDDEN_USERNAME')
+
+    def test_forbidden_name_pattern(self):
+        form = RegistrationForm({
+            'username': 'Visit https://totally-legit.com for $$$',
+            'email': 'prince_ibrahim@nigeria.gov',
+            'password1': 'p4ssw0rd',
+            'password2': 'p4ssw0rd'
+        })
+        self.assertFalse(form.is_valid())
+
+        errors = form.errors.as_data() 
+        self.assertEqual(errors.keys(), {'username'})
+        self.assertEqual(errors['username'][0].code,
+                         'FORBIDDEN_USERNAME_PATTERN')

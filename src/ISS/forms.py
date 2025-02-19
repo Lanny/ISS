@@ -522,6 +522,16 @@ class ISSAuthenticationForm(AuthenticationForm):
 @utils.captchatize_form
 class RegistrationForm(UserCreationForm):
     error_css_class = 'in-error'
+    # In general, we take the position that we should be permissive with
+    # usernames so as to afford non-latin scripts, spaces, fun, etc.
+    # Normalization takes care of confuable/nonprintable abuse. However some
+    # patterns that remain are abusable
+    bad_username_patterns = [
+        # Expressly anything that looks like it could be a URL. Spammers have
+        # abused URLs in usernames in order to hijack our email verification to
+        # advertise their sites
+        re.compile(r'.*://.*')
+    ]
 
     class Meta:
         model = Poster
@@ -541,6 +551,16 @@ class RegistrationForm(UserCreationForm):
 
         if len(norm_username) < 1:
             raise ValidationError('Invalid username', code='INVALID_GENERAL')
+
+        if norm_username in forbidden_names:
+            raise ValidationError('You may not register that username.',
+                                  code='FORBIDDEN_USERNAME')
+
+        for pattern in self.bad_username_patterns:
+            if pattern.match(username):
+                raise ValidationError('You may not register that username.',
+                                      code='FORBIDDEN_USERNAME_PATTERN')
+
 
         if Poster.objects.filter(normalized_username=norm_username).count():
             raise ValidationError(
