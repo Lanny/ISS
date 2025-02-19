@@ -17,7 +17,6 @@ def get_banners():
 
 def banner(request):
     banners = cache.get_or_set('banners', get_banners, 60*60*24)
-    print(banners)
     banner = random.choice(banners) if banners else None
 
     return { 'banner': banner }
