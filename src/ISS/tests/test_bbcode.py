@@ -42,7 +42,7 @@ class VideoTestCase(tutils.ForumConfigTestCase):
     def test_valid_long_yt_embed(self):
         parser = build_parser(('VIDEO',))
         bbc = '[video]https://www.youtube.com/watch?v=6DaL-Z4dwzI[/video]'
-        expected = '<iframe width="640" height="480" class="yt-embed" src="https://www.youtube.com/embed/6DaL-Z4dwzI?start=0" frameborder="0" allowfullscreen></iframe>'
+        expected = '<iframe width="640" height="480" class="yt-embed" src="https://www.youtube.com/embed/6DaL-Z4dwzI?start=0" frameborder="0" allowfullscreen referrerpolicy="origin"></iframe>'
         actual = parser.format(bbc)
         self.assertEqual(expected, actual)
         

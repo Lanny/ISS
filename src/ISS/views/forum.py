@@ -809,7 +809,8 @@ class ThankPost(utils.MethodSplitView):
         except IntegrityError:
             pass
 
-        if request.is_ajax():
+        if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+
             return utils.render_mixed_mode(
                 request,
                 (('thanksBlock', 'thanks_block.html', {'post': post}),
@@ -828,7 +829,7 @@ class UnthankPost(utils.MethodSplitView):
 
         thanks.delete()
 
-        if request.is_ajax():
+        if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
             return utils.render_mixed_mode(
                 request,
                 (('thanksBlock', 'thanks_block.html', {'post': post}),
