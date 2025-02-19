@@ -37,7 +37,6 @@ class SpamCanTestCase(TestCase):
         self.joes_post.save()
 
         self.legit_thread.subscribe(self.joe)
-        self.legit_thread.mark_read(self.joe)
 
         self.admins_second_post = Post(
             author=self.admin,
