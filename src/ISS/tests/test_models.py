@@ -217,6 +217,13 @@ class SubscriptionTestCase(TestCase):
                     posted_from='8.8.8.4')
         post.save()
 
+        # Clear flag cache. Note this is sort of a bug but in reality we never
+        # populate this cache, create a post, then turn around and query it
+        # again so the invalidation is only necessary in test
+        self.thread._flag_cache = {}
+        self.thread.last_update = post.created
+        self.thread.save()
+
         return post
 
     def test_subscription_no_update(self):
@@ -224,6 +231,9 @@ class SubscriptionTestCase(TestCase):
 
     def test_subscription_with_update(self):
         self._mkpost()
+
+        flag = self.thread._get_flag(self.tu_1, False)
+
         self.assertTrue(self.thread.has_unread_posts(self.tu_1))
 
     def test_subscription_after_delete(self):
@@ -232,6 +242,7 @@ class SubscriptionTestCase(TestCase):
         self.assertTrue(self.thread.has_unread_posts(self.tu_1))
         
         self.thread.mark_read(self.tu_1)
+        flag = self.thread._get_flag(self.tu_1)
         self.assertFalse(self.thread.has_unread_posts(self.tu_1))
 
         post.delete()
