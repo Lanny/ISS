@@ -83,17 +83,17 @@ WSGI_APPLICATION = 'ISS.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE':   'django.db.backends.postgresql_psycopg2',
-        'NAME':     'travisdb',
-        'USER':     'postgres',
-        'PASSWORD': '',
-        'HOST':     'localhost',
+        'NAME':     'iss_test',
+        'USER':     'iss_user',
+        'PASSWORD': 'this0is0a0super0secret0password69',
+        'HOST':     'db',
         'PORT':     '',
     }
 }
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/

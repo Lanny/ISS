@@ -51,3 +51,11 @@ First, click the "Add" link on the "Category" line. On the resulting page enter 
 Next return to the [admin interface](http://127.0.0.1:8000/admin/) and click "Add" next to the "Forum" record type. Repeat the process here, selecting your recently created category, picking a name and description. Repeat this process one more time, creating a forum, and checking the "Is Trash" checkbox. A trash forum is necessary for spam control, and where trashed threads will be sent.
 
 After this, you should have a pair of forums visible on the home page, and be able to create threads, posts, polls, etc. and generally test out the features of ISS.
+
+## Testing
+
+You can run the tests by standing up the docker container and running the following command:
+
+```
+docker exec -w /opt/ISS/src -it $(docker ps | grep iss_web | awk '{ print $1 }') bash -c 'export ISS_SETTINGS_FILE=/opt/ISS/config/test_settings && ./manage.py test'
+```
