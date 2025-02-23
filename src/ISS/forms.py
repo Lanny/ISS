@@ -530,7 +530,8 @@ class RegistrationForm(UserCreationForm):
         # Expressly anything that looks like it could be a URL. Spammers have
         # abused URLs in usernames in order to hijack our email verification to
         # advertise their sites
-        re.compile(r'.*://.*')
+        re.compile(r'.*://.*'),
+        re.compile('.*[\r\n].*')
     ]
 
     class Meta:
@@ -551,10 +552,6 @@ class RegistrationForm(UserCreationForm):
 
         if len(norm_username) < 1:
             raise ValidationError('Invalid username', code='INVALID_GENERAL')
-
-        if norm_username in forbidden_names:
-            raise ValidationError('You may not register that username.',
-                                  code='FORBIDDEN_USERNAME')
 
         for pattern in self.bad_username_patterns:
             if pattern.match(username):
