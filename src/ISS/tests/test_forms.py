@@ -65,6 +65,20 @@ class RegistrationFormTestCase(tutils.ForumConfigTestCase):
         self.assertEqual(errors.keys(), {'username'})
         self.assertEqual(errors['username'][0].code, 'FORBIDDEN_USERNAME')
 
+    def test_forbidden_name_w_newlines(self):
+        username = 'Instant Bitcoin Payouts. $16863 Ready For You\r\n >>> https://script.google.com/macros/s/AKfycbz_xnlUaUlxIDn_8JCIrW1EG9wpFCb1OBgVEY4ME7yjzJqL4eUrwzAXVjEUxH88Ct1l/exec#\r\n <<< 8671643'
+        form = RegistrationForm({
+            'username': username,
+            'email': 'not@spammer.biz',
+            'password1': 'p4ssw0rd',
+            'password2': 'p4ssw0rd'
+        })
+        self.assertFalse(form.is_valid())
+
+        errors = form.errors.as_data() 
+        self.assertEqual(errors.keys(), {'username'})
+        self.assertEqual(errors['username'][0].code, 'FORBIDDEN_USERNAME_PATTERN')
+
     def test_forbidden_name_pattern(self):
         form = RegistrationForm({
             'username': 'Visit https://totally-legit.com for $$$',
