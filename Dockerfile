@@ -1,11 +1,11 @@
-FROM node:18 as statics
+FROM node:18 AS statics
 USER node
 COPY --chown=node ./src/statics /home/node/static-builder
 WORKDIR /home/node/static-builder
 RUN npm ci
 RUN npm run build
 
-FROM python:3.10 as web
+FROM python:3.10 AS web
 COPY ./requirements.txt /opt/ISS/
 WORKDIR /opt/ISS
 
