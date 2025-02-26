@@ -13,4 +13,5 @@ RUN python -m pip install -r /opt/ISS/requirements.txt
 
 COPY ./src/ISS /opt/ISS/src/ISS
 COPY ./src/manage.py /opt/ISS/src/manage.py
-COPY --from=statics /home/node/static-builder/dist/* /opts/ISS/src/ISS/static/
+COPY --from=statics /home/node/static-builder/dist /opt/ISS/src/ISS/static
+RUN mkdir -p /opt/ISS/statics_and_media/statics && mkdir /opt/ISS/statics_and_media/media
