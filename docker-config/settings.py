@@ -28,7 +28,8 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'django.contrib.sitemaps',
     'ISS',
-    'ISS.contrib.taboo'
+    'ISS.contrib.taboo',
+    'django_probes'
 )
 
 MIDDLEWARE = [

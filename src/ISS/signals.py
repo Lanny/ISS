@@ -6,7 +6,6 @@ from django.dispatch import receiver
 from ISS.utils import normalize_email
 from ISS.models import *
 
-
 @receiver(signals.post_save, sender=Post)
 def update_thread_last_update_on_insert(sender, instance, created, **kwargs):
     if not created:
