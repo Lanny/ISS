@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=iss
+      - POSTGRES_USER=iss_user
+      - POSTGRES_PASSWORD=this0is0a0super0secret0password69
+
+  statics:
+    build:
+      context: .
+      target: statics
+    command: npm run watch -- --out-dir=./dist
+    volumes:
+      - ./src/statics/src:/static-builder/src
+      - ./src/ISS/static:/static-builder/dist
+
+  web:
+    build:
+      context: .
+      target: web
+    environment:
+      - ISS_SETTINGS_FILE=/opt/ISS/config/settings
+      - DJANGO_DEBUG=TRUE
+    command: sh /opt/ISS/config/mig-and-run.sh
+    volumes:
+      - ./docker-config:/opt/ISS/config
+      - ./docker-config/banners:/opt/ISS/src/ISS/static/banners
+      - ./src/ISS:/opt/ISS/src/ISS
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - statics

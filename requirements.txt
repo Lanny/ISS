@@ -1,0 +1,14 @@
+bbcode==1.1.0
+Django==4.2.16
+email-normalize==2.0.0
+lxml==5.3.0
+pillow==10.4.0
+psycopg2==2.9.9
+pytz==2024.2
+requests==2.32.3
+tripphrase==0.5
+django-debug-toolbar==4.4.6
+django-recaptcha==4.0.0
+django-redis==5.4.0
+django-probes==1.7.0
+uWSGI==2.0.28

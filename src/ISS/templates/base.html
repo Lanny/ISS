@@ -50,13 +50,16 @@
     {% block head_extra %}{% endblock %}
   </head>
   <body>
+    <a href="#" id="top"></a>
     <div class="page-content">
-      <a href="/" id='top-banner'>
-        <div class="peekaboo-container">
-          <img src="{% static "img/peekaboo.png" %}" class="peekaboo" >
-        </div>
-        <img src="{% static banner %}" class="banner" >
-      </a>
+      {% if banner %}
+        <a href="/" id='top-banner'>
+          <div class="peekaboo-container">
+            <img src="{% static "img/peekaboo.png" %}" class="peekaboo" >
+          </div>
+          <img src="{{ banner.image.url }}" class="banner" >
+        </a>
+      {% endif %}
 
       <div class="user-controls">
         <h3>User Controls</h3>
@@ -117,7 +120,7 @@
         Base Template.
       {% endblock %}
 
-      <a class="jump-to-top" href="#top-banner">
+      <a class="jump-to-top" href="#top">
         <i class="up-arrow"></i>
         <span>Jump to Top</span>
         <i class="up-arrow"></i>

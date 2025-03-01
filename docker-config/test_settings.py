@@ -38,7 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'django.contrib.sitemaps',
-    'snowpenguin.django.recaptcha2',
+    'django_recaptcha',
     'ISS',
     'ISS.contrib.taboo'
 )
@@ -83,17 +83,18 @@ WSGI_APPLICATION = 'ISS.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE':   'django.db.backends.postgresql_psycopg2',
-        'NAME':     'travisdb',
-        'USER':     'postgres',
-        'PASSWORD': '',
-        'HOST':     'localhost',
+        'NAME':     'iss_test',
+        'USER':     'iss_user',
+        'PASSWORD': 'this0is0a0super0secret0password69',
+        'HOST':     'db',
         'PORT':     '',
     }
 }
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -143,3 +144,5 @@ MEDIA_ROOT = '/media'
 MEDIA_URL = '/media/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+
+SILENCED_SYSTEM_CHECKS = ['django_recaptcha.recaptcha_test_key_error']

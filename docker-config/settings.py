@@ -27,9 +27,9 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'django.contrib.sitemaps',
-    'snowpenguin.django.recaptcha2',
     'ISS',
-    'ISS.contrib.taboo'
+    'ISS.contrib.taboo',
+    'django_probes'
 )
 
 MIDDLEWARE = [

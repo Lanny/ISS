@@ -16,7 +16,12 @@ from django.http import (
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.template.defaultfilters import truncatechars
-from django.views.decorators.cache import cache_control, cache_page
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import (
+    cache_control,
+    cache_page,
+    never_cache
+)
 
 from ISS import utils, forms, iss_bbcode
 from ISS.models import *
@@ -764,6 +769,7 @@ class GetQuote(utils.MethodSplitView):
         })
 
 class LoginUser(utils.MethodSplitView):
+    @method_decorator(never_cache)
     def GET(self, request):
         form = forms.ISSAuthenticationForm(autofocus=True)
         ctx = {'form': form}
@@ -809,7 +815,8 @@ class ThankPost(utils.MethodSplitView):
         except IntegrityError:
             pass
 
-        if request.is_ajax():
+        if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+
             return utils.render_mixed_mode(
                 request,
                 (('thanksBlock', 'thanks_block.html', {'post': post}),
@@ -828,7 +835,7 @@ class UnthankPost(utils.MethodSplitView):
 
         thanks.delete()
 
-        if request.is_ajax():
+        if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
             return utils.render_mixed_mode(
                 request,
                 (('thanksBlock', 'thanks_block.html', {'post': post}),

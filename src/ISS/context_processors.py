@@ -3,28 +3,23 @@ import os.path
 import re
 import random
 
+from django.core.cache import cache
 from django.contrib.auth.models import AnonymousUser
 from django.conf import settings
 
+from ISS.models import Banner
 from ISS.forms import ISSAuthenticationForm
 from ISS import utils
 
-banners = []
-try:
-    banners = os.listdir(os.path.join(settings.STATIC_ROOT, utils.get_config('banner_dir')))
-    banners = [x for x in banners if re.match(r'[^.]*\.(gif|png|jpg)', x)]
-except Exception:
-    pass
+
+def get_banners():
+    return Banner.objects.all().filter(is_enabled=True)
 
 def banner(request):
-    if not banners:
-        return ''
+    banners = cache.get_or_set('banners', get_banners, 60*60*24)
+    banner = random.choice(banners) if banners else None
 
-    banner_name = random.choice(banners)
-
-    return {
-        'banner': os.path.join(utils.get_config('banner_dir'), banner_name)
-    }
+    return { 'banner': banner }
 
 def forum_config(request):
     return {'config': utils.get_config()}
