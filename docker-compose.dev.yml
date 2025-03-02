@@ -14,8 +14,8 @@ services:
       target: statics
     command: npm run watch -- --out-dir=./dist
     volumes:
-      - ./src/statics/src:/static-builder/src
-      - ./src/ISS/static:/static-builder/dist
+      - ./src/statics/src:/home/node/static-builder/src
+      - ./src/ISS/static:/home/node/static-builder/dist
 
   web:
     build:
