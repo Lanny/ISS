@@ -1,0 +1,25 @@
+{% include "django/forms/div.html" %}
+
+<div class="iss-captcha">
+  <p>
+    Solve the following captcha by selecting all of the areas where a white
+    circle is visible.
+  </p>
+
+  <div class="captcha-content">
+    <img src="{{ form.captcha_data_url }}">
+    <div class="selector" />
+      <input type="checkbox" name="c_0_0">
+      <input type="checkbox" name="c_0_1">
+      <input type="checkbox" name="c_0_2">
+      <input type="checkbox" name="c_1_0">
+      <input type="checkbox" name="c_1_1">
+      <input type="checkbox" name="c_1_2">
+      <input type="checkbox" name="c_2_0">
+      <input type="checkbox" name="c_2_1">
+      <input type="checkbox" name="c_2_2">
+    </div>
+  </div>
+
+  <input type="hidden" name="challenge_id" value="{{ form.challenge_id }}">
+</div>

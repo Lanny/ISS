@@ -15,6 +15,7 @@ from PIL import Image
 from tripphrase.tripphrase import tripphrase
 
 from . import utils
+from .utils.captcha import CaptchaForm
 from .models import *
 from .models.core_models import THEME_CHOICES
 
@@ -346,7 +347,7 @@ class NewPostForm(InitialPeriodLimitingForm, PostDuplicationPreventionForm):
 
         return self.post
 
-class EditPostForm(forms.Form):
+class EditPostForm(CaptchaForm):
     error_css_class = 'in-error'
     post_min_len = utils.get_config('min_post_chars')
     post_max_len = utils.get_config('max_post_chars')
