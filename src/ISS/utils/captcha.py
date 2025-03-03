@@ -76,11 +76,13 @@ class CaptchaForm(forms.Form):
             self.captcha_data_url = 'data:image/png;base64,' + b64
 
     def clean(self, data, *args, **kwargs):
-        solution = captcha_cache.get(
-            'captcha_challenge:%s' % data.get('challenge_id'))
+        key = 'captcha_challenge:%s' % data.get('challenge_id') 
+        solution = captcha_cache.get(key)
 
         if not solution:
             raise ValidationError('Invalid captcha', code='NO_CHALLENGE')
+
+        captcha_cache.delete(key)
 
         for cx, cy in solution:
             if data.get('c_%d_%d' % (cx, cy), None) != 'on':
@@ -90,30 +92,3 @@ class CaptchaForm(forms.Form):
 
 
         return result
-
-            
-
-'''
-class CaptchaWidget(forms.Widget):
-    template_name = "django/forms/widgets/hidden.html"
-
-    def __init__(self, challenge_id, captcha_image):
-        self.challenge_id = challenge_id
-        self.captcha_image = captcha_image
-        super().__init__()
-
-    def get_context(self, name, value, attrs):
-        context = super().get_context(name, value, attrs)
-        context["widget"]["challenge_id"] = self.challenge_id
-        context["widget"]["captcha_image"] = self.captcha_image
-        return context
-
-class CaptchaField(forms.Field):
-    def __init__(self, *, **kwargs):
-        kwargs['widget'] = CaptchaWidget()
-        super().__init__(**kwargs)
-
-    def clean(self, value):
-        value = super(CaptchaField, self).clean(value)
-
-'''
