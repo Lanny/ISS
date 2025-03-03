@@ -148,6 +148,5 @@ class ConfigurationManager(Singleton):
 
         target[key_path[-1]] = value
 
-
-
-
+def get_config(*keys):
+    return ConfigurationManager.get_instance().get(*keys)

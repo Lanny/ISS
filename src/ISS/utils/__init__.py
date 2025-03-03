@@ -25,6 +25,9 @@ from ISS.models import *
 from ISS import iss_bbcode
 from ISS.utils import misc
 
+from .captcha import captchatize_form, conditionally_captchatize
+from .ConfigurationManager import get_config
+
 
 # Functions and classes defined in the misc submodule should be available as
 # properties of the `utils` module, however some other utils submodules which
@@ -69,9 +72,6 @@ def memoize(f):
         return memo[args]
 
     return memoized
-
-def get_config(*keys):
-    return ConfigurationManager.get_instance().get(*keys)
 
 def get_ext_config(ext, *keys):
     return ConfigurationManager.get_instance().get_ext(ext, *keys)
@@ -303,33 +303,4 @@ class TolerantJSONEncoder(json.JSONEncoder):
             return super(self, json.JSONEncoder).default(o)
         except TypeError:
             return None
-
-def captchatize_form(form, label="Captcha"):
-    has_recaptcha_config = getattr(settings, 'RECAPTCHA_PUBLIC_KEY', None)
-
-    if has_recaptcha_config:
-        class NewForm(form):
-            captcha = ReCaptchaField(label=label)
-
-        return NewForm
-
-    else:
-        return form
-
-
-GENERIC_CAPTCHA_LABEL = 'Captcha (required for your first %d posts)' % (
-    get_config('captcha_period')
-)
-
-def conditionally_captchatize(request, Form):
-    if not request.user.is_authenticated:
-        return Form
-
-    post_count = request.user.post_set.count()
-
-    if post_count < get_config('captcha_period'):
-        return captchatize_form(Form, label=GENERIC_CAPTCHA_LABEL)
-    else:
-        return Form
-    
 

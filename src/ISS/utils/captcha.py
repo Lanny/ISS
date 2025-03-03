@@ -7,6 +7,8 @@ from django.core.cache import cache, caches
 from django.core.cache.backends.base import InvalidCacheBackendError
 from PIL import Image, ImageDraw, ImageEnhance
 
+from .ConfigurationManager import get_config
+
 
 '''
 A hacky bid at builing a low effort but (hopefully) unique captcha system. A
@@ -76,11 +78,6 @@ class CaptchaForm(Form):
         b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
         self.captcha_data_url = 'data:image/png;base64,' + b64
 
-    def clean(self, *args, **kwargs):
-        result = super().clean(*args, **kwargs)
-        self.validate_captcha()
-        return result
-
     def validate_captcha(self, *args, **kwargs):
         key = 'captcha_challenge:%s' % self.data.get('challenge_id') 
         solution = captcha_cache.get(key)
@@ -98,3 +95,37 @@ class CaptchaForm(Form):
 
             if submitted != in_solution:
                 raise ValidationError('Invalid captcha', code='INVALID_CAPTCHA')
+
+
+
+def captchatize_form(form, label="Captcha"):
+    class NewForm(form, CaptchaForm):
+        def clean(self, *args, **kwargs):
+            '''
+            Make sure we call validate_captcha because the faustian
+            multi-inheritence bargain we've struck here is tenuous and fragile.
+            '''
+            result = super().clean(*args, **kwargs)
+            super().validate_captcha()
+            return result
+    return NewForm
+
+
+GENERIC_CAPTCHA_LABEL = 'Captcha (required for your first %d posts)' % (
+    get_config('captcha_period')
+)
+
+def conditionally_captchatize(request, Form):
+    if not request.user.is_authenticated:
+        return Form
+
+    post_count = request.user.post_set.count()
+
+    if post_count < get_config('captcha_period'):
+        return captchatize_form(Form, label=GENERIC_CAPTCHA_LABEL)
+    else:
+        return Form
+    
+
+
+

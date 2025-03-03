@@ -520,7 +520,8 @@ class ISSAuthenticationForm(AuthenticationForm):
         else:
             return user.username
 
-class RegistrationForm(UserCreationForm, CaptchaForm):
+@utils.captchatize_form
+class RegistrationForm(UserCreationForm):
     error_css_class = 'in-error'
     # In general, we take the position that we should be permissive with
     # usernames so as to afford non-latin scripts, spaces, fun, etc.
@@ -583,15 +584,6 @@ class RegistrationForm(UserCreationForm, CaptchaForm):
                 code='TOO_SIMILAR')
 
         return address
-
-    def clean(self, *args, **kwargs):
-        '''
-        Make sure we call validate_captcha because the faustian
-        multi-inheritence bargain we've struck here is tenuous and fragile.
-        '''
-        result = super().clean(*args, **kwargs)
-        super().validate_captcha()
-        return result
 
     def save(self):
         poster = UserCreationForm.save(self)
