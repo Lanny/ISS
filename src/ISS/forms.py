@@ -347,7 +347,7 @@ class NewPostForm(InitialPeriodLimitingForm, PostDuplicationPreventionForm):
 
         return self.post
 
-class EditPostForm(CaptchaForm):
+class EditPostForm(forms.Form):
     error_css_class = 'in-error'
     post_min_len = utils.get_config('min_post_chars')
     post_max_len = utils.get_config('max_post_chars')
@@ -520,8 +520,7 @@ class ISSAuthenticationForm(AuthenticationForm):
         else:
             return user.username
 
-@utils.captchatize_form
-class RegistrationForm(UserCreationForm):
+class RegistrationForm(UserCreationForm, CaptchaForm):
     error_css_class = 'in-error'
     # In general, we take the position that we should be permissive with
     # usernames so as to afford non-latin scripts, spaces, fun, etc.
@@ -584,6 +583,15 @@ class RegistrationForm(UserCreationForm):
                 code='TOO_SIMILAR')
 
         return address
+
+    def clean(self, *args, **kwargs):
+        '''
+        Make sure we call validate_captcha because the faustian
+        multi-inheritence bargain we've struck here is tenuous and fragile.
+        '''
+        result = super().clean(*args, **kwargs)
+        super().validate_captcha()
+        return result
 
     def save(self):
         poster = UserCreationForm.save(self)

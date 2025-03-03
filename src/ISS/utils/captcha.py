@@ -77,6 +77,11 @@ class CaptchaForm(Form):
         self.captcha_data_url = 'data:image/png;base64,' + b64
 
     def clean(self, *args, **kwargs):
+        result = super().clean(*args, **kwargs)
+        self.validate_captcha()
+        return result
+
+    def validate_captcha(self, *args, **kwargs):
         key = 'captcha_challenge:%s' % self.data.get('challenge_id') 
         solution = captcha_cache.get(key)
 
@@ -93,8 +98,3 @@ class CaptchaForm(Form):
 
             if submitted != in_solution:
                 raise ValidationError('Invalid captcha', code='INVALID_CAPTCHA')
-
-        result = super().clean(*args, **kwargs)
-
-
-        return result
