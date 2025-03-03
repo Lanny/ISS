@@ -24,6 +24,7 @@ services:
     environment:
       - ISS_SETTINGS_FILE=/opt/ISS/config/settings
       - DJANGO_DEBUG=TRUE
+      - PYTHONUNBUFFERED=TRUE
     command: sh /opt/ISS/config/mig-and-run.sh
     volumes:
       - ./docker-config:/opt/ISS/config

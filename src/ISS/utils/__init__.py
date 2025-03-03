@@ -20,7 +20,6 @@ from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse, \
     HttpResponseForbidden
 from django.utils import html
 from django.shortcuts import render
-from django_recaptcha.fields import ReCaptchaField
 
 from ISS.models import *
 from ISS import iss_bbcode

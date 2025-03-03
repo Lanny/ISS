@@ -2,7 +2,7 @@ import random
 import io
 import base64
 
-from django import forms
+from django.forms import Form, ValidationError
 from django.core.cache import cache, caches
 from django.core.cache.backends.base import InvalidCacheBackendError
 from PIL import Image, ImageDraw, ImageEnhance
@@ -26,6 +26,8 @@ try:
     captcha_cache = caches['db_cache']
 except InvalidCacheBackendError:
     print('No `db_cache` exists, this could be a problem if you\'re using LocMemCache')
+
+CAPTCHA_CELLS = [(x,y) for x in range(3) for y in range(3)]
 
 def create_captcha(cells):
     # Create iamge where pixels are randomly assigned black or white
@@ -59,24 +61,23 @@ def create_challenge():
 
     return (challenge_id, captcha_image)
 
-class CaptchaForm(forms.Form):
+class CaptchaForm(Form):
     template_name = 'forms/captcha_form.html'
     challenge_id = None
     captcha_data_url = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if not self.is_bound:
-            challenge_id, captcha_image = create_challenge()
-            self.challenge_id = challenge_id
+        challenge_id, captcha_image = create_challenge()
+        self.challenge_id = challenge_id
 
-            buf = io.BytesIO()
-            captcha_image.save(buf, format="PNG")
-            b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
-            self.captcha_data_url = 'data:image/png;base64,' + b64
+        buf = io.BytesIO()
+        captcha_image.save(buf, format="PNG")
+        b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+        self.captcha_data_url = 'data:image/png;base64,' + b64
 
-    def clean(self, data, *args, **kwargs):
-        key = 'captcha_challenge:%s' % data.get('challenge_id') 
+    def clean(self, *args, **kwargs):
+        key = 'captcha_challenge:%s' % self.data.get('challenge_id') 
         solution = captcha_cache.get(key)
 
         if not solution:
@@ -84,11 +85,16 @@ class CaptchaForm(forms.Form):
 
         captcha_cache.delete(key)
 
-        for cx, cy in solution:
-            if data.get('c_%d_%d' % (cx, cy), None) != 'on':
+        for cell in CAPTCHA_CELLS:
+            cx, cy = cell
+            key = 'c_%d_%d' % (cx, cy)
+            submitted = self.data.get(key) == 'on'
+            in_solution = cell in solution
+
+            if submitted != in_solution:
                 raise ValidationError('Invalid captcha', code='INVALID_CAPTCHA')
 
-        result = super().clean(data, *args, **kwargs)
+        result = super().clean(*args, **kwargs)
 
 
         return result
