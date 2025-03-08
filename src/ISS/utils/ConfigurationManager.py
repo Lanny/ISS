@@ -14,7 +14,6 @@ class ConfigurationManager(Singleton):
         'forum_domain': 'yourdomain.space',
         'default_protocol': 'http',
         'email_host_blacklist': [],
-        'banner_dir': 'banners',
         'min_post_chars': 1,
         'max_post_chars': 19475, # No. characters in the first chapter of Dune
         'min_thread_title_chars': 1,
@@ -62,6 +61,7 @@ class ConfigurationManager(Singleton):
         'initial_account_period_total': 150,
         'initial_account_period_width': datetime.timedelta(days=1),
         'initial_account_period_limit': 20,
+        'disable_captchas': False,
         'captcha_period': 0,
         'enable_registration': True,
         'require_email_verification': True,

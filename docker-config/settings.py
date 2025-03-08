@@ -130,5 +130,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
 FORUM_CONFIG = {
     'extensions': [],
-    'initial_account_period_total': 1
+    'initial_account_period_total': 1,
+    'disable_captchas': False,
 }

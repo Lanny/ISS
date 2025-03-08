@@ -1,5 +1,6 @@
 {% include "django/forms/p.html" %}
 
+{% if not form.captcha_disabled %}
 <div class="iss-captcha">
   <p>
     Solve the following captcha by selecting all of the areas where a white
@@ -25,3 +26,4 @@
 
   <input type="hidden" name="challenge_id" value="{{ form.challenge_id }}">
 </div>
+{% endif %}

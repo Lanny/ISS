@@ -118,7 +118,8 @@ AUTH_USER_MODEL = 'ISS.Poster'
 FORUM_CONFIG = {
     'extensions': [
         'ISS.contrib.taboo'
-    ]
+    ],
+    'disable_captchas': True,
 }
 
 AUTHENTICATION_BACKENDS = [

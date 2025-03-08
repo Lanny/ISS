@@ -67,9 +67,15 @@ class CaptchaForm(Form):
     template_name = 'forms/captcha_form.html'
     challenge_id = None
     captcha_data_url = None
+    captcha_disabled = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        if get_config('disable_captchas'):
+            self.captcha_disabled = True
+            return
+
         challenge_id, captcha_image = create_challenge()
         self.challenge_id = challenge_id
 
@@ -79,6 +85,9 @@ class CaptchaForm(Form):
         self.captcha_data_url = 'data:image/png;base64,' + b64
 
     def validate_captcha(self, *args, **kwargs):
+        if get_config('disable_captchas'):
+            return
+
         key = 'captcha_challenge:%s' % self.data.get('challenge_id') 
         solution = captcha_cache.get(key)
 
