@@ -29,7 +29,6 @@ class ConfigurationManager(Singleton):
             (10, 'Acolyte'),
             (0, 'Novice')
         ),
-        'recaptcha_settings': None,
         'max_avatar_size': 128*1024,
         'junk_user_username': 'The Self Taught Man',
         'system_user_username': 'Wintermute',

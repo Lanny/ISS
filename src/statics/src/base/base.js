@@ -15,11 +15,6 @@
         }
       });
 
-      if ($('.g-recaptcha').length > 0) {
-        $(document.documentElement).append(
-          '<script src="https://www.google.com/recaptcha/api.js"></script>');
-      }
-
       $('[data-checkbox-list-container]').each(function(i, el) {
         new CheckboxList(el);
       });

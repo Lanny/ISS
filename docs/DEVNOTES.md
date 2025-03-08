@@ -51,7 +51,6 @@ Here is a list of the recognized properties and what each does:
 | ninja_edit_grace_time | The amount of time, in seconds, after post creation that a user can edit their post without it being branded with an edit notice and timestamp. | 120 |
 | private_message_flood_control | The number of seconds users must wait after sending a private message before they can send a new one. | 30 |
 | title_ladder | Used for assigning users a user title based on their post count. See utils.py for the format. | see utils.py |
-| recaptcha_settings | Either `None` or a 2-tuple with your reCAPTCHA site(public) and secret keys in that order to be used at registration time. If this is None users will be able to register without solving a captcha. | None |
 | max_avatar_size | The maximum filesize for avatars, in bytes. Regardless of this value the display size of avatars is constrained to 75px in either dimension | 128kB |
 | extensions | A list of forum extensions to be enabled. Currently only 'taboo' is available | [] |
 | min_age_to_anonymize | A timedelta indicating how long an account needs to have existed before it can anonymize itself | timedelta(days=28) |

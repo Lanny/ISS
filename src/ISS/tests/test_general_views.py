@@ -708,7 +708,6 @@ class AbstractRegistrationTestCase(tutils.ForumConfigTestCase):
 
 class RegistrationTestCase(AbstractRegistrationTestCase):
     forum_config = {
-        'recaptcha_settings': None,
         'enable_registration': True
     }
 
@@ -778,7 +777,6 @@ class RegistrationTestCase(AbstractRegistrationTestCase):
 
 class EmailNormalizationTestCase(AbstractRegistrationTestCase):
     forum_config = {
-        'recaptcha_settings': None,
         'enable_registration': True,
         'email_host_blacklist': ['damnthespam.com']
     }
@@ -823,7 +821,6 @@ class EmailNormalizationTestCase(AbstractRegistrationTestCase):
 
 class RegistrationDisabledTestCase(tutils.ForumConfigTestCase):
     forum_config = {
-        'recaptcha_settings': None,
         'enable_registration': False
     }
 
@@ -848,7 +845,6 @@ class RegistrationDisabledTestCase(tutils.ForumConfigTestCase):
 
 class RegistrationByInviteTestCase(tutils.ForumConfigTestCase):
     forum_config = {
-        'recaptcha_settings': None,
         'captcha_period': 0,
         'enable_registration': False,
         'enable_invites': True
@@ -1091,7 +1087,6 @@ class UserCPTestCase(tutils.ForumConfigTestCase):
 
 class ReportPostTestCase(tutils.ForumConfigTestCase):
     forum_config = {
-        'recaptcha_settings': None,
         'report_reasons': (('TOO_PRETTY', 'Too pretty'),),
     }
 
