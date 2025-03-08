@@ -767,6 +767,10 @@ class UserSettingsForm(forms.Form):
                                 required=False,
                                 widget=forms.Textarea())
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.label_suffix = ""
+
     def clean(self, *args, **kwargs):
         ret = super(UserSettingsForm, self).clean(*args, **kwargs)
 

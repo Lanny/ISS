@@ -250,7 +250,8 @@
     }
 
     label {
-      margin-top: 10px
+      margin-top: 12px;
+      margin-bottom: 4px;
     }
 
     input, textarea {
@@ -290,15 +291,20 @@
 }
 
 .bool-field(@name) {
+  p:has(#id_@{name}) {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 6px;
+  }
+
   #id_@{name} {
-    display: inline;
-    width: auto;
+    flex: 0;
+    transform: scale(1.25);
   }
 
   [for="id_@{name}"] {
-    display: inline-block;
-    width: auto;
-    width: 50%;
+    margin-top: 0;
+    margin-bottom: 0;
   }
 }
 
@@ -307,7 +313,12 @@
     list-style: none;
     padding-left: 5px;
 
-    li {
+    div {
+      label {
+        margin-top: 4px;
+        margin-bottom: 4px;
+      }
+
       input {
         display: inline;
         width: auto;
