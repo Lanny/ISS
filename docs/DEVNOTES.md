@@ -42,7 +42,6 @@ Here is a list of the recognized properties and what each does:
 | forum_domain | Domain used in composing absolute urls (only used in emails) | 'yourdomain.com' |
 | default_protocol | Protocol used in composing absolute urls (only used in emails) | 'http' |
 | email_host_blacklist | List of email hosts users are not allowed to register new accounts with | [] |
-| banner_dir | A path, relative to the static dir (in the src tree) that contains an arbitrary number of forum banners in jpg, gif, or png format. One of the files from this dir will be randomly selected for the page banner on each page load. | 'banners' |
 | min_post_chars | The minimum length, in characters, of a post. | 1
 | max_post_chars | The maximum length of a post, in characters. Defaults to the number of characters in the first chapter of Dune | 19476 |
 | min_thread_title_chars | The minimum length, in characters, of a thread title | 1 |
