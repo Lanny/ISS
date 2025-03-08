@@ -6,8 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+
+### Features
 - Added in-app captchas to replace google recaptcha, because recaptcha is cancer
-- Minor updates to default theme and user settings page, chiefly bumping the default text size and giving forms a little more room to breathe
+
+### Deprecations
+- Removed `recaptcha_settings` from FORUM_CONFIG
+  - Captchas are now done in-app and thus are on by default, to disable them entirely set `disable_captchas` to `True` in FORUM_CONFIG
+- Removed `banner_dir` from FORUM_CONFIG as this config hasn't been used for some time
+
+### Bugfix/Trivial
+- Updated default font size across themes to 14px
+- Minor visual updates to user settings page
 
 ## 1.0.0
 
