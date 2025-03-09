@@ -13,7 +13,7 @@
 
       <fieldset>
         {% csrf_token %}
-        {{ form }}
+        {{ form.as_p }}
         <input type="submit" value="Submit" />
       </fieldset>
      </form>

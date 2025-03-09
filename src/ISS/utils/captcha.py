@@ -64,7 +64,10 @@ def create_challenge():
     return (challenge_id, captcha_image)
 
 class CaptchaForm(Form):
-    template_name = 'forms/captcha_form.html'
+    template_name_div = 'forms/captcha_form/div.html'
+    template_name_p = 'forms/captcha_form/p.html'
+    template_name_table = 'forms/captcha_form/table.html'
+    template_name_ul = 'forms/captcha_form/ul.html'
     challenge_id = None
     captcha_data_url = None
     captcha_disabled = False
