@@ -11,3 +11,4 @@ django-debug-toolbar==4.4.6
 django-redis==5.4.0
 django-probes==1.7.0
 uWSGI==2.0.28
+ipython==9.0.2
