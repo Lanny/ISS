@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Bugfix/Trivial
 - Updated default font size across themes to 14px
 - Minor visual updates to user settings page
+- Fixed visual z-index bug in auto-suggest dropdowns, noticeable when searching for a user on the user index page
 
 ## 1.0.0
 
