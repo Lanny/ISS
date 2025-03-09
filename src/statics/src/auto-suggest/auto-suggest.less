@@ -12,19 +12,20 @@
     margin: 0;
     padding: 0;
     border-style: solid;
-    border-color: lightgray;
+    border-color: @seperator_color;
     border-width: 0 1px;
     z-index: 1;
 
     li {
-      background-color: white;
+      background-color: @inactive_control_bg;
+      color: @inactive_control_fg;
       padding: 3px 10px;
-      border-bottom: 1px solid lightgray;
+      border-bottom: 1px solid @seperator_color;
       cursor: pointer;
 
       &.active {
-        background-color: #0095ff;
-        color: white;
+        background-color: @active_control_bg;
+        color: @active_control_fg;
       }
     }
   }

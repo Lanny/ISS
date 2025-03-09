@@ -1,14 +1,27 @@
 @import "icons.less";
 
-@bg_dark: #FF00FF;
-@bg_ultra_dark: #FF00FF;
-@fg_ultra_dark: #FF00FF;
-@bg_light: #FF00FF;
+// For most polychrome themes, @bg_primary is usually the strongest color in
+// the palette, e.g. in &T it's the signature totse teal. @fg_alt is a
+// contrasting color that can be safely used against @bg_primary
 @bg_primary: #FF00FF;
 @bg_primary_disabled: #FF00FF;
+@fg_alt: #FF00FF;
+
+// Standard body text
 @fg: #FF00FF;
 @fg_disabled: #FF00FF;
-@fg_alt: #FF00FF;
+
+// Generally used for alternating colors in lists and tables. Typically these
+// are closely related if there's any distinction at all. @fg and @link_color
+// need to be safe against both of these.
+@bg_dark: #FF00FF;
+@bg_light: #FF00FF;
+
+// bg/fg that's distinct from the usual @fg_alt on @bg_primary and @fg on
+// @bg_dark/@bg_light pairs. Rarely used, most notable for the footer in &T
+@bg_ultra_dark: #FF00FF;
+@fg_ultra_dark: #FF00FF;
+
 @link_color: #FF00FF;
 @fg_low_contrast: #FF00FF;
 @alert_red: #FF00FF;
@@ -17,9 +30,15 @@
 @white: #FF00FF;
 @body_bg_color: unset;
 
-@checkbox_bg_unchedked: @fg_alt;
-@checkbox_bg_checked: @bg_primary;
-@checkbox_check: @fg_alt;
+// Governs user intractable controls like checkboxes, or dropdowns
+@active_control_bg: @bg_primary;
+@active_control_fg: @fg_alt;
+@inactive_control_bg: @bg_dark;
+@inactive_control_fg: @fg;
+
+@checkbox_bg_unchecked: @active_control_fg;
+@checkbox_bg_checked: @active_control_bg;
+@checkbox_check: @active_control_fg;
 
 @std_lr_padding: 20px;
 @content_margin_bottom: 15px;
@@ -307,14 +326,14 @@
     width: 30px;
     height: 30px;
     border: 2px solid @seperator_color;
-    background: @fg_alt;
-    border-radius: 5px;
+    background: @checkbox_bg_unchecked;
+    border-radius: @minor_rounding_factor;
     transition: background 0.25s ease-in-out;
     cursor: pointer;
     position: relative;
 
     &:checked {
-      background: @bg_primary;
+      background: @checkbox_bg_checked;
 
       &:after {
         content: '';
