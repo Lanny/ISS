@@ -17,6 +17,10 @@
 @white: #FF00FF;
 @body_bg_color: unset;
 
+@checkbox_bg_unchedked: @fg_alt;
+@checkbox_bg_checked: @bg_primary;
+@checkbox_check: @fg_alt;
+
 @std_lr_padding: 20px;
 @content_margin_bottom: 15px;
 @body_font_family: Verdana, Lucida, Arial, Helvetica, sans-serif;
@@ -295,11 +299,37 @@
     display: flex;
     flex-direction: row-reverse;
     gap: 6px;
+    align-items: center;
   }
 
   #id_@{name} {
-    flex: 0;
-    transform: scale(1.25);
+    appearance: none;
+    width: 30px;
+    height: 30px;
+    border: 2px solid @seperator_color;
+    background: @fg_alt;
+    border-radius: 5px;
+    transition: background 0.25s ease-in-out;
+    cursor: pointer;
+    position: relative;
+
+    &:checked {
+      background: @bg_primary;
+
+      &:after {
+        content: '';
+        border-style: solid;
+        border-width: 0 2px 2px 0;
+        border-color: @checkbox_check;
+        position: absolute;
+        display: block;
+        width: 8px;
+        height: 18px;
+        transform: rotate(45deg);
+        top: 1px;
+        left: 8px;
+      }
+    }
   }
 
   [for="id_@{name}"] {
