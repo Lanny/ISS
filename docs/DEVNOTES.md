@@ -1,33 +1,31 @@
 # DEVNOTES
 
 ## Code Layout
-There are two main parts to the ISS code, the frontend and the backend. The backend consists of the typical Django components, views, models, form etc. The fontend is a gulp pipeline that produces static assets for the site. It lives under the `src/statcs` directory. It outputs into the static directory which the backend either serves directly in development mode or processes to be served by something like nginx in production.
+There are two main parts to the ISS code, the frontend and the backend. The backend consists of the typical Django components, views, models, form etc. The fontend is a gulp pipeline that produces static assets for the site. It lives under the `src/statics` directory. It outputs into the static directory which the backend either serves directly in development mode or processes to be served by something like nginx in production.
 
 ## Setting it up
 
 The easiest way to get a development environment up and running is to use the dockerized environment. This removes much of the headache of figuring out dependencies, configuration, and OS specific oddities. To get started make sure you have docker and docker-compose installed (Docker Desktop is the usual way to get these on dev machines) and simply:
 
 ```
-docker-compose up --build
+docker compose -f docker-compose.dev.yml up --build
 ```
 
-The docker containers use a hefty amount of storage and come with some startup overhead. This is usually not a big deal, but if you'd like to run ISS without dockerization see the [legacy setup instructions](../docs/SETUP_LEGACY.md).
+This should start up a functioning instance of ISS. When you edit files, your dev server should automatically reload and it's generally not necessary to restart the dev server during development.
 
-### Creating an admin
-You can simply:
-
-```
-docker exec -it iss_web_1 ./manage.py createsuperuser
-```
-
-In general, any time you might want to run a management command or do some operation in the webserver environment, it will look like:
+The first time you start up the dev server, your database will likely be empty. As a recommended starting point, you can can load some seed data into your database:
 
 ```
-docker exec -it iss_web_1 <your command here>
+docker exec -i $(docker ps | grep postgres | awk '{ print $1 }') psql -U iss_user -v -d iss < seed-data.sql
 ```
 
-Note that the container must be up in order for this to work.
+This will create a few users and example forum to play around with. The superuser in this dataset has the username `admin` and the password `password`.
 
+Often during development, you'll want to start a repl or run other management commands, you can do that like so:
+
+```
+docker exec -w /opt/ISS/src -it $(docker ps | grep iss-web | awk '{ print $1 }') ./manage.py shell
+```
 ## Development Tips
 - When debug mode is on, you can use ctrl+P on any page to cycle through the available themes without reloading a page.
 
