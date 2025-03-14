@@ -613,6 +613,12 @@ class PostSnapshot(models.Model):
     obsolesced_by = models.ForeignKey(Poster, on_delete=models.CASCADE)
     obsolescing_ip = models.GenericIPAddressField(null=True)
 
+    def __str__(self):
+        return 'Snapshot of post %d at %s (%d)' % (
+            self.post_id,
+            self.time,
+            self.pk
+        )
 
 class Thanks(models.Model):
     class Meta:

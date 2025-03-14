@@ -132,5 +132,6 @@ FORUM_CONFIG = {
     'extensions': [],
     'initial_account_period_total': 1,
     'disable_captchas': False,
-    'captcha_period': 200,
+    'captcha_period': 0,
+    'initial_account_period_total': 0,
 }

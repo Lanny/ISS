@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Updated default font size across themes to 14px
 - Minor visual updates to user settings page
 - Fixed visual z-index bug in auto-suggest dropdowns, noticeable when searching for a user on the user index page
+- Fixed several issues in model admin where a select for a related field would enumerate all possible options, even in cases where possible relations might number in the thousands or millions (e.g. selecting the post to which a thanks belongs). Such fields are now read-only
 
 ## 1.0.0
 

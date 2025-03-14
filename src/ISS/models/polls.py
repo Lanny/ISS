@@ -41,6 +41,9 @@ class Poll(models.Model):
         denom = 1.0 * (sum((len(opt.votes.all()) for opt in opts)) or 1)
         return {opt: len(opt.votes.all()) * 100.0 / denom for opt in opts}
 
+    def __str__(self):
+        return 'Poll: %s' % self.question
+
 
 class PollOption(models.Model):
     poll = models.ForeignKey(Poll, null=False, on_delete=models.CASCADE)
