@@ -1,5 +1,6 @@
 import pytz
 import traceback
+from uuid import uuid4
 
 from django.conf import settings
 from django.utils import timezone
@@ -72,3 +73,30 @@ class PMAdminMiddleware(BaseMiddleware):
             message)
 
         return None
+
+CSP_BASE = '; '.join([
+    key + ' ' + ' '.join(value)
+    for (key, value)
+    in {
+        'default-src': ["'self'", "'nonce-%s'"],
+        'style-src-attr': ["'unsafe-inline'"],
+        'img-src': ['*', 'data:'],
+        'media-src': ['*'],
+        'frame-src': [
+            'https://www.youtube.com',
+            'https://www.bitchute.com',
+            'https://bandcamp.com',
+        ],
+        'object-src': ["'none'"],
+    }.items()
+])
+
+class CSPMiddleware(BaseMiddleware):
+    def __call__(self, request):
+        nonce = 'wariat-' + uuid4().hex
+
+        request.NONCE = nonce
+        response = self.get_response(request)
+        response['Content-Security-Policy'] = CSP_BASE % nonce
+
+        return response

@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Features
 - Added in-app captchas to replace google recaptcha, because recaptcha is cancer
+- Added `ISS.middleware.CSPMiddleware`. Adopting this middleware is not required, but strongly recommended as it provides valuable XSS mitigation.
 
 ### Deprecations
 - Removed `recaptcha_settings` from FORUM_CONFIG

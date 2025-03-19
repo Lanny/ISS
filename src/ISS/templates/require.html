@@ -1,7 +1,7 @@
 {% load static %}
 
 {% if allow_js %}
-  <script>
+  <script nonce="{{ request.NONCE }}">
     window.config = {
       'bandcamp-embed-url': "{% url 'embed-bandcamp' %}",
       'editor-buttons': {% if editor_buttons %}true{% else %}false{% endif %},
@@ -23,7 +23,7 @@
   </script>
 
   <script type="text/javascript" src="{% static 'js/require.js' %}"></script>
-  <script type="text/javascript">
+  <script type="text/javascript" nonce="{{ request.NONCE }}">
     requirejs.config({
       baseUrl: '{% static "js/base.js" %}.'.split('/').slice(0,-1).join('/'),
       paths: {
