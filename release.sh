@@ -23,3 +23,5 @@ docker push lannysport/iss:latest
 docker push lannysport/iss:$MAJOR
 docker push lannysport/iss:$MINOR
 docker push lannysport/iss:$FULL
+
+git push origin tag "v$FULL"
