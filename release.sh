@@ -4,7 +4,6 @@ MAJOR=$(cat VERSION | sed -r 's/([0-9]+)\.([0-9]+)\.([0-9]+)/\1/')
 MINOR=$(cat VERSION | sed -r 's/([0-9]+)\.([0-9]+)\.([0-9]+)/\1.\2/')
 FULL=$(head -n 1 VERSION)
 
-
 git diff-files --quiet
 if [ $? -eq 1 ]; then
   echo "Uncomitted changes in git, bailing"
