@@ -59,3 +59,23 @@ class PrivateMessageViewsTestCase(tutils.ForumConfigTestCase):
         path = reverse('read-pm', kwargs={'pm_id': sent_pm.pk})
         response = self.kurt_client.get(path)
         self.assertEqual(response.status_code, 403)
+
+    def test_mak_all_as_read(self):
+        (sent_1,), _ = tutils.send_pm(self.kurt, [self.bertrand])
+        (sent_2,), _ = tutils.send_pm(self.kurt, [self.bertrand])
+        (sent_3,), _ = tutils.send_pm(self.bertrand, [self.kurt])
+
+        sent_1.read = True
+        sent_1.save()
+
+        path = reverse('pms-action')
+        response = self.bertrand_client.post(path, {
+            'action': 'mark-all-read'
+        })
+        self.assertEqual(response.status_code, 302)
+
+        self.assertTrue(PrivateMessage.objects.get(pk=sent_1.pk).read)
+        self.assertTrue(PrivateMessage.objects.get(pk=sent_2.pk).read)
+
+        # Bertrand's action shouldn't impact Kurt's PMs
+        self.assertFalse(PrivateMessage.objects.get(pk=sent_3.pk).read)

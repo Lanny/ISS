@@ -168,6 +168,8 @@ class PrivateMessageActions(utils.MethodSplitView):
             action = form.cleaned_data['action']
             if action == 'delete-message':
                 return self._handle_delete_messages(request)
+            if action == 'mark-all-read':
+                return self._handle_mark_all_read(request)
             else:
                 raise Exception('Unexpected action.')
         else:
@@ -182,6 +184,15 @@ class PrivateMessageActions(utils.MethodSplitView):
             if message.inbox != request.user:
                 raise PermissionDenied('You can\'t delete that!')
             message.delete()
+
+        target = request.POST.get('next', None)
+        return HttpResponseRedirect(target)
+
+    @transaction.atomic
+    def _handle_mark_all_read(self, request):
+        PrivateMessage.objects \
+            .filter(inbox=request.user, read=False) \
+            .update(read=True)
 
         target = request.POST.get('next', None)
         return HttpResponseRedirect(target)
