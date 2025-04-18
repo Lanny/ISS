@@ -67,8 +67,15 @@ def robots(request):
         'Disallow: /pms/',
         'Disallow: /api/',
         'Disallow: /embed/',
+        '# The following urls are lists of posts, they are all available under',
+        '# /thread/* which is their cannonical location for crawling',
         'Disallow: /search',
         'Disallow: /search/',
+        'Disallow: /post/',
+        'Disallow: /user/*/posts$',
+        'Disallow: /user/*/thankedposts$',
+        'Disallow: /user/*/poststhanked$',
+        'Disallow: /user/*/threads$',
     ]
 
     for forum in Forum.objects.filter(is_trash=True):
