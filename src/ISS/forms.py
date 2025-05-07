@@ -681,7 +681,7 @@ class ReportPostForm(forms.Form):
                               widget=forms.Textarea())
 
     def __init__(self, *args, **kwargs):
-        forms.Form.__init__(self, *args, **kwargs)
+        CaptchaForm.__init__(self, *args, **kwargs)
         self.fields['reason'] = forms.ChoiceField(
             label='Reason for reporting',
             choices=utils.get_config('report_reasons'),
