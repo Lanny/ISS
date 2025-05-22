@@ -16,6 +16,7 @@
       this._pendingQuery = null;
       this._selectedOption = 0;
       this._hasFocus = false;
+      this._isOpen = false;
 
       this._bindHandlers();
     }
@@ -24,6 +25,9 @@
       _bindHandlers: function() {
         var self = this;
         this._el.on('keydown', function(e) {
+          if (!self._isOpen)
+            return
+
           if (e.keyCode === 38) {
             e.preventDefault();
             self._selectedOption = Math.max(self._selectedOption - 1, 0);
@@ -125,9 +129,11 @@
         if (!this._hasFocus)
           return; 
 
+        this._isOpen = true;
         this._suggestionsBox.css('display', 'block');
       },
       _close: function() {
+        this._isOpen = false;
         this._suggestionsBox.css('display', 'none');
       }
     }

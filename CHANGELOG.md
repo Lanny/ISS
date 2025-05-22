@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added as "mark all as read" action in the private messages list views
 - Blacklist a few non-canonical URLs that contain post content (e.g. user list-of-posts pages, post-by-id URLs) in robots.txt
 
+### Bugfix/Trivial
+- Fixed issue where some password managers would treat the find-user field on the /members page like a login form
+- Fixed bug with find-user form where pressing enter (when auto-suggest was closed) wouldn't submit the form
+
 ## 1.1.0
 
 ### Features
