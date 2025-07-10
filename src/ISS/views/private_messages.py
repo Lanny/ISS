@@ -101,6 +101,7 @@ def read_pm(request, pm_id):
 class NewPrivateMessage(utils.MethodSplitView):
     login_required = True
     active_required = True
+    approval_required = True
 
     ctx_defaults = {
         'page_name': 'Compose New Private Message',

@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added as "mark all as read" action in the private messages list views
 - Blacklist a few non-canonical URLs that contain post content (e.g. user list-of-posts pages, post-by-id URLs) in robots.txt
 - Add the `tstm` function to the admin shell so I don't have to go look up the source listing every time I do this
+- Add a simple account approval system that can be opted into via the `new_accounts_require_approval` config option (boolean)
 
 ## 1.1.0
 

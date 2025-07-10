@@ -533,6 +533,7 @@ def search(request):
 class NewThread(utils.MethodSplitView):
     require_login = True
     unbanned_required = True
+    approval_required = True
 
     def _get_form(self, request):
         return utils.conditionally_captchatize(request, forms.NewThreadForm)
@@ -584,6 +585,7 @@ class NewThread(utils.MethodSplitView):
 class NewReply(utils.MethodSplitView):
     require_login = True
     unbanned_required = True
+    approval_required = True
 
     def _get_form(self, request):
         return _get_new_post_form(request)

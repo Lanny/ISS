@@ -135,4 +135,5 @@ FORUM_CONFIG = {
     'disable_captchas': False,
     'captcha_period': 0,
     'initial_account_period_total': 0,
+    'new_accounts_require_approval': True,
 }

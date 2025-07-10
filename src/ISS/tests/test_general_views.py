@@ -184,6 +184,19 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
         })
         self.assertEqual(self.scrub.get_post_count(), post_count + 1)
 
+    def test_new_post_when_unapproved(self):
+        thread = Thread.objects.all()[0]
+        path = reverse('new-reply', kwargs={'thread_id': thread.pk})
+
+        self.scrub.is_approved = False
+        self.scrub.save()
+
+        response = self.scrub_client.post(path, {
+            'content': 'P = NP?',
+            'thread': thread.pk
+        })
+        self.assertEqual(response.status_code, 403)
+
     def test_new_post_too_long(self):
         thread = Thread.objects.all()[0]
         path = reverse('new-reply', kwargs={'thread_id': thread.pk})
@@ -254,6 +267,23 @@ class GeneralViewTestCase(tutils.ForumConfigTestCase):
         subscription = ThreadFlag.objects.get(poster=self.scrub,
                                               thread=thread)
         self.assertTrue(subscription.subscribed)
+
+    def test_new_thread_when_unapproved(self):
+        forum = Forum.objects.all()[0]
+        path = reverse('new-thread', kwargs={'forum_id': forum.pk})
+
+        self.scrub.is_approved = False
+        self.scrub.save()
+
+        response = self.scrub_client.post(
+            path,
+            {
+                'title': 'SAT is a lie',
+                'content': 'NP erect lol',
+                'forum': forum.pk
+            })
+
+        self.assertEqual(response.status_code, 403)
 
     def test_subscribe_on_view(self):
         self.scrub.auto_subscribe = 2
@@ -842,6 +872,25 @@ class RegistrationDisabledTestCase(tutils.ForumConfigTestCase):
             })
 
         self.assertEqual(Poster.objects.count(), initial_user_count)
+
+
+class RegistrationWithApprovalTestCase(AbstractRegistrationTestCase):
+    forum_config = {
+        'enable_registration': True,
+        'new_accounts_require_approval': True,
+    }
+
+    def setUp(self):
+        tutils.create_std_forums()
+        self.anon_client = Client()
+        self.path = reverse('register')
+
+    def test_user_created_without_approval(self):
+        initial_user_count = Poster.objects.count()
+        self._register(username="CM1", email= "Colin.Maclaurin@gov.scot")
+
+        cm = Poster.objects.get(username='CM1')
+        self.assertFalse(cm.is_approved)
 
 class RegistrationByInviteTestCase(tutils.ForumConfigTestCase):
     forum_config = {

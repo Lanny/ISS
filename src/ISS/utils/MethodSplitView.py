@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseBadRequest, \
         HttpResponseForbidden
 
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
 from ISS.utils.misc import get_ban_403_response
@@ -42,6 +43,14 @@ class MethodSplitView(object):
 
             if request.user.is_banned():
                 return get_ban_403_response(request)
+
+        if getattr(self, 'approval_required', False):
+            if not request.user.is_authenticated:
+                return HttpResponseForbidden(
+                    'You must be authenticated to take this action.')
+
+            if not request.user.is_approved:
+                return render(request, 'unapproved_notification.html', status=403)
 
         meth = getattr(self, request.method, None)
 

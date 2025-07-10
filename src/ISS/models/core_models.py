@@ -57,6 +57,7 @@ class Poster(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=True)
     has_report_privilege = models.BooleanField(default=True)
     tripphrase = models.CharField(max_length=256, null=True, blank=True)
 

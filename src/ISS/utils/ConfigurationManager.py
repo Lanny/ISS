@@ -61,6 +61,7 @@ class ConfigurationManager(Singleton):
         'initial_account_period_total': 150,
         'initial_account_period_width': datetime.timedelta(days=1),
         'initial_account_period_limit': 20,
+        'new_accounts_require_approval': False,
         'disable_captchas': False,
         'captcha_period': 0,
         'enable_registration': True,

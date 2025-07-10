@@ -233,9 +233,32 @@ class RegisterUser(utils.MethodSplitView):
         return render(request, 'register.html', ctx)
 
     def _create_poster(self, form):
+        approval_required = utils.get_config('new_accounts_require_approval')
+
         poster = form.save()
         poster.is_active = False
+        poster.is_approved = not approval_required
         poster.save()
+
+        if approval_required:
+            message = '''
+                The following user has signed up and required approval before they can post:
+
+                Username: %s
+                Email Address: %s
+
+                [url=/admin/ISS/poster/%d/change/]Admin Link[url]
+            ''' % (
+                poster.username,
+                poster.email,
+                poster.pk,
+            )
+
+            PrivateMessage.send_pm(
+                Poster.get_or_create_system_user(),
+                Poster.objects.filter(is_admin=True),
+                'New user "%s" has registered' % poster.username,
+                message)
 
         return poster
 
