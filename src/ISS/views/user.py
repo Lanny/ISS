@@ -456,7 +456,9 @@ class UserIndex(utils.MethodSplitView):
 
 class FindUser(utils.MethodSplitView):
     def POST(self, request):
-        username = request.POST.get('username', '')
+        # Reverse field name to avoid password managers treating it like a
+        # login field.
+        username = request.POST.get('emanresu', '')
         norm_username = Poster.iss_normalize_username(username)
 
         try:

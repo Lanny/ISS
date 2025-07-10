@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Add the `tstm` function to the admin shell so I don't have to go look up the source listing every time I do this
 - Add a simple account approval system that can be opted into via the `new_accounts_require_approval` config option (boolean)
 
+### Bugfix/Trivial
+- Fixed issue where some password managers would treat the find-user field on the /members page like a login form
+- Fixed bug with find-user form where pressing enter (when auto-suggest was closed) wouldn't submit the form
+
 ## 1.1.0
 
 ### Features
