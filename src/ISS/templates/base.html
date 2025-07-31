@@ -86,6 +86,21 @@
         </div>
       </div>
 
+      {% if user.is_authenticated and not user.is_approved %}
+        <div class="page-message">
+          <div class="icon-container">
+            <div class="alert-icon"></div>
+          </div>
+          <div class="message-content">
+            <p>
+              Your account isn't approved yet, you won't be able to post or
+              message users until it is. An approver has been notified and your
+              account should be reviewed soon.
+            </p>
+          </div>
+        </div>
+      {% endif %}
+
       {% if allow_js %}
         <noscript>
           <div class="page-message">
