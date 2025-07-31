@@ -16,7 +16,7 @@ This should start up a functioning instance of ISS. When you edit files, your de
 The first time you start up the dev server, your database will likely be empty. As a recommended starting point, you can can load some seed data into your database:
 
 ```
-docker exec -i $(docker ps | grep postgres | awk '{ print $1 }') psql -U iss_user -v -d iss < seed-data.sql
+docker exec -i $(docker ps | grep 'iss[-_]db' | awk '{ print $1 }') psql -U iss_user -v -d iss < seed-data.sql
 ```
 
 This will create a few users and example forum to play around with. The superuser in this dataset has the username `admin` and the password `password`.
