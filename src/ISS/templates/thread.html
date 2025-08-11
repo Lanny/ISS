@@ -118,6 +118,21 @@
       </form>
     {% endif %}
 
+          {% block navigation %}
+        <div class="breadcrumb">
+          <h3>Navigation</h3>
+
+          <div class="crumbs">
+            <a class="crumb" href="{% url "forum-index" %}">
+              {{ config.forum_name }}
+            </a>
+
+            {% block breadcrumb %}
+            {% endblock %}
+          </div>
+        </div>
+      {% endblock %}
+
     {% if not thread.can_reply %}
       <div class="page-message">
         <div class="icon-container">
