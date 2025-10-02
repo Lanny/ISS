@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Bugfix/Trivial
 - Fixed issue where some password managers would treat the find-user field on the /members page like a login form
 - Fixed bug with find-user form where pressing enter (when auto-suggest was closed) wouldn't submit the form
+- Misc dependency updates, including security updates for Django 
 
 ## 1.1.0
 
